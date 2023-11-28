@@ -9,7 +9,7 @@ import {categoryCombos} from "./categorias/combos.js"
 
 import { ref } from "vue"
 
-const version_menu = ref(1)
+const version_menu = ref(1.4)
 const menuGlobal = [
     categorySalchipapa,
     categoryHamburguers,

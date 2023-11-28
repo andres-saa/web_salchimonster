@@ -95,10 +95,14 @@ onMounted(() => {
     //   }
 
     // })
+
     menuOptions.value[0].menus = menuGlobal
     localStorage.setItem('menu', JSON.stringify(menuGlobal))
     localStorage.setItem('versionMenu', version_menu.value)
     console.log('nuevo menu')
+    localStorage.removeItem('cart')
+    localStorage.removeItem('currentNeigborhood')
+
   }
 
 
