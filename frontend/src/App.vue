@@ -15,7 +15,7 @@ import { domicilio,quantity } from './service/cart';
 // import { cart } from './service/cart';
 // import {vue} from 'vue';imp
 import { cities } from './service/citiesService';
-import { menuGlobal } from './service/menu/menu';
+import { menuGlobal,version_menu } from './service/menu/menu';
 // import { PrimeIcons } from 'primevue/api';
 import { formatoPesosColombianos } from './service/formatoPesos';
 // import TarjetaMenu from './components/TarjetaMenu.vue';
@@ -45,7 +45,6 @@ const c_neigbor = ref(localStorage.getItem('currentNeigborhood'))
 
 onMounted(() => {
 
-  domicilio.value = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
 
 
 
@@ -75,9 +74,16 @@ onMounted(() => {
   console.log(JSON.parse((localStorage.getItem('menu'))))
   // cart.value = JSON.parse(localStorage.getItem('cart'))
 
-  if (localStorage.getItem('menu')) {
-    console.log('habia')
-    menuOptions.value[0].menus = JSON.parse(localStorage.getItem('menu'))
+  if (localStorage.getItem('menu') && localStorage.getItem('versionMenu') && parseFloat(localStorage.getItem('versionMenu')) ==  version_menu.value) {
+    const version_local = parseFloat(localStorage.getItem('versionMenu')) 
+    console.log(version_local, version_menu.value)
+
+  
+      console.log('habia')
+      menuOptions.value[0].menus = JSON.parse(localStorage.getItem('menu'))
+    // menuOptions.value[0].version = JSON.parse(localStorage.getItem('versionMenu'))
+
+    
   } else {
 
     //   getMenu().then(products => {
@@ -91,6 +97,8 @@ onMounted(() => {
     // })
     menuOptions.value[0].menus = menuGlobal
     localStorage.setItem('menu', JSON.stringify(menuGlobal))
+    localStorage.setItem('versionMenu', version_menu.value)
+    console.log('nuevo menu')
   }
 
 
@@ -269,7 +277,7 @@ const cargarSalsas = (item) => {
 </script>
 
 <template>
-  <router-view  style="background-color: ;" class="col-12 p-0 m-0" :class="screenWidth<800 && ruta.fullPath == '/cart' || ruta.fullPath == '/pay' ? 'fondo-movil':'fondo-pc'"  />
+  <router-view  style="background-color: ;" class="col-12 p-0 m-0" :class="screenWidth<800 && ruta.fullPath == '/cart' || ruta.fullPath == '/pay' || screenWidth<800 && ruta.fullPath == '/menu'? 'fondo-movil':'fondo-pc'"  />
   <!-- <Dialog v-if="menuOptions[0].menus.length < 2" v-model:visible="menuOptions" modal header="Header"
         :style="{ width: '100%', border: 'none', overflow: 'hidden' }" :breakpoints="{ '960px': '75vw', '641px': '100vw' }">
         <img class="imagen" style="" src="http://localhost:5173/src/images/logo.png" alt="">

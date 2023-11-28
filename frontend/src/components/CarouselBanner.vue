@@ -15,9 +15,9 @@
 
 
 
-<div  id="banner" class="carousel slide p-0 m-0" data-ride="carousel" style="border-radius: ; outline: 20px solid var(--primary-color);">
+<div   id="banner" class="carousel slide p-0 m-0" data-ride="carousel" style="border-radius:1rem ; outline: 20px solid var(--primary-color);">
     
-    <div class="carousel-inner p-0 " style="width: 100%;height: ;">
+    <div class="carousel-inner p-0 " style="border-radius: 1rem; width: 100%;height: ;">
       <div class="carousel-item active sm:d-none p-0" style="width: 100%;">
         <img class="p-0" style="width: 100%;height: 100%;  object-fit: contain; " :src="`/images/banners/banner-1.jpeg`" alt="">
       </div>

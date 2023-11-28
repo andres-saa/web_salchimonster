@@ -137,8 +137,13 @@
             <InputText type="text" class="col-12 p-1  mb-4" v-model="user_data.user_phone" />
             </div>
 
-    <button @click="send_order()">enviar</button>
+            <div class="col-12 p-6 d-flex justify-content-center">
+                <button @click="send_order()" class="col-6 "
+                        style=" width: 100%;border:none; background-color: var(--primary-color); color: white; border-radius: 0.6rem; padding: 0.5rem;">
+                        <span class="text-xl" style="font-weight: bold;margin-top: 5rem;">FINALIZAR COMPRA</span></button>
 
+            </div>
+            
        </div>
 
 

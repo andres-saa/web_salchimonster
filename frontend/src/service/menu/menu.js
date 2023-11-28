@@ -7,7 +7,9 @@ import { categoryMalteadas } from "./categorias/Malteadas"
 import { categoryAlmuersos } from "./categorias/almuersos.js"
 import {categoryCombos} from "./categorias/combos.js"
 
+import { ref } from "vue"
 
+const version_menu = ref(1)
 const menuGlobal = [
     categorySalchipapa,
     categoryHamburguers,
@@ -17,4 +19,4 @@ const menuGlobal = [
     // categoryCombos
 ]
 
-export { menuGlobal }
+export { menuGlobal,version_menu }

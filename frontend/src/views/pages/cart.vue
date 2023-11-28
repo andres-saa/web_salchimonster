@@ -66,7 +66,7 @@
 
 
 
-                    <div class="triangulo"></div>
+                    <!-- <div class="triangulo"></div> -->
                 </div>
 
 
@@ -411,8 +411,8 @@
 
             <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
-                <span style="font-weight: bold; text-transform: uppercase;"> DOMICILIO A {{ domicilio.name }}</span>
-                <span style="font-weight: bold;"> {{ formatoPesosColombianos(domicilio.deliveryPrice) }} </span>
+                <span style="font-weight: bold; text-transform: uppercase;"> DOMICILIO A <span @click="setShowDialog()" style="margin-right: 1rem; cursor: pointer; color: var(--primary-color);">{{ domicilio.name }}</span> </span>
+                <span style="font-weight: bold; margin-right: 1rem"> {{ formatoPesosColombianos(domicilio.deliveryPrice) }} </span>
 
             </div>
 
@@ -469,7 +469,7 @@ import { PrimeIcons } from 'primevue/api';
 import { order_notes } from '@/service/order.js'
 import { quitarSalsas, eliminarSalsaDelCarrito, agregarSalsasAlCarrito, domicilio, useCart, eliminarAdicionDelCarrito, agregarAdicionAlCarrito, products, updateCart, contarObjetosRepetidos, quitarElementos } from '../../service/cart';
 import { useRoute } from 'vue-router';
-import { calcularPrecioTotal, calcularTotalCarrito } from '../../service/state';
+import { calcularPrecioTotal, calcularTotalCarrito, setShowDialog } from '../../service/state';
 import { adiciones } from '../../service/menu/adiciones/adiciones';
 const showAditionsDialog = ref(false)
 import { URI } from '../../service/conection';
@@ -505,6 +505,8 @@ const updateScreenWidth = () => {
 
 onMounted(() => {
     window.addEventListener('resize', updateScreenWidth);
+domicilio.value = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
+
 });
 
 onBeforeUnmount(() => {

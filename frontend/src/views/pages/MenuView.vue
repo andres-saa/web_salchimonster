@@ -1,10 +1,10 @@
 <template >
     <p class="mb-6" style="; text-align: center; width: 100%; font-size: 36px; font-weight: bold; background-color: ;">
-        Monster <span style="color:var(--primary-color) ;">Menú</span>
+        Menú <span style="color:var(--primary-color) ;"></span>
     </p>
 
-    <div v-if="isSmallScreen" style="   ; top:5rem;width:; position: sticky;z-index: 50;background-color: white;height:;outline: 2rem solid rgb(255, 255, 255);margin-bottom: 5rem; padding: 3rem;display: flex;align-items: center" class="" >
-        <div  class="grid col-12 m-0  " style="margin-bottom: ;   box-shadow: 0px 0px 30px rgba(0, 0, 0, 2);  outline: 0.6rem solid var(--primary-color); padding: 0rem 0;border-radius: 100px;   ;  ; height: min-content; background-color: white;">
+    <div v-if="isSmallScreen" style="b  ; top:5rem;width:; position: sticky;z-index: 50;background-color: ;outline: 2rem solid transparent;margin-bottom: 5rem; padding: 3rem;display: flex;align-items: center" class="" >
+        <div  class="grid col-12 m-0  " style="margin-bottom: ;   box-shadow: 0px 0px 50px rgba(0, 0, 0, 1);  outline: 0.6rem solid var(--primary-color); padding: 0rem 0;border-radius: 100px;   ;  ; height: min-content; background-color: white;">
 
 
             
@@ -49,7 +49,7 @@
 
         <div class="grid  xl:col-10 xl:m-auto  " style="background-color:var(--primary-color); border-radius:2rem; margin-bottom: 5rem;">
 
-            <div v-if="currentSection" v-for="product in currentSection.products" class="xl:col-3 lg:col-4 md:p-3 col-6 p-1 ">
+            <div v-if="currentSection" v-for="product in currentSection.products" class="xl:col-3 lg:col-4 md:p-3 col-6 p-3 ">
                 <TarjetaMenu style="width: 100%;" class="" :product="product"></TarjetaMenu>
 
                 <!-- <TarjetaMenu class=""></TarjetaMenu> -->
@@ -83,7 +83,7 @@ import { formatoPesosColombianos } from '../../service/formatoPesos';
 
 const screenWidth = ref(window.innerWidth);
 
-const isSmallScreen = computed(() => screenWidth.value < 720);
+const isSmallScreen = computed(() => screenWidth.value < 800);
 
 const updateScreenWidth = () => {
   screenWidth.value = window.innerWidth;

@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
 import axios from 'axios';
+import { setShowDialog } from '../service/state';
 
 import { URI } from '@/service/conection'
 import { menuOptions } from '@/service/menuOptions';
@@ -43,13 +44,14 @@ const router = createRouter({
           path: '/cart',
           name: 'cart',
           component: () => import('@/views/pages/cart.vue'),
+          meta: { requirelocation: true },
           // meta: { requireMenu: true },
         },
         {
           path: '/pay',
           name: 'pay',
           component: () => import('@/views/pages/pay.vue'),
-          // meta: { requireMenu: true },
+          meta: { requirelocation: true },
         },
 
 
@@ -244,26 +246,24 @@ const router = createRouter({
   ]
 });
 
-router.beforeEach((to, from, next) => {
-  const reqMenu = to.matched.some((record) => record.meta.requireMenu);
-
-  if (reqMenu) {
-    // Verifica si el usuario tiene un token de acceso válido en el Local Storage
-    const menu = ableMenu.value
-
-    if (!menu) {
-      // Si no tiene un token válido, redirige al inicio de sesión
-      next('/menu');
+router.beforeEach(async (to, from, next) => {
+  // Verificar si la ruta requiere autenticación
+  if (to.meta.requirelocation) {
+    // Obtener el token de acceso desde localStorage
+    const location = localStorage.getItem('currentNeigborhood');
+    if (!location) {
+      // Si no hay un token de acceso, redirigir a la página de inicio de sesión
+      setShowDialog()
+      next('/');
     } else {
-      // Si tiene un token válido, verifica su validez en el backend con fetch
-
-      // Si la ruta no requiere autenticación, permite el acceso
+      // Si hay un token de acceso, continuar con la navegación
       next();
     }
-
-  }else{
-    next()
-  }});
+  } else {
+    // Si la ruta no requiere autenticación, continuar con la navegación
+    next();
+  }
+});
 
 
 export default router;
