@@ -23,6 +23,8 @@ import { RouterLink } from 'vue-router';
 import router from '@/router/index.js'
 import { useCart } from './service/cart';
  
+
+const version_tienda = ref(3)
 const screenWidth = ref(window.innerWidth);
 console.log(screenWidth.value)
 // Función para actualizar el valor del ancho de la pantalla
@@ -38,6 +40,59 @@ window.addEventListener('resize', updateScreenWidth);
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateScreenWidth);
 });
+
+
+
+
+
+const storedVersion = localStorage.getItem('version_tienda');
+
+// Check if it doesn't exist in local storage
+if (!storedVersion) {
+  // If it doesn't exist, save the current version to local storage
+  localStorage.setItem('version_tienda', version_tienda.value);
+} else {
+  // If it exists, compare with the current version
+  if (parseInt(storedVersion) !== version_tienda.value) {
+    // If it's not equal, update the local storage with the current version
+    localStorage.setItem('version_tienda', version_tienda.value);
+    localStorage.removeItem('menu')
+    localStorage.removeItem('cart')
+    localStorage.removeItem('currentNeigborhood')
+
+    // Perform any additional actions needed when the version changes
+    // For example, you might want to update the UI or perform other logic.
+    console.log('Version updated. Do additional actions here.');
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
