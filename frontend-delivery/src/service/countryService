@@ -1,0 +1,25 @@
+var req = unirest("GET", "https://www.universal-tutorial.com/api/getaccesstoken");
+
+  req.headers({
+    "Accept": "application/json",
+    "api-token": "AuXnFjES43NqbdODZoc1anLtpO9op_9HsA7hqU56HJoxlbbNrMsUAzmsp6cqoZ0HhWQ",
+    "user-email": "abc@gmail.com"
+  });
+
+
+
+const requestOptions = {
+    method: 'GET',
+    headers: {
+        "Accept": "application/json",
+        "api-token": "w3Z_dBq9u6zKLbUq4Tt6nzhr0p_PzKmpgbsz0tM75n0HZQpbwqMs99F-t0l3ym7DxkI",
+        "user-email": "andrew19f@gmail.com"
+      }
+};
+
+// Realizar la solicitud Fetch
+fetch("https://www.universal-tutorial.com/api/getaccesstoken", requestOptions)
+    .then(response => {console.log(response)})
+    .catch(error => {
+        console.error('Error en la solicitud:', error);
+    });
