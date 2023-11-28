@@ -70,7 +70,11 @@ const useCart = {
 
 const domicilio = ref()
 
-
+if (localStorage.getItem('currentNeigborhood')){
+    domicilio.value = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
+}else{
+    domicilio.value = 'definir domicilio'
+}
 
 
 function contarObjetosRepetidos(arr) {

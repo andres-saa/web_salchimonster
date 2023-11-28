@@ -165,7 +165,7 @@ const setNeigborhood = () => {
   console.log(localStorage.getItem('currentNeigborhood'))
   // setShowDialog()
   location.reload();
-  domicilio.value = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
+  
 
 
 }
@@ -268,7 +268,7 @@ const cargarSalsas = (item) => {
 
 
 
-
+const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood'))) 
 
 
 
@@ -369,7 +369,7 @@ const cargarSalsas = (item) => {
 
     </div>
 
-    <button   @click="setShowDialog" style="width: 3rem;height: 3rem; border: none; position: absolute; right: 2rem; top:1rem;background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center;justify-content: center;">
+    <button v-if="hay_barrio"  @click="setShowDialog" style="width: 3rem;height: 3rem; border: none; position: absolute; right: 2rem; top:1rem;background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center;justify-content: center;">
       <i :class="PrimeIcons.TIMES" style="color: white; font-weight: bold; " class="text-2xl"></i>
 
     </button>
