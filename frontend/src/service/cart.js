@@ -26,6 +26,15 @@ const add = (product) => {
 }
 
 
+function deleteAllCookies() {
+    const cookies = document.cookie.split(';');
+
+    cookies.forEach(cookie => {
+        const [name] = cookie.split('=');
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    });
+}
+
 function quitarElementos(array, elementosAEliminar) {
     console.log('array', array);
     console.log('elementosAEliminar', elementosAEliminar);
@@ -271,4 +280,4 @@ function agregarSalsasAlCarrito(salsaAAgregar, producto) {
 
 
 
-export {quitarSalsas, eliminarSalsaDelCarrito,agregarSalsasAlCarrito,domicilio, quantity,useCart,carro,eliminarAdicionDelCarrito,products,updateCart,contarObjetosRepetidos,quitarElementos,agregarAdicionAlCarrito}
+export {deleteAllCookies, quitarSalsas, eliminarSalsaDelCarrito,agregarSalsasAlCarrito,domicilio, quantity,useCart,carro,eliminarAdicionDelCarrito,products,updateCart,contarObjetosRepetidos,quitarElementos,agregarAdicionAlCarrito}

@@ -21,7 +21,7 @@ import { formatoPesosColombianos } from './service/formatoPesos';
 // import TarjetaMenu from './components/TarjetaMenu.vue';
 import { RouterLink } from 'vue-router';
 import router from '@/router/index.js'
-import { useCart } from './service/cart';
+import { useCart,deleteAllCookies } from './service/cart';
  
 
 const version_tienda = ref(3)
@@ -59,6 +59,7 @@ if (!storedVersion) {
     localStorage.removeItem('menu')
     localStorage.removeItem('cart')
     localStorage.removeItem('currentNeigborhood')
+    deleteAllCookies()
 
     // Perform any additional actions needed when the version changes
     // For example, you might want to update the UI or perform other logic.
