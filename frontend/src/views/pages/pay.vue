@@ -159,6 +159,26 @@
     
     </div>
 
+
+
+
+
+<Dialog class="pt-8" style="background-color: white; border-radius: 1rem;" v-model:visible="showThaks" modal header="Header" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+
+    <div>
+        <p class="text-xl" style="color: black;"> Muchas gracias <span style="text-transform: capitalize;">{{user_data.user_name}}</span>, hemos recibido tu pedido y en breve será despachado</p>
+    </div>
+    
+
+    <button @click="changeThanks"
+                            style="width: 3rem;height: 3rem; border: none; position: absolute; right: 2rem; top:1rem;background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center;justify-content: center; z-index: 9;">
+                            <i :class="PrimeIcons.TIMES" style="color: white; font-weight: bold; " class="text-2xl"></i>
+
+                        </button>
+</Dialog>
+
+
+
 </template>
 
 
@@ -171,9 +191,14 @@ import { useCart,domicilio, eliminarAdicionDelCarrito,agregarAdicionAlCarrito, p
 import { useRoute } from 'vue-router';
 import { calcularPrecioTotal, calcularTotalCarrito, showSiteDialog } from '../../service/state';
 import { adiciones } from '../../service/menu/adiciones/adiciones';
-import { send_order,order_notes,user_data } from '../../service/order';
+import {showThaks, send_order,order_notes,user_data } from '../../service/order';
+import router from '@/router/index.js'
+const changeThanks = () =>{
+    showThaks.value = false
+    // router.push('/')
+    location.reload()
 
-
+}
 const currenNeigborhood = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood.name
 
 

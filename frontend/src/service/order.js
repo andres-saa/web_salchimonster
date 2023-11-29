@@ -2,9 +2,10 @@ import { contarObjetosRepetidos, products } from "./cart";
 import { ref } from "vue";
 import {URI} from '@/service/conection'
 import { domicilio } from "./cart";
+import router from '@/router/index.js'
 const user_data = ref({})
 const order_notes = ref("")
-
+const showThaks = ref(false)
 const currenNeigborhood = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood.name
 
 
@@ -94,7 +95,8 @@ const send_order = async () => {
             // Aquí puedes trabajar con los datos actualizados
             console.log('Datos actualizados:', data);
             localStorage.removeItem('cart')
-            location.reload()
+            showThaks.value = true
+            
         })
         .catch(error => {
             console.error('Error en la solicitud:', error);
@@ -108,4 +110,4 @@ const send_order = async () => {
 
 
 
-export{send_order,order_notes,user_data}
+export{showThaks,send_order,order_notes,user_data}
