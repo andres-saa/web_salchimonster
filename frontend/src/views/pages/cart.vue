@@ -1,8 +1,6 @@
 <template>
-    <p class="col-12 md:col-7 p- text-center text-4xl m-auto mb-5 lg:col-7 md:col-12 sm:col-12 m-auto mb-8"
-        style="border-radius: 2rem; font-weight: bold; color: white; background-color: black;"> <i class="text-4xl pr-3 p-0"
-            :class="PrimeIcons.SHOPPING_CART" style="color: white;"></i>CARRITO DE COMPRAS </p>
-
+    <p class="col-12 md:col-7 p-1 text-center text-4xl m-auto mb-5 lg:col-7 md:col-12 sm:col-12 m-auto mb-8" style="border-radius: 2rem; font-weight: bold; color: white; background-color: black;" > <i class="text-4xl pr-3 p-0" :class="PrimeIcons.SHOPPING_CART" style="color: white;"></i>CARRITO DE COMPRAS </p>
+    
 
 
     <div sty class=" contenedor-principal p-0 md:p-3 grid md:col-12 xl:col-8 xl:ml-auto xl:mr-auto clase"
@@ -17,7 +15,7 @@
 
 
 
-                <div class="nombre-produc ml-2  col p-1 " style="border-radius: 0 .0rem .5rem 0.5rem; background-color: #ffede1
+                <div class="nombre-produc   col p-1 " style="border-radius: 0 .0rem .5rem 0.5rem; background-color: #ffede1
 ;height:100% ;display: flex; flex-direction:column ;justify-content: space-between;overflow:  ">
 
 

@@ -15,16 +15,20 @@
 
 
 
-<div   id="banner" class="carousel slide p-0 m-0" data-ride="carousel" style="border-radius:1rem ; outline: 20px solid var(--primary-color);">
+<div   id="banner" class="carousel slide p-0 m-0" data-ride="carousel" style="border-radius:1rem ;background-color: var(--primary-color); outline: 20px solid var(--primary-color);">
     
     <div class="carousel-inner p-0 " style="border-radius: 1rem; width: 100%;height: ;">
-      <div class="carousel-item active sm:d-none p-0" style="width: 100%;">
-        <img class="p-0" style="width: 100%;height: 100%;  object-fit: contain; " :src="`/images/banners/banner-1.jpeg`" alt="">
+      <div class="carousel-item active sm:d-none p-0" style="width: 100%; border-radius: 2rem;">
+        <img class="p-0" style="width: 100%;height: 100%;max-height: 80vh;border-radius: 2rem;overflow: hidden;  object-fit: contain; " :src="`/images/banners/banner-1.jpeg`" alt="">
       </div>
 
       
-      <div v-for="i in [2,3,4,5,6,7,8]" class="carousel-item p-0 ">
-        <img  style="width: 100%;height:100% ;  object-fit:contain;" :src="`/images/banners/banner-${i}.jpeg`" alt="">
+      <div v-for="i in [2,3,4,5]" class="carousel-item p-0 " style="">
+        <img  style="width: 100%;height:100% ;max-height: 80vh;  object-fit:contain;border-radius: 2rem;" :src="`/images/banners/banner-${i}.jpeg`" alt="">
+
+        <div>
+          
+        </div>
 
       </div>
     </div>

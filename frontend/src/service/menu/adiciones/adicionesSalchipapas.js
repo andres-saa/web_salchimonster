@@ -7,17 +7,17 @@ const adicioneSalchipapas = {
     products: [{
         id:4,
         name: 'CHICHARRON',
-        price:17500
+        price:18500
     },
     {
         id:8,
-        name: 'CRISPY',
-        price:3000
+        name: 'CEBOLLA CRISPY',
+        price:4000
     },
     {
         id:7,
         name: 'CHORIZO',
-        price:11000
+        price:14000
     },
     {
         id:13,
@@ -27,7 +27,7 @@ const adicioneSalchipapas = {
     {
         id:5,
         name: 'COSTILLA AHUMADA EN SALSA BUFALO',
-        price:15400
+        price:16900
     },
     {
         id:6,
@@ -49,7 +49,7 @@ const adicioneSalchipapas = {
     {
         id:11,
         name: 'HUEVO DE CODORNIZ',
-        price:5500
+        price:6000
     },
     {
         id:12,
@@ -65,11 +65,11 @@ const adicioneSalchipapas = {
     {
         id:15,
         name: 'SALCHICHA (PREMIUM SM)',
-        price:8600
+        price:8900
     },
     {
         id:16,
-        name: 'BACON',
+        name: 'BACON PREMIUM',
         price:8800
     },
     {
@@ -90,11 +90,11 @@ const adicioneSalchipapas = {
     {
         id:20,
         name: 'SALCHICHA RANCHERA',
-        price:18500
+        price:20000
     },
     {
         id:21,
-        name: 'RIPIO PAPA',
+        name: 'RIPIO DE PAPA',
         price:3300
     },
     {

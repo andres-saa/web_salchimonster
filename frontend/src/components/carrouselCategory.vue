@@ -15,7 +15,7 @@
 
 
 <div v-if="isSmallScreen" style=" ; width: auto; position: relative">
-  <div  class="container" ref="scrollContainer"  style="background-color: #fff; position: ; display: flex;gap:1rem ; overflow-x: auto;padding-left:0.1rem">
+  <div  class="container pt-5 " ref="scrollContainer"  style="background-color: #fff; position: ; display: flex;gap:1rem ; overflow-x: auto;padding-left:0.1rem">
 
 <div   style="margin:0 0 2rem 0;" v-for="product in category.products" class="item col-6 p-0">
   <TarjetaMenu   style="   ;width: ;"    :product="product"></TarjetaMenu>     
@@ -182,6 +182,7 @@ p {
 
 ::-webkit-scrollbar {
   width: 12px; /* Ancho de la barra de desplazamiento */
+  
 }
 
 /* Estilo del pulgar de la barra de desplazamiento */
@@ -189,6 +190,7 @@ p {
 ::-webkit-scrollbar-thumb {
   background-color: var(--primary-color); /* Color del pulgar de la barra de desplazamiento */
   border-radius: 6px; /* Radio de esquinas del pulgar */
+  margin-bottom: 1rem;
 }
 
    

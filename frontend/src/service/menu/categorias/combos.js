@@ -19,7 +19,7 @@ const categoryCombos = {
         {
             id: 90,
             name: "MADURIMONSTER+GASEOSA 400 ML",
-            price: 35500,
+            price: 36500,
             description: "",
             category_id: 6,
             adiciones:adicioneSalchipapas,
@@ -37,13 +37,37 @@ const categoryCombos = {
         {
             id: 90,
             name: "RANCHIMONSTER + GASEOSA 400 ML",
-            price: 46000,
+            price: 46500,
+            description: "",
+            category_id: 6,
+            adiciones:adicioneSalchipapas,
+           
+        },
+        {
+            id: 90,
+            name: "COMBO ALMUERZO #1 : 1 BASE + ENSALADA + 1 ACOMPAÑANTE + GASEOSA 400 ML",
+            price: 19000,
+            description: "",
+            category_id: 6,
+            adiciones:adicioneSalchipapas,
+           
+        },
+        {
+            id: 90,
+            name: "COMBO ALMUERZO # 2: 1 BASE + 2 ACOMPAÑANTES + GASEOSA 400 ML",
+            price: 21500,
             description: "",
             category_id: 6,
             adiciones:adicioneSalchipapas,
            
         },
       
+      
+
+
+
+
+
        ]
 }
 

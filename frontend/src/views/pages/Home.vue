@@ -9,8 +9,8 @@
     <!-- <CarouselBanner></CarouselBanner>
     <CarouselBanner></CarouselBanner>
     <CarouselSites></CarouselSites> -->
-    <!-- <gridCombo></gridCombo> --> 
-    <!-- <carouselCombo></carouselCombo> -->
+    <!-- <gridCombo></gridCombo>  -->
+    <carouselCombo></carouselCombo>
 
 
     <div class="col-12 xl:text-7xl text-3xl  p-8">
@@ -29,9 +29,10 @@
 </div>
     <carrouselCategory  :category="menuGlobal[0]"></carrouselCategory>
     <carrouselCategory :category="menuGlobal[1]"></carrouselCategory>
-    <carrouselCategory :category="menuGlobal[3]"></carrouselCategory>
+    <!-- <carrouselCategory :category="menuGlobal[3]"></carrouselCategory> -->
     <!-- <carrouselCategory :category="menuGlobal[4]"></carrouselCategory> -->
     <carrouselCategory :category="menuGlobal[2]"></carrouselCategory>
+    <carrouselCategory :category="menuGlobal[3]"></carrouselCategory>
 
 
 

@@ -114,13 +114,24 @@ const updateCart = () =>{
     
     
 
-    const cartData = JSON.parse(localStorage.getItem('cart'));
+    const cartDataString = localStorage.getItem('cart');
 
-    // Check if 'cart' exists in localStorage and has 'products' attribute
-    const productsLength = cartData && cartData.products ? cartData.products.length : 0;
-
-    // Create a ref with the calculated quantity
-    quantity.value = productsLength;
+    // Check if 'cart' exists and is not null or undefined
+    if (cartDataString) {
+        // Attempt to parse the 'cart' data
+        const cartData = JSON.parse(cartDataString);
+    
+        // Check if 'cart' has 'products' attribute
+        const productsLength = cartData.products ? cartData.products.length : 0;
+    
+        // Assign the calculated quantity to the 'quantity' variable
+       quantity.value = productsLength;
+    
+        // Now 'quantity' contains the calculated value, either the length of 'products' or 0 if 'products' is missing
+    } else {
+        // 'cart' is not present in localStorage, set quantity to 0 or handle it as needed
+       quantity.value = 0;
+    }
 }
 
 function eliminarAdicionDelCarrito(adicionAEliminar, producto) {

@@ -18,10 +18,8 @@
 <div v-if="isSmallScreen" style=" ; width: auto; position: relative">
   <div  class="containr" ref="scrollContainer"  style=" background-color: transparent position: ; display: flex;gap:1rem ; overflow-x: auto;padding-left:0.1rem">
 
-<div   style="margin:2rem 0;" v-for="product in menuGlobal[5].products" class="item col-12 p-0">
+<div   style="margin:2rem 0;" v-for="product in menuGlobal[4].products" class="item col-12 p-0">
   <TarjetaCombo   style="width: ;"    :combo="product"></TarjetaCombo>     
- 
-
 </div>
 <a style="width: auto; position: absolute; left: -2rem; ; padding: 0; transform: translateX(); "
   class="carousel-control-prev"  role="button" data-slide="prev">
@@ -43,7 +41,7 @@
 
   
 <div v-if="!isSmallScreen" class=" col-12 p-0 m-0 p-1  mb-8" style="background-color: rgb(0, 0, 0);    box-shadow: 0px 0px 20px rgb(0, 0, 0);">
-  <Carousel   class=" m-auto xl:col md col-12" circular  :responsiveOptions="responsiveOptions"  style="height:max-content; padding: 0;margin: 0" :value="menuGlobal[5].products" :numVisible="2" :numScroll="1"  >
+  <Carousel   class=" m-auto xl:col md col-12" circular  :responsiveOptions="responsiveOptions"  style="height:max-content; padding: 0;margin: 0" :value="menuGlobal[4].products" :numVisible="2" :numScroll="1"  >
         <template #item="slotProps" >
    
             <div class=" m-3 lg:m-5 xl:p-5  ">

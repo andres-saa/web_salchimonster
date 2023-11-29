@@ -24,7 +24,7 @@ import router from '@/router/index.js'
 import { useCart,deleteAllCookies } from './service/cart';
  
 
-const version_tienda = ref(3)
+const version_tienda = ref(1)
 const screenWidth = ref(window.innerWidth);
 console.log(screenWidth.value)
 // Función para actualizar el valor del ancho de la pantalla
@@ -472,7 +472,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
           {{ productDialog.description }}
         </p>
 
-        <div v-if="productDialog.category_id == 1 || productDialog.category_id == 2 || productDialog.category_id == 5 ">
+        <div v-if="productDialog.category_id != 4 && productDialog.category_id != 3 ">
                   <p class="col-12 text-xl" style="font-weight: bold;color: black;display: flex;align-items: center;">
           <span class="col-4 p-0 m-0">SALSAS</span> <div class="col p-0 m-0" style="height: auto; height: 01rem;background-color: var(--primary-color)"> </div>
         </p> 
@@ -491,7 +491,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 
 
-        <div v-if="productDialog.category_id">
+        <div v-if="productDialog.category_id != 3">
 
 
           <p class="col-12 text-xl" style="font-weight: bold;color: black;display: flex;align-items: center;">
@@ -535,7 +535,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 
         <p v-if="productDialog.category_id ==5" class="col-12 text-xl" style="font-weight: bold;color: black;display: flex;align-items: center;">
-          <span class="col-4 p-0 m-0 ">{{ `ELIGE ${productDialog.acomp_cantidad} ${productDialog.acomp_cantidad<2? 'ACOMPANANTE':'ACOMPANANTES'}`}}</span> <div class="col p-0 m-0" style="height: auto; height: 01rem;background-color: var(--primary-color)"> </div>
+          <span  class="col-4 p-0 m-0 mr-4 ">{{ `ELIGE ${productDialog.acomp_cantidad} ${productDialog.acomp_cantidad<2? 'ACOMPANANTE':'ACOMPANANTES'}`}}</span> <div class="col p-0 m-0" style="height: auto; height: 01rem;background-color: var(--primary-color)"> </div>
         </p>
        
 

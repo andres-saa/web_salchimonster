@@ -122,7 +122,9 @@
         <div class=" col-12 p-4 md:p-0   "
             style="position: relative; border-radius: 1rem;height:max-content;  ; ;padding:0 1rem ;background-color: white; ">
 
-            
+            <div style="font-weight: bold;" class="col-12 pl-0 text-center text-xl">
+                DATOS DE USUARIO
+            </div>
             <label for="year">NOMBRE</label>
            
            
@@ -138,9 +140,9 @@
             </div>
 
             <div class="col-12 p-6 d-flex justify-content-center">
-                <button @click="send_order()" class="col-6 "
+                <button @click="send_order()" class="col "
                         style=" width: 100%;border:none; background-color: var(--primary-color); color: white; border-radius: 0.6rem; padding: 0.5rem;">
-                        <span class="text-xl" style="font-weight: bold;margin-top: 5rem;">FINALIZAR COMPRA</span></button>
+                        <span class="text-xl" style="min-width:max-content; font-weight: bold;margin-top: 5rem;">FINALIZAR COMPRA</span></button>
 
             </div>
             

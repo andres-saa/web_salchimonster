@@ -6,39 +6,27 @@ from pathlib import Path
 # from model.files_connection import siteDocumentConnection
 # from schema.site_document_schema import SiteDocumentSchemaPost,SiteDocumentSchema
 from PIL import Image
-
+from os import remove
+from fastapi.responses import JSONResponse
 # conn = siteDocumentConnection()
 
 router = APIRouter()
 
 
-def resize_image(path:str,upload_dir:str,product_id:str,file_extension:str):
+def resize_image(path: str, upload_dir: str, product_id: str, file_extension: str):
     sizes = [
-        {
-            "width":96,
-            "height":96
-        },
-        {
-            "width":300,
-            "height":300
-        },
-        {
-            "width":600,
-            "height":600
-        },  
+        {"width": 96, "height": 96},
+        {"width": 300, "height": 300},
+        {"width": 600, "height": 600},
     ]
 
     for size in sizes:
-        upload_dir.mkdir(parents=True, exist_ok=True)
         size_defined = size["width"], size["height"]
-        image =  Image.open(path, mode='r')
+        image = Image.open(path, mode='r')
         image.thumbnail(size_defined)
-        file_path = upload_dir / ( "product image " + product_id + " "+ str(size["width"]) + 'x' + str(size["height"]) + file_extension)
-        image.save(file_path)
-        print(file_extension)
-        
-
-
+        resized_file_path = upload_dir / (
+            "product image " + product_id + " " + str(size["width"]) + 'x' + str(size["height"]) + file_extension)
+        image.save(resized_file_path)
 
 @router.get("/")
 def root():
@@ -46,27 +34,30 @@ def root():
 
 @router.post('/upload-product-image/{product_id}')
 async def upload_user_photo(product_id: str, file: UploadFile = File(...), background_tasks: BackgroundTasks = BackgroundTasks):
-    # Obtener la extensión del archivo
-    file_extension = splitext(file.filename)[1]
-
     # Directorio donde se guardarán las imágenes
-    upload_dir = Path(getcwd()) / "files" / "images" / "products" / product_id
+    upload_dir = Path.cwd() / "files" / "images" / "products" / product_id
 
-    # Crear la carpeta "users" si no existe
+    # Eliminar la carpeta y archivos existentes
+    if upload_dir.is_dir():
+        for existing_file in upload_dir.glob("*"):
+            remove(existing_file)
+
+    # Crear la carpeta "products"
     upload_dir.mkdir(parents=True, exist_ok=True)
 
+    # Obtener el nombre del archivo
+    file_extension = splitext(file.filename)[1]
+
     # Combinar el nombre del archivo con el directorio
-    file_path = upload_dir / ( "product image " + product_id + file_extension)
+    file_path = upload_dir / ("product image " + product_id + file_extension)
 
     with open(file_path, "wb") as myflle:
         content = await file.read()
         myflle.write(content)
-        myflle.close()
 
-    background_tasks.add_task(resize_image,file_path,upload_dir,product_id,file_extension)
+    background_tasks.add_task(resize_image, file_path, upload_dir, product_id, file_extension)
 
-    return "hecho"
-
+    return JSONResponse(content={"message": "hecho"}, status_code=200)
 
 
 
