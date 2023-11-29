@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHashHistory,createWebHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
 import axios from 'axios';
 import { setShowDialog } from '../service/state';
@@ -8,7 +8,7 @@ import { menuOptions } from '@/service/menuOptions';
 import { ableMenu } from '../service/menuOptions';
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
