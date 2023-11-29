@@ -217,7 +217,12 @@ const changePossiblesNeigborhoods = () => {
 watch(currenCity, () => { changePossiblesNeigborhoods() })
 
 const setNeigborhood = () => {
-  localStorage.setItem('currentNeigborhood', JSON.stringify({ currenCity: currenCity.value.name, currenNeigborhood: currenNeigborhood.value.neigborhood, currenSite: currenNeigborhood.value.site.name, currenSiteId:currenNeigborhood.value.site.site_id }))
+  localStorage.setItem('currentNeigborhood', JSON.stringify({ 
+    currenCity: currenCity.value.name, 
+    currenNeigborhood: currenNeigborhood.value.neigborhood, 
+    currenSite: currenNeigborhood.value.site.name, 
+    currenSiteId:currenNeigborhood.value.site.site_id,
+    currenSiteWsp:currenNeigborhood.value.site.wsp }))
   console.log(localStorage.getItem('currentNeigborhood'))
   // setShowDialog()
   location.reload();
@@ -337,7 +342,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 </script>
 
 <template>
-  <router-view  style="background-color: ;" class="col-12 p-0 m-0" :class="screenWidth<800 && ruta.fullPath == '/cart' || ruta.fullPath == '/pay' || screenWidth<800 && ruta.fullPath == '/menu'? 'fondo-movil':'fondo-pc'"  />
+  <router-view  style="background-color: ;" class="col-12 p-0 m-0" :class="screenWidth<800 && ruta.fullPath == '/cart' || ruta.fullPath == '/pay' || screenWidth<800 && ruta.fullPath == '/menu' || screenWidth<800 && ruta.fullPath == '/Sedes'? 'fondo-movil':'fondo-pc'"  />
   <!-- <Dialog v-if="menuOptions[0].menus.length < 2" v-model:visible="menuOptions" modal header="Header"
         :style="{ width: '100%', border: 'none', overflow: 'hidden' }" :breakpoints="{ '960px': '75vw', '641px': '100vw' }">
         <img class="imagen" style="" src="http://localhost:5173/src/images/logo.png" alt="">

@@ -218,7 +218,8 @@ const modelia = {
       deliveryPrice: 6000
     },
   ],
-  site_id:7
+  site_id:7,
+  wsp:"https://wa.link/0chwft"
 }
 
 export { modelia}

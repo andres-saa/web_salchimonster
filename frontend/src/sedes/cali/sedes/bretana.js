@@ -477,7 +477,8 @@ const bretana = {
           deliveryPrice: 5000
         },
     ],
-    site_id:1
+    site_id:1,
+    wsp:"https://wa.link/nko5yx"
   }
 
   export {bretana}

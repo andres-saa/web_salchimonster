@@ -451,8 +451,10 @@ const sedePalmira =
         deliveryPrice: 7000
       },
 ],
-site_id:5
+site_id:5,
+wsp:"https://wa.link/cgrfse"
   }
+  
 
 
   export {sedePalmira }

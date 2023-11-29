@@ -359,7 +359,8 @@ const flora =
               deliveryPrice: 12000
             },
         ],
-        site_id:2
+        site_id:2,
+        wsp:"https://wa.link/6v9ajk"
       }
     
 

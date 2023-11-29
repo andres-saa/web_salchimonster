@@ -1054,7 +1054,8 @@ const kenedy = {
           deliveryPrice: 6500
         },
     ],
-    site_id:10
+    site_id:10,
+    wsp:"https://wa.link/pokuyx"
   }
 
 export {kenedy}
