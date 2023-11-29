@@ -3,4 +3,4 @@
 // http://192.168.1.142:5173/
 const URI = 'http://167.71.178.54:8200'
 
-export {URI}
+export {URI} 
