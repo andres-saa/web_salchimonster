@@ -222,7 +222,7 @@ import { curentSite } from './service/un_pedido';
 </script>
 
 <template>
-  <audio id="notificacion_pedido" src="sound/pip.mp3"></audio>
+ <!-- <audio id="notificacion_pedido" src="sound/pip.mp3"></audio> -->
   <router-view  style="overflow-x: hidden;" class="col-12 p-0 m"   />
 
 

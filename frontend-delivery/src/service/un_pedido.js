@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { URI } from "./conection";
 const gruposPedidos = ref({})
-const miAudio = document.getElementById("notificacion_pedido");
+const miAudio = new Audio('sound/pip.mp3');
 const curentSite = ref(0)
 
 const grupos = [
@@ -69,11 +69,7 @@ const getOrders = async()=> {
 
       // Si hay nuevas órdenes generadas, emite un sonido
       if (newOrders.some(order => order.order_status.status === 'generada')) {
-        document.addEventListener('click', () => {
-          miAudio.play(); // Esta función debería emitir el sonido que desees
-        }, { once: true });
-        document.body.click()
-        console.log('sonido')
+        miAudio.play(); 
         
       }
 

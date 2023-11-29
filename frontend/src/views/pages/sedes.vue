@@ -1,12 +1,12 @@
 
 
 <template>
-    <div class=" grid col-12 lg:col-10 m-auto p-0" style="overflow:;">
+    <div class=" grid col-12 lg:col-10 m-auto p-0 m-0" style="overflow:;">
 
         <div style=" background-color: rgb(255, 255, 255);
-        border-radius: 1rem; overflow: hidden;" class="col-12 lg:col-6 p-4 " v-for=" sede in sedes">
+        border-radius: 1rem; overflow: hidden;" class="col-12 lg:col-6 p-2 lg:p-3 m-0" v-for=" sede in sedes">
 
-            <div class="col-12 p-0" style="
+            <div class="col-12 p-0 m-0" style="
             background-color: white;
             position: relative;overflow: hidden;">
 
@@ -18,23 +18,24 @@
                     alt="">
 
                 <div class="" style="
-                width: 100%;height: 30%;
+                width: 100%;height: 50%;
                 background-color: rgba(0, 0, 0, 0.8);
                 position: absolute; 
+                display: flex; flex-direction: column; justify-content: center;
                 left: 0;bottom: 0;
                 border-radius:0 0 1rem 1rem;">
 
-                <p class="text-2xl pl-4 pt-4" style="font-weight: bold; color:var(--primary-color)"><span class="pr-4" style="text-transform: uppercase;"><i :class="PrimeIcons.LOCK" style="color: var(--primary-color);"></i></span>{{sede.Ciudad}} <span style="font-weight: 100; padding-left: 1rem; color: white;">{{ sede.Dirección }}</span> <p style="color: white;">SALCHIMONSTER {{sede.Nombre}}</p></p>
+                <p class="xl:text-xl text-l pl-2 pt-4 pb-0" style="font-weight: bold; color:var(--primary-color)"><span class="pr-4" style="text-transform: uppercase;"><i :class="PrimeIcons.LOCK" style="color: var(--primary-color);"></i></span>{{sede.Ciudad}} <span style="font-weight: 100; padding-left: 1rem; color: white;">{{ sede.Dirección }}</span> <p style="color: white;">SALCHIMONSTER {{sede.Nombre}}</p></p>
 
 
 
-                <p class="text-2xl pl-4 pt-0" style="font-weight: ; color:white"><span class="pr-4"><i class="text-3xl" :class="PrimeIcons.WHATSAPP" style="font-weight: bold; color: rgb(58, 255, 58);"></i></span>{{ sede.WSP }}  </p>
+                <p class="xl:text-xl text-l pl-2 " style="font-weight: ; color:white"><span class="pr-4"><i class="text-l p-0" :class="PrimeIcons.WHATSAPP" style="font-weight: bold; color: rgb(58, 255, 58);"></i></span>{{ sede.WSP }}  </p>
 
 
 
 
 
-                <div style="position: absolute; right: 0rem; width: 10rem;height: 100%;bottom: 0; background-color:transparent;display: flex; padding: 1rem;">
+                <div style="position: absolute; right: 0rem; width: 5rem;height: 5rem;bottom: 0; background-color:transparent;display: flex; padding: 1rem;">
 
                     <a :href="sede['Google Maps']">
                         <img style="width: 100%; height: 100%; background-color: rebeccapurple; border-radius: 1rem;" src="https://motor.elpais.com/wp-content/uploads/2022/01/google-maps-22-1046x616.jpg"/>

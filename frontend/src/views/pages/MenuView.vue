@@ -49,7 +49,7 @@
 
         <div class="grid  xl:col-10 xl:m-auto  " style="background-color:var(--primary-color); border-radius:2rem; margin-bottom: 5rem;">
 
-            <div v-if="currentSection" v-for="product in currentSection.products" class="xl:col-3 lg:col-4 md:p-3 col-6 p-3 ">
+            <div v-if="currentSection" v-for="product in currentSection.products" class="xl:col-3 lg:col-4 md:p-3 col-6 p-2 m-0 ">
                 <TarjetaMenu style="width: 100%;" class="" :product="product"></TarjetaMenu>
 
                 <!-- <TarjetaMenu class=""></TarjetaMenu> -->

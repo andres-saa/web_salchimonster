@@ -81,11 +81,11 @@ const model = ref([
                 to: '/menu'
             },
 
-            // {
-            //     label: 'Sedes',
-            //     icon: 'pi pi-fw pi-pencil',
-            //     to: '/pages/sites'
-            // },
+            {
+                label: 'Sedes',
+                icon: 'pi pi-fw pi-pencil',
+                to: '/sedes'
+            },
             {
                 label: 'Carrito de compras',
                 icon: 'pi pi-fw pi-pencil',
