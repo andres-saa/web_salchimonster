@@ -349,7 +349,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
         <img class="imagen" style="" src="http://localhost:5173/src/images/logo.png" alt="">
       </Dialog> -->
 
-  <Dialog v-if="!c_neigbor || showSiteDialog" v-model:visible="showSiteDialog" :style="{ width: '500px' }"
+  <Dialog :closeOnEscape="!c_neigbor? false: true" v-if="!c_neigbor || showSiteDialog" v-model:visible="showSiteDialog" :style="{ width: '500px' }"
     header="Seleccion de sede" :modal="true" class="p-fluid "
     style="    box-shadow: 0px 0px 50px rgb(255, 0, 0);; background-color: white;border: .5rem solid ;position: relative; border-radius: 30px;padding-top: 2rem;">
 
