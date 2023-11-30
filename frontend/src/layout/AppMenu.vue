@@ -87,6 +87,11 @@ const model = ref([
                 to: '/sedes'
             },
             {
+                label: 'Carta',
+                icon: 'pi pi-fw pi-pencil',
+                to: '/menu'
+            },
+            {
                 label: 'Carrito de compras',
                 icon: 'pi pi-fw pi-pencil',
                 to: '/cart'
