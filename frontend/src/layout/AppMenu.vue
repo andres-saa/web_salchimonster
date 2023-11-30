@@ -78,7 +78,7 @@ const model = ref([
             {
                 label: 'Menu',
                 icon: 'pi pi-fw pi-pencil',
-                to: '/menu'
+                to: '/menu-view'
             },
 
             {
