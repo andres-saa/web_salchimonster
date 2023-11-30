@@ -15,7 +15,7 @@ const menuGlobal = [
     categoryHamburguers,
     categoryMalteadas,
     categoryBebidas,
-    categoryCombos,
+    // categoryCombos,
     // categoryAlmuersos,
    
     

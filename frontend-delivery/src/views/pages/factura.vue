@@ -3,7 +3,7 @@
 <div class="col-12 p-0 m-0 xl:col-12 p-0 md:p-3 texto-negro" style="width: 100%;" > 
 
 <p class="text-xl col-12 text-center " style="font-weight: bold;">SALCHIMONSTER</p>
-<p class="text-xl " style="font-weight: bold;">RESUMEN PEDIDO</p>
+<p class="text-xl pl-4" style="font-weight: bold;color: white;background-color: black;">ENTREGAR</p>
 
 <!-- <input style="border-radius: 20px; " class="col-12 " type="text" name="" id=""> -->
 <!-- <img class="col-2" src="images/logo.png" alt=""> -->
@@ -134,10 +134,10 @@
 
 </div>
 
-<p class="text-xl mt-4" style="font-weight: bold;">NOTAS DEl PEDIDO</p>
+<p class="text-xl pl-4" style="font-weight: bold;color: white;background-color: black;">NOTAS</p>
 
-<textarea :value="pedido.order_notes" readonly  style=" min-height:5rem ;margin-bottom: 2rem; border;" class="col-12 " type="text" name="" id="dynamicTextarea" ></textarea>
 
+<P>{{ pedido.order_notes }}</P>
 <!-- <textarea cla style=" font-size: 1.5rem; resize: none; height: max-content;" class="col-12 text-xl" name="" id="" cols="30" rows="10"></textarea> -->
 
 
@@ -145,7 +145,8 @@
 
 <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
-<span style="font-weight: bold;"> DATOS DE USUARIO </span>
+<p class="text-xl pl-4 col-12 p-0" style="font-weight: bold;color: white;background-color: black;">DATOS DE USUARIO</p>
+
 <!-- <span style="font-weight: bold;"> {{ formatoPesosColombianos(calcularTotalCarrito(pedido))  }} </span> -->
 
 </div>
@@ -169,6 +170,13 @@
 
 <span style="font-weight: bold;"> DIRECCIÓN </span>
 <span style="font-weight:;text-transform: uppercase;"> {{ user.user_address }} </span>
+
+</div>
+
+<div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
+
+<span style="font-weight: bold;"> MÉTODO DE PAGO </span>
+<span style="font-weight:;text-transform: uppercase;"> {{ pedido.payment_method }} </span>
 
 </div>
 

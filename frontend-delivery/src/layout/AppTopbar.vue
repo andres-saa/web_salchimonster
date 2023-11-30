@@ -7,6 +7,8 @@ import { PrimeIcons } from 'primevue/api';
 
 import { ableMenu } from '../service/menuOptions';
 import router from '@/router/index.js'
+import { buscarSedePorId } from '../service/sedes'
+import {curentSite} from '../service/un_pedido'
 
 const ruta = ref(router.currentRoute)
 
@@ -201,7 +203,7 @@ const cerrar_sesion = () => {
         
 
 
-        <!-- <button class="p-link boton-menu layout-topbar-logo"
+        <button class="p-link boton-menu layout-topbar-logo"
             style=" font-size: 24px; font-weight: bold;  color: black; z-index: 99999;display:flex; justify-content: center; align-items: center;">
 
             <i sty :class="PrimeIcons.MAP_MARKER" style="font-size: 100%; color: var(--primary-color)"> </i>
@@ -216,7 +218,8 @@ const cerrar_sesion = () => {
                 color: var(--primary-color);">
 
 
-                    {{ currentCity ? currentCity.currenCity : 'Definir ubicacion' }}
+                    {{ buscarSedePorId(parseInt(curentSite)).Ciudad }}
+                    
                 </span>
 
                 <span style="
@@ -228,14 +231,14 @@ const cerrar_sesion = () => {
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 200px;">
-                    <span v-if="!isSmallScreen" class="sm:d-none">salchimonster -</span> <span v-else class="sm:d-none">sede
-                        -</span> {{ currentCity ? currentCity.currenSite : 'Definir ubicacion' }}
+                    <span v-if="!isSmallScreen" class="sm:d-none"></span> <span v-else class="sm:d-none">sede
+                        -</span>  {{ buscarSedePorId(parseInt(curentSite)).Nombre }} 
                 </span>
 
             </div>
 
 
-        </button> -->
+        </button>
 
         <!-- <button v-if="isSmallScreen" style="border: none" class="p-link layout-menu-button layout-topbar-button"
             @click="onMenuToggle()">

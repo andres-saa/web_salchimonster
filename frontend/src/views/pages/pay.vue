@@ -40,7 +40,7 @@
                     <!-- {{ product.product.salsas }} -->
 
                     <p v-if="product.product.adiciones.length > 0" class="col-12 p-0 pl-2 mb-0" style="font-weight: bold ;">ADICIONES</p>
-                    <div class="col-12 p-0 pl-1 "
+                    <div class="col-12 p-0 pl-3 "
                         style="display: flex; justify-content: space-between; align-items:center ;"
                         v-for="adicion in product.product.adiciones">
 
@@ -58,6 +58,30 @@
 
                         <p style="font-weight: ;height: ;">{{ formatoPesosColombianos(adicion.price) }}
                         </p>
+
+
+
+                    </div>
+
+                    <p v-if="product.product.salsas.length > 0" class="col-12 p-0 pl-2 mb-0" style="font-weight: bold;">
+                        SALSAS</p>
+                    <div class="col-12 p-0 pl-4 mt-0 "
+                        style="display: flex; justify-content: space-between; align-items:center ;"
+                        v-for="salsa in product.product.salsas">
+
+    
+                        <p class="m-0"
+                            style="text-transform: uppercase; min-width: max-content;margin: 0; padding: 0.1rem 0;width: 100%">
+                            <span>{{ salsa
+                            }}</span>
+                        </p>
+
+
+
+
+                        <!-- <p style="font-weight: ;height: ;">{{ formatoPesosColombianos(adicion.price) }}
+                        </p> -->
+
 
 
 
@@ -125,19 +149,22 @@
             <div style="font-weight: bold;" class="col-12 pl-0 text-center text-xl">
                 DATOS DE USUARIO
             </div>
-            <label for="year">NOMBRE</label>
-           
-           
+            <label for="year">NOMBRE</label> 
             <InputText type="text" class="col-12 p-1  mb-4" v-model="user_data.user_name" />
-
             <label for="year">BARRIO (click para modificar)</label>
             <InputText @click="showSiteDialog = !showSiteDialog" :value="currenNeigborhood" type="text" readonly class="col-12 p-1  mb-4" v-model="user_data.barrio" />
-        
             <label for="year">DIRECCION</label>
             <InputText type="text" class="col-12 p-1  mb-4" v-model="user_data.user_address" />
             <label for="year">TELEFONO</label>
-            <InputText type="text" class="col-12 p-1  mb-4" v-model="user_data.user_phone" />
-            </div>
+            <InputText  max="10" type="Number" class="col-12 p-1  mb-4" v-model="user_data.user_phone" />
+            <label for="year">METODO DE PAGO</label>
+            <Dropdown class="col-12 p-0"  v-model.trim="payMethod" :options="payMethods" placeholder=""
+                            required="true" :class="{ 'p-invalid': submitted && !currentUser.position }" />
+
+
+        
+        
+        </div>
 
             <div class="col-12 p-6 d-flex justify-content-center">
                 <button @click="send_order()" class="col "
@@ -191,7 +218,7 @@ import { useCart,domicilio, eliminarAdicionDelCarrito,agregarAdicionAlCarrito, p
 import { useRoute } from 'vue-router';
 import { calcularPrecioTotal, calcularTotalCarrito, showSiteDialog } from '../../service/state';
 import { adiciones } from '../../service/menu/adiciones/adiciones';
-import {showThaks, send_order,order_notes,user_data } from '../../service/order';
+import {showThaks, send_order,order_notes,user_data,payMethod,payMethods } from '../../service/order';
 import router from '@/router/index.js'
 const changeThanks = () =>{
     showThaks.value = false
@@ -206,9 +233,6 @@ const currenNeigborhood = JSON.parse(localStorage.getItem('currentNeigborhood'))
 
 
 
-
-const payMethod = ref('')
-const payMethods = ref(["Recoger en local", "Efectivo", "Pago con tarjeta (datafono)"])
 
 
 

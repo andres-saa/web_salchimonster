@@ -7,6 +7,9 @@ const user_data = ref({})
 const order_notes = ref("")
 const showThaks = ref(false)
 const currenNeigborhood = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood.name
+const payMethod = ref('')
+const payMethods = ref(["Recoger en local", "Efectivo", "Pago con tarjeta (datafono),"])
+
 
 
 
@@ -59,7 +62,7 @@ const send_order = async () => {
             "status": "generada",
             "timestamp": new Date().toLocaleString()
         },
-        "payment_method": "Efectivo",
+        "payment_method": payMethod.value,
         "delivery_person_id": 4,
         "status_history": [
             {
@@ -110,4 +113,4 @@ const send_order = async () => {
 
 
 
-export{showThaks,send_order,order_notes,user_data}
+export{payMethods,payMethod,showThaks,send_order,order_notes,user_data}

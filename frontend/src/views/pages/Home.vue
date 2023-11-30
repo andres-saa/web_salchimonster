@@ -10,7 +10,7 @@
     <CarouselBanner></CarouselBanner>
     <CarouselSites></CarouselSites> -->
     <!-- <gridCombo></gridCombo>  -->
-    <carouselCombo></carouselCombo>
+    <!-- <carouselCombo></carouselCombo> -->
 
 
     <div class="col-12 xl:text-7xl text-3xl  p-8">
@@ -44,7 +44,7 @@
 import CarouselBanner from '@/components/CarouselBanner.vue'
 // import CarouselSites from '../../components/CarouselSites.vue';
 // import gridCombo from './gridCombo.vue';
-import carrouselCategory from '../../components/carrouselCategory.vue';
+import carrouselCategory from '@/components/carrouselCategory.vue';
 import { menuGlobal } from '../../service/menu/menu';
 // import carouselCombo from '../../components/carouselCombo.vue';
 import carouselCombo from '../../components/carouselCombo.vue';

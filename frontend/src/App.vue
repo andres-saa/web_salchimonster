@@ -342,7 +342,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 </script>
 
 <template>
-  <router-view  style="background-color: ;" class="col-12 p-0 m-0" :class="screenWidth<800 && ruta.fullPath == '/cart' || ruta.fullPath == '/pay' || screenWidth<800 && ruta.fullPath == '/menu' || screenWidth<800 && ruta.fullPath == '/Sedes'? 'fondo-movil':'fondo-pc'"  />
+  <router-view  style="background-color: ;" class="col-12 p-0 m-0" :class="screenWidth<800 && ruta.fullPath == '/cart' || ruta.fullPath == '/pay' || screenWidth<800 && ruta.fullPath == '/menu-view' || screenWidth<800 && ruta.fullPath == '/Sedes'? 'fondo-movil':'fondo-pc'"  />
   <!-- <Dialog v-if="menuOptions[0].menus.length < 2" v-model:visible="menuOptions" modal header="Header"
         :style="{ width: '100%', border: 'none', overflow: 'hidden' }" :breakpoints="{ '960px': '75vw', '641px': '100vw' }">
         <img class="imagen" style="" src="http://localhost:5173/src/images/logo.png" alt="">
@@ -396,10 +396,10 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
         <div class="img-cont">
 
-          <div class="img-before" v-if="currenNeigborhood.site?.name == 'default'">
+          <!-- <div class="img-before" v-if="currenNeigborhood.site?.name == 'default'">
             <p class="text-2xl lg:text-4xl text-center " style="font-weight: bold;color: black;">Vamos a buscar tu sede mas cercana</p>
-          </div>
-          <img :src="sitesImages[currenNeigborhood.site?.name]"
+          </div> -->
+          <img :src="`${URI}/read_product_image/600/site-${ currenNeigborhood.site?.site_id }`"
             :class="currenNeigborhood.site?.name == 'default' ? 'default-image' : ''"
             style="border: 1px solid gray; width: 100%; height: 100%; object-fit: cover; border-radius: 5px;" alt="">
         </div>

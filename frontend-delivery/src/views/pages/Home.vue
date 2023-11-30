@@ -18,8 +18,6 @@
    
 
 
-
-
   </div>
 </template>
 
@@ -31,6 +29,13 @@ import { ref, computed } from 'vue';
 import { curentSite,getOrders } from '../../service/un_pedido';
 import { onMounted, onBeforeUnmount, watch } from 'vue'
 // import { ref, computed } from 'vue';
+
+
+
+
+
+
+
 
 onMounted(() => {
   getOrders()

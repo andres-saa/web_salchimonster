@@ -138,7 +138,8 @@ function filtrarPorEstado(orders, estado) {
 
 function prepararPedido(order) {
   // Cambiar el estado a "En preparación" con la hora actual
-
+  miAudio.pause();
+  miAudio.currentTime = 0
   const timestampActual = new Date().toLocaleString();
   order.order_status.status = "en preparacion";
   order.order_status.timestamp = timestampActual;

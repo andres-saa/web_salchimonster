@@ -141,6 +141,7 @@ const menuOptions = ref(
 
         {
             name: 'Menu',
+            to:'menu-view',
             menus:[
                 {
                     "category": {
@@ -154,6 +155,7 @@ const menuOptions = ref(
 
         {
             name: 'Sedes',
+            to:'sedes',
             menus: [
                 {
                     name: 'Cali',
@@ -195,6 +197,11 @@ const menuOptions = ref(
                 }
             
             ]
+        },
+        {
+            name: 'Carta',
+            menus: [],
+            to:'menu'
         },
         
     ]

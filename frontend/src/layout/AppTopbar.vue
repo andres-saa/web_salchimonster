@@ -236,7 +236,7 @@ const fondoVisible = ref(false)
             </div>
 
             <router-link :to="`/`" @click="handleDropDownMenu(false)" class="" style="padding: 1rem;">
-                    <button  @click="getToken" class="p-link boton-menu" @mouseover="handleDropDownMenu(false)  "
+                    <button   class="p-link boton-menu" @mouseover="handleDropDownMenu(false)  "
                    :class="!curentMenu.name && router.currentRoute.value.path=='/'   ? 'selected' : 'boton-menu'" >
                        
                         <!-- <i class="pi pi-calendar"></i> -->
@@ -250,9 +250,9 @@ const fondoVisible = ref(false)
                 style="display: flex; ">
 
                 
-                <router-link :to="`/${menuTopbar.name}`" @click="handleDropDownMenu(false)" class="col-12">
-                    <button @click="getToken" class="p-link boton-menu" @mouseover="showMenu(menuTopbar)"
-                        :class="curentMenu.name == menuTopbar.name || router.currentRoute.value.path== `/${menuTopbar.name}`  ? 'selected' : 'boton-menu'">
+                <router-link :to="`/${menuTopbar.to}`" @click="handleDropDownMenu(false)" class="col-12">
+                    <button  class="p-link boton-menu" @mouseover="showMenu(menuTopbar)"
+                        :class="curentMenu.name == menuTopbar.name || router.currentRoute.value.path== `/${menuTopbar.to}`  ? 'selected' : 'boton-menu'">
                         <!-- <i class="pi pi-calendar"></i> -->
                         <!-- <h3> {{i}}</h3> -->
                         {{ menuTopbar.name }}
@@ -279,7 +279,7 @@ const fondoVisible = ref(false)
             </button>
 
             <router-link to="/cart" >
-                <button @click="getToken" class="p-link layout-topbar-button p-0" style="position: relative;" >
+                <button  class="p-link layout-topbar-button p-0" style="position: relative;" >
                 <i badge="5+" :class="PrimeIcons.SHOPPING_CART" ></i>
                 <div class="p-0" style="display: flex;align-items: center;justify-content: center; position: absolute;bottom: 50%;left: 100%; background-color:var(--primary-color); width: 2rem;height: 2rem;border-radius: 50%">
                     <div class="text-xl" style="color: white;font-weight: bold;font-size">

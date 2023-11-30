@@ -28,9 +28,15 @@ const router = createRouter({
           // meta: { requiresAuth: true },
         },
         {
+          path: '/menu-view',
+          name: 'menu-view',
+          component: () => import('@/views/pages/MenuView.vue'),
+          // meta: { requireMenu: true },
+        },
+        {
           path: '/menu',
           name: 'menu',
-          component: () => import('@/views/pages/MenuView.vue'),
+          component: () => import('@/views/pages/carta.vue'),
           // meta: { requireMenu: true },
         },
         {

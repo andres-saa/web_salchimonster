@@ -31,7 +31,7 @@
 
               
 
-
+               
      
               <div class="col " style="display: flex; justify-content:end;align-items: center;gap: 1rem; ">
                 <i v-if="order.order_status.status == 'en preparacion'"  class="pi pi-spin pi-spinner p-3" style="font-size: 3rem;color: var(--primary-color);font-weight: bold;"></i>
@@ -39,8 +39,9 @@
                 <i v-if="order.order_status.status == 'generada'" class="pi pi-star-fill p-3" style="font-size: 3rem;color: var(--primary-color);font-weight: bold;"></i>
                 <i v-if="order.order_status.status == 'cancelada'" class="pi pi-times p-3" style="font-size: 3rem;color: var(--primary-color);font-weight: bold;"></i>
 
+                
                 <div class="p-2" style="border-radius: 2rem; color: black; width: max-content;" :class="order.order_status.status.split(' ')[0]" > {{order.order_status.status}} </div>
-                <span  style="color: black; font-weight: bold; min-width: max-content;">{{ order.order_status.timestamp.split(' ')[1] }}</span>
+                <span  style="color: black; font-weight: bold; min-width: max-content;">{{ order.order_id}}</span>
               </div>
               
               

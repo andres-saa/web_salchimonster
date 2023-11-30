@@ -75,7 +75,7 @@ const IMPRIMIR = () => {
     ventanaImpresion.document.write('</head><body>');
     ventanaImpresion.document.write(contenidoFactura);
    
-    ventanaImpresion.document.write('</body>   <style>  *{font-family: sans-serif; padding: 0 !IMPORTANT; margin: 0 !IMPORTANT; font-size:0.8rem !IMPORTANT} </style>      </html> ');
+    ventanaImpresion.document.write('</body>   <style>  *{font-family: sans-serif; padding: 0 !IMPORTANT; margin: 0.1rem !IMPORTANT; font-size:0.8rem !IMPORTANT} </style>      </html> ');
     
 
     ventanaImpresion.document.close();
