@@ -199,41 +199,54 @@ function eliminarSalsaDelCarrito(salsaAEliminar, producto) {
 function agregarAdicionAlCarrito(adicionAAgregar, producto) {
     // Obtener el carrito actual desde el localStorage
     const carritoEnLocalStorage = JSON.parse(localStorage.getItem('cart')) || { products: [], total: 0 };
-
+  
     // Verificar si el carrito tiene productos y la propiedad "adiciones"
     if (carritoEnLocalStorage.products) {
-        // Encontrar el producto en el carrito
-        const productoEnCarrito = carritoEnLocalStorage.products.find(p => p.id === producto.id);
-
-        // Verificar si se encontró el producto y tiene la propiedad "adiciones"
-        if (productoEnCarrito && productoEnCarrito.adiciones) {
-            // Verificar si la adición ya existe en el producto
-            const adicionExistente = productoEnCarrito.adiciones.find(adicion => adicion.id === adicionAAgregar.id);
-
-            if (!adicionExistente) {
-                // Agregar la nueva adición al producto
-                productoEnCarrito.adiciones.push(adicionAAgregar);
-
-                // Actualizar el localStorage con el carrito modificado
-                localStorage.setItem('cart', JSON.stringify(carritoEnLocalStorage));
-
-                // Devolver el carrito modificado
-                carro.value = carritoEnLocalStorage;
-                updateCart();
-
-                return carritoEnLocalStorage;
-            } else {
-                // Devolver el carrito sin cambios si la adición ya existe
-                updateCart();
-                return carritoEnLocalStorage;
-            }
+      // Encontrar el producto en el carrito
+      const productoEnCarrito = carritoEnLocalStorage.products.find(p => p.id === producto.id);
+  
+      // Verificar si se encontró el producto y tiene la propiedad "adiciones"
+      if (productoEnCarrito && productoEnCarrito.adiciones) {
+        // Verificar la cantidad de adiciones gratis permitidas
+        const gratis = 2; // Ajusta este valor según tus necesidades
+        const negativePriceCount = productoEnCarrito.adiciones.filter(adicion => adicion.price <= 0).length;
+  
+        if (negativePriceCount >= gratis && adicionAAgregar.price <= 0) {
+          console.log('ya');
+          toast.add({ severity: 'error', summary: 'Recuerda', detail: `solo puede elegir ${gratis} acompañantes gratis`, life: 3000 });
+          // Devolver el carrito sin cambios si se excede la cantidad de adiciones gratis
+          updateCart();
+          return carritoEnLocalStorage;
         }
+  
+        // Verificar si la adición ya existe en el producto
+        const adicionExistente = productoEnCarrito.adiciones.find(adicion => adicion.id === adicionAAgregar.id);
+  
+        if (!adicionExistente) {
+          // Agregar la nueva adición al producto
+          productoEnCarrito.adiciones.push(adicionAAgregar);
+  
+          // Actualizar el localStorage con el carrito modificado
+          localStorage.setItem('cart', JSON.stringify(carritoEnLocalStorage));
+  
+          // Devolver el carrito modificado
+          carro.value = carritoEnLocalStorage;
+          updateCart();
+  
+          return carritoEnLocalStorage;
+        } else {
+          // Devolver el carrito sin cambios si la adición ya existe
+          updateCart();
+          return carritoEnLocalStorage;
+        }
+      }
     }
-
+  
     // Devolver el carrito original si no se encuentra el producto o la propiedad "adiciones"
     updateCart();
     return carritoEnLocalStorage;
-}
+  }
+  
 
 
 function agregarSalsasAlCarrito(salsaAAgregar, producto) {

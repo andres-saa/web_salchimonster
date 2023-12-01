@@ -1,38 +1,38 @@
  const acomp_almuerzos= {
-    category_id:5,
+    category_id:10,
     products:[
         {
-            id:1,
+            id:100,
             name: 'COSTILLA AHUM EN SALSA BUFALO',
             price:0
         },
         {
-            id:2,
+            id:200,
             name: 'POLLO A LA NARANJA',
             price:0
         },
         {
-            id:3,
+            id:300,
             name: 'MADURO',
             price:0
         },
         {
-            id:4,
+            id:400,
             name: 'CHORIZO',
             price:0
         },
         {
-            id:5,
+            id:500,
             name: 'POLLO DESMECHADO',
             price:0
         },
         {
-            id:6,
+            id:600,
             name: 'CHICHARRON',
             price:1500
         },
         {
-            id:7,
+            id:700,
             name: 'CARNE DESMECHADA',
             price:2000
         },

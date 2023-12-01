@@ -1,9 +1,8 @@
 <template>
     <!-- <p class="col-12 md:col-7 p-1 text-center text-4xl m-auto mb-5 lg:col-7 md:col-12 sm:col-12 m-auto mb-8" style="border-radius: 2rem; font-weight: bold; color: white; background-color: black;" > <i class="text-4xl pr-3 p-0" :class="PrimeIcons.SHOPPING_CART" style="color: white;"></i>CARRITO DE COMPRAS </p>
      -->
-
-
-    <div sty class=" contenedor-principal p-0 md:p-3 grid md:col-12 xl:col-8 xl:ml-auto xl:mr-auto clase"
+<div class="col-12 p-4">
+    <div sty class=" contenedor-principal p- md:p-3 grid md:col-12 xl:col-8 xl:ml-auto xl:mr-auto clase"
         v-if="products.length > 0" style="margin-bottom: 5rem;overflow: hidden;height: 100%;">
 
         <div class=" col-12 xl:col-7 xl:p-5 " style="">
@@ -13,10 +12,10 @@
 
 
                 <div v-for="product in products" class=" m-0 grid mb-5 md:pr-5 pb-6"
-                    style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); height: min-content;border-radius: 1rem; overflow: hidden; position: relative;">
+                    style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); height: min-content;border-radius: 1rem; overflow: hidden; position: relative; background-color: white;">
 
 
-                    <img class="col-3 p-1 " style=" object-fit: contain;"
+                    <img @click="setProductDialog(product.product)" class="col-3 p-1 " style=" object-fit: contain;"
                         :src="`${URI}/read_product_image/600/${product.product.id}`" alt="">
 
                     <div class="col-9 grid m-0 pl-3  " style="">
@@ -24,7 +23,7 @@
                             {{  `${product.quantity} ${product.product.name} ` }}
 
                         </div>
-                        <div class="col text-right md:text-xl p-0" style="font-weight: bold;">{{formatoPesosColombianos(product.quantity * product.product.price) }}
+                        <div class="col-4 text-right md:text-xl p-0" style="font-weight: bold;">{{formatoPesosColombianos(product.quantity * product.product.price) }}
                         </div>
                         <div class="col-12 text-left md:text-xl descripcion p-0"
                             style="font-weight:; text-transform: lowercase;">{{ product.product.description }} </div>
@@ -139,7 +138,7 @@
                                         product.product.category_id == 2 ? adiciones.hamburguesas.products :
                                             product.product.category_id == 3 ? adiciones.salchipapas.products :
                                                 product.product.category_id == 4 ? adiciones.topings.products :
-                                                    product.product.category_id == 5 ? adiciones.almuerzos.products :
+                                                    product.product.category_id == 5 ? adiciones.almuerzos.products.concat(adiciones.acomp_almuerzos.products)  :
                                                         product.product.category_id == 6 ? product.product.adiciones.products : [], product.product.adiciones) ">
 
                                     <button @click="agregarAdicionAlCarrito(adicion, product.product)"
@@ -269,6 +268,20 @@
 
 
                     </div>
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
                     <div class="col-12 p-0 pl-4 pt-1 "
                         style="display: flex; justify-content: space-between; align-items:center ;">
 
@@ -413,8 +426,8 @@
 
 
                 <RouterLink style=" width: 60%;" to="/pay"><button
-                        style=" width: 100%;border:none; background-color: var(--primary-color); color: white; border-radius: 0.6rem; padding: 0.5rem;">
-                        <span class="text-xl" style="font-weight: bold;margin-top: 5rem;">REALIZAR PEDIDO</span></button>
+                        style=" width: 100%;min-width: max-content; border:none; background-color: var(--primary-color); color: white; border-radius: 0.6rem; padding: 0.5rem;">
+                        <span class="text-xl" style="font-weight: bold;margin-top: 5rem;min-width: max-content;">REALIZAR PEDIDO</span></button>
                 </RouterLink>
 
 
@@ -427,23 +440,29 @@
 
     </div>
 
+
+
     <div class="col-12 m-auto d-flex" v-else
         style="display: flex; flex-direction: column; justify-content: center; text-align: center; height: 80vh; align-items: center; ">
         <i class="col-12" style="font-size: 30vh;" :class="PrimeIcons.SHOPPING_CART"></i>
         <i class="col-12" style="font-size: 5vh;"> Tu carrito esta vacio </i>
 
     </div>
+</div>
+
+
 </template>
 
 
 <script setup>
+import { useToast } from 'primevue/usetoast';
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { formatoPesosColombianos } from '../../service/formatoPesos';
 import { PrimeIcons } from 'primevue/api';
 import { order_notes } from '@/service/order.js'
 import { quitarSalsas, eliminarSalsaDelCarrito, agregarSalsasAlCarrito, domicilio, useCart, eliminarAdicionDelCarrito, agregarAdicionAlCarrito, products, updateCart, contarObjetosRepetidos, quitarElementos } from '../../service/cart';
 import { useRoute } from 'vue-router';
-import { calcularPrecioTotal, calcularTotalCarrito, setShowDialog } from '../../service/state';
+import { calcularPrecioTotal, calcularTotalCarrito, setProductDialog, setShowDialog } from '../../service/state';
 import { adiciones } from '../../service/menu/adiciones/adiciones';
 const showAditionsDialog = ref(false)
 import { URI } from '../../service/conection';
@@ -656,8 +675,9 @@ console.log(resultado);
     display: flex;
     border-radius: 0.1rem;
     padding: 0.1rem 1rem;
-    border: 1px solid var(--primary-color);
+    /* border: 1px solid var(--primary-color); */
     border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.274) ;
     /* bottom: 0.5rem; */
     position: absolute;
     right:1rem;

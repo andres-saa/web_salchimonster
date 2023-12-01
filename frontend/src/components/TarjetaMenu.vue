@@ -31,8 +31,8 @@
 
         <div class="info">
             
-            <div class="text-xl" style="font-size: rem; font-weight: bold;"> {{ formatoPesosColombianos(props.product.price) }}</div>
-            <button @click="addcar(prepare_product(props.product))" class="add-cart-btn text-2xl"><i  class="icono text-xl lg:text-4xl " :class="PrimeIcons.PLUS_CIRCLE"> </i>  </button>
+            <div class="text-xl" style="font-size: 2rem; font-weight: bold;"> {{ formatoPesosColombianos(props.product.price) }}</div>
+            <button @click="addcar(prepare_product(props.product))" class="add-cart-btn text-xl"><i style="color: red;"  class="icono text-5xl lg:text-6xl p-0 m-0 " :class="PrimeIcons.PLUS_CIRCLE"> </i>  </button>
             <!-- <button class="mas-detalles"> + </button> -->
         </div> 
     </div>
@@ -116,9 +116,9 @@ const imagenError = (Event) => {
 
     /* padding: 1rem 1rem; */
     font-size: 20px;
-    background-color: rgb(251, 0, 0);
+    background-color: rgba(251, 0, 0, 0);
     /* border-radius: 10px; */
-    color: #fff;
+    color: #ff0000;
 }
 
 .add-cart-btn .icono{
@@ -129,7 +129,9 @@ const imagenError = (Event) => {
 
 
 
-
+*:focus{
+    outline: none;
+}
 
 .icono{
     /* transition: all  0.2s ease; */

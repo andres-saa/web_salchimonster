@@ -45,7 +45,7 @@ const model = ref([
     //     ]
     // },
     {
-        label: 'Menu',
+        label: '',
         icon: 'pi pi-fw pi-briefcase',
         to: '/',
         items: [
@@ -77,23 +77,23 @@ const model = ref([
             // },
             {
                 label: 'Menu',
-                icon: 'pi pi-fw pi-pencil',
+                icon: 'pi pi-fw pi-home',
                 to: '/'
             },
 
             {
                 label: 'Sedes',
-                icon: 'pi pi-fw pi-pencil',
+                icon: 'pi pi-fw pi-map-marker',
                 to: '/sedes'
             },
             {
                 label: 'Carta menu',
-                icon: 'pi pi-fw pi-pencil',
+                icon: 'pi pi-fw pi-info-circle',
                 to: '/menu'
             },
             {
                 label: 'Carrito de compras',
-                icon: 'pi pi-fw pi-pencil',
+                icon: 'pi pi-fw pi-shopping-cart',
                 to: '/cart'
             },
             // {
@@ -194,7 +194,7 @@ const model = ref([
 <template>
     <ul class="layout-menu">
         <template v-for="(item, i) in model" :key="item">
-            <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
+            <app-menu-item class="text-xl" v-if="!item.separator" :item="item" :index="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator"></li>
         </template>
         <!-- <li>

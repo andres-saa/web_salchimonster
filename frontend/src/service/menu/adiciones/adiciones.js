@@ -12,6 +12,7 @@ const adiciones =
     topings:topings,
     salsas:salsas,
     almuerzos:toping_almuerzos,
+    shows:[],
     acomp_almuerzos:acomp_almuerzos
 
 }

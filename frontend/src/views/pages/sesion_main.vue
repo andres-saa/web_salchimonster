@@ -2,7 +2,7 @@
     
 
 
-<div class="grid  xl:col-10 xl:m-auto  " style="; border-radius:2rem; margin-bottom: 5rem;">
+<div class="grid  xl:col-10 xl:m-auto p-4  " style="; border-radius:2rem; margin-bottom: 5rem;">
 
 <div  v-for="product in menuGlobal.salchipapas.products" class="xl:col-3 lg:col-4 md:p-3 col-6 p-2 m-0 ">
     <TarjetaMenu style="width: 100%;" class="" :product="product"></TarjetaMenu>

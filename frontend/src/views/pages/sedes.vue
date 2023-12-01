@@ -1,7 +1,7 @@
 
 
 <template>
-    <div class=" grid col-12 lg:col-10 m-auto p-0 m-0 mb-8" style="">
+    <div class=" grid col-12 lg:col-10 m-auto p-3 m-0 mb-8" style="">
 
         <div style=" background-color: rgb(255, 255, 255);
         border-radius: 1rem; overflow: hidden;" class="col-12 lg:col-6 p-0 mb-5 lg:p-3 m-0" v-for=" sede in sedes">

@@ -262,12 +262,27 @@ const topbarMenuActive = ref(false);
 
 
 
-const cargarAdiciones = (item) => {
-  console.log('hola');
+const cargarAdiciones = (item,gratis=0) => {
+
 
   // Asegúrate de que checkedAdiciones y currentAditions estén definidos en el ámbito adecuado
 
+  const negativePriceCount = currentAditions.value.filter((el) => el.price <= 0).length;
+  
+ 
+
   if (checkedAdiciones.value[item.name]) {
+
+    if (negativePriceCount >= gratis && item.price ==0) {
+    checkedAdiciones.value[item.name] = false
+    console.log('ya')
+
+    toast.add({ severity: 'error', summary: 'Recuerda', detail: `solo puede elegir ${gratis} acompanantes gratis`, life: 3000 });
+
+    // Si ya hay dos o más objetos con price < 0, no hacer nada y retornar
+    return;
+   
+  }
     // Si el checkbox está marcado, agregar el elemento a la lista
     currentAditions.value.push(item);
   } else {
@@ -348,7 +363,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 <!-- <barra></barra> -->
   
-  <router-view  class="p-0 " style="background-color: rgb(250, 247, 253); width: 100vw;left:0px;position: absolute;"/>
+  <router-view  class="p-0 pb-8" style="background-color: rgb(250, 247, 253); width: 100vw;left:0px;position: absolute;"/>
   <!-- <Dialog v-if="menuOptions[0].menus.length < 2" v-model:visible="menuOptions" modal header="Header"
         :style="{ width: '100%', border: 'none', overflow: 'hidden' }" :breakpoints="{ '960px': '75vw', '641px': '100vw' }">
         <img class="imagen" style="" src="http://localhost:5173/src/images/logo.png" alt="">
@@ -378,7 +393,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
       <img style="width: 50px;" src="http://localhost:5173/src/images/logo.png" alt="">
 
-      <div class="field col-12 pb-0" style="width: 100%;">
+      <div class="field col-12 pb-0 p-0" style="width: 100%;">
         <label for="site_id" style="color: black;">Ciudad</label>
         <Dropdown @click="() => currenNeigborhood = {
           site: {
@@ -387,7 +402,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
         }" v-model="currenCity" :options="cities" placeholder="" optionLabel="name" required="true" />
 
       </div>
-      <div class="field col-12 mt-0 pt-0" style="width: 100%; display: block;">
+      <div class="field col-12 mt-0 pt-0 p-0" style="width: 100%; display: block;">
         <label for="site_id" style="color: black;">Barrio</label>
 
         <Dropdown filter v-model="currenNeigborhood" :disabled="!possibleNeigborhoods" :options="possibleNeigborhoods"
@@ -397,28 +412,31 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
       </div>
 
-      <div class="field col-12" style="width: 100%; height:15rem ; position: relative;">
+      <div class="field col-12 p-0" style="width: 100%; height:15rem ; position: relative;">
 
 
-        <div class="img-cont">
+        <div class="img-cont col-12 p-0" style="overflow: hidden;position: relative;">
 
           <!-- <div class="img-before" v-if="currenNeigborhood.site?.name == 'default'">
             <p class="text-2xl lg:text-4xl text-center " style="font-weight: bold;color: black;">Vamos a buscar tu sede mas cercana</p>
           </div> -->
           <img :src="`${URI}/read_product_image/600/site-${ currenNeigborhood.site?.site_id }`"
             :class="currenNeigborhood.site?.name == 'default' ? 'default-image' : ''"
-            style="border: 1px solid gray; width: 100%; height: 100%; object-fit: cover; border-radius: 5px;" alt="">
-        </div>
+            style="border: 1px solid rgb(255, 255, 255); width: 100%; height: 100%; object-fit: cover; border-radius: 5px;" alt="">
 
 
-
-        <div
-          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display:flex; padding: 1rem; align-items: end; ">
-          <p v-if="currenNeigborhood.site.name != 'default'" class=""
+            <div 
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display:flex; padding: ; align-items: end;border-radius: 1rem; ">
+          <p v-if="currenNeigborhood.site.name != 'default'" class="col-12 p-0"
             style="text-align: center; height: min-content;  width: 100%; font-size: 35px; font-weight: bold; background-color: rgba(0, 0, 0, 0.577);">
             <span class="text-xl lg:text-2xl" style=""> SALCHIMONSTER</span> <span style="text-transform: uppercase;" class="text-xl lg:text-2xl">{{ currenNeigborhood.site.name }}</span>
           </p>
         </div>
+        </div>
+
+
+
+
 
 
       </div>
@@ -452,13 +470,17 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
     style="    box-shadow: 0px 0px 100px rgb(255, 0, 0);outline: 4px solid red; background-color: white;border: 1rem solid ; border-radius: 30px;padding-top: 2rem;">
 
 
-    <div class="header col-12 grid m-0 p-4" style=" position:absolute;top:1rem;left: 0;">
+ 
+
+    <div class="header col-12 grid m-0 text-justify" style="background-color: rgb(255, 255, 255);z-index:99; position:absolute;top:1rem;left: 0;height: max-content;">
         <p class="nombre col-9 text-xl lg:text-2xl p-0 text-left" style="color:black;font-weight: bold"> {{ productDialog.name }}</p>
         <p class="precio col-3 text-xl lg:text-2xl p-0 text-right " style="color:black;font-weight: bold"> {{formatoPesosColombianos( productDialog.price + sumarAdiciones(currentAditions))}}</p>
       </div>
 
 
-    <button  @click="showProductDialog = ! showProductDialog" style="width: 3rem;height: 3rem; border: none; position: absolute; left: 93%; bottom: 97px;%;background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center;justify-content: center; z-index: 9;">
+
+
+    <button  @click="showProductDialog = ! showProductDialog" style=" width: 3rem;height: 3rem; border: none; position: absolute; left: 93%; bottom: 97%;background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center;justify-content: center; z-index: 99;">
       <i :class="PrimeIcons.TIMES" style="color: white; font-weight: bold; " class="text-2xl"></i>
 
     </button>
@@ -468,6 +490,10 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 
 
+   <div class="bajador col-12 p-0 grid m-0" style="background-color: rgb(255, 255, 255); color: transparent; z-index:9;height: max-content;">
+      <p class="nombre col-9 text-justify text-xl lg:text-2xl p-0 text-left" style="color:rgba(0, 0, 0, 0);font-weight: bold"> {{ productDialog.name }}</p>
+      <p class="precio col-3 text-xl lg:text-2xl p-0 text-right " style="color:rgba(0, 0, 0, 0)09, 28, 28);font-weight: bold"> {{formatoPesosColombianos( productDialog.price + sumarAdiciones(currentAditions))}}</p>
+    </div>
       
 
       <div class="col-12 md:col-6 p-4" style="display: flex;align-items: center; max-height: 45rem; background-color:white;box-shadow: 0 0 20px rgba(0, 0, 0, 0.239); border-radius: 2rem;; overflow: hidden; " >
@@ -559,7 +585,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
        
 
           <div v-if="productDialog.category_id ==5" class="p-0" v-for="i in adiciones.acomp_almuerzos.products" 
-          style=" ; padding-bottom: 0.5rem; ; color:black;border-radius:2rem" :class="checkedAcomp[i.name]? 'selected':''" >
+          style=" ; padding-bottom: 0.5rem; ; color:black;border-radius:2rem" :class="checkedAdiciones[i.name]? 'selected':''" >
 
 
 
@@ -567,7 +593,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
               
 
             <div class="col-9 p-0 " style="display: flex;">
-              <Checkbox @change="cargarAdiciones(i)"   class="p-0" v-model="checkedAcomp[i.name]" :binary="true" style="margin-right: 1rem;  " />
+              <Checkbox @change="cargarAdiciones(i,productDialog.acomp_cantidad)"   class="p-0" v-model="checkedAdiciones[i.name]" :binary="true" style="margin-right: 1rem;  " />
 
                   <p   class="   p-0" style=";"> {{ i.name }}
                   </p>

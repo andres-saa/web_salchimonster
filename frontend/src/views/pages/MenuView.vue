@@ -9,13 +9,14 @@
   <img src="/images/banners/banner-1.jpeg" class="pb-6" alt="" style="width: 100%; ">
     
 
-    <div class=" col-12 d-flex p lg:justify-content-center align-items-center mb-5 p-0" style="overflow-x: auto;position: sticky; z-index: 99;top:5rem; background-color: rgb(250, 247, 253);box-shadow: 0 0 1rem rgba(0, 0, 0, 0.337); ">
-        <div v-for="section in menuOptions[0].menus" :key="section.category.name">
+    <div class=" col-12 d-flex p lg:justify-content-center align-items-center mb-5 p-2 md:p-3" style="overflow-x: auto;position: sticky; z-index: 99;top:5rem; background-color: rgb(250, 247, 253);box-shadow: 0 0 1rem rgba(0, 0, 0, 0.337); ">
+        <div v-for="section in menuOptions[0].menus" :key="section.category.name" class="p-0">
 
 
 
             <RouterLink :to="`/${section.category.name}`">
-                <button   :class="ruta.params.menu_name == section.category.name? 'selected menu-button': 'menu-button' " style="font-weight: bold;">
+                <button class="p-1"   :class="ruta.params.menu_name == section.category.name? 'selected menu-button':
+                ruta.fullPath == '/' && section.category.name == 'Salchipapas'? 'selected menu-button': 'menu-button' " style="font-weight: bold;">
                 {{ section.category.name }}
             </button>
             </RouterLink>
@@ -26,7 +27,7 @@
 
 
 
-    <RouterView>
+    <RouterView class="pb-8" >
 
     </RouterView>
 
@@ -141,7 +142,8 @@ onMounted(async () => {
     /* box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5); */
     /* transform: scale(1.1); */
     /* border-bottom:  2px red; */
-    color: var(--primary-color);
+    /* color: var(--primary-color); */
+    /* padding:; */
     cursor: pointer;
 
 
@@ -177,8 +179,9 @@ onMounted(async () => {
 }
 
 .selected {
-    outline: 0px 2px 0px var(--primary-color);
-    color: var(--primary-color);
+    /* color: var(--primary-color); */
+    box-shadow: 0 0.4rem var(--primary-color);
+    padding: 1rem;
     /* font-weight: bold; */
 
 
