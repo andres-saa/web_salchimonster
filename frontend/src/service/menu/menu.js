@@ -9,16 +9,21 @@ import {categoryCombos} from "./categorias/combos.js"
 
 import { ref } from "vue"
 
-const version_menu = ref(1)
-const menuGlobal = [
-    categorySalchipapa,
-    categoryHamburguers,
-    categoryMalteadas,
-    categoryBebidas,
+const version_menu = ref(1.007)
+const menuGlobal = {
+
+    salchipapas:categorySalchipapa,
+    burgers:categoryHamburguers,
+  
+    bebidas:categoryBebidas,
+    malteadas:categoryMalteadas,
+
+}
+    
     // categoryCombos,
     // categoryAlmuersos,
    
     
-]
+
 
 export { menuGlobal,version_menu }

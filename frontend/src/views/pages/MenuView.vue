@@ -1,60 +1,47 @@
 <template >
-    <p class="mb-6" style="; text-align: center; width: 100%; font-size: 36px; font-weight: bold; background-color: ;">
-        Menú <span style="color:var(--primary-color) ;"></span>
-    </p>
-
-    <div v-if="isSmallScreen" style="b  ; top:5rem;width:; position: sticky;z-index: 50;background-color: ;outline: 2rem solid transparent;margin-bottom: 5rem; padding: 3rem;display: flex;align-items: center" class="" >
-        <div  class="grid col-12 m-0  " style="margin-bottom: ;   box-shadow: 0px 0px 50px rgba(0, 0, 0, 1);  outline: 0.6rem solid var(--primary-color); padding: 0rem 0;border-radius: 100px;   ;  ; height: min-content; background-color: white;">
 
 
-            
-<div class="" 
-    style=" padding: 0 ; display: flex;z-index: 2;width: 100%;height: 100%; left: 0; overflow-x: auto;background-color: ;  ; ">
-    <div class="" style="" v-for="section in menuOptions[0].menus" :key="section.category.name">
-        <button
-            style=" margin: 0.5rem ; padding:  0.1rem 1rem ; border-radius: 100px; ; background-color: #00000015; ;"
-            class="menu-button" @click="changesection({ category: section.category, products: section.products })"
-            :class="currentSection.category.name == section.category.name ? '' : ''">
-            {{ section.category.name }}
-        </button>
-        
-    </div>
+<div class="p-0 m-0" style="min-height: 100vh;">
 
-
-</div>
-
-</div>
-    </div>
     
 
 
-    <!-- <div style="position: absolute; background-color: red; height: 30px; width: 100vw;left: 0;">holas</div> -->
+  <img src="/images/banners/banner-1.jpeg" class="pb-6" alt="" style="width: 100%; ">
+    
 
-    <Toolbar v-if="!isSmallScreen" style="margin-bottom: 1rem;background-color: white;  " class="p-5">
-            <template #center>
-                <div class=" d-flex flex-wrap justify-content-center align-items-center">
-                    <div v-for="section in menuOptions[0].menus" :key="section.category.name">
-                        <button class="menu-button"
-                            @click="changesection({ category: section.category, products: section.products })"
-                            :class="currentSection.category.name == section.category.name ? 'selected' : ''">
-                            {{ section.category.name }}
-                        </button>
-                    </div>
-                </div>
-            </template>
-        </Toolbar>
+    <div class=" col-12 d-flex p lg:justify-content-center align-items-center mb-5 p-0" style="overflow-x: auto;position: sticky; z-index: 99;top:5rem; background-color: rgb(250, 247, 253);box-shadow: 0 0 1rem rgba(0, 0, 0, 0.337); ">
+        <div v-for="section in menuOptions[0].menus" :key="section.category.name">
+
+
+
+            <RouterLink :to="`/${section.category.name}`">
+                <button   :class="ruta.params.menu_name == section.category.name? 'selected menu-button': 'menu-button' " style="font-weight: bold;">
+                {{ section.category.name }}
+            </button>
+            </RouterLink>
+            
+
+        </div>
+    </div>
+
+
+
+    <RouterView>
+
+    </RouterView>
+
+
+
 
   
     
+    
 
-        <div class="grid  xl:col-10 xl:m-auto  " style="background-color:var(--primary-color); border-radius:2rem; margin-bottom: 5rem;">
 
-            <div v-if="currentSection" v-for="product in currentSection.products" class="xl:col-3 lg:col-4 md:p-3 col-6 p-2 m-0 ">
-                <TarjetaMenu style="width: 100%;" class="" :product="product"></TarjetaMenu>
 
-                <!-- <TarjetaMenu class=""></TarjetaMenu> -->
-            </div>
-        </div>
+</div>
+
+    
 
 
 
@@ -68,18 +55,22 @@
 </template>
 
 <script setup>
-import TarjetaCombo from '../../components/TarjetaCombo.vue';
+// import TarjetaCombo from '../../components/TarjetaCombo.vue';
 import TarjetaMenu from '../../components/TarjetaMenu.vue'
 import { menuOptions } from '../../service/menuOptions';
-import { ref, onMounted, onBeforeUnmount, computed,watch } from 'vue';
+import {  onMounted, onBeforeUnmount, computed,watch } from 'vue';
 import { PrimeIcons } from 'primevue/api';
 import { curentProduct, changeProduct } from '../../service/productServices';
 import { menuGlobal } from '../../service/menu/menu';
 import { ableMenu } from '../../service/menuOptions';
 import { formatoPesosColombianos } from '../../service/formatoPesos';
+import sesion from './sesion.vue';
 
+import router from '@/router/index.js'
+import {ref} from 'vue'
 
-
+const ruta = ref(router.currentRoute)
+const hola = ref( localStorage.getItem('currentNeigborhood') )
 
 const screenWidth = ref(window.innerWidth);
 
@@ -155,7 +146,9 @@ onMounted(async () => {
 
 
 }
-
+*:focus{
+    outline: none;
+}
 
 ::-webkit-scrollbar {
   width: 12px;
@@ -163,6 +156,13 @@ onMounted(async () => {
 
 
    /* Ancho de la barra de desplazamiento */
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 
 /* Estilo del pulgar de la barra de desplazamiento */
@@ -177,7 +177,8 @@ onMounted(async () => {
 }
 
 .selected {
-    box-shadow: 0px 5px 0px var(--primary-color);
+    outline: 0px 2px 0px var(--primary-color);
+    color: var(--primary-color);
     /* font-weight: bold; */
 
 
@@ -185,7 +186,7 @@ onMounted(async () => {
 
 .col-12 {
     width: 100vw;
-    position: absolute;
+    /* position: absolute; */
     left: 0;
     padding: 1.5rem;
 }</style>

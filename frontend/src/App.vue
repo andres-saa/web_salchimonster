@@ -22,7 +22,7 @@ import { formatoPesosColombianos } from './service/formatoPesos';
 import { RouterLink } from 'vue-router';
 import router from '@/router/index.js'
 import { useCart,deleteAllCookies } from './service/cart';
- 
+import barra from './components/barra.vue';
 
 const version_tienda = ref(1)
 const screenWidth = ref(window.innerWidth);
@@ -162,7 +162,7 @@ onMounted(() => {
   }
 
 
-  if (!c_neigbor.value) {
+  if (!c_neigbor.value && ruta.fullPath == '/menu' ) {
     showSiteDialog.value = true
   }
 
@@ -222,16 +222,19 @@ const setNeigborhood = () => {
     currenNeigborhood: currenNeigborhood.value.neigborhood, 
     currenSite: currenNeigborhood.value.site.name, 
     currenSiteId:currenNeigborhood.value.site.site_id,
-    currenSiteWsp:currenNeigborhood.value.site.wsp }))
-  console.log(localStorage.getItem('currentNeigborhood'))
-  // setShowDialog()
-  location.reload();
+     }))
+  // console.log(localStorage.getItem('currentNeigborhood'))
+  localStorage.setItem('currenSiteWsp', currenNeigborhood.value.site.wsp)
+  
+  setShowDialog()
+  location.reload()
+  
   
 
 
 }
 
-
+const wsp = ref(localStorage.getItem('currenSiteWsp'))
 
 const searchCountry = (event) => {
   setTimeout(() => {
@@ -342,7 +345,10 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 </script>
 
 <template>
-  <router-view  style="background-color: ;" class="col-12 p-0 m-0" :class="screenWidth<800 && ruta.fullPath == '/cart' || ruta.fullPath == '/pay' || screenWidth<800 && ruta.fullPath == '/menu-view' || screenWidth<800 && ruta.fullPath == '/Sedes'? 'fondo-movil':'fondo-pc'"  />
+
+<!-- <barra></barra> -->
+  
+  <router-view  class="p-0 " style="background-color: rgb(250, 247, 253); width: 100vw;left:0px;position: absolute;"/>
   <!-- <Dialog v-if="menuOptions[0].menus.length < 2" v-model:visible="menuOptions" modal header="Header"
         :style="{ width: '100%', border: 'none', overflow: 'hidden' }" :breakpoints="{ '960px': '75vw', '641px': '100vw' }">
         <img class="imagen" style="" src="http://localhost:5173/src/images/logo.png" alt="">
@@ -372,7 +378,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
       <img style="width: 50px;" src="http://localhost:5173/src/images/logo.png" alt="">
 
-      <div class="field col-12 " style="width: 100%;">
+      <div class="field col-12 pb-0" style="width: 100%;">
         <label for="site_id" style="color: black;">Ciudad</label>
         <Dropdown @click="() => currenNeigborhood = {
           site: {
@@ -381,7 +387,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
         }" v-model="currenCity" :options="cities" placeholder="" optionLabel="name" required="true" />
 
       </div>
-      <div class="field col-12" style="width: 100%; display: block;">
+      <div class="field col-12 mt-0 pt-0" style="width: 100%; display: block;">
         <label for="site_id" style="color: black;">Barrio</label>
 
         <Dropdown filter v-model="currenNeigborhood" :disabled="!possibleNeigborhoods" :options="possibleNeigborhoods"
@@ -391,7 +397,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
       </div>
 
-      <div class="field col-12" style="width: 100%; height:300px ; position: relative;">
+      <div class="field col-12" style="width: 100%; height:15rem ; position: relative;">
 
 
         <div class="img-cont">
@@ -410,7 +416,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
           style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display:flex; padding: 1rem; align-items: end; ">
           <p v-if="currenNeigborhood.site.name != 'default'" class=""
             style="text-align: center; height: min-content;  width: 100%; font-size: 35px; font-weight: bold; background-color: rgba(0, 0, 0, 0.577);">
-            <span class="text-2xl lg:text-2xl" style=""> SALCHIMONSTER</span> <span style="text-transform: uppercase;" class="text-2xl lg:text-2xl">{{ currenNeigborhood.site.name }}</span>
+            <span class="text-xl lg:text-2xl" style=""> SALCHIMONSTER</span> <span style="text-transform: uppercase;" class="text-xl lg:text-2xl">{{ currenNeigborhood.site.name }}</span>
           </p>
         </div>
 
@@ -442,29 +448,35 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 
   <Dialog  v-model:visible="showProductDialog" :style="{ width: '1024px',height:'max-content' }"
-    header="Seleccion de sede" :modal="true" class="p-fluid "
+    header="Seleccion de sede" :modal="true" class="p-fluid pt-8"
     style="    box-shadow: 0px 0px 100px rgb(255, 0, 0);outline: 4px solid red; background-color: white;border: 1rem solid ; border-radius: 30px;padding-top: 2rem;">
 
 
-    <button  @click="showProductDialog = ! showProductDialog" style="width: 3rem;height: 3rem; border: none; position: absolute; right: 1rem; top:0.5rem;background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center;justify-content: center; z-index: 9;">
+    <div class="header col-12 grid m-0 p-4" style=" position:absolute;top:1rem;left: 0;">
+        <p class="nombre col-9 text-xl lg:text-2xl p-0 text-left" style="color:black;font-weight: bold"> {{ productDialog.name }}</p>
+        <p class="precio col-3 text-xl lg:text-2xl p-0 text-right " style="color:black;font-weight: bold"> {{formatoPesosColombianos( productDialog.price + sumarAdiciones(currentAditions))}}</p>
+      </div>
+
+
+    <button  @click="showProductDialog = ! showProductDialog" style="width: 3rem;height: 3rem; border: none; position: absolute; left: 93%; bottom: 97px;%;background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center;justify-content: center; z-index: 9;">
       <i :class="PrimeIcons.TIMES" style="color: white; font-weight: bold; " class="text-2xl"></i>
 
     </button>
    
  
-    <div class="grid col-12 p-0 pt-6 md:p-4"  >
-      <div class="header col-12 grid m-0 p-0" >
-        <p class="nombre col-9 text-xl lg:text-2xl p-0 text-left" style="color:black;font-weight: bold"> {{ productDialog.name }}</p>
-        <p class="precio col-3 text-xl lg:text-2xl p-0 text-right " style="color:black;font-weight: bold"> {{formatoPesosColombianos( productDialog.price + sumarAdiciones(currentAditions))}}</p>
-      </div>
+    <div class="grid col-12 p-0  md:p-4"  >
 
-      <div class="col-12 md:col-6 p-0" style="display: flex;align-items: center; max-height: 45rem; background-color: var(--primary-color); border-radius: 2rem;; overflow: hidden; " >
 
-      <div class="before"
+
+      
+
+      <div class="col-12 md:col-6 p-4" style="display: flex;align-items: center; max-height: 45rem; background-color:white;box-shadow: 0 0 20px rgba(0, 0, 0, 0.239); border-radius: 2rem;; overflow: hidden; " >
+
+      <!-- <div class="before"
                 style="top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; position: ;  position: absolute;">
                 <img :src="`${URI}/read_product_image/600/${productDialog.id}`" alt=""
                     style="width: 110%; height: 110%; opacity: 0.3; object-fit:  cover; filter: blur(5px);">
-        </div>
+        </div> -->
         <img class="col-12 p-0"  :src="`${URI}/read_product_image/600/${productDialog.id}`" alt="" style="width: 100%;object-fit: cover;">
 
       </div>
@@ -473,16 +485,16 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
         <p class="col-12 text-xl " style="font-weight: bold;color: black; ">
           DESCRIPCION  
         </p>
-        <p class="col-12 text-l " style="color: black;">
+        <p class="col-12 text-l p-0 md:pl-3" style="color: black;">
           {{ productDialog.description }}
         </p>
 
         <div v-if="productDialog.category_id != 4 && productDialog.category_id != 3 ">
-                  <p class="col-12 text-xl" style="font-weight: bold;color: black;display: flex;align-items: center;">
+                  <p class="col-12 text-xl p-0 md:pl-3" style="font-weight: bold;color: black;display: flex;align-items: center;">
           <span class="col-4 p-0 m-0">SALSAS</span> <div class="col p-0 m-0" style="height: auto; height: 01rem;background-color: var(--primary-color)"> </div>
         </p> 
 
-        <div v-for="i in adiciones.salsas" class="col-12 pt-0 pb-0 mb-2" :class="checkedSalsas[i] || checkedSalsas['TODAS LAS SALSAS'] ? 'selected' : ''" style="justify-content: start; padding-bottom: 0.5rem; padding-left: 1rem; border-radius: 1rem;">
+        <div v-for="i in adiciones.salsas" class="col-12 pt-0 pb-0 mb-2 p-0 md:pl-3" :class="checkedSalsas[i] || checkedSalsas['TODAS LAS SALSAS'] ? 'selected' : ''" style="justify-content: start; padding-bottom: 0.5rem; padding-left: 1rem; border-radius: 1rem;">
 
 <div class="salsa col-12 p-0" style="color: black; margin: 0; padding: 0; display: flex; justify-content: space-between; align-items: center;">
     <p class="texto p-0 m-0" style="margin: 0; padding: 0; min-width: max-content">{{ i }}</p>
@@ -499,14 +511,14 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
         <div v-if="productDialog.category_id != 3">
 
 
-          <p class="col-12 text-xl" style="font-weight: bold;color: black;display: flex;align-items: center;">
+          <p class="col-12 text-xl pl-0 md:pl-3" style="font-weight: bold;color: black;display: flex;align-items: center;">
           <span class="col-4 p-0 m-0">{{productDialog.category_id ==4 ? ' TOPINGS' : 'ADICIONES'}}</span> <div class="col p-0 m-0" style="height: auto; height: 01rem;background-color: var(--primary-color)"> </div>
         </p>
        
 
        
 
-          <div class="p-0" v-for="i in 
+          <div class="md:p-0 pl-3" v-for="i in 
             productDialog.category_id == 1 ? adiciones.salchipapas.products : 
             productDialog.category_id == 2 ? adiciones.hamburguesas.products :
             productDialog.category_id == 3 ? adiciones.salchipapas.products : 
@@ -517,7 +529,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 
 
-          <div class=" col-12 grid pl-5 pb-0 pt-0 mb-4" style=" align-items: center; justify-content: space-between; ">
+          <div class=" col-12 grid p-0 pb-0 md:pl-5 mb-4" style=" align-items: center; justify-content: space-between; ">
               
 
             <div class="col-9 p-0 " style="display: flex;">
@@ -583,9 +595,9 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
        
 
       </div>
-      <div @click="addcar(productDialog)"  class="col-12 md:col-6 add-car" style="position: absolute;display: flex; align-items: end; justify-content: center; background-color: white;  height: rem; bottom: 1.5rem;right: 0;">
+      <div   class="col-12 md:col-6 add-car" style="position: absolute;display: flex; align-items: end; justify-content: center; background-color: rgba(255, 255, 255, 0);  height: rem; bottom: 1.5rem;right: 0;">
 
-        <button style="background-color: var(--primary-color); color:white; border:none;padding: 0.5rem 3rem; font-weight: bold; border-radius: 2rem;">  <span class="text-xl"  >AGREGAR AL CARRITO</span></button>
+        <button @click="addcar(productDialog)" style="background-color: var(--primary-color); color:white; border:none;padding: 0.5rem 3rem; font-weight: bold; border-radius: 2rem;">  <span class="text-xl"  >AGREGAR AL CARRITO</span></button>
 
       </div>
     </div>
@@ -723,7 +735,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 
     
-    <a class="whatsapp" style="
+    <a class="whatsapp" :href="wsp" style="
                             
                         
                             ">
@@ -858,8 +870,8 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 }
 
 .fondo-pc{
-  background-color: #ffffff;
-  overflow-x: hidden;
+  background-color: #626262;
+  /* overflow-x: hidden; */
 }
 .img-cont {
   width: 100%;
@@ -1161,5 +1173,10 @@ a{
   height: 10rem;
   width: 10rem;
   /* display: none;  */
+}
+
+
+.fondo-pc{
+  background-color: rgb(247, 247, 247);
 }
 </style>

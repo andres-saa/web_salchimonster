@@ -236,7 +236,8 @@ const Caney =
           deliveryPrice: 9000
         },
     ],
-    site_id:3
+    site_id:3,
+    wsp:"https://wa.link/b711k3"
   }
 
   export{Caney}

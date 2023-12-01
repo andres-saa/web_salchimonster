@@ -235,16 +235,7 @@ const fondoVisible = ref(false)
                 style="padding:  30px; ">
             </div>
 
-            <router-link :to="`/`" @click="handleDropDownMenu(false)" class="" style="padding: 1rem;">
-                    <button   class="p-link boton-menu" @mouseover="handleDropDownMenu(false)  "
-                   :class="!curentMenu.name && router.currentRoute.value.path=='/'   ? 'selected' : 'boton-menu'" >
-                       
-                        <!-- <i class="pi pi-calendar"></i> -->
-                        <!-- <h3> {{i}}</h3> -->
-                        Inicio
-                    </button>
-
-                </router-link>
+            <!--  -->
 
             <div class=" botones-menu" :class="topbarMenuClasses" v-for=" menuTopbar in menuOptions"
                 style="display: flex; ">

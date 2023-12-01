@@ -9,10 +9,6 @@ const categoryBebidas = {
             price: 4500,
             description: "BEBIDAS",
             category_id: 3,
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
-           
 
         },
         {
@@ -21,10 +17,7 @@ const categoryBebidas = {
             price: 4500,
             description: "BEBIDAS",
             category_id: 3,
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
-       
+
         },
         {
             id: 39,
@@ -32,10 +25,7 @@ const categoryBebidas = {
             price: 8000,
             description: "BEBIDAS",
             category_id: 3,
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
-     
+
 
         },
 
@@ -45,10 +35,7 @@ const categoryBebidas = {
             price: 4000,
             description: "BEBIDAS",
             category_id: 3,
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
-      
+
         },
         {
             id: 42,
@@ -56,10 +43,6 @@ const categoryBebidas = {
             price: 4500,
             description: "BEBIDAS",
             category_id: 3,
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
-   
 
         },
         {
@@ -68,10 +51,7 @@ const categoryBebidas = {
             price: 4500,
             description: "BEBIDAS",
             category_id: 3,
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
-   
+
 
         }
         ,
@@ -81,91 +61,59 @@ const categoryBebidas = {
             price: 4500,
             description: "BEBIDAS",
             category_id: 3,
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
-   
 
         }
         ,
         {
-            id: 81,
+            id: 123,
             name: "JUGO DE LULO",
             price: 8000,
             description: "BEBIDAS",
             category_id: 3,
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
-   
+
 
         }
         ,
         {
-            id: 81,
+            id: 124,
             name: "JUGO DE UVA",
             price: 8000,
             description: "BEBIDAS",
             category_id: 3,
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
-   
 
         }
         ,
         {
-            id: 81,
+            id: 125,
             name: "JUGO DE MANGO",
             price: 8000,
             description: "BEBIDAS",
             category_id: 3,
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
-   
+
 
         }
         ,
         {
-            id: 81,
+            id: 126,
             name: "BUDWEISER",
             price: 8000,
             description: "BEBIDAS",
             category_id: 3,
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
-   
+
 
         }
         ,
         {
-            id: 81,
+            id: 127,
             name: "CORONA",
             price: 9500,
             description: "BEBIDAS",
             category_id: 3,
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+       
    
 
         }
-        ,
-        {
-            id: 81,
-            name: "GRANIZADOS",
-            price: 15000,
-            description: "BEBIDAS",
-            category_id: 3,
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
-   
-
-        }
-
+              
 
         
        ]

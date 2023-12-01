@@ -219,7 +219,7 @@ const modelia = {
     },
   ],
   site_id:7,
-  wsp:"https://wa.link/0chwft"
+  wsp:"https://wa.link/6v0usl"
 }
 
 export { modelia}

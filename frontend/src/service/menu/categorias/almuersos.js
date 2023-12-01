@@ -13,9 +13,7 @@ const categoryAlmuersos = {
             porcion: "1 PERSONA",
             acomp_cantidad:2,
             
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+  
         },
         {
             id: 54,
@@ -26,9 +24,7 @@ const categoryAlmuersos = {
             porcion: "1 PERSONA",
             acomp_cantidad:1,
 
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+       
         },
         {
             id: 55,
@@ -39,9 +35,7 @@ const categoryAlmuersos = {
             porcion: "1 PERSONA",
             acomp_cantidad:1,
             
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+           
         },
 
         {
@@ -53,9 +47,7 @@ const categoryAlmuersos = {
             porcion: "1 PERSONA",
             acomp_cantidad:2,
             
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+            
         },
         
 ]

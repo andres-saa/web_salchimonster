@@ -10,7 +10,7 @@
 
 
 
-   <RouterView class="p-0">
+   <RouterView class="p-0 ">
 
    </RouterView>
 

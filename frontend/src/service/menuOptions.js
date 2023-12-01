@@ -141,7 +141,7 @@ const menuOptions = ref(
 
         {
             name: 'Menu',
-            to:'menu-view',
+            to:'',
             menus:[
                 {
                     "category": {

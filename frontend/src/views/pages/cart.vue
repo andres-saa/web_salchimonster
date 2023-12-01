@@ -1,87 +1,60 @@
 <template>
-    <p class="col-12 md:col-7 p-1 text-center text-4xl m-auto mb-5 lg:col-7 md:col-12 sm:col-12 m-auto mb-8" style="border-radius: 2rem; font-weight: bold; color: white; background-color: black;" > <i class="text-4xl pr-3 p-0" :class="PrimeIcons.SHOPPING_CART" style="color: white;"></i>CARRITO DE COMPRAS </p>
-    
+    <!-- <p class="col-12 md:col-7 p-1 text-center text-4xl m-auto mb-5 lg:col-7 md:col-12 sm:col-12 m-auto mb-8" style="border-radius: 2rem; font-weight: bold; color: white; background-color: black;" > <i class="text-4xl pr-3 p-0" :class="PrimeIcons.SHOPPING_CART" style="color: white;"></i>CARRITO DE COMPRAS </p>
+     -->
 
 
     <div sty class=" contenedor-principal p-0 md:p-3 grid md:col-12 xl:col-8 xl:ml-auto xl:mr-auto clase"
-        v-if="products.length > 0" style="margin-bottom: 5rem;he">
+        v-if="products.length > 0" style="margin-bottom: 5rem;overflow: hidden;height: 100%;">
 
-        <div class=" productos-scroll col-12 xl:col-7   md:pl-4 md:pr-6  p-2 pt-4" style="">
-            <div v-for=" product in products" class="producto-list grid mb-6 contenedor-producto "
-                style="background-color: ; ">
-
-                <img class=" mr-2 md:mr-6 pl-0 p-2  " style="background-color: #ffede1
-; object-fit: contain;height: 7rem;width: 7rem; border-radius:50% ;" :src="`${URI}/read_product_image/600/${product.product.id}`" alt="">
-
-
-
-                <div class="nombre-produc   col p-1 " style="border-radius: 0 .0rem .5rem 0.5rem; background-color: #ffede1
-;height:100% ;display: flex; flex-direction:column ;justify-content: space-between;overflow:  ">
+        <div class=" col-12 xl:col-7 xl:p-5 " style="">
+            <div class="cont-products grid p-2" style=";position: inherit; ">
 
 
 
 
-                    <div class="col-12 mr-8"
-                        style="background-color: ;text-transform: uppercase;  font-weight:bold ; width: 100%;height:1rem; display: flex;  justify-content: space-between;padding: 1rem; ">
-                        <p class="xl:text-l md:text-l text-l" style="height: min-content;">{{ product.quantity }} {{
-                            product.product.name }}</p>
-                        <p class="xl:text-l md:text-xl" style="height: min-content;"> {{
-                            formatoPesosColombianos(calcularPrecioTotal(product.product) * product.quantity) }}</p>
+                <div v-for="product in products" class=" m-0 grid mb-5 md:pr-5 pb-6"
+                    style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); height: min-content;border-radius: 1rem; overflow: hidden; position: relative;">
 
 
-                    </div>
+                    <img class="col-3 p-1 " style=" object-fit: contain;"
+                        :src="`${URI}/read_product_image/600/${product.product.id}`" alt="">
 
-                    <div class="col-12"
-                        style="text-transform: lowercase;text-align: ;  gap:2rem ;height: 4rem;overflow:hidden ; width: auto; display: flex; padding-right: 10rem ; justify-content: space-between; ; ">
-                        <p v-if="!isSmallScreen" class="" style="height: auto;">{{ product.product.description }} </p>
-
-
-                        <div class="contador ">
-
-                            <button style="  
-                            display: flex; 
-                            align-items: center;
-                            justify-content: center;  
-                            border: none; 
-                            /* font-size: 3vh;  */
-                            background-color: transparent;
-                            " @click="remove(product.product)"> <i :class="PrimeIcons.MINUS"> </i>
-
-                            </button>
-
-                            <input class="cantidad"
-                                style="font-size: 1.5rem; text-align: center; width: 30px; border: 1px none;  " readonly
-                                type="text" :value="product.quantity">
-
-                            <button
-                                style="  display: flex; align-items: center;justify-content: center; border: none;font-weight: bold; font-size: 3vh;background-color: transparent;"
-                                @click="add(product.product)"> <i :class="PrimeIcons.PLUS"> </i> </button>
-
+                    <div class="col-9 grid m-0 pl-3  " style="">
+                        <div class="col text-left md:text-xl p-0" style="font-weight: bold;">
+                            {{  `${product.quantity} ${product.product.name} ` }}
 
                         </div>
+                        <div class="col text-right md:text-xl p-0" style="font-weight: bold;">{{formatoPesosColombianos(product.quantity * product.product.price) }}
+                        </div>
+                        <div class="col-12 text-left md:text-xl descripcion p-0"
+                            style="font-weight:; text-transform: lowercase;">{{ product.product.description }} </div>
 
+
+
+                      
                     </div>
+                    <div class="contador col text-reignt ">
+
+<button
+    style="  display: flex; align-items: center;justify-content: center;  border: none;background-color: transparent;"
+    @click="remove(product.product)"> <i :class="PrimeIcons.MINUS"> </i>
+
+</button>
+
+<input class="cantidad"
+    style="font-size: 1.5rem; text-align: center; width: 30px; border: 1px none;  " readonly
+    type="text" :value="product.quantity">
+
+<button
+    style="  display: flex; align-items: center;justify-content: center; border: none;font-weight: bold; font-size: 3vh;background-color: transparent;"
+    @click="add(product.product)"> <i :class="PrimeIcons.PLUS"> </i> </button>
 
 
+</div>
 
-                    <!-- <div class="triangulo"></div> -->
                 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
             </div>
         </div>
-
 
 
         <div class=" col-12 xl:col-5   "
@@ -409,8 +382,11 @@
 
             <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
-                <span style="font-weight: bold; text-transform: uppercase;"> DOMICILIO A <span @click="setShowDialog()" style="margin-right: 1rem; cursor: pointer; color: var(--primary-color);">{{ domicilio.name }}</span> </span>
-                <span style="font-weight: bold; margin-right: 1rem"> {{ formatoPesosColombianos(domicilio.deliveryPrice) }} </span>
+                <span style="font-weight: bold; text-transform: uppercase;"> DOMICILIO A <span @click="setShowDialog()"
+                        style="margin-right: 1rem; cursor: pointer; color: var(--primary-color);">{{ domicilio.name
+                        }}</span> </span>
+                <span style="font-weight: bold; margin-right: 1rem"> {{ formatoPesosColombianos(domicilio.deliveryPrice) }}
+                </span>
 
             </div>
 
@@ -503,7 +479,7 @@ const updateScreenWidth = () => {
 
 onMounted(() => {
     window.addEventListener('resize', updateScreenWidth);
-domicilio.value = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
+    domicilio.value = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
 
 });
 
@@ -564,6 +540,11 @@ console.log(resultado);
 .led {
     animation: cambiaColor 1s infinite;
     /* 3s de duración, animación infinita */
+}
+
+
+.descripcion::first-letter {
+    text-transform: uppercase;
 }
 
 @keyframes cambiaColor {
@@ -643,12 +624,12 @@ console.log(resultado);
 }
 
 .contenedor-principal {
-    border-radius: 2rem;
-    position: sticky;
-    top: 100px;
-    margin-bottom: 10rem;
-    background-color: var(--primary-color);
-    height: auto;
+    /* border-radius: 2rem; */
+    /* position: sticky */
+    /* top: 100px; */
+    /* margin-bottom: 10rem; */
+    /* background-color: var(--primary-color); */
+    /* height: auto; */
 }
 
 
@@ -679,7 +660,8 @@ console.log(resultado);
     border-radius: 0.5rem;
     /* bottom: 0.5rem; */
     position: absolute;
-    right: 0.5rem;
+    right:1rem;
+    bottom: 1rem;
     width: 8rem;
     height: 2.5rem;
 
@@ -729,6 +711,8 @@ button:hover {
 }
 
 .clase {}
+
+*:focus{outline: none;}
 
 /* Estilo del pulgar de la barra de desplazamiento */
 /* WebKit (Chrome, Safari) */

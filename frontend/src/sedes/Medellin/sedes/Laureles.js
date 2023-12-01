@@ -796,7 +796,8 @@ const Laureles =
         deliveryPrice: 8000
       },
      ],
-     site_id:11
+     site_id:11,
+     wsp:"https://walink.co/45bd74"
   }
 
   export{Laureles}

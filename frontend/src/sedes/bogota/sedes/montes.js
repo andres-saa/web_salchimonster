@@ -144,7 +144,8 @@ const Montes = {
       deliveryPrice: 6500
     },
   ],
-  site_id:9
+  site_id:9,
+  wsp:"https://wa.link/tr1653"
 }
 
 export { Montes}

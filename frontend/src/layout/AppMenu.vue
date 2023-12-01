@@ -4,11 +4,11 @@ import { ref } from 'vue';
 import AppMenuItem from './AppMenuItem.vue';
 
 const model = ref([
-    {
-        label: 'Principal',
-        items: [
-            { label: 'Inicio', icon: 'pi pi-fw pi-home', to: '/' }]
-    },
+    // {
+    //     label: 'Principal',
+    //     items: [
+    //         { label: 'Inicio', icon: 'pi pi-fw pi-home', to: '/' }]
+    // },
     // {
     //     label: 'UI Components',
     //     items: [
@@ -47,7 +47,7 @@ const model = ref([
     {
         label: 'Menu',
         icon: 'pi pi-fw pi-briefcase',
-        to: '/menu',
+        to: '/',
         items: [
             // {
             //     label: 'Landing',
@@ -78,7 +78,7 @@ const model = ref([
             {
                 label: 'Menu',
                 icon: 'pi pi-fw pi-pencil',
-                to: '/menu-view'
+                to: '/'
             },
 
             {
@@ -87,7 +87,7 @@ const model = ref([
                 to: '/sedes'
             },
             {
-                label: 'Carta',
+                label: 'Carta menu',
                 icon: 'pi pi-fw pi-pencil',
                 to: '/menu'
             },
@@ -96,11 +96,11 @@ const model = ref([
                 icon: 'pi pi-fw pi-pencil',
                 to: '/cart'
             },
-            {
-                label: 'Finalizar compra',
-                icon: 'pi pi-fw pi-pencil',
-                to: '/pay'
-            },
+            // {
+            //     label: 'Finalizar compra',
+            //     icon: 'pi pi-fw pi-pencil',
+            //     to: '/pay'
+            // },
             // {
             //     label: 'Gestion de Sedes',
             //     icon: 'pi pi-fw pi-pencil',

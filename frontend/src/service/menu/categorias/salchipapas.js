@@ -12,10 +12,7 @@ const categorySalchipapa = {
             category_id: 1,
             porcion: "2 PERSONAS",
             
-            
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+
         },
         {
             id: 2,
@@ -24,10 +21,7 @@ const categorySalchipapa = {
             description: "PAPA AMARILLA, SALCHICHA PREMIUM SM, QUESO GRATINADO, MADURO GUAYABO Y SALSAS.",
             category_id: 1,
             porcion: "2 PERSONAS",
-            
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+
         },
         {
             id: 3,
@@ -37,9 +31,7 @@ const categorySalchipapa = {
             category_id: 1,
             porcion: "2 PERSONAS",
             
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+
         },
         {
             id: 4,
@@ -49,9 +41,7 @@ const categorySalchipapa = {
             category_id: 1,
             porcion: "2 PERSONAS",
             
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+      
         },
         {
             id: 5,
@@ -60,10 +50,7 @@ const categorySalchipapa = {
             description: "PAPA AMARILLA, SALCHICHA PREMIUM SM, QUESO GRATINADO, POLLO EN SALSA A LA NARANJA, HUEVOS DE CODORNIZ Y SALSAS.",
             category_id: 1,
             porcion: "2 PERSONAS",
-            
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+        
         },
         {
             id: 6,
@@ -73,21 +60,17 @@ const categorySalchipapa = {
             category_id: 1,
             porcion: "2 PERSONAS",
             
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+          
         },
         {
             id: 7,
             name: "NACHIMONSTER",
             price: 48500,
-            description: "PAPA AMARILLA, CARNE DESMECHADA, GUACAMOLE, QUESO CHEDDAR, MAICITOS, PICO DE GALLO, NACHOS Y SALSAS",
+            description: "PAPA AMARILLA, CARNE DESMECHADA, GUACAMOLE, QUESO CHEDDAR, QUESO CON MAIZ, PICO DE GALLO, NACHOS Y SALSAS",
             category_id: 1,
             porcion: "2 PERSONAS",
             
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+           
         },
         {
             id: 8,
@@ -97,9 +80,7 @@ const categorySalchipapa = {
             category_id: 1,
             porcion: "2 PERSONAS",
             
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+            
         },
         {
             id: 9,
@@ -109,9 +90,7 @@ const categorySalchipapa = {
             category_id: 1,
             porcion: "2 PERSONAS",
             
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+            
         },
         {
             id: 10,
@@ -121,9 +100,7 @@ const categorySalchipapa = {
             category_id: 1,
             porcion: "2 PERSONAS",
             
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+           
             
         },
         {
@@ -134,9 +111,7 @@ const categorySalchipapa = {
             category_id: 1,
             porcion: "2 PERSONAS",
             
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+            
         },
         {
             id: 12,
@@ -146,9 +121,7 @@ const categorySalchipapa = {
             category_id: 1,
             porcion: "2 PERSONAS",
             
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+           
         },
         {
             id: 13,
@@ -157,9 +130,7 @@ const categorySalchipapa = {
             description: "PAPA AMARILLA, SALCHICHA PREMIUM SM, POLLO EN SALSA A LA NARANJA, BACON PREMIUM, COSTILLA AHUMADA EN SALSA BUFALO, CHORIZO, MAICITOS, QUESO GRATINADO, RIPIO, HUEVO DE CODORNIZ, MADURO GUAYABO Y SALSAS.",
             category_id: 1,
             porcion: "5-6 PERSONAS",
-            get img_96x96() {return fotos[this.id]['96x96']},
-            get img_300x300() {return fotos[this.id]['300x300']},
-            get img_600x600() {return fotos[this.id]['600x600']},
+            
         },  
 ]
 }

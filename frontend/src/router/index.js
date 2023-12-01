@@ -17,8 +17,24 @@ const router = createRouter({
         {
           path: '/',
           name: 'Home',
-          component: () => import('@/views/pages/Home.vue'),
-          // meta: { requiresAuth: true },
+          component: () => import('@/views/pages/MenuView.vue'),
+          children:[
+            {
+              path: '/:menu_name',
+              name: 'sesion',
+              component: () => import('@/views/pages/sesion.vue'),
+              // meta: { requireMenu: true },
+              // meta: { requiresAuth: true },
+            },
+            {
+              path: '/',
+              name: 'main',
+              component: () => import('@/views/pages/sesion_main.vue'),
+              // meta: { requireMenu: true },
+              // meta: { requiresAuth: true },
+            },
+          ]
+          
         },
 
         {
@@ -62,13 +78,7 @@ const router = createRouter({
 
 
 
-        {
-          path: '/product/:product_id',
-          name: 'product',
-          component: () => import('@/views/pages/ProductView.vue'),
-          // meta: { requireMenu: true },
-          // meta: { requiresAuth: true },
-        },
+
         {
           path: '/combo/:combo_id',
           name: 'combo',

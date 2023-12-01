@@ -32,9 +32,9 @@
         <div class="info">
             
             <div class="text-xl" style="font-size: rem; font-weight: bold;"> {{ formatoPesosColombianos(props.product.price) }}</div>
-            <button @click="addcar(prepare_product(props.product))" class="add-cart-btn"><i  class="icono text-xl lg:text-4xl p-2" :class="PrimeIcons.SHOPPING_CART"> </i>  </button>
+            <button @click="addcar(prepare_product(props.product))" class="add-cart-btn text-2xl"><i  class="icono text-xl lg:text-4xl " :class="PrimeIcons.PLUS_CIRCLE"> </i>  </button>
             <!-- <button class="mas-detalles"> + </button> -->
-        </div>
+        </div> 
     </div>
 </template>
 
@@ -45,7 +45,7 @@ import {URI} from '@/service/conection'
 import {useCart} from '@/service/cart'
 import { menuGlobal } from '../service/menu/menu';
 import  {formatoPesosColombianos} from '../service/formatoPesos'
-import { setProductDialog,showProductDialog } from '../service/state';
+import { check_site, setProductDialog,showProductDialog } from '../service/state';
 import { useToast } from 'primevue/usetoast';
 
 const toast = useToast();
@@ -71,6 +71,7 @@ const props = defineProps({
 const addcar =(product) => {
     useCart.add(product)  
     toast.add({ severity: 'success', summary: 'Agregado al carrito', detail: props.product.name, life: 3000 });
+    check_site()
 }
 
 const imagenError = (Event) => {
@@ -105,11 +106,18 @@ const imagenError = (Event) => {
 
 .add-cart-btn{
     /* transition: all  0.2s ease; */
+    border-radius: 50%;
     border: none;
-    padding: 0.1rem 1rem;
+    height: 3rem;
+    width: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* padding: 1rem 1rem; */
     font-size: 20px;
-    background-color: var(--primary-color);
-    border-radius: 10px;
+    background-color: rgb(251, 0, 0);
+    /* border-radius: 10px; */
     color: #fff;
 }
 
@@ -130,9 +138,9 @@ const imagenError = (Event) => {
     font-weight: bold;
 }
 .cont {
-    border: 1px solid gray;
+    /* border: 1px solid gray; */
     border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     /* margin: 20px; */
     /* height: max-content; */
     /* width: 100%; */
@@ -154,19 +162,19 @@ const imagenError = (Event) => {
     /* background-color: red; */
     /* margin:1rem; */
 }
-.cont:hover .imagen{
+/* .cont:hover .imagen{
     filter: brightness(1);
-    transform: scale(1.1) rotate(3deg);
-    filter: brightness(1.1) drop-shadow(2px 2px 10px rgb(255, 123, 0));
+    transform: scale(1.1) rotate(3deg); */
+    /* filter: brightness(1.1) drop-shadow(2px 2px 10px rgb(255, 123, 0)); */
     /* filter: brightness(1.1) drop-shadow(2px 2px 10px rgb(0, 0, 0)); */
-}
+
 
 .cont:hover .add-cart-btn{
     
     /* transform: translateY(-10px); */
 }
 .cont:hover {
-    filter: brightness(1.2);
+    filter: brightness(1.1);
     /* box-shadow: 0px 0px 30px var(--primary-color); */
     background-color: #ff620035;
 }
@@ -178,7 +186,7 @@ const imagenError = (Event) => {
     /* background-image: url('https://i.ytimg.com/vi/yvIhfmAfsck/maxresdefault.jpg'); */
     height: 100%;
     /* background-color: red; */
-    filter: brightness(1.1) drop-shadow(2px 2px 10px rgb(255, 123, 0));
+    /* filter: brightness(1.1) drop-shadow(2px 2px 10px rgb(255, 123, 0)); */
 }
 
 .imagen-cont{

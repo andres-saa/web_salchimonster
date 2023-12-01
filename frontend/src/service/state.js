@@ -92,7 +92,13 @@ function calcularTotalCarrito() {
   return totalCarrito;
 }
 
+const c_neigbor = ref(localStorage.getItem('currentNeigborhood'))
 
+const check_site = () => {
+  if (!c_neigbor.value && ruta.fullPath == '/menu' ) {
+    showSiteDialog.value = true
+  }
+}
 
 const setShowDialog =()=>{
   currentAditions.value=[]
@@ -102,8 +108,9 @@ const setShowDialog =()=>{
     console.log('hola')
     if (showProductDialog.value) {
 
-       
+      // location.reload()
     }
+    
   }
 
   const setProductDialog =(product)=>{
@@ -123,4 +130,4 @@ const setShowDialog =()=>{
 
 
 
-export {checkedAcomp,calcularTotalCarrito,calcularPrecioTotal,sumarAdiciones, showSiteDialog,setShowDialog,showProductDialog,setProductDialog,productDialog,checkedSalsas,checkedAdiciones,currentAditions,currentSalsas}
+export {check_site,checkedAcomp,calcularTotalCarrito,calcularPrecioTotal,sumarAdiciones, showSiteDialog,setShowDialog,showProductDialog,setProductDialog,productDialog,checkedSalsas,checkedAdiciones,currentAditions,currentSalsas}

@@ -4,6 +4,7 @@ const salsas = [
     'VERDE DE LA CASA',
     'PIÑA',
     'AJO DE LA CASA', 
+    'SIN SALSAS'
     
 ]
 

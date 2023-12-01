@@ -162,7 +162,8 @@ const Suba = {
       deliveryPrice: 6000
     },
   ],
-  site_id:8
+  site_id:8,
+  wsp:"https://wa.link/m0sxtw"
 }
 
 export { Suba}

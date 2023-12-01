@@ -521,7 +521,8 @@ const sedeTulua = {
           deliveryPrice: 5000
         },
     ],
-    site_id:6
+    site_id:6,
+    wsp:"https://wa.link/bcfp9z"
   }
 
   export {sedeTulua}

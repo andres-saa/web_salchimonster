@@ -1101,7 +1101,8 @@ const sede_jamundi = {
       },
   
     ],
-    site_id:4
+    site_id:4,
+    wsp:"https://wa.link/ahsl9u"
   }
 
   export {sede_jamundi}
