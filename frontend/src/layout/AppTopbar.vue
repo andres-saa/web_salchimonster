@@ -172,7 +172,7 @@ const fondoVisible = ref(false)
 </script>
 
 <template>
-    <div class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 " style=" z-index: ">
+    <div class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 " style=" z-index:999 ">
         
 
         <router-link to="/" class="layout-topbar-logo" style="z-index: 99999;">
@@ -231,7 +231,7 @@ const fondoVisible = ref(false)
 
 
         <div class="layout-topbar-menu " :class="topbarMenuClasses">
-            <div @mouseover="handleDropDownMenu(false)" class="p-link boton-menu "
+            <div class="p-link boton-menu "
                 style="padding:  30px; ">
             </div>
 
@@ -242,7 +242,7 @@ const fondoVisible = ref(false)
 
                 
                 <router-link :to="`/${menuTopbar.to}`" @click="handleDropDownMenu(false)" class="col-12">
-                    <button  class="p-link boton-menu" @mouseover="showMenu(menuTopbar)"
+                    <button  class="p-link boton-menu" 
                         :class="curentMenu.name == menuTopbar.name || router.currentRoute.value.path== `/${menuTopbar.to}`  ? 'selected' : 'boton-menu'">
                         <!-- <i class="pi pi-calendar"></i> -->
                         <!-- <h3> {{i}}</h3> -->
@@ -252,7 +252,7 @@ const fondoVisible = ref(false)
                 </router-link>
             </div>
 
-            <div @mouseover="handleDropDownMenu(false)" class="p-link boton-menu "
+            <div  class="p-link boton-menu "
                 style="padding:  30px; width: px; background-color:#fff;">
             </div>
 
@@ -293,7 +293,7 @@ const fondoVisible = ref(false)
             <!-- <p style="text-align: center; width: 100%; font-size: 36px; font-weight: bold;">
                 {{ curentMenu.name }}
             </p> -->
-            <div style=" box-shadow: 0px 0px 20px;  display: flex;border-radius:0 0 20px 20px; background-color: rgba(255, 255, 255, 0.9);backdrop-filter: blur(20px);    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);  " class=" grid pl-0 pr-0 m-auto xl:col-10 lg:col-12" @mouseover="handleDropDownMenu(true)"
+            <div style=" box-shadow: 0px 0px 20px;  display: flex;border-radius:0 0 20px 20px; background-color: rgba(255, 255, 255, 0.9);backdrop-filter: blur(20px);    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);  " class=" grid pl-0 pr-0 m-auto xl:col-10 lg:col-12" 
             @mouseleave="handleDropDownMenu(false)">
 
                 <!-- <carousel-banner class="col-12"></carousel-banner> -->
@@ -307,7 +307,7 @@ const fondoVisible = ref(false)
                         <!-- aqui es el name del apartado del menu -->
                         <p style="text-align: center; width: 100%;  ;font-weight:bold ; margin-bottom: 1rem"
                             class="text-2xl"  
-                            @mouseover="changeCurrentGroupMenu(grupoMenu)">
+                            >
                             {{ grupoMenu.category.name }} 
                         </p>
 
@@ -317,7 +317,7 @@ const fondoVisible = ref(false)
 
 
                     <div class="img-product-cont" v-if="curentMenu.name != 'Sedes'"
-                        v-for="product in grupoMenu.products.slice(0, 4)" @mouseover="changeCurrentGroupMenu(grupoMenu)">
+                        v-for="product in grupoMenu.products.slice(0, 4)" >
                         <div class="img-product-cont" 
                             style="overflow: hidden; color: inherit; display: flex; align-items: center; justify-content:start;"
                             @click="{ handleDropDownMenu(false); changeProduct(product);setProductDialog(product) }">
