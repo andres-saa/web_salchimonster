@@ -47,7 +47,7 @@ import { menuGlobal } from '../service/menu/menu';
 import  {formatoPesosColombianos} from '../service/formatoPesos'
 import { check_site, setProductDialog,showProductDialog } from '../service/state';
 import { useToast } from 'primevue/usetoast';
-
+import { comprobar_sede } from '../service/state';
 const toast = useToast();
 
 // console.log(menuGlobal[0].products)
@@ -69,6 +69,8 @@ const props = defineProps({
 });
 
 const addcar =(product) => {
+
+    comprobar_sede()
     useCart.add(product)  
     toast.add({ severity: 'success', summary: 'Agregado al carrito', detail: props.product.name, life: 3000 });
     check_site()
