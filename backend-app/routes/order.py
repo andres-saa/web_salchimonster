@@ -3,6 +3,8 @@ from schema.order import order_schema_post
 from models.order import Order
 from fastapi import APIRouter, HTTPException
 from datetime import datetime
+
+import pytz 
 order_router = APIRouter()
 
 @order_router.get("/orders")
@@ -69,5 +71,22 @@ def get_orders_by_user(user_id: int):
 
 @order_router.get("/server_time")
 def get_server_time():
-    server_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    return {"server_time": server_time}
+    # Configura la zona horaria de Colombia
+    colombia_tz = pytz.timezone('America/Bogota')
+
+    # Obtiene la hora actual con la zona horaria de Colombia
+    now_colombia = datetime.now(colombia_tz)
+
+    # Formatea la fecha y la hora según tus especificaciones
+    fecha = {
+        "d": now_colombia.strftime("%d"),
+        "m": now_colombia.strftime("%m"),
+        "a": now_colombia.strftime("%Y"),
+    }
+
+    hora = {
+        "h": now_colombia.strftime("%H"),
+        "m": now_colombia.strftime("%M"),
+    }
+
+    return {"fecha": fecha, "hora": hora}
