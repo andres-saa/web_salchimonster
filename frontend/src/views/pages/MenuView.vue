@@ -9,7 +9,7 @@
   <img src="/images/banners/banner-1.jpeg" class="pb-6" alt="" style="width: 100%; ">
     
 
-    <div class=" col-12 d-flex p lg:justify-content-center align-items-center mb-5 p-2 md:p-3" style="overflow-x: auto;position: sticky; z-index: 99;top:5rem; background-color: rgb(255, 255, 255);box-shadow: 0 0 1rem rgba(0, 0, 0, 0.337); ">
+    <div class=" col-12 d-flex p lg:justify-content-center align-items-center mb-5 p-2 md:p-3" style="overflow-x: auto;position: sticky; z-index: 999;top:5rem; background-color: rgb(255, 255, 255);box-shadow: 0 0 1rem rgba(0, 0, 0, 0.337); ">
         <div v-for="section in menuOptions[0].menus" :key="section.category.name" class="p-0">
 
 

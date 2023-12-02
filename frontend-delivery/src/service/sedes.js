@@ -96,7 +96,17 @@ const sedes  = [
       "Google Maps": "https://maps.app.goo.gl/SrTRXEbEC3fhnK5W7",
       "Ciudad": "Medellín",
       "Foto": "https://lh3.googleusercontent.com/p/AF1QipNacg4X8DwsUhEkQ9a-VMWg6RUgCX-NdrrExueh=s680-w680-h510"
-    }
+    },
+    {
+      "site_id":12,
+      "Nombre": "test",
+      "Dirección": "Transversal 39  #74 B-14 PRIMER PISO",
+      "WSP": "3207950433",
+      "Google Maps": "https://maps.app.goo.gl/SrTRXEbEC3fhnK5W7",
+      "Ciudad": "Medellín",
+      "Foto": "https://lh3.googleusercontent.com/p/AF1QipNacg4X8DwsUhEkQ9a-VMWg6RUgCX-NdrrExueh=s680-w680-h510"
+    },
+    
   ]
   
   function buscarSedePorId(id) {

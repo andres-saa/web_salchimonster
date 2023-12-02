@@ -47,17 +47,18 @@ const getUserID = async (userData) => {
 
 
 
+
+
 const send_order = async () => {
-    // Obtiene la hora del servidor
+
     const serverTimeResponse = await fetch('https://backend.salchimonster.com/server_time');
     const serverTimeData = await serverTimeResponse.json();
 
     // Extrae la fecha y la hora del objeto de respuesta
     const { fecha, hora } = serverTimeData;
 
-    // Construye el objeto de datos para la orden con la hora del servidor
-    const user = user_data.value;
-    user.site_id = JSON.parse(localStorage.getItem('currentNeigborhood')).currenSiteId;
+    const user = user_data.value
+    user.site_id = JSON.parse(localStorage.getItem('currentNeigborhood')).currenSiteId
     const user_id = await getUserID(user);
 
     const data = {
@@ -70,15 +71,77 @@ const send_order = async () => {
         },
         "payment_method": payMethod.value,
         "delivery_person_id": 4,
-        "status_history": [{}],
-        "delivery_price": domicilio.value.deliveryPrice,
-        "order_notes": order_notes.value == null || order_notes.value == "" ? 'sin notas' : order_notes.value
+        "status_history": [
+            {
+
+            }
+        ],
+        "delivery_price":domicilio.value.deliveryPrice,
+        "order_notes":order_notes.value == null || order_notes.value == "" ? 'sin notas': order_notes.value
+    }
+
+
+    let Method = "POST"
+    const queryUrl = `${URI}/order`
+    const requestOptions = {
+        method: Method,
+        headers: {
+            'Content-Type': 'application/json' // Asegúrate de establecer el tipo de contenido adecuado
+        },
+        body: JSON.stringify(data)
     };
 
-    // Resto del código para enviar la orden...
-};
+    // Realizar la solicitud Fetch
+   await fetch(queryUrl, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error en la solicitud: ${response.status}`);
+            }
+            // file.value? uploadUserPhotoProfile(file.value,data.dni): '' 
+
+            return response.json();
+        })
+        .then(data => {
+            // Aquí puedes trabajar con los datos actualizados
+            console.log('Datos actualizados:', data);
+            // localStorage.removeItem('cart')
+            eliminarProductosDelCarrito();
+
+            showThaks.value = true
+            // router.push('/')
+
+        })
+        .catch(error => {
+            console.error('Error en la solicitud:', error);
+            // toast.add({ severity: 'error', summary: 'llene todos los campos', detail: '', life: 3000 })
+
+        });
 
 
+
+        
+
+}
+
+
+
+function eliminarProductosDelCarrito() {
+    // Obtener el carrito actual almacenado en el LocalStorage
+    const cart = JSON.parse(localStorage.getItem('cart'));
+  
+    // Verificar si el carrito existe y tiene la propiedad "products"
+    if (cart && cart.products) {
+      // Vaciar el array de productos
+      cart.products = [];
+  
+      // Actualizar el LocalStorage con el carrito modificado
+      localStorage.setItem('cart', JSON.stringify(cart));
+  
+      console.log('Se eliminaron los productos del carrito y se actualizó el LocalStorage.');
+    } else {
+      console.log('El carrito no tiene la propiedad "products" o no existe en el LocalStorage.');
+    }
+  }
 
 
 export{payMethods,payMethod,showThaks,send_order,order_notes,user_data}
