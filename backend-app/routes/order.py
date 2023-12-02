@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 from schema.order import order_schema_post
 from models.order import Order
-
+from fastapi import APIRouter, HTTPException
+from datetime import datetime
 order_router = APIRouter()
 
 @order_router.get("/orders")
@@ -64,3 +65,9 @@ def get_orders_by_user(user_id: int):
     orders = order_instance.select_orders_by_user(user_id)
     order_instance.close_connection()
     return orders
+
+
+@order_router.get("/server_time")
+def get_server_time():
+    server_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return {"server_time": server_time}

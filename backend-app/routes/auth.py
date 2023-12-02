@@ -86,6 +86,8 @@ sites = [
         password="salchi_laureles_0433"
     ),
 ]
+
+
 # Configuración del esquema de seguridad
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
