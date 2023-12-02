@@ -85,6 +85,12 @@ sites = [
         username="salchi_laureles",
         password="salchi_laureles_0433"
     ),
+        Site(
+        site_id=12,
+        site_name="pueba",
+        username="test",
+        password="test"
+    ),
 ]
 
 
