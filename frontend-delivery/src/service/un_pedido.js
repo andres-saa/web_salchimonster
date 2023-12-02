@@ -32,6 +32,41 @@ const pedido = ref({
 }) 
 
 
+
+
+function filtrarOrdenesHoy(orders) {
+  // Obtiene la fecha actual en el formato "YYYY-MM-DD"
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Establece las horas, minutos, segundos y milisegundos a 0 para comparar solo la fecha
+
+  console.log(today.toISOString());
+
+  console.log(orders);
+
+  // Utiliza el método filter para obtener solo los objetos que tienen el timestamp del día de hoy
+  const ordersFiltradas = orders.filter(order => {
+    const orderDate = order.order_status.timestamp;
+    // orderDate.setHours(0, 0, 0, 0); 
+    console.log(orderDate,'order date')
+    // Establece las horas, minutos, segundos y milisegundos a 0 para comparar solo la fecha
+    // return orderDate.getTime() === today.getTime();
+  });
+
+  return ordersFiltradas;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 const pedidos = ref([])
 const dialog_pedido_visible = ref(false)
 
@@ -160,7 +195,8 @@ function prepararPedido(order) {
 
 function cancelarPedido(order) {
   // Cambiar el estado a "En preparación" con la hora actual
-
+  miAudio.pause();
+  miAudio.currentTime = 0
   const timestampActual = new Date().toLocaleString();
   order.order_status.status = "cancelada";
   order.order_status.timestamp = timestampActual;
@@ -253,4 +289,4 @@ function enviarOrdenActualizada(order) {
 
 
 
-export {getOrders,curentSite, cancelarPedido,miAudio, gruposPedidos,grupos,pedido,pedidos,formatoPesosColombianos,dialog_pedido_visible,set_dialog_order,filtrarPorEstado,marcarComoEnviado,prepararPedido}
+export {filtrarOrdenesHoy,getOrders,curentSite, cancelarPedido,miAudio, gruposPedidos,grupos,pedido,pedidos,formatoPesosColombianos,dialog_pedido_visible,set_dialog_order,filtrarPorEstado,marcarComoEnviado,prepararPedido}

@@ -1,6 +1,6 @@
 <template>
 
-    <p class="col-12 md:col-7 p-1 text-center text-4xl m-auto mb-5 lg:col-7 md:col-12 sm:col-12 m-auto mb-8" style="border-radius: 2rem; font-weight: bold; color: white; background-color: black;" > <i class="text-4xl pr-3 p-0" :class="PrimeIcons.SHOPPING_CART" style="color: white;"></i>FINALIZAR COMPRA</p>
+    <!-- <p class="col-12 md:col-7 p-1 text-center text-4xl m-auto mb-5 lg:col-7 md:col-12 sm:col-12 m-auto mb-8" style="border-radius: 2rem; font-weight: bold; color: white; background-color: black;" > <i class="text-4xl pr-3 p-0" :class="PrimeIcons.SHOPPING_CART" style="color: white;"></i>FINALIZAR COMPRA</p> -->
 
     
     <div class=" col-12 grid container md:col-11 xl:col-10  m-auto mb-8 p-0 md:p-4" style="background-color: white; border-radius: 2rem;   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);" v-if="products.length>0">

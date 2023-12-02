@@ -129,5 +129,17 @@ const setShowDialog =()=>{
   }
 
 
+const comprobar_sede = () => {
+  const c_neigbor = ref(localStorage.getItem('currentNeigborhood'))
 
-export {check_site,checkedAcomp,calcularTotalCarrito,calcularPrecioTotal,sumarAdiciones, showSiteDialog,setShowDialog,showProductDialog,setProductDialog,productDialog,checkedSalsas,checkedAdiciones,currentAditions,currentSalsas}
+  if (!c_neigbor.value && ruta.value.fullPath == '/menu' || !c_neigbor.value && ruta.value.fullPath == '/sedes'   ) {
+    showSiteDialog.value = false
+  }
+
+  if (!c_neigbor.value && ruta.value.fullPath != '/menu' ) {
+    showSiteDialog.value = true
+  }
+}
+
+
+export {comprobar_sede, check_site,checkedAcomp,calcularTotalCarrito,calcularPrecioTotal,sumarAdiciones, showSiteDialog,setShowDialog,showProductDialog,setProductDialog,productDialog,checkedSalsas,checkedAdiciones,currentAditions,currentSalsas}

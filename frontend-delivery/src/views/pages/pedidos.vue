@@ -14,35 +14,10 @@
 
           <div class="col-12 p-0 " v-for="order in filtrarPorEstado(pedidos,estado.order_status)   " style=""  @click="open_order(order)">
 
-            <div class="col-12  " >
 
-              <div class=" grid p-2 pedido " style=";color:white;cursor: pointer;">
-
-                <div class="" v-for="product in order.order_products.slice(0,4)"  >
-                
-                <!-- {{ product.img_96x96 }} -->
-                <img class="p-1" style=" width: 60px; height: 60px; object-fit: contain;" :src="`${URI}/read_product_image/96/${product.id}`" alt="">
-               
-                
-                </div>
-
-              <i v-if="estado.order_status == 'en preparacion'" class="pi pi-spin pi-spinner p-3" style="font-size: 3rem;color: var(--primary-color);font-weight: bold;"></i>
-              <i v-if="estado.order_status == 'enviada'" class="pi pi-check p-3" style="font-size: 3rem;color: var(--primary-color);font-weight: bold;"></i>
-              <i v-if="estado.order_status == 'generada'" class="pi pi-star-fill p-3" style="font-size: 3rem;color: var(--primary-color);font-weight: bold;"></i>
-
-              
-              <span class="col text-right" style="color: black; font-weight: bold; min-width: max-content;">{{order.order_id}}</span>
-              <!-- {{ order.order_status.timestamp.split(' ')[1] }} -->
-              
+            <pedidoItem :order=" order" :estado="estado"></pedidoItem>
 
 
-
-                <!-- <div class="col-" style="background-color: rgb(172, 172, 255);"></div> -->
-
-
-              </div>
-
-            </div>
 
           </div>
         </div>
@@ -66,6 +41,7 @@
 import {gruposPedidos, grupos, pedido, pedidos, dialog_pedido_visible,set_dialog_order,filtrarPorEstado } from '@/service/un_pedido'
 import { URI } from '../../service/conection';
 import DialogoPedido from './dialogo-pedido.vue';
+import pedidoItem from '@/components/pedidoItem.vue';
 
 const open_order = (order) => {
   set_dialog_order(order)

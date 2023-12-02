@@ -162,9 +162,7 @@ onMounted(() => {
   }
 
 
-  if (!c_neigbor.value && ruta.fullPath == '/menu' ) {
-    showSiteDialog.value = true
-  }
+
 
 
 

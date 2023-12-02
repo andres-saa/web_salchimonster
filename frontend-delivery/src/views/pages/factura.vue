@@ -1,14 +1,17 @@
 <template>
 
-<div class="col-12 p-0 m-0 xl:col-12 p-0 md:p-3 texto-negro" style="width: 100%;" > 
 
+<div class="col-12 p-0 m-0 xl:col-12 p-0 md:p-3 texto-negro" style="width: 100%;" > 
+<div class="col-12 p-0" style="display: flex;">
+    <img class="m-auto" src="images/logo.png" alt="" style="height: 4rem; width: 4rem; object-fit: contain;">
+</div>
 <p class="text-xl col-12 text-center " style="font-weight: bold;">SALCHIMONSTER</p>
+<p class="text-xl col-12 text-center " style="font-weight: bold;">ORDEN #{{pedido.order_id }}</p>
+
+
 <p class="text-xl pl-4" style="font-weight: bold;color: white;background-color: black;">ENTREGAR</p>
 
 <!-- <input style="border-radius: 20px; " class="col-12 " type="text" name="" id=""> -->
-<!-- <img class="col-2" src="images/logo.png" alt=""> -->
-
-
 
 
 <div class="productos">
@@ -145,7 +148,7 @@
 
 <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
-<p class="text-xl pl-4 col-12 p-0" style="font-weight: bold;color: white;background-color: black;">DATOS DE USUARIO</p>
+<p class="text-xl pl-4 col-12 py-0" style="font-weight: bold;color: white;background-color: black;">DATOS DE USUARIO</p>
 
 <!-- <span style="font-weight: bold;"> {{ formatoPesosColombianos(calcularTotalCarrito(pedido))  }} </span> -->
 

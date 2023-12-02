@@ -466,6 +466,7 @@ import { calcularPrecioTotal, calcularTotalCarrito, setProductDialog, setShowDia
 import { adiciones } from '../../service/menu/adiciones/adiciones';
 const showAditionsDialog = ref(false)
 import { URI } from '../../service/conection';
+import { comprobar_sede } from '../../service/state';
 const existeAdicionEnProducto = (adicion, producto) => {
     return producto.adiciones && producto.adiciones.some(a => a.id === adicion.id);
 }
@@ -497,6 +498,7 @@ const updateScreenWidth = () => {
 };
 
 onMounted(() => {
+
     window.addEventListener('resize', updateScreenWidth);
     domicilio.value = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
 
@@ -504,6 +506,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     window.removeEventListener('resize', updateScreenWidth);
+    comprobar_sede()
 });
 
 
