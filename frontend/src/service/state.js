@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import { adiciones } from "./menu/adiciones/adiciones";
-
+import { useRouter } from "vue-router";
+import router from '@/router/index.js'
 const showProductDialog = ref(false)
 const showSiteDialog = ref(false)
 const productDialog = ref({})
@@ -14,6 +15,7 @@ const currentSalsas=ref([]);
 const currentAcomp=ref([]);
 
 
+const ruta = ref(router.currentRoute)
 
             
 

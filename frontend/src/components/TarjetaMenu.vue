@@ -77,9 +77,11 @@ const addcar =(product) => {
 }
 
 const imagenError = (Event) => {
-    Event.target.src = 'https://novatocode.online/assets/logo-f2daca0e.png'
+    Event.target.src = 'https://salchimonster.com/images/logo.png'
 }
+
 </script>
+
 <style scoped>
 .info {
     width: 100%;
@@ -90,9 +92,9 @@ const imagenError = (Event) => {
     position: absolute;
     bottom: 0;
     left: 0;
-    padding: 5%;
+    padding: 5%; 
     /* gap: 20px; */
-
+ 
     /* padding: 20px; */
 }
 

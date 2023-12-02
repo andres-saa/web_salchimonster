@@ -69,6 +69,7 @@ import sesion from './sesion.vue';
 
 import router from '@/router/index.js'
 import {ref} from 'vue'
+import { comprobar_sede } from '../../service/state';
 
 const ruta = ref(router.currentRoute)
 const hola = ref( localStorage.getItem('currentNeigborhood') )
@@ -83,10 +84,12 @@ const updateScreenWidth = () => {
 
 onMounted(() => {
   window.addEventListener('resize', updateScreenWidth);
+  comprobar_sede()
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateScreenWidth);
+  
 });
 
 
