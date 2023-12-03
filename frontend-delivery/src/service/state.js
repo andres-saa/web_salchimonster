@@ -57,6 +57,7 @@ function calcularTotalCarrito(carrito) {
 
   for (const producto of carrito.order_products) {
     totalCarrito += calcularPrecioTotal(producto);
+    console.log( "precio producto",totalCarrito)
   }
 
   return totalCarrito;
@@ -64,33 +65,29 @@ function calcularTotalCarrito(carrito) {
 
 
 
-// const setShowDialog =()=>{
-//   currentAditions.value=[]
-//   currentSalsas.value=[]
+const sumarAdicionesAlProducto = (product) => {
+
+  let sumaAdicionesValue = 0
+
+
+  for (const adicion of product.product.adiciones) {
+    sumaAdicionesValue += adicion.price*product.quantity
+  }
+
+  return product.quantity * product.product.price + sumaAdicionesValue 
+
+}
+
+const sumarProductos = (productos) => {
   
-//     showSiteDialog.value = !showSiteDialog.value
-//     console.log('hola')
-//     if (showProductDialog.value) {
+  let sumaProductos = 0
 
-       
-//     }
-//   }
+  for (const product of productos) {
+    sumaProductos += sumarAdicionesAlProducto(product)
+  }
 
-  // const setProductDialog =(product)=>{
-  //   checkedAdiciones.value = []
-  //     checkedSalsas.value = []
-  //     currentAditions.value = []
-  //     currentAditions.value = []
-  //   showProductDialog.value = !showProductDialog.value
-
-  //   console.log('hola')
-  //   if (product) {
-  //     productDialog.value = product
+  return sumaProductos
+}
 
 
-  //   }
-  // }
-
-
-
-export {calcularTotalCarrito,calcularPrecioTotal,contarObjetosRepetidos}
+export { sumarProductos, sumarAdicionesAlProducto, calcularTotalCarrito,calcularPrecioTotal,contarObjetosRepetidos}

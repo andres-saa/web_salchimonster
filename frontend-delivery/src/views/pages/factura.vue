@@ -27,8 +27,7 @@
                     </p>
 
 
-                    <p style="font-weight: bold;height: ;">{{ formatoPesosColombianos(product.quantity *
-                        calcularPrecioTotal(product.product)) }}
+                    <p style="font-weight: bold;height: ;">{{ formatoPesosColombianos(product.quantity * product.product.price) }}
                     </p>
                 </div>
 
@@ -72,19 +71,30 @@
                     style="background-color: var(--primary-color); border: none;border-radius: 0.5rem; color: white;">
                     <i style="color: white; border-radius: 1rem;" :class="PrimeIcons.TIMES"></i></button> -->
                     <p class="pl-2" style="text-transform: uppercase; min-width: ;margin: 0; padding: 0.1rem 0;width: 100%">
-                        <span>{{ adicion.name
-                        }}</span>
+                        <span> {{ product.quantity  }} de   {{ adicion.name  }}</span>
                     </p>
 
 
 
 
-                    <p style="font-weight: ;height: ;">{{ formatoPesosColombianos(adicion.price) }}
+                    <p style="font-weight: ;height: ;">{{ formatoPesosColombianos(product.quantity * adicion.price) }}
                     </p>
 
 
 
                 </div>
+
+              
+                    
+                    <p v-if="product.product.adiciones.length > 0" class="col-12 p-0 pl-2 mb-0 text-right" style="font-weight: bold ;">
+                        {{ formatoPesosColombianos(
+                        sumarAdicionesAlProducto(product)) }}</p>
+
+                     
+
+                
+
+      
 
 
 
@@ -115,7 +125,7 @@
         <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
             <span style="font-weight: bold;"> SUBTOTAL </span>
-            <span style="font-weight: bold;"> {{ formatoPesosColombianos(calcularTotalCarrito(pedido)) }} </span>
+            <span style="font-weight: bold;"> {{ sumarProductos(contarObjetosRepetidos(pedido.order_products)) }} </span>
 
         </div>
 
@@ -144,14 +154,14 @@
 
 
 
-      
+        <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
-            <p class="text-xl pl-4  py-0 negrilla" style="font-weight: bold;color: white;background-color: black;">
+            <p class="text-xl pl-4 col-12 py-0 negrilla" style="font-weight: bold;color: white;background-color: black;">
                 DATOS DE USUARIO</p>
 
             <!-- <span style="font-weight: bold;"> {{ formatoPesosColombianos(calcularTotalCarrito(pedido))  }} </span> -->
 
-       
+        </div>
 
         <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
@@ -199,11 +209,12 @@ import { pedido } from '@/service/un_pedido'
 
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { formatoPesosColombianos } from '../../service/formatoPesos';
-import { calcularPrecioTotal, calcularTotalCarrito, contarObjetosRepetidos } from '../../service/state';
+import { calcularPrecioTotal, calcularTotalCarrito, contarObjetosRepetidos,sumarAdicionesAlProducto,sumarProductos } from '../../service/state';
 import { URI } from '../../service/conection';
 
 // const currenNeigborhood = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood.name
 
+const pedidosAll = pedido
 
 const user = ref({})
 

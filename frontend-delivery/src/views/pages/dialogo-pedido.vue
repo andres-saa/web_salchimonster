@@ -72,7 +72,7 @@ const IMPRIMIR = () => {
         ventanaImpresion.document.write(estilosPagina[i].outerHTML);
     }
 
-    ventanaImpresion.document.write('<style> @media print { html{height: min-content;} .negrilla{background-color:black !IMPORTANT; color:white !IMPORTANT;} *{font-family: sans-serif; padding: 0 !IMPORTANT; margin: 0.1rem !IMPORTANT; font-size:0.9rem !IMPORTANT} body { -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } } </style>');
+    ventanaImpresion.document.write('<style> @media print { html{height: min-content;} .negrilla{background-color:black !IMPORTANT; color:white !IMPORTANT;} *{ font-family: sans-serif; padding: 0 !IMPORTANT; margin: 0.2rem !IMPORTANT; font-size:0.9rem !IMPORTANT} body { -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } } </style>');
     ventanaImpresion.document.write('</head><body>');
     ventanaImpresion.document.write(contenidoFactura);
    
@@ -120,13 +120,12 @@ const IMPRIMIR = () => {
     color: black;
 }
 
-body{
-    height: min-content;
-}
+
 .before{
     background-color: rgba(0, 0, 0, 0.8);width: 100vw;height: 100vh; z-index: 999;
     position: absolute; top: 0;left: 0;
     transform: scale(2);
+    justify-content: space-between;
 }
 
 

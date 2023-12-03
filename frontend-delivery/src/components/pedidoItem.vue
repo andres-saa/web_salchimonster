@@ -1,34 +1,42 @@
 <template>
   <div class="col-12">
     <div class="grid  pedido align-items-center" style="color: white; cursor: pointer;">
-      <div v-for="product in order.order_products.slice(0, 4)">
+      <div v-for="product in order.order_products">
         <img class="" style="width: 60px; height: 60px; object-fit: contain;"
           :src="`${URI}/read_product_image/96/${product.id}`" alt="" />
       </div>
 
-      <i v-if="estado.order_status == 'en preparacion'" class="pi pi-spin pi-spinner ml-3"
-        style="font-size: 3rem; color: var(--primary-color); font-weight: bold;"></i>
+     
       <i v-if="estado.order_status == 'enviada'" class="pi pi-check "
         style="font-size: 3rem; color: var(--primary-color); font-weight: bold;"></i>
       <i v-if="estado.order_status == 'generada'" class="pi pi-star-fill p-3"
         style="font-size: 3rem; color: var(--primary-color); font-weight: bold;"></i>
 
       <span class="col text-right m-3 p-0" style="color: black; font-weight: bold; min-width: max-content;"> #{{
-        order.order_id }}</span>
+        order.order_id }}  <span class="col text-right m-3 p-0" style="color: black; font-weight: bold; min-width: max-content;"> {{
+      convertirA12h(order.order_status.timestamp.hora)    }}</span></span>
+
+
+
+
+<!-- <span class="col text-right m-3 p-0" style="color: black; font-weight: bold; min-width: max-content;"> #{{
+        order.order_status.timestamp.hora.h }}</span> -->
 
       <!-- Agrega la cuenta regresiva aquí -->
 
 
       <div v-if="order.order_status.status == 'en preparacion'" :class="minutos == 0 && segundos == 0 ? 'finalizado' : ''"
-        class="countdown-timer m-3"
+        class="countdown-timer m-3" style="display: flex; align-items: center;justify-content: center;"
         :style="{ borderRadius: '50%', position: 'relative', width: '3rem', height: '3rem' }">
 
         <div style="position: absolute; top: 50%; left: 50%; z-index: 99; transform: translate(-50%, -50%);">
           {{ minutos }}:{{ segundos }}
         </div>
 
+       
+
         <div
-          :style="{ position: 'absolute', width: '100%', height: '100%', borderRadius: '50%', clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)', background: 'linear-gradient(90deg, rgb(255, 119, 119) 0%, rgb(255, 119, 119) ' + porcentajeCompletado + '%, transparent ' + porcentajeCompletado + '%, transparent 100%)' }">
+          :style="{ position: 'absolute', width: '100%', height: '100%', borderRadius: '50%', clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)' }">
         </div>
 
       </div>
@@ -41,6 +49,7 @@
 <script setup>
 import { defineProps, ref, onMounted, onUnmounted } from "vue";
 import { URI } from "../service/conection";
+import { convertirA12h } from "../service/un_pedido";
 const porcentajeCompletado = ref(0);
 const props = defineProps({
   order: {
@@ -86,24 +95,36 @@ onUnmounted(() => {
 .countdown-timer {
   color: black;
   font-weight: bold;
-  background-color: white;
+  /* background-color: white; */
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 3rem;
   width: 3rem;
-  outline: 0.3rem solid;
+  outline: 0.3rem solid var(--primary-color);
+  animation:  parpadeoColor 1s infinite;
   /* margin-top: 10px; */
 }
 
+@keyframes parpadeoColor {
+  0% {
+    background-color: rgb(159, 221, 255); /* Color inicial */
+  }
+  50% {
+    background-color: rgb(255, 255, 179); /* Color intermedio */
+  }
+  100% {
+    background-color: rgb(151, 255, 167)(255, 195, 195); /* Color final */
+  }
+}
 
 .texto-negro {
   color: black;
 }
 
 .finalizado {
-  background-color: rgb(255, 139, 139);
+  background-color: rgb(255, 0, 0);
 }
 
 .before {

@@ -542,21 +542,21 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
        
 
-          <div class="md:p-0 pl-3" v-for="i in 
+          <div class="md:p-0 p-0" v-for="i in 
             productDialog.category_id == 1 ? adiciones.salchipapas.products : 
             productDialog.category_id == 2 ? adiciones.hamburguesas.products :
             productDialog.category_id == 3 ? adiciones.salchipapas.products : 
             productDialog.category_id == 4 ? adiciones.topings.products :
             productDialog.category_id == 5 ? adiciones.almuerzos.products :
             productDialog.category_id == 6 ? productDialog.adiciones.products :[]" 
-          style=" ; padding-bottom: 0.5rem; ; color:black;border-radius:2rem" :class="checkedAdiciones[i.name]? 'selected':''" >
+          style=" ;  ; color:black;border-radius:2rem" :class="checkedAdiciones[i.name]? 'selected':''" >
 
 
 
-          <div class=" col-12 grid p-0 pb-0 md:pl-5 mb-4" style=" align-items: center; justify-content: space-between; ">
+          <div class=" col-12 grid p-0  md:pl-5 mb-4" style=" align-items: center; justify-content: space-between;  ">
               
 
-            <div class="col-9 p-0 " style="display: flex;">
+            <div class="col-9 p-0  " style="display: flex;">
               <Checkbox @change="cargarAdiciones(i)"   class="p-0" v-model="checkedAdiciones[i.name]" :binary="true" style="margin-right: 1rem;  " />
 
                   <p   class="   p-0" style=";"> {{ i.name }}
@@ -1200,7 +1200,33 @@ a{
 }
 
 
+
+
 .fondo-pc{
   background-color: rgb(247, 247, 247);
+}
+
+dialog{
+  ::-webkit-scrollbar {
+    width: 0.5rem;
+    /* Ancho de la barra de desplazamiento */
+    padding-top: 1rem;
+    position: absolute;
+    /* display: none; */
+}
+
+.clase {}
+
+/* Estilo del pulgar de la barra de desplazamiento */
+/* WebKit (Chrome, Safari) */
+::-webkit-scrollbar-thumb {
+    background-color:var(--primary-color);
+    /* Color del pulgar de la barra de desplazamiento */
+    border-radius: 9px;
+    /* border: 5px solid var(--primary-color); */
+    height: 10rem;
+    width: 10rem;
+    /* display: none;  */
+}
 }
 </style>

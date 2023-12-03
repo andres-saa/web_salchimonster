@@ -2,7 +2,7 @@
 
 import { curentSite } from './service/un_pedido';
 // import { menuOptions } from './service/menuOptions';
-
+import {onBeforeUnmount} from 'vue'
 // // import {sumarAdiciones, showSiteDialog, setShowDialog,showProductDialog,setProductDialog,productDialog,checkedSalsas,checkedAdiciones,currentAditions,currentSalsas, calcularTotalCarrito } from './service/state';
 // import { carro } from './service/cart';
 
@@ -27,52 +27,20 @@ import { curentSite } from './service/un_pedido';
 // window.addEventListener('resize', updateScreenWidth);
 
 // // Limpieza al desmontar el componente
-// onBeforeUnmount(() => {
-//   window.removeEventListener('resize', updateScreenWidth);
-// });
+onBeforeUnmount(async() => {
+  
+  const serverTimeResponse = await fetch('https://backend.salchimonster.com/server_time');
+  fechaHoy.value = await serverTimeResponse.json();
+  localStorage.setItem("fecha_server",JSON.stringify(fechaHoy.value) )
+});
 
 
 
 // const c_neigbor = ref(localStorage.getItem('currentNeigborhood'))
 
-// onMounted(() => {
 
 
-//   if (localStorage.getItem('cart')) {
-//     // localStorage.setItem('cart',{products:[],total:0})
-//     carro.value = JSON.parse(localStorage.getItem('cart'))
-//   }
-
-//   if (!localStorage.getItem('cart')) {
-//     localStorage.setItem('cart', JSON.stringify({ products: [], total: 0 }))
-//     // localStorage.setItem('totalCart',0)
-//   }
-
-//   console.log(JSON.parse((localStorage.getItem('menu'))))
-//   // cart.value = JSON.parse(localStorage.getItem('cart'))
-
-//   if (localStorage.getItem('menu')) {
-//     console.log('habia')
-//     menuOptions.value[0].menus = JSON.parse(localStorage.getItem('menu'))
-//   } else {
-
-//     //   getMenu().then(products => {
-//     //   menuOptions.value[0].menus = products
-//     //   localStorage.setItem("menu", JSON.stringify(products))
-
-//     //   if(!showSiteDialog.value){
-//     //     location.reload()
-//     //   }
-
-//     // })
-//     menuOptions.value[0].menus = menuGlobal
-//     localStorage.setItem('menu', JSON.stringify(menuGlobal))
-//   }
-
-
-//   if (!c_neigbor.value) {
-//     showSiteDialog.value = true
-//   }
+  
 
 
 

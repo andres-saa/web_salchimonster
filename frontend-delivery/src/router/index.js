@@ -26,6 +26,12 @@ const router = createRouter({
               
             },
             {
+              path: '/cuadre',
+              name: 'cuadre',
+              component: () => import('@/views/pages/cuadre.vue'),
+              
+            },
+            {
               path: '/historial',
               name: 'historial',
               component: () => import('@/views/pages/historial-pedidos.vue'),

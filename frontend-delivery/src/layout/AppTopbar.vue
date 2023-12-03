@@ -109,6 +109,7 @@ const changeCurrentGroupMenu = (grupoMenu) => {
 const menus = [
     { name: 'ATENDER', to: '/' },
     { name: 'HISTORIAL DE PEDIDOS', to: '/historial' },
+    { name: ' CUADRE DE CAJA', to: '/cuadre' },
 
 ]
 
