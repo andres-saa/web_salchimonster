@@ -12,12 +12,13 @@ import { ableMenu } from '../service/menuOptions';
 import { URI } from "@/service/conection";
 import { showSiteDialog, setShowDialog } from '../service/state';
 import { productDialog,setProductDialog } from '../service/state';
-
+import router from '../router';
+import { useRoute } from 'vue-router';
 const { layoutConfig, onMenuToggle } = useLayout();
 const screenWidth = ref(window.innerWidth);
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
-const router = useRouter();
+
 const onArea = ref(false)
 const onMenu = ref(false)
 const selectedMenu = ref({})
@@ -39,7 +40,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', updateScreenWidth);
 });
 
-
+const ruta = ref(router)
 
 onMounted(async () => {
 
@@ -72,6 +73,16 @@ watch(currentCity, () => {
 });
 
 
+
+    // Verificar si la ruta actual o alguna de sus rutas secundarias es /admin-products
+const route = useRoute();
+
+// Verificar si la ruta actual o alguna de sus rutas secundarias es /admin-products
+const isInAdminProductsRoute =
+route.matched.some(record => record.path === '/admin-products') ||
+route.matched.some(record => record.path.startsWith('/admin-products/'));
+
+   
 
 
 onBeforeUnmount(() => {
@@ -172,7 +183,7 @@ const fondoVisible = ref(false)
 </script>
 
 <template>
-    <div class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 " style=" z-index:999 ">
+    <div v-if="!isInAdminProductsRoute "  class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 " style=" z-index:999 " >
         
 
         <router-link to="/" class="layout-topbar-logo" style="z-index: 99999;">
@@ -230,7 +241,7 @@ const fondoVisible = ref(false)
 
 
 
-        <div class="layout-topbar-menu " :class="topbarMenuClasses">
+        <div class="layout-topbar-menu " :class="topbarMenuClasses" v-if="!isInAdminProductsRoute">
             <div class="p-link boton-menu "
                 style="padding:  30px; ">
             </div>
@@ -363,6 +374,12 @@ const fondoVisible = ref(false)
 
         </div>
 
+    </div>
+
+
+    <div  v-else class="col-12 p-4" style="background-color: red; position: fixed; z-index: 99;">
+
+        <p class="text-2xl text-center" style="color: white; font-weight: bold;"> ADMINISTRADOR DE IMAGENES</p>
     </div>
 </template>
 

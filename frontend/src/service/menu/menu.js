@@ -10,7 +10,7 @@ import {categoryCombos} from "./categorias/combos.js"
 import { ref } from "vue"
 import { categoryShows } from "./categorias/Shows.js"
 
-const version_menu = ref(1.038)
+const version_menu = ref(1.039)
 const menuGlobal = {
 
     salchipapas:categorySalchipapa,

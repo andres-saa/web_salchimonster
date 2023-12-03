@@ -177,7 +177,7 @@ import { menuOptions } from '../../service/menuOptions';
 import { ref, onMounted, watch } from "vue"
 import { PrimeIcons } from 'primevue/api';
 import { curentProduct, changeProduct } from '../../service/productServices';
-
+import { showSiteDialog } from '../../service/state';
 const product = ref({})
 const productDialog = ref(false)
 const showDialog = () => {
@@ -201,10 +201,11 @@ watch(menuOptions, setSection);
 
 
 
-
+showDialog.value = false
 
 
 onMounted(async () => {
+    showDialog.value = false
     // changesection({category:localStorage.getItem('menu').category,products:localStorage.getItem('menu').products})
     // getMenu().then(products => currentSection.value = products[0])
 });

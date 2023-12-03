@@ -44,6 +44,22 @@ const router = createRouter({
           // meta: { requiresAuth: true },
         },
         {
+          path: '/admin-products',
+          name: 'admin-product',
+          component: () => import('@/views/pages/fotos.vue'),
+          meta: { requiresAuth: true },
+          children:[
+            {
+              path: ':category',
+              name: 'admin-sesion',
+              component: () => import('@/views/pages/sesion_admin.vue'),
+              // meta: { requireMenu: true },
+              // meta: { requiresAuth: true },
+            },
+          ]
+          // meta: { requiresAuth: true },
+        },
+        {
           path: '/menu-view',
           name: 'menu-view',
           component: () => import('@/views/pages/MenuView.vue'),
@@ -60,6 +76,7 @@ const router = createRouter({
           name: 'menuAdmin',
           component: () => import('@/views/pages/MenuViewAdmin.vue'),
           // meta: { requireMenu: true },
+          
         },
 
         {
@@ -244,11 +261,11 @@ const router = createRouter({
     //     component: () => import('@/views/pages/NotFound.vue')
     // },
 
-    // {
-    //   path: '/login',
-    //   name: 'login',
-    //   component: () => import('@/views/pages/auth/Login.vue')
-    // },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/pages/auth/Login.vue')
+    },
     // {
     //     path: '/auth/access',
     //     name: 'accessDenied',
@@ -277,6 +294,22 @@ router.beforeEach(async (to, from, next) => {
     }
   } else {
     // Si la ruta no requiere autenticación, continuar con la navegación
+    next();
+  }
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    const token = localStorage.getItem('token-admin-fotos');
+    if (!token) {
+      // Si no hay token, redirige a la página de inicio de sesión
+      next('/login');
+    } else {
+      // Si hay token, permite el acceso
+      next();
+    }
+  } else {
+    // Si la ruta no requiere autenticación, permite el acceso
     next();
   }
 });

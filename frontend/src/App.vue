@@ -23,7 +23,20 @@ import { RouterLink } from 'vue-router';
 import router from '@/router/index.js'
 import { useCart,deleteAllCookies } from './service/cart';
 import barra from './components/barra.vue';
+import { useRoute } from 'vue-router';
 
+
+
+const route = useRoute();
+
+// Verificar si la ruta actual o alguna de sus rutas secundarias es /admin-products
+const isInAdminProductsRoute =
+route.matched.some(record => record.path === '/admin-products') ||
+route.matched.some(record => record.path.startsWith('/admin-products/'));
+
+
+
+const ruta = ref(router.currentRoute)
 const version_tienda = ref(1)
 const screenWidth = ref(window.innerWidth);
 console.log(screenWidth.value)
@@ -100,6 +113,8 @@ if (!storedVersion) {
 const c_neigbor = ref(localStorage.getItem('currentNeigborhood'))
 
 onMounted(() => {
+
+ 
 
 
 
@@ -183,7 +198,6 @@ const currenNeigborhood = ref({
 })
 const possibleNeigborhoods = ref()
 
-const ruta = ref(router.currentRoute)
 const vueMenu = ref(false)
 
 const addcar =(product) => {
@@ -361,6 +375,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 <!-- <barra></barra> -->
   
+
   <router-view  class="p-0 pb-8" style="background-color: rgb(250, 247, 253); width: 100vw;left:0px;position: absolute;"/>
   <!-- <Dialog v-if="menuOptions[0].menus.length < 2" v-model:visible="menuOptions" modal header="Header"
         :style="{ width: '100%', border: 'none', overflow: 'hidden' }" :breakpoints="{ '960px': '75vw', '641px': '100vw' }">
@@ -372,6 +387,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
         :style="{ width: '100%', border: 'none', overflow: 'hidden' }" :breakpoints="{ '960px': '75vw', '641px': '100vw' }">
         <img class="imagen" style="" src="http://localhost:5173/src/images/logo.png" alt="">
       </Dialog> -->
+
 
   <Dialog :closeOnEscape="!c_neigbor? false: true" v-if="!c_neigbor || showSiteDialog" v-model:visible="showSiteDialog" :style="{ width: '500px' }"
     header="Seleccion de sede" :modal="true" class="p-fluid "
@@ -647,7 +663,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 
  
-  <div v-if="ruta.fullPath != '/cart'" class="barra-carrito col-12 " style=" 
+  <div v-if="ruta.fullPath != '/cart' && !ruta.fullPath.includes('admin-products') " class="barra-carrito col-12 " style=" 
                           /* width: auto; */
                             display: flex;
                             gap:2rem;
@@ -789,7 +805,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
   </div>
 
 
-  <div v-if="showProductDialog" class="full-before col-12 p-0 m-0" style="top: 0;left: 0; position: fixed; background-color: black;height: 100vh;opacity: 0.8;"> </div>
+  <div v-if="showProductDialog" class="full-before col-12 p-0 m-0" style="top: 0;left: 0; position: fixed; background-color: black;height: 100vh;opacity: 0.1;"> </div>
 </template>
 
 <style scoped>
