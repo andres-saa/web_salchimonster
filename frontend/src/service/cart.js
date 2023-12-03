@@ -8,22 +8,35 @@ import { calcularTotalCarrito } from "./state";
 const products = ref([])
 const quantity = ref(0);
 const add = (product) => {
-
-    if (!localStorage.getItem('cart')){
-        localStorage.setItem('cart',{products:[],total:0})
-        // localStorage.setItem('totalCart',0)
+    try {
+      // Check if 'cart' exists in localStorage
+      if (!localStorage.getItem('cart')) {
+        localStorage.setItem('cart', JSON.stringify({ products: [], total: 0 }));
+      }
+  
+      // Parse the existing cart data from localStorage
+      const cart = { ...JSON.parse(localStorage.getItem('cart')) };
+  
+      // Add the new product to the cart
+      cart.products.push(product);
+  
+      // Update the total
+      cart.total = Number(cart.total) + product.price;
+  
+      // Save the updated cart back to localStorage
+      localStorage.setItem('cart', JSON.stringify(cart));
+  
+      // Update the value of 'carro'
+      carro.value = cart;
+  
+      // Call the updateCart function (assuming it's defined elsewhere)
+      updateCart();
+  
+    } catch (error) {
+      console.error('Error updating cart:', error);
+      // Handle the error as needed, for example, show an error message to the user.
     }
-    const cart = {...JSON.parse(localStorage.getItem('cart'))}
-    // const cart = {products:[],total:0}
-    // localStorage.setItem('cart',JSON.stringify(cart.value))
-    // console.log(JSON.parse(localStorage.getItem('cart')))
-    cart.products.push(product)
-    cart.total = Number(cart.total)+product.price
-    localStorage.setItem('cart',JSON.stringify(cart))
-    carro.value = cart
-    updateCart()
-    // console.log(localStorage.getItem('cart'))
-}
+  };
 
 
 function deleteAllCookies() {

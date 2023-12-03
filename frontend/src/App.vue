@@ -389,7 +389,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
     <div
       style="width: 100%;display: flex; flex-direction: column; align-items: center; border-radius: ;background-color: ">
 
-      <img style="width: 50px;" src="http://localhost:5173/src/images/logo.png" alt="">
+      <!-- <img style="width: 50px;" src="http://localhost:5173/src/images/logo.png" alt=""> -->
 
       <div class="field col-12 pb-0 p-0" style="width: 100%;">
         <label for="site_id" style="color: black;">Ciudad</label>
@@ -415,9 +415,9 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
         <div class="img-cont col-12 p-0" style="overflow: hidden;position: relative;">
 
-          <!-- <div class="img-before" v-if="currenNeigborhood.site?.name == 'default'">
+          <div class="img-before" v-if="currenNeigborhood.site?.name == 'default'">
             <p class="text-2xl lg:text-4xl text-center " style="font-weight: bold;color: black;">Vamos a buscar tu sede mas cercana</p>
-          </div> -->
+          </div>
           <img :src="`${URI}/read_product_image/600/site-${ currenNeigborhood.site?.site_id }`"
             :class="currenNeigborhood.site?.name == 'default' ? 'default-image' : ''"
             style="border: 1px solid rgb(255, 255, 255); width: 100%; height: 100%; object-fit: cover; border-radius: 5px;" alt="">
@@ -426,7 +426,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
             <div 
           style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display:flex; padding: ; align-items: end;border-radius: 1rem; ">
           <p v-if="currenNeigborhood.site.name != 'default'" class="col-12 p-0"
-            style="text-align: center; height: min-content;  width: 100%; font-size: 35px; font-weight: bold; background-color: rgba(0, 0, 0, 0.577);">
+            style="text-align: center; height: min-content;  width: 100%; font-size: 35px; font-weight: bold; background-color: rgba(0, 0, 0, 0);">
             <span class="text-xl lg:text-2xl" style=""> SALCHIMONSTER</span> <span style="text-transform: uppercase;" class="text-xl lg:text-2xl">{{ currenNeigborhood.site.name }}</span>
           </p>
         </div>
@@ -452,7 +452,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
     </div>
 
-    <button v-if="hay_barrio"  @click="setShowDialog" style="width: 3rem;height: 3rem; border: none; position: absolute; right: 2rem; top:1rem;background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center;justify-content: center;">
+    <button   @click="setShowDialog" style="width: 3rem;height: 3rem; border: none; position: absolute; right: 2rem; top:1rem;background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center;justify-content: center;">
       <i :class="PrimeIcons.TIMES" style="color: white; font-weight: bold; " class="text-2xl"></i>
 
     </button>
@@ -923,7 +923,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 .default-image::before {
   content: 'hola';
   width: 100%;
-  background-color: rgba(177, 99, 9, 0.1);
+  /* background-color: rgba(177, 99, 9, 0.1); */
   height: 100%;
   position: absolute;
   top: 0;
@@ -954,7 +954,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 }
 
 .img-cont {
-  background-color:rgb(255, 226, 192);
+  /* background-color:rgb(255, 255, 255); */
   /* display: flex; */
   /* justify-content: flex-start; */
   align-items: start;
