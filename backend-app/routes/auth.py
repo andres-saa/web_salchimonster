@@ -88,8 +88,8 @@ sites = [
         Site(
         site_id=12,
         site_name="pueba",
-        username="test",
-        password="test"
+        username="admin-fotos",
+        password="admin-fotos-sm"
     ),
 ]
 
