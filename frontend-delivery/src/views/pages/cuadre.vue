@@ -1,20 +1,31 @@
 <template>
-  <!-- {{ fechaActualServidor }}
-{{ fechapedido }} -->
+
+
+
+
+
+
+{{ fecha_del_server }}
+
+ {{ filtrarPedidosPorFecha(pedidos,fecha_del_server) }}
+
+
+
+
+
 
 <div style="height: 80vh;overflow-y: auto; display:flex; align-items: center;">
   <div class="  col-12 m-auto" style="width: 30rem; box-shadow: 0 0 10px rgba(0, 0, 0, 0.196); border-radius: 2rem; ">
 
-<p class="text-center text-xl " style="font-weight: bold;"> VENTAS {{ `${fechaServer.fecha.d} DE ${nombresMeses[fechaServer.fecha.m - 1].toLocaleUpperCase()} DE ${fechaServer.fecha.a}` }} </p>
+<p class="text-center text-xl " style="font-weight: bold;"> VENTAS {{ formatearFechaHora(fecha_del_server).toUpperCase() }} </p>
 
 <p class=" text-center mb-1" style="font-weight: bold; background-color: rgb(191, 255, 96); border-radius: 1rem;"> PEDIDOS ENVIADOS  {{  filtrarPorEstado(ordenes_de_hoy,'enviada').length }}</p>
 
 <div >
-  <div class=" pedido" id="hola" v-for="order in filtrarPorEstado(ordenes_de_hoy,'enviada')" style="display: flex;">
+  <div class=" pedido" v-for="order in filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),'enviada')" style="display: flex;">
 
-   <div class="col p-0 text-left" @click="clickarPedido(order.order_id)" >
+   <div class="col p-0 text-left"  >
     Pedido #{{ order.order_id }}  
-
    </div>
    <div class="col p-0 text-right" style="font-weight: bold;">
     {{ formatoPesosColombianos(sumarProductos(contarObjetosRepetidos(order.order_products))) }}
@@ -48,7 +59,7 @@
     
 
    </div>
-   <div class="col pb-0 text-right" style="font-weight: bold;">
+   <div class="col pb-0 text-right" ref="hola" style="font-weight: bold;">
     {{ formatoPesosColombianos(sumarProductos(contarObjetosRepetidos(order.order_products))) }}
 
    </div>
@@ -70,16 +81,6 @@
 
 </div>
 
-<div v-for="pedido in   ordenes_de_hoy  ">
-
-
-
-
-
-
-
-
-</div>
 
 </div>
 
@@ -97,19 +98,19 @@
 
 <script setup>
 
-import { fechaHoyFormateada,set_dialog_order, fechaHoy, pedidos, ordenes_de_hoy,filtrarPorEstado,dialog_pedido_visible } from '../../service/un_pedido';
+import { fecha_del_server,open_order, filtrarPedidosPorFecha, fechaHoyFormateada,set_dialog_order, pedidos, ordenes_de_hoy,filtrarPorEstado,dialog_pedido_visible } from '../../service/un_pedido';
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { formatoPesosColombianos } from '../../service/formatoPesos';
 import { calcularPrecioTotal, calcularTotalCarrito, contarObjetosRepetidos, sumarProductos } from '../../service/state';
+import { URI } from "@/service/conection";
+import dialogoPedido from './dialogo-pedido.vue';
 
-// const open_order = (order) => {
-//   set_dialog_order(order.value)
-//   dialog_pedido_visible.value = !dialog_pedido_visible.value
-// }
+
  
 const clickarPedido = (pedido_id) => {
-  const pedido = document.getElementById('orden_297')
-  console.log(pedido)
+  const pedido = ref("hola")
+  console.log(hola)
+  // pedido.click()
 }
 function calcularTotalConjuntoOrdenes(orders) {
   // Inicializar la variable para almacenar la suma total
@@ -128,10 +129,22 @@ function calcularTotalConjuntoOrdenes(orders) {
   return totalGlobal;
 }
 
+const formatearFechaHora = (fechaHoraString) => {
+  const fechaHora = new Date(fechaHoraString);
+  const diaSemanaNumero = fechaHora.getDay();
+  const diasSemana = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+  const diaSemana = diasSemana[diaSemanaNumero];
+  const diaMes = fechaHora.getDate();
+  const mes = fechaHora.toLocaleString("es-ES", { month: "long" });
+  const anio = fechaHora.getFullYear();
+  const horas = fechaHora.getHours();
+  const minutos = fechaHora.getMinutes();
+  const periodo = horas >= 12 ? "PM" : "AM";
+  const horasFormato12 = horas % 12 || 12;
 
+  return `${diaSemana} ${diaMes} de ${mes} de ${anio} hasta las ${horasFormato12}:${minutos} ${periodo}`;
+};
 
-
-const fechaServer = ref({ "fecha": { "d": "02", "m": "12", "a": "2023" }, "hora": { "h": "21", "m": "20" } })
 
 const fechaActualServidor = ref()
 const fechapedido = ref()
@@ -141,38 +154,29 @@ const nombresMeses = [
   "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
 ];
 
-const filtrarOrdenesPorFecha = async (ordenes) => {
-  // Obtener la fecha actual del servidor
-  const serverTimeResponse = await fetch('https://backend.salchimonster.com/server_time');
-  const serverTimeData = await serverTimeResponse.json();
-  fechaActualServidor.value = serverTimeData.fecha;
+// const filtrarOrdenesPorFecha = async (ordenes) => {
+//   // Obtener la fecha actual del servidor
+//   const serverTimeResponse = await fetch(`${URI}/server_time`);
+//   const serverTimeData = await serverTimeResponse.json();
+//   fechaActualServidor.value = serverTimeData.fecha;
 
-  // Filtrar las órdenes por la fecha actual
-  const ordenesFiltradas = ordenes.filter(orden => {
-    const fechaOrden = orden.order_status.timestamp.fecha;
-    fechapedido.value = fechaOrden
-    return (
-      fechaOrden.d === fechaActualServidor.value.d &&
-      fechaOrden.m === fechaActualServidor.value.m &&
-      fechaOrden.a === fechaActualServidor.value.a
-    );
-  });
+//   // Filtrar las órdenes por la fecha actual
+//   const ordenesFiltradas = ordenes.filter(orden => {
+//     const fechaOrden = orden.order_status.timestamp.fecha;
+//     fechapedido.value = fechaOrden
+//     return (
+//       fechaOrden.d === fechaActualServidor.value.d &&
+//       fechaOrden.m === fechaActualServidor.value.m &&
+//       fechaOrden.a === fechaActualServidor.value.a
+//     );
+//   });
 
-  fechapedido.value = ordenesFiltradas
-  return ordenesFiltradas
-}
+//   fechapedido.value = ordenesFiltradas
+//   return ordenesFiltradas
+// }
 
-onMounted(async () => {
-  try {
-    const serverTimeResponse = await fetch('https://backend.salchimonster.com/server_time');
-    const data = await serverTimeResponse.json(); // Assuming the server response is in JSON format
 
-    fechaServer.value = data; // Assign the value to fechaServer after receiving the response
-  } catch (error) {
-    console.error('Error fetching server time:', error);
-    // Handle errors as needed
-  }
-});
+
 
 
 

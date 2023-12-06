@@ -64,8 +64,8 @@ const send_order = async () => {
     const data = {
         "order_products": JSON.parse(localStorage.getItem('cart')).products,
         "user_id": user_id,
-        // "site_id":JSON.parse(localStorage.getItem('currentNeigborhood')).currenSiteId,
-        "site_id":12,
+        "site_id":JSON.parse(localStorage.getItem('currentNeigborhood')).currenSiteId,
+        // "site_id":12,
         "order_status": {
             "status": "generada",
             "timestamp":serverTimeData

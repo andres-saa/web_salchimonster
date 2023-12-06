@@ -14,7 +14,7 @@
 
       <span class="col text-right m-3 p-0" style="color: black; font-weight: bold; min-width: max-content;"> #{{
         order.order_id }}  <span class="col text-right m-3 p-0" style="color: black; font-weight: bold; min-width: max-content;"> {{
-      convertirA12h(order.order_status.timestamp.hora)    }}</span></span>
+      obtenerHoraFormateadaAMPM(order.order_status.timestamp )  }}</span></span>
 
 
 
@@ -49,7 +49,8 @@
 <script setup>
 import { defineProps, ref, onMounted, onUnmounted } from "vue";
 import { URI } from "../service/conection";
-import { convertirA12h } from "../service/un_pedido";
+import { convertirA12h,obtenerHoraFormateadaAMPM } from "../service/un_pedido";
+
 const porcentajeCompletado = ref(0);
 const props = defineProps({
   order: {

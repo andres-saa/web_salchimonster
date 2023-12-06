@@ -1,6 +1,6 @@
 <template>
-  <div style="" class="grid col-12 m-0 p-0" >
-    <div  class="col p-0" style="" > 
+  <div style="min-width: 500px" class="grid col-6  m-auto m-0 p-0" >
+    <div  class="col-12 p-0" style="" > 
  
       <div  class="col-12 mb-6 m-0 pb-0" 
         style=";border-radius: 1rem; box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.3);overflow:hidden">
@@ -8,40 +8,30 @@
         
  
 
-        <div class=" p-0 grid ">
+       
 
 
-          <div class=" col-12 xl:col-6 p-0 " v-for="order in pedidos   " style=""  @click="open_order(order)" :class="order.order_status.status.split(' ')[0]">
+          <div class=" col-12  p-0 " v-for="order in pedidos   " style="border-radius: 40rem"  @click="open_order(order)" :class="order.order_status.status.split(' ')[0]">
 
         
 
-            <div class="col-12  " >
+            <div class="col-12 mb-3 p-0" >
 
-              <div class=" grid p-2 pedido " style=";color:white;cursor: pointer;">
+              <div class=" grid  pedido  " style=";color:white;cursor: pointer;">
 
-                <div class="" v-for="product in order.order_products"  >
-                
-                <!-- {{ product.img_96x96 }} -->
-                <img class="p-1" style=" width: 60px; height: 60px; object-fit: contain;" :src="`${URI}/read_product_image/96/${product.id}`" alt="">
-               
-                
-                </div>
-
-              <!-- <i v-if="estado.order_status == 'en preparacion'" class="pi pi-spin pi-spinner p-3" style="font-size: 3rem;color: var(--primary-color);font-weight: bold;"></i> -->
-
-              
+      
 
                
-     
-              <div class="col " style="display: flex; justify-content:end;align-items: center;gap: 1rem; ">
-                <i v-if="order.order_status.status == 'en preparacion'"  class="pi pi-spin pi-spinner p-3" style="font-size: 3rem;color: var(--primary-color);font-weight: bold;"></i>
-                <i v-if="order.order_status.status == 'enviada'" class="pi pi-check p-3" style="font-size: 3rem;color: var(--primary-color);font-weight: bold;"></i>
-                <i v-if="order.order_status.status == 'generada'" class="pi pi-star-fill p-3" style="font-size: 3rem;color: var(--primary-color);font-weight: bold;"></i>
-                <i v-if="order.order_status.status == 'cancelada'" class="pi pi-times p-3" style="font-size: 3rem;color: var(--primary-color);font-weight: bold;"></i>
+              <span class="col"  style="color: black; font-weight: bold; min-width: max-content;"> ORDEN # {{ order.order_id}}</span>
+              <div class="col py-0 m-0" style="display: flex; justify-content:end;align-items: center; ">
+                <i v-if="order.order_status.status == 'en preparacion'"  class="pi pi-spin pi-spinner p-0 mr-3" style="font-size: 2rem;color: var(--primary-color);font-weight: bold;"></i>
+                <i v-if="order.order_status.status == 'enviada'" class="pi  pi-check tex-l mr-3" style="font-size: 2rem;color: var(--primary-color);font-weight: bold;"></i>
+                <i v-if="order.order_status.status == 'generada'" class="pi pi-star-fill p-0 mr-3" style="font-size: 2rem;color: var(--primary-color);font-weight: bold;"></i>
+                <i v-if="order.order_status.status == 'cancelada'" class="pi pi-times p-0 mr-3" style="font-size: 2rem;color: var(--primary-color);font-weight: bold;"></i>
 
                 
-                <div class="p-2" style="border-radius: 2rem; color: black; width: max-content;" :class="order.order_status.status.split(' ')[0]" > {{order.order_status.status}} </div>
-                <span  style="color: black; font-weight: bold; min-width: max-content;">{{ order.order_id}}</span>
+                <div class="py-1 px-2 text-center " style="border-radius: 50rem;min-width: 80px; color: black; width: max-content;" :class="order.order_status.status.split(' ')[0]" > {{order.order_status.status}} </div>
+                
               </div>
               
               
@@ -56,7 +46,7 @@
             </div>
 
           </div>
-        </div>
+    
 
 
       </div>
@@ -107,20 +97,22 @@ const open_order = (order) => {
 
 .pedido{
   /* background-color: white; */
-  border-radius: 0.5rem;overflow: hidden;background-color: rgba(255, 255, 255, 0.742);
+  border-radius:20rem;overflow: hidden;background-color: rgba(255, 255, 255, 0.742);
   transition: .3s all ease;
   padding:0; margin: 0;
+  outline: 2px solid rgb(255, 255, 255);
 
 }
 
 .pedido:hover{
     background-color: rgb(255, 255, 255);
+    outline: 2px solid red;
     /* transform:  translateX(10px); */
 }
 
 .RECIBIDOS{
 
-  background-color: rgba(246, 255, 0, 0.73)
+  background-color: rgba(252, 255, 179, 0.73)
 }
 
 
@@ -143,7 +135,7 @@ background-color: rgba(66, 255, 255, 0.73)
 }
 
 .cancelada{
-  background-color: rgba(255, 66, 66, 0.73);
+  background-color: rgba(255, 160, 160, 0.73);
   /* border: 2px solid red; */
   
 

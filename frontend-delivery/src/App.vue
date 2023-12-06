@@ -29,9 +29,7 @@ import {onBeforeUnmount} from 'vue'
 // // Limpieza al desmontar el componente
 onBeforeUnmount(async() => {
   
-  const serverTimeResponse = await fetch('https://backend.salchimonster.com/server_time');
-  fechaHoy.value = await serverTimeResponse.json();
-  localStorage.setItem("fecha_server",JSON.stringify(fechaHoy.value) )
+
 });
 
 

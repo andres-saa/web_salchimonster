@@ -5,8 +5,9 @@ const miAudio = new Audio('sound/pip.mp3');
 const curentSite = ref(0)
 const ordenes_de_hoy = ref([])
 
-const fechaHoy = ref({ "d": "02", "m": "12", "a": "2023" });
+const fecha_del_server = ref(new Date());
 const fechaHoyFormateada = ref("");
+
 
 function convertirA12h(tiempo) {
   var horas = parseInt(tiempo.h, 10);
@@ -49,35 +50,61 @@ const pedido = ref({
 
 
 
-const filtrarOrdenesHoy = async() => {
+// const filtrarOrdenesHoy = async() => {
  
 
+//  const objetosDeHoy = pedidos.value.filter(pedido => {
+//   // Convierte la cadena de fecha del objeto a un objeto Date
+//   const fechaPedido = new Date(pedido.order_status.timestamp);
   
-  
-
- const ordenesFiltradas = pedidos.value.filter( orden => {
-  if (! orden.order_status.timestamp.fecha){
-    return false
-  }
-  return orden.order_status.timestamp.fecha.d == fechaHoy.value.fecha.d})
-
-
- ordenes_de_hoy.value = ordenesFiltradas
-  
-}
+//   // Compara la fecha de hoy con la fecha del objeto (ignorando la hora)
+//   return (
+//     fechaHoy.value.getFullYear() === fechaPedido.getFullYear() &&
+//     fechaHoy.value.getMonth() === fechaPedido.getMonth() &&
+//     fechaHoy.value.getDate() === fechaPedido.getDate()
+//   );
 
 
+// })
+
+//   return []
+// }
+
+// ordenes_de_hoy.value = filtrarOrdenesHoy
 
 
 
-async function obtenerFechaDelServidor() {
-    try {
-        const serverTimeResponse = await fetch('https://backend.salchimonster.com/server_time');
-        fechaHoy.value = await serverTimeResponse.json();
-    } catch (error) {
-        console.error("Error al obtener la fecha del servidor:", error);
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -98,9 +125,9 @@ const dialog_pedido_visible = ref(false)
 
 const getOrders = async () => {
 
-  const serverTimeResponse = await fetch('https://backend.salchimonster.com/server_time');
-  fechaHoy.value = await serverTimeResponse.json();
-  localStorage.setItem("fecha_server",JSON.stringify(fechaHoy.value) )
+  const serverTimeResponse = await fetch(`${URI}/server_time`);
+  fecha_del_server.value = await serverTimeResponse.json();
+  localStorage.setItem("fecha_server",JSON.stringify(fecha_del_server.value) )
 
 
 
@@ -146,7 +173,7 @@ const getOrders = async () => {
       // Actualiza las variables de vue (asumo que usas Vue.js)
       pedidos.value = [... data];
 
-      filtrarOrdenesHoy()
+      // filtrarOrdenesHoy()
       // pedido.value = pedidos.value[0];
 
       grupos.map(grup => {
@@ -168,7 +195,7 @@ const getOrders = async () => {
 
 
 }
-const intervalID = setInterval(getOrders, 3000);
+const intervalID = setInterval(getOrders, 3000000);
 // const emitirSonido = async () => {
 //   // Implementa la lógica para emitir el sonido que desees
 //   console.log('Sonido emitido');
@@ -195,6 +222,7 @@ const set_dialog_order = (order) => {
   pedido.value = order
 }
 
+
 function filtrarPorEstado(orders, estado) {
   // Utiliza el método filter para obtener solo los objetos que coinciden con el estado proporcionado
   const ordersFiltradas = orders.filter(order => order.order_status.status === estado);
@@ -213,7 +241,7 @@ const prepararPedido = async (order) => {
   miAudio.currentTime = 0
   const timestampActual = new Date().toLocaleString();
   order.order_status.status = "en preparacion";
-  order.order_status.timestamp = serverTimeData;
+  order.order_status.timestamp = fecha_del_server.value;
 
   // Agregar el nuevo estado al historial de estados
   const nuevoEstado = {
@@ -237,7 +265,7 @@ const cancelarPedido = async (order) => {
   miAudio.currentTime = 0
   const timestampActual = new Date().toLocaleString();
   order.order_status.status = "cancelada";
-  order.order_status.timestamp = serverTimeData;
+  order.order_status.timestamp = fecha_del_server.value;
 
   // Agregar el nuevo estado al historial de estados
   const nuevoEstado = {
@@ -259,7 +287,7 @@ const marcarComoEnviado = async (order) => {
   // Cambiar el estado a "Enviado" con la hora actual
   const timestampActual = new Date().toLocaleString();
   order.order_status.status = "enviada";
-  order.order_status.timestamp = serverTimeData;
+  order.order_status.timestamp = fecha_del_server.value;
 
   // Agregar el nuevo estado al historial de estados
   const nuevoEstado = {
@@ -291,6 +319,7 @@ function enviarOrdenActualizada(order) {
     .then(response => {
       if (!response.ok) {
         throw new Error(`Error al enviar la orden: ${response.status}`);
+        getOrders()
       }
       return response.json();
     })
@@ -305,24 +334,57 @@ function enviarOrdenActualizada(order) {
 
 
 
+const filtrarPedidosPorFecha = (pedidos, fechaString) => {
+  // Convierte la cadena de fecha a un objeto Date
+  const fechaBusqueda = new Date(fechaString);
 
-async function filtrarOrdenesPorFecha(ordenes) {
-  // Obtener la fecha actual del servidor
-  const serverTimeResponse = await fetch('https://backend.salchimonster.com/server_time');
-  const serverTimeData = await serverTimeResponse.json();
-  const fechaActualServidor = serverTimeData.fecha;
+  // Filtra los pedidos cuyo order_status.timestamp coincide con la fecha de búsqueda y no es un "invalid date"
+  const pedidosFiltrados = pedidos.filter((pedido) => {
+    // Convierte la cadena de fecha del pedido a un objeto Date
+    const fechaPedido = new Date(pedido.order_status.timestamp);
 
-  // Filtrar las órdenes por la fecha actual
-  const ordenesFiltradas = ordenes.filter(orden => {
-    const fechaOrden = orden.order_status.timestamp.fecha;
-    return (
-      fechaOrden.d === fechaActualServidor.d &&
-      fechaOrden.m === fechaActualServidor.m &&
-      fechaOrden.a === fechaActualServidor.a
-    );
+    // Muestra las fechas en la consola
+    console.log("Fecha del pedido:", fechaPedido);
+    console.log("Fecha de búsqueda:", fechaBusqueda);
+
+    // Verifica si la fecha del pedido es válida (no es un "invalid date")
+    if (isNaN(fechaPedido.getTime())) {
+      // Si la fecha es inválida, descarta el pedido
+      console.log("Pedido descartado debido a una fecha inválida.");
+      return false;
+    }
+
+    // Compara solo el día, mes y año
+    const esMismoDia = fechaPedido.getDate() === fechaBusqueda.getDate();
+    const esMismoMes = fechaPedido.getMonth() === fechaBusqueda.getMonth();
+    const esMismoAno = fechaPedido.getFullYear() === fechaBusqueda.getFullYear();
+
+    return esMismoDia && esMismoMes && esMismoAno;
   });
 
-  return ordenesFiltradas;
+  console.log(pedidosFiltrados)
+  return pedidosFiltrados;
+};
+
+
+const obtenerHoraFormateadaAMPM = (fecha) => {
+  const fechaParseada = new Date(fecha);
+  const horas = fechaParseada.getHours();
+  const minutos = fechaParseada.getMinutes();
+  const ampm = horas >= 12 ? 'pm' : 'am';
+  const hora12 = horas % 12 || 12;
+  const horaFormateada = hora12 < 10 ? '0' + hora12 : hora12;
+  const minutosFormateados = minutos < 10 ? '0' + minutos : minutos;
+
+  return `${horaFormateada}:${minutosFormateados} ${ampm}`;
+};
+
+
+
+
+const open_order = (order) => {
+  set_dialog_order(order)
+  dialog_pedido_visible.value = !dialog_pedido_visible.value
 }
 
 
@@ -342,9 +404,4 @@ async function filtrarOrdenesPorFecha(ordenes) {
 
 
 
-
-
-
-
-
-export {fechaHoyFormateada, fechaHoy, convertirA12h, ordenes_de_hoy, getOrders, curentSite, cancelarPedido, miAudio, gruposPedidos, grupos, pedido, pedidos, formatoPesosColombianos, dialog_pedido_visible, set_dialog_order, filtrarPorEstado, marcarComoEnviado, prepararPedido }
+export {open_order, obtenerHoraFormateadaAMPM, fechaHoyFormateada,filtrarPedidosPorFecha, fecha_del_server, convertirA12h, ordenes_de_hoy, getOrders, curentSite, cancelarPedido, miAudio, gruposPedidos, grupos, pedido, pedidos, formatoPesosColombianos, dialog_pedido_visible, set_dialog_order, filtrarPorEstado, marcarComoEnviado, prepararPedido }

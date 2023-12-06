@@ -12,7 +12,7 @@
         <div class="col-12 p-0" style="height: 60vh;overflow-y: auto;">
 
 
-          <div class="col-12 p-0 " v-for="order in filtrarPorEstado(ordenes_de_hoy,estado.order_status)   " style=""  >
+          <div class="col-12 p-0 " v-for="order in filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),estado.order_status)   " style=""  >
 
 
             <pedidoItem  :id="`orden-${order.order_id}`" :order=" order" :estado="estado" @click="open_order(order)"> </pedidoItem>
@@ -38,16 +38,12 @@
 
 <script setup>
 
-import {gruposPedidos,convertirA12h, grupos, pedido, pedidos,ordenes_de_hoy, dialog_pedido_visible,set_dialog_order,filtrarPorEstado } from '@/service/un_pedido'
+import {gruposPedidos,obtenerHoraFormateadaAMPM,filtrarPedidosPorFecha,fecha_del_server, grupos, pedido, pedidos,ordenes_de_hoy, dialog_pedido_visible,set_dialog_order,filtrarPorEstado,open_order } from '@/service/un_pedido'
 import { URI } from '../../service/conection';
 import DialogoPedido from './dialogo-pedido.vue';
 import pedidoItem from '@/components/pedidoItem.vue';
 import { ref } from 'vue';
 
-const open_order = (order) => {
-  set_dialog_order(order)
-  dialog_pedido_visible.value = !dialog_pedido_visible.value
-}
 
 
 
