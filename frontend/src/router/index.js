@@ -44,6 +44,12 @@ const router = createRouter({
           // meta: { requiresAuth: true },
         },
         {
+          path: '/entregas',
+          name: 'entregas',
+          component: () => import('@/views/pages/entregas.vue'),
+          meta: { requirelocation: true },
+        },
+        {
           path: '/admin-products',
           name: 'admin-product',
           component: () => import('@/views/pages/fotos.vue'),
@@ -92,6 +98,8 @@ const router = createRouter({
           component: () => import('@/views/pages/pay.vue'),
           meta: { requirelocation: true },
         },
+
+       
 
 
 
@@ -265,6 +273,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('@/views/pages/auth/Login.vue')
+    },
+    {
+      path: '/cv',
+      name: 'cv',
+      component: () => import('@/views/pages/cv.vue')
     },
     // {
     //     path: '/auth/access',

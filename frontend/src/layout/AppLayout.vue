@@ -1,7 +1,7 @@
 <script setup>
 import { computed, watch, ref } from 'vue';
 import AppTopbar from './AppTopbar.vue';
-import AppFooter from './AppFooter.vue';
+// import AppFooter from './AppFooter.vue';
 import AppSidebar from './AppSidebar.vue';
 import AppConfig from './AppConfig.vue';
 import { useLayout } from '@/layout/composables/layout';
@@ -58,20 +58,29 @@ const isOutsideClicked = (event) => {
 </script>
 
 <template>
-    <div class="layout-wrapper" :class="containerClass">
-        <app-topbar></app-topbar>
+
+    
+
+
+    <div class="layout-wrapper col-12 " :class="containerClass" >
+        <div class="col-12" style=" height: 100vh; position: fixed; background-color: red; z-index:999; left: 100%;box-shadow: 0 0 20px black;">
+
+</div>
+        <app-topbar></app-topbar> 
         <div class="layout-sidebar">
             <app-sidebar></app-sidebar>
         </div>
-        <div class="layout-main-container  pr-0 pl-0" style="contain: paint;">
+        <div class="layout-main-container  pr-0 pl-0 " style="contain:paint ;">
             <div class="layout-main  ">
-                <router-view style=""></router-view>
+                <router-view ></router-view>
             </div>
             <app-footer></app-footer>
         </div>
         <!-- <app-config></app-config> -->
         <div class="layout-mask"></div>
     </div>
+
+    
 </template>
 
 <style lang="scss" scoped></style>

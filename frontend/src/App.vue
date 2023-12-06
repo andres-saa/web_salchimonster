@@ -32,7 +32,10 @@ const route = useRoute();
 // Verificar si la ruta actual o alguna de sus rutas secundarias es /admin-products
 const isInAdminProductsRoute =
 route.matched.some(record => record.path === '/admin-products') ||
-route.matched.some(record => record.path.startsWith('/admin-products/'));
+route.matched.some(record => record.path.startsWith('/admin-products/')) || 
+
+route.matched.some(record => record.path === '/entregas') ||
+route.matched.some(record => record.path.startsWith('/entregas/'));;
 
 
 
@@ -376,7 +379,7 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 <!-- <barra></barra> -->
   
 
-  <router-view  class="p-0 pb-8" style="background-color: rgb(250, 247, 253); width: 100vw;left:0px;position: absolute;"/>
+  <router-view  class="p-0 pb-8" style="content:; background-color: rgb(250, 247, 253); width: 100vw;left:0px;position: absolute;"/>
   <!-- <Dialog v-if="menuOptions[0].menus.length < 2" v-model:visible="menuOptions" modal header="Header"
         :style="{ width: '100%', border: 'none', overflow: 'hidden' }" :breakpoints="{ '960px': '75vw', '641px': '100vw' }">
         <img class="imagen" style="" src="http://localhost:5173/src/images/logo.png" alt="">
@@ -663,7 +666,10 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 
  
-  <div v-if="ruta.fullPath != '/cart' && !ruta.fullPath.includes('admin-products') " class="barra-carrito col-12 " style=" 
+  <div v-if="ruta.fullPath != '/cart' && 
+  !ruta.fullPath.includes('admin-products') &&
+  !ruta.fullPath.includes('entregas')
+   " class="barra-carrito col-12 " style=" 
                           /* width: auto; */
                             display: flex;
                             gap:2rem;

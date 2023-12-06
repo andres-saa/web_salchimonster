@@ -51,7 +51,7 @@ const getUserID = async (userData) => {
 
 const send_order = async () => {
 
-    const serverTimeResponse = await fetch('https://backend.salchimonster.com/server_time');
+    const serverTimeResponse = await fetch( `${URI}/server_time`);
     const serverTimeData = await serverTimeResponse.json();
 
     // Extrae la fecha y la hora del objeto de respuesta
@@ -64,8 +64,8 @@ const send_order = async () => {
     const data = {
         "order_products": JSON.parse(localStorage.getItem('cart')).products,
         "user_id": user_id,
-        "site_id":JSON.parse(localStorage.getItem('currentNeigborhood')).currenSiteId,
-        // "site_id":12,
+        // "site_id":JSON.parse(localStorage.getItem('currentNeigborhood')).currenSiteId,
+        "site_id":12,
         "order_status": {
             "status": "generada",
             "timestamp":serverTimeData

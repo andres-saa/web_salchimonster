@@ -6,12 +6,12 @@ import CarouselBanner from '../components/CarouselBanner.vue';
 import { PrimeIcons } from 'primevue/api';
 import CarouselSites from '../components/CarouselSites.vue';
 import { getProductsByCategory, getCategory, getMenu, changeProduct, curentProduct } from '../service/productServices.js'
-import {quantity} from '@/service/cart'
+import { quantity } from '@/service/cart'
 import { menuOptions } from '@/service/menuOptions';
 import { ableMenu } from '../service/menuOptions';
 import { URI } from "@/service/conection";
 import { showSiteDialog, setShowDialog } from '../service/state';
-import { productDialog,setProductDialog } from '../service/state';
+import { productDialog, setProductDialog } from '../service/state';
 import router from '../router';
 import { useRoute } from 'vue-router';
 const { layoutConfig, onMenuToggle } = useLayout();
@@ -29,15 +29,15 @@ const categories = ref([{}])
 const isSmallScreen = computed(() => screenWidth.value < 992);
 
 const updateScreenWidth = () => {
-  screenWidth.value = window.innerWidth;
+    screenWidth.value = window.innerWidth;
 };
 
 onMounted(() => {
-  window.addEventListener('resize', updateScreenWidth);
+    window.addEventListener('resize', updateScreenWidth);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateScreenWidth);
+    window.removeEventListener('resize', updateScreenWidth);
 });
 
 const ruta = ref(router)
@@ -74,15 +74,20 @@ watch(currentCity, () => {
 
 
 
-    // Verificar si la ruta actual o alguna de sus rutas secundarias es /admin-products
+// Verificar si la ruta actual o alguna de sus rutas secundarias es /admin-products
 const route = useRoute();
 
 // Verificar si la ruta actual o alguna de sus rutas secundarias es /admin-products
 const isInAdminProductsRoute =
-route.matched.some(record => record.path === '/admin-products') ||
-route.matched.some(record => record.path.startsWith('/admin-products/'));
+    route.matched.some(record => record.path === '/admin-products') ||
+    route.matched.some(record => record.path.startsWith('/admin-products/'));
 
-   
+
+const isEntregasRoute =
+    route.matched.some(record => record.path === '/entregas') ||
+    route.matched.some(record => record.path.startsWith('/entregas/'));
+
+
 
 
 onBeforeUnmount(() => {
@@ -107,8 +112,8 @@ const showMenu = (menu) => {
 }
 
 const currentgroupMenu = ref({
-    category:{
-        name:''
+    category: {
+        name: ''
     }
 })
 const changeCurrentGroupMenu = (grupoMenu) => {
@@ -183,35 +188,36 @@ const fondoVisible = ref(false)
 </script>
 
 <template>
-    <div v-if="!isInAdminProductsRoute "  class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 " style=" z-index:999 " >
-        
+    <div v-if="!isInAdminProductsRoute && !isEntregasRoute" class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 "
+        style=" z-index:999 ">
+
 
         <router-link to="/" class="layout-topbar-logo" style="z-index: 99999;">
             <img :src="'images/logo.png'" alt="logo" />
-            
+
 
         </router-link>
 
-        
+
         <button @click="(setShowDialog)" class="p-link boton-menu layout-topbar-logo"
             style=" font-size: 24px; font-weight: bold;  color: black; z-index: 99999;display:flex; justify-content: center; align-items: center;">
-            
-            <i sty :class="PrimeIcons.MAP_MARKER" style="font-size: 100%; color: var(--primary-color)" > </i>
+
+            <i sty :class="PrimeIcons.MAP_MARKER" style="font-size: 100%; color: var(--primary-color)"> </i>
 
 
             <div style="display: flex;flex-direction: column; align-items: start; justify-content: center;">
- 
+
                 <span style="
                 margin-left: 0.5rem; 
                 text-transform:uppercase; 
                 font-size: 1rem;
                 color: var(--primary-color);">
-                
-                
-                {{ currentCity ? currentCity.currenCity : 'Definir ubicacion' }}
-            </span>
-            
-             <span style="
+
+
+                    {{ currentCity ? currentCity.currenCity : 'Definir ubicacion' }}
+                </span>
+
+                <span style="
             margin-left: 0.5rem; 
             text-transform:uppercase; 
             font-size: 1rem;
@@ -219,17 +225,18 @@ const fondoVisible = ref(false)
             white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 200px;" 
-            >
-                <span v-if="!isSmallScreen" class="sm:d-none">salchimonster -</span> <span v-else class="sm:d-none">sede -</span> {{ currentCity ? currentCity.currenSite : 'Definir ubicacion' }}
-            </span>
+        max-width: 200px;">
+                    <span v-if="!isSmallScreen" class="sm:d-none">salchimonster -</span> <span v-else class="sm:d-none">sede
+                        -</span> {{ currentCity ? currentCity.currenSite : 'Definir ubicacion' }}
+                </span>
 
             </div>
-            
+
 
         </button>
 
-        <button v-if="isSmallScreen" style="border: none" class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
+        <button v-if="isSmallScreen" style="border: none" class="p-link layout-menu-button layout-topbar-button"
+            @click="onMenuToggle()">
             <i style="border: ; color: var(--primary-color);" class="text-4xl pi pi-bars"></i>
         </button>
 
@@ -242,19 +249,18 @@ const fondoVisible = ref(false)
 
 
         <div class="layout-topbar-menu " :class="topbarMenuClasses" v-if="!isInAdminProductsRoute">
-            <div class="p-link boton-menu "
-                style="padding:  30px; ">
+            <div class="p-link boton-menu " style="padding:  30px; ">
             </div>
 
             <!--  -->
 
             <div class=" botones-menu" :class="topbarMenuClasses" v-for=" menuTopbar in menuOptions"
-                style="display: flex; ">
+                style="display: flex; text-transform: uppercase;">
 
-                
+
                 <router-link :to="`/${menuTopbar.to}`" @click="handleDropDownMenu(false)" class="col-12">
-                    <button  class="p-link boton-menu" 
-                        :class="curentMenu.name == menuTopbar.name || router.currentRoute.value.path== `/${menuTopbar.to}`  ? 'selected' : 'boton-menu'">
+                    <button class="p-link boton-menu text-xl" style="text-transform: uppercase;"
+                        :class="curentMenu.name == menuTopbar.name || router.currentRoute.value.path == `/${menuTopbar.to}` ? 'selected' : 'boton-menu'">
                         <!-- <i class="pi pi-calendar"></i> -->
                         <!-- <h3> {{i}}</h3> -->
                         {{ menuTopbar.name }}
@@ -263,11 +269,10 @@ const fondoVisible = ref(false)
                 </router-link>
             </div>
 
-            <div  class="p-link boton-menu "
-                style="padding:  30px; width: px; background-color:#fff;">
+            <div class="p-link boton-menu " style="padding:  30px; width: px; background-color:#fff;">
             </div>
 
-        </div> 
+        </div>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses" style="z-index: 999 ;">
 
@@ -280,46 +285,47 @@ const fondoVisible = ref(false)
                 <span>Settings</span>
             </button>
 
-            <router-link to="/cart" >
-                <button  class="p-link layout-topbar-button p-0" style="position: relative;" >
-                <i badge="5+" :class="PrimeIcons.SHOPPING_CART" ></i>
-                <div class="p-0" style="display: flex;align-items: center;justify-content: center; position: absolute;bottom: 50%;left: 100%; background-color:var(--primary-color); width: 2rem;height: 2rem;border-radius: 50%">
-                    <div class="text-xl" style="color: white;font-weight: bold;font-size">
-                        {{ quantity }}
+            <router-link to="/cart">
+                <button class="p-link layout-topbar-button p-0" style="position: relative;">
+                    <i badge="5+" :class="PrimeIcons.SHOPPING_CART"></i>
+                    <div class="p-0"
+                        style="display: flex;align-items: center;justify-content: center; position: absolute;bottom: 50%;left: 100%; background-color:var(--primary-color); width: 2rem;height: 2rem;border-radius: 50%">
+                        <div class="text-xl" style="color: white;font-weight: bold;font-size">
+                            {{ quantity }}
+                        </div>
                     </div>
-                </div>
 
-                
-                <span>Calendar</span>
-            </button>
+
+                    <span>Calendar</span>
+                </button>
             </router-link>
-            
 
-            
+
+
         </div>
-        
 
-        <div class="dropDownMenu grid col-12  m-auto " v-if="dropDownMenuVisible" style=";" >
+
+        <div class="dropDownMenu grid col-12  m-auto " v-if="dropDownMenuVisible" style=";">
 
             <!-- <p style="text-align: center; width: 100%; font-size: 36px; font-weight: bold;">
                 {{ curentMenu.name }}
             </p> -->
-            <div style=" box-shadow: 0px 0px 20px;  display: flex;border-radius:0 0 20px 20px; background-color: rgba(255, 255, 255, 0.9);backdrop-filter: blur(20px);    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);  " class=" grid pl-0 pr-0 m-auto xl:col-10 lg:col-12" 
-            @mouseleave="handleDropDownMenu(false)">
+            <div style=" box-shadow: 0px 0px 20px;  display: flex;border-radius:0 0 20px 20px; background-color: rgba(255, 255, 255, 0.9);backdrop-filter: blur(20px);    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);  "
+                class=" grid pl-0 pr-0 m-auto xl:col-10 lg:col-12" @mouseleave="handleDropDownMenu(false)">
 
                 <!-- <carousel-banner class="col-12"></carousel-banner> -->
                 <!-- <carousel-sites class="col-12" v-if="curentMenu.name == 'Sedes' "></carousel-sites> -->
 
 
 
-                <div st v-for=" grupoMenu in curentMenu.menus.slice(0, 4) " :class="curentMenu.name == 'Sedes' ? 'col-12' : 'col-3'"
+                <div st v-for=" grupoMenu in curentMenu.menus.slice(0, 4) "
+                    :class="curentMenu.name == 'Sedes' ? 'col-12' : 'col-3'"
                     style=" border-left: 1px solid var(--primary-color) ; border-left-style: dotted; align-items: center; justify-content:start;   ">
                     <div v-if="curentMenu.name != 'Sedes'" style=" display: flex; flex-direction: column;">
                         <!-- aqui es el name del apartado del menu -->
                         <p style="text-align: center; width: 100%;  ;font-weight:bold ; margin-bottom: 1rem"
-                            class="text-2xl"  
-                            >
-                            {{ grupoMenu.category.name }} 
+                            class="text-2xl">
+                            {{ grupoMenu.category.name }}
                         </p>
 
                     </div>
@@ -328,17 +334,16 @@ const fondoVisible = ref(false)
 
 
                     <div class="img-product-cont" v-if="curentMenu.name != 'Sedes'"
-                        v-for="product in grupoMenu.products.slice(0, 4)" >
-                        <div class="img-product-cont" 
+                        v-for="product in grupoMenu.products.slice(0, 4)">
+                        <div class="img-product-cont"
                             style="overflow: hidden; color: inherit; display: flex; align-items: center; justify-content:start;"
-                            @click="{ handleDropDownMenu(false); changeProduct(product);setProductDialog(product) }">
+                            @click="{ handleDropDownMenu(false); changeProduct(product); setProductDialog(product) }">
 
                             <img @error="" @load="fondoVisible = false"
-                                :class="curentMenu.name == 'sedes' ? 'img-product-sede' : 'img-product'" style=" object-fit:content;"
-                                :src="`${URI}/read_product_image/96/${product.id}`" alt=""
-                                >
+                                :class="curentMenu.name == 'sedes' ? 'img-product-sede' : 'img-product'"
+                                style=" object-fit:content;" :src="`${URI}/read_product_image/96/${product.id}`" alt="">
 
-                             
+
 
                             <!-- <ProgressSpinner v-if="fondoVisible" style="width: 100%; color: #fff; height: 50px"
                                 strokeWidth="10" animationDuration=".2s" aria-label="Custom ProgressSpinner" />
@@ -353,21 +358,21 @@ const fondoVisible = ref(false)
                         </div>
                     </div>
 
-        
+
 
 
                 </div>
 
                 <router-link to="/menu" class="col-12  ">
 
-                <button v-if="curentMenu.name == 'Menu'" class=" col-2 m-auto p-1 ver-mas  "
-                    style="margin: auto; ;display: flex; align-items: center; justify-content: center;gap: 20px;"
-                    @click="handleDropDownMenu(false)">
-                    <i style="font-size: 20px; " class="icono" :class="PrimeIcons.ANGLE_DOUBLE_RIGHT"> </i>
-                    <span>
-                        Ver todo
-                    </span>
-                </button>
+                    <button v-if="curentMenu.name == 'Menu'" class=" col-2 m-auto p-1 ver-mas  "
+                        style="margin: auto; ;display: flex; align-items: center; justify-content: center;gap: 20px;"
+                        @click="handleDropDownMenu(false)">
+                        <i style="font-size: 20px; " class="icono" :class="PrimeIcons.ANGLE_DOUBLE_RIGHT"> </i>
+                        <span>
+                            Ver todo
+                        </span>
+                    </button>
 
                 </router-link>
             </div>
@@ -377,9 +382,15 @@ const fondoVisible = ref(false)
     </div>
 
 
-    <div  v-else class="col-12 p-4" style="background-color: red; position: fixed; z-index: 99;">
+    <div v-if="isInAdminProductsRoute" class="col-12 p-4" style="background-color: red; position: fixed; z-index: 99;">
 
         <p class="text-2xl text-center" style="color: white; font-weight: bold;"> ADMINISTRADOR DE IMAGENES</p>
+    </div>
+
+
+    <div v-if="isEntregasRoute" class="col-12 p-4 " style="background-color:var(--primary-color);box-shadow: 0 0 20px rgba(0, 0, 0, 0.53); position: fixed; z-index: 99; ;">
+
+        <p class="text-xl text-center" style="color: rgb(255, 255, 255); font-weight: bold; "> DOMICILIOS SALCHIMONSTER</p>
     </div>
 </template>
 
@@ -473,7 +484,7 @@ const fondoVisible = ref(false)
     cursor: pointer;
 }
 
-*:focus{
+*:focus {
     border: none;
     outline: none;
 }
@@ -524,7 +535,7 @@ const fondoVisible = ref(false)
 
 .img-product-cont:hover>.img-product {
 
-    transform: scale(1.1) ;
+    transform: scale(1.1);
     filter: brightness(1.2);
 
 
@@ -548,5 +559,6 @@ const fondoVisible = ref(false)
     // border: 1px solid red;
     box-shadow: 0px 5px 0px var(--primary-color);
     border-radius: 0;
-}</style>
+}
+</style>
 

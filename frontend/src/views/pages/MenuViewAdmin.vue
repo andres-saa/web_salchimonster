@@ -201,7 +201,7 @@ watch(menuOptions, setSection);
 
 
 
-showDialog.value = false
+
 
 
 onMounted(async () => {
