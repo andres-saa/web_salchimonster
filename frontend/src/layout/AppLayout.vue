@@ -58,29 +58,24 @@ const isOutsideClicked = (event) => {
 </script>
 
 <template>
+    <div class="layout-wrapper col-12 " :class="containerClass">
+        <div class="col-12"
+            style=" height: 100vh; position: fixed; background-color: red; z-index:9999; left: 100%;box-shadow: 0 0 20px black;">
 
-    
-
-
-    <div class="layout-wrapper col-12 " :class="containerClass" >
-        <div class="col-12" style=" height: 100vh; position: fixed; background-color: red; z-index:9999; left: 100%;box-shadow: 0 0 20px black;">
-
-</div> 
-        <app-topbar></app-topbar> 
+        </div>
+        <app-topbar></app-topbar>
         <div class="layout-sidebar">
             <app-sidebar></app-sidebar>
         </div>
-        <div class="layout-main-container  pr-0 pl-0 " style="contain:paint ;">
+        <div class="layout-main-container  pr-0 pl-0 pt-8 " style="contain:paint ;">
             <div class="layout-main  ">
-                <router-view ></router-view>
+                <router-view></router-view>
             </div>
             <app-footer></app-footer>
         </div>
         <!-- <app-config></app-config> -->
         <div class="layout-mask"></div>
     </div>
-
-    
 </template>
 
 <style lang="scss" scoped></style>
