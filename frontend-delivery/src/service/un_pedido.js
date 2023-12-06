@@ -195,7 +195,7 @@ const getOrders = async () => {
 
 
 }
-const intervalID = setInterval(getOrders, 3000000);
+const intervalID = setInterval(getOrders, 3000);
 // const emitirSonido = async () => {
 //   // Implementa la lógica para emitir el sonido que desees
 //   console.log('Sonido emitido');
