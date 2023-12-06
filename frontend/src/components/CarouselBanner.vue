@@ -9,7 +9,7 @@
     
     <div class="carousel-inner p-0 " style=" width: 100%;height: ;">
       <div class="carousel-item active sm:d-none p-0" style="width: 100%;">
-        <img class="" style="width: 100%;height: 100%;max-height: 80vh;border-radius: 2rem;overflow: hidden;  object-fit: contain; " :src="`/images/banners/banner-1.jpeg`" alt="">
+        <img class="" style="width: 100%;height: 100%;max-height: 80vh;overflow: hidden;  object-fit: contain; " :src="`/images/banners/banner-1.jpeg`" alt="">
       </div>
 
       
