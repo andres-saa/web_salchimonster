@@ -11,7 +11,7 @@
     
 
     <div class=" col-12 d-flex p lg:justify-content-center align-items-center mb-5 p-1 md:p-1" style="overflow-x: auto;position: sticky; z-index: 999;top:5rem; background-color: rgb(255, 255, 255);box-shadow: 0 0 1rem rgba(0, 0, 0, 0.337); ">
-        <div v-for="section in menuOptions[0].menus" :key="section.category.name" class="p-0">
+        <div v-for="section in menuOptions[0].menus" :key="section.category.name" class="p-1">
 
 
 
@@ -185,8 +185,8 @@ onMounted(async () => {
 
 .selected {
     /* color: var(--primary-color); */
-    box-shadow: 0 0.4rem var(--primary-color);
-    padding: 1rem;
+    box-shadow: 0 0.5rem var(--primary-color);
+    /* padding: 1rem; */
     /* font-weight: bold; */
 
 
