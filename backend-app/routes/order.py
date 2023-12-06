@@ -77,16 +77,7 @@ def get_server_time():
     # Obtiene la hora actual con la zona horaria de Colombia
     now_colombia = datetime.now(colombia_tz)
 
-    # Formatea la fecha y la hora según tus especificaciones
-    fecha = {
-        "d": now_colombia.strftime("%d"),
-        "m": now_colombia.strftime("%m"),
-        "a": now_colombia.strftime("%Y"),
-    }
+    # Formatea la fecha y la hora de manera tradicional (YYYY-MM-DD HH:MM)
+    fecha_hora_tradicional = now_colombia.strftime("%Y-%m-%d %H:%M")
 
-    hora = {
-        "h": now_colombia.strftime("%H"),
-        "m": now_colombia.strftime("%M"),
-    }
-
-    return {"fecha": fecha, "hora": hora}
+    return fecha_hora_tradicional

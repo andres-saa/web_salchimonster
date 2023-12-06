@@ -1,16 +1,8 @@
-from fastapi import APIRouter
-
-# from models.category import category_model
-# import json
-# from sqlalchemy import select, func
-# from config.db import conn
-# from models.product_photo import Product_photo_model
-# import sqlalchemy
+from fastapi import APIRouter, HTTPException
 from models.product import Product
-from schema.product import Product_schema_post
+from schema.product import ProductSchemaPost
+
 product_router = APIRouter()
-
-
 
 @product_router.get("/products")
 def get_products():
@@ -20,27 +12,34 @@ def get_products():
     return products
 
 @product_router.post("/products")
-def create_product(product: Product_schema_post):
+def create_product(product: ProductSchemaPost):
     product_instance = Product()
-    product_id = product_instance.insert_product(
-        product.product_name,
-        product.product_description,
-        product.product_selling_price,
-        product.product_purchase_price,
-        product.unit_of_measure,
-        product.provider_id,
-        product.category_id,
-    )
+    product_id = product_instance.insert_product(product)
     created_product = product_instance.select_product_by_id(product_id)
-
-    # Convierte la tupla resultante en un diccionario
-
     product_instance.close_connection()
     return {"product_id": created_product[0]}
 
-@product_router.delete("/products/{product_id}", response_model=dict)
+@product_router.put("/products/{product_id}")
+def update_product(product_id: int, product: ProductSchemaPost):
+    product_instance = Product()
+    existing_product = product_instance.select_product_by_id(product_id)
+    if existing_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    product_instance.update_product(product_id, product)
+    updated_product = product_instance.select_product_by_id(product_id)
+    product_instance.close_connection()
+    return {"message": "Product updated successfully", "product_id": product_id}
+
+@product_router.delete("/products/{product_id}")
 def delete_product(product_id: int):
     product_instance = Product()
+    existing_product = product_instance.select_product_by_id(product_id)
+    if existing_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
     product_instance.delete_product(product_id)
     product_instance.close_connection()
-    return {"message": "Product deleted successfully"}
+    return {"message": "Product deleted successfully", "deleted_product": existing_product}
+
+# Otras rutas según sea necesario

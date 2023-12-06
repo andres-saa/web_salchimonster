@@ -1,5 +1,5 @@
-# producto.py
-
+from typing import Optional
+from pydantic import BaseModel
 import psycopg2
 from dotenv import load_dotenv
 import os
@@ -12,6 +12,13 @@ DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
 DB_NAME = os.getenv('DB_NAME')
 
+class ProductSchemaPost(BaseModel):
+    name: str
+    price: int
+    description: str
+    category_id: Optional[int] = None
+    porcion: str
+
 class Product:
     def __init__(self, product_id=None):
         self.conn_str = f"dbname={DB_NAME} user={DB_USER} password={DB_PASSWORD} host={DB_HOST} port={DB_PORT}"
@@ -19,33 +26,30 @@ class Product:
         self.cursor = self.conn.cursor()
         self.product_id = product_id
 
-    def create_table(self):
-        create_table_script = """
-        CREATE TABLE IF NOT EXISTS products (
-            product_id SERIAL PRIMARY KEY,
-            product_name VARCHAR(255),
-            product_description VARCHAR(255),
-            product_selling_price FLOAT,
-            product_purchase_price FLOAT,
-            unit_of_measure VARCHAR(50),
-            provider_id INTEGER REFERENCES providers(provider_id),
-            category_id INTEGER REFERENCES categories(category_id)
-        );
-        """
-        self.cursor.execute(create_table_script)
-        self.conn.commit()
+    # def create_table(self):
+    #     create_table_script = """
+    #     CREATE TABLE IF NOT EXISTS products (
+    #         product_id SERIAL PRIMARY KEY,
+    #         name VARCHAR(255),
+    #         price INT,
+    #         description VARCHAR(255),
+    #         category_id INTEGER,
+    #         porcion VARCHAR(50)
+    #     );
+    #     """
+        # self.cursor.execute(create_table_script)
+        # self.conn.commit()
 
-    def insert_product(self, product_name, product_description, product_selling_price,
-                       product_purchase_price, unit_of_measure, provider_id, category_id):
+    def insert_product(self, product_data: ProductSchemaPost):
         insert_query = """
         INSERT INTO products (
-            product_name, product_description, product_selling_price,
-            product_purchase_price, unit_of_measure, provider_id, category_id
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING product_id;
+            name, price, description,
+            category_id, porcion, state
+        ) VALUES (%s, %s, %s, %s, %s, %s) RETURNING product_id;
         """
         self.cursor.execute(insert_query, (
-            product_name, product_description, product_selling_price,
-            product_purchase_price, unit_of_measure, provider_id, category_id
+            product_data.name, product_data.price, product_data.description,
+            product_data.category_id, product_data.porcion, product_data.state
         ))
         product_id = self.cursor.fetchone()[0]
         self.conn.commit()
@@ -62,28 +66,24 @@ class Product:
         self.cursor.execute(select_query, (product_id,))
         return self.cursor.fetchone()
 
-    def update_product(self, product_id, new_product_name, new_product_description,
-                       new_product_selling_price, new_product_purchase_price,
-                       new_unit_of_measure, new_provider_id, new_category_id):
+    def update_product(self, product_id, product_data: ProductSchemaPost):
         update_query = """
         UPDATE products SET
-            product_name = %s,
-            product_description = %s,
-            product_selling_price = %s,
-            product_purchase_price = %s,
-            unit_of_measure = %s,
-            provider_id = %s,
-            category_id = %s
+            name = %s,
+            price = %s,
+            description = %s,
+            category_id = %s,
+            porcion = %s,
+            state = %s
         WHERE product_id = %s;
         """
         self.cursor.execute(update_query, (
-            new_product_name, new_product_description,
-            new_product_selling_price, new_product_purchase_price,
-            new_unit_of_measure, new_provider_id, new_category_id,
+            product_data.name, product_data.price, product_data.description,
+            product_data.category_id, product_data.porcion, product_data.state,
             product_id
         ))
         self.conn.commit()
-
+ 
     def delete_product(self, product_id):
         delete_query = "DELETE FROM products WHERE product_id = %s;"
         self.cursor.execute(delete_query, (product_id,))
@@ -94,14 +94,12 @@ class Product:
 
 # Ejemplo de uso:
 if __name__ == "__main__":
-    producto_instance = Producto()
+    producto_instance = Product()
     producto_instance.create_table()
 
     # Insertar un producto
-    product_id = producto_instance.insert_product(
-        "Producto1", "Descripción del Producto1", 10.99, 5.99, "Unit",
-        1, 1
-    )
+    product_data = ProductSchemaPost(name="Producto1", price=10, description="Descripción del Producto1", porcion="Unit", category_id=1)
+    product_id = producto_instance.insert_product(product_data)
     print(f"Producto insertado con ID: {product_id}")
 
     # Seleccionar todos los productos
@@ -115,9 +113,8 @@ if __name__ == "__main__":
     print(f"Producto seleccionado por ID ({product_id}): {selected_product}")
 
     # Actualizar un producto
-    producto_instance.update_product(
-        product_id, "Producto1_actualizado", "Nueva descripción", 15.99, 8.99, "Kg", 2, 2
-    )
+    updated_product_data = ProductSchemaPost(name="Producto1_actualizado", price=15, description="Nueva descripción", porcion="Kg", category_id=2)
+    producto_instance.update_product(product_id, updated_product_data)
     print("Producto actualizado")
 
     # Seleccionar todos los productos después de la actualización
