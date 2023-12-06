@@ -5,13 +5,6 @@
 
 
 
-{{ fecha_del_server }}
-
- {{ filtrarPedidosPorFecha(pedidos,fecha_del_server) }}
-
-
-
-
 
 
 <div style="height: 80vh;overflow-y: auto; display:flex; align-items: center;">
