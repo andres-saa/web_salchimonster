@@ -1,9 +1,9 @@
 <template>
-    <div class="cont" style="background-color: white; "  >
+    <div class="cont" style="background-color: rgb(255, 0, 0);height:max-content "  >
         <!-- <router-link :to="`product/${props.product.id}` " @click="changeProduct(product)"> -->
 
             <div class="imagen-cont" style="position: ;" @click="setProductDialog(product)">
-                <img class="imagen" @error="imagenError" :src="`${URI}/read_product_image/300/${props.product.id}`" alt="">
+                <img class="imagen" @error="imagenError" style="; object-fit: cover;" :src="`${URI}/read_product_image/300/${props.product.id}`" alt="">
                 
 
             <!-- <div class="before"
