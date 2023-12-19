@@ -107,7 +107,7 @@ const sedeTulua = {
         },
         {
           name: 'Prados del limonar',
-          deliveryPrice: 5000
+          deliveryPrice: 4000
         },
         {
           name: 'Bosques de maracaibo',
