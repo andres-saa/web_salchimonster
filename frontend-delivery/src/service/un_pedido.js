@@ -150,7 +150,7 @@ const getOrders = async () => {
     })
     .then(data => {
       // La variable "data" contiene los pedidos recuperados
-      console.log('Pedidos:', data);
+      // console.log('Pedidos:', data);
 
       // Obtén las órdenes almacenadas en el localStorage
       const storedOrders = JSON.parse(localStorage.getItem('orders')) || [];
@@ -195,7 +195,7 @@ const getOrders = async () => {
 
 
 }
-const intervalID = setInterval(getOrders, 3000);
+const intervalID = setInterval(getOrders, 11000);
 // const emitirSonido = async () => {
 //   // Implementa la lógica para emitir el sonido que desees
 //   console.log('Sonido emitido');
@@ -251,7 +251,7 @@ const prepararPedido = async (order) => {
   order.status_history.push(nuevoEstado);
 
   // Enviar la orden actualizada al servidor
-  console.log(order)
+  // console.log(order)
   enviarOrdenActualizada(order);
   dialog_pedido_visible.value = false
 }
@@ -276,7 +276,7 @@ const cancelarPedido = async (order) => {
   order.status_history.push(nuevoEstado);
 
   // Enviar la orden actualizada al servidor
-  console.log(order)
+  // console.log(order)
   enviarOrdenActualizada(order);
   dialog_pedido_visible.value = false
 }
@@ -319,11 +319,12 @@ function enviarOrdenActualizada(order) {
     .then(response => {
       if (!response.ok) {
         throw new Error(`Error al enviar la orden: ${response.status}`);
-        getOrders()
+       
       }
       return response.json();
     })
     .then(data => {
+      getOrders()
       console.log('Orden enviada con éxito:', data);
     })
     .catch(error => {
@@ -344,8 +345,8 @@ const filtrarPedidosPorFecha = (pedidos, fechaString) => {
     const fechaPedido = new Date(pedido.order_status.timestamp);
 
     // Muestra las fechas en la consola
-    console.log("Fecha del pedido:", fechaPedido);
-    console.log("Fecha de búsqueda:", fechaBusqueda);
+    // console.log("Fecha del pedido:", fechaPedido);
+    // console.log("Fecha de búsqueda:", fechaBusqueda);
 
     // Verifica si la fecha del pedido es válida (no es un "invalid date")
     if (isNaN(fechaPedido.getTime())) {
@@ -362,7 +363,7 @@ const filtrarPedidosPorFecha = (pedidos, fechaString) => {
     return esMismoDia && esMismoMes && esMismoAno;
   });
 
-  console.log(pedidosFiltrados)
+  // console.log(pedidosFiltrados)
   return pedidosFiltrados;
 };
 

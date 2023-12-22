@@ -166,14 +166,14 @@
         <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
             <span style="font-weight: bold;"> NOMBRE </span>
-            <span style="font-weight:;text-transform: uppercase;"> {{ user.user_name }} </span>
+            <span style="font-weight:;text-transform: uppercase;"> {{ pedido.user_data.user_name }} </span>
 
         </div>
 
         <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
             <span style="font-weight: bold;"> TELEFONO </span>
-            <span style="font-weight:;text-transform: uppercase;"> {{ user.user_phone }} </span>
+            <span style="font-weight:;text-transform: uppercase;"> {{ pedido.user_data.user_phone }} </span>
 
         </div>
 
@@ -181,7 +181,7 @@
         <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
             <span style="font-weight: bold;"> DIRECCIÓN </span>
-            <span style="font-weight:;text-transform: uppercase;"> {{ user.user_address }} </span>
+            <span style="font-weight:;text-transform: uppercase;"> {{ pedido.user_data.user_address }} </span>
 
         </div>
 

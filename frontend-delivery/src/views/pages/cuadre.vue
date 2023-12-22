@@ -1,12 +1,4 @@
 <template>
-
-
-
-
-
-
-
-
 <div style="height: 80vh;overflow-y: auto; display:flex; align-items: center;">
   <div class="  col-12 m-auto" style="width: 30rem; box-shadow: 0 0 10px rgba(0, 0, 0, 0.196); border-radius: 2rem; ">
 
@@ -24,9 +16,6 @@
     {{ formatoPesosColombianos(sumarProductos(contarObjetosRepetidos(order.order_products))) }}
 
    </div>
-
-    
-
   </div>
 
 </div>
@@ -36,7 +25,7 @@
 <div class=" grid p-3 pb-0  text-xl mb-2 p-0" style="">
   <p class="  col p-0 text-left m-0" style="font-weight: bold; ">  TOTAL CAJA</p>
   <p class="  col p-0 text-right m-0 pr-3" style="font-weight: bold;border-radius: 1rem;  background: linear-gradient(to right,transparent, rgb(191, 255, 96) );
-">  {{formatoPesosColombianos( calcularTotalConjuntoOrdenes(filtrarPorEstado(ordenes_de_hoy,'enviada')) )}}</p>
+">  {{formatoPesosColombianos( calcularTotalConjuntoOrdenes(filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),'enviada')) )}}</p>
 </div>
 
 
@@ -62,16 +51,6 @@
   </div>
 
 </div>
-
-<div class="p-1 mb-2 " style="border-bottom: 1px solid;"></div>
-<div class=" grid p-3 pb-0  text-xl mb-0" style="">
-  <p class="  col p-0 text-left" style="font-weight: bold; ">  TOTAL</p>
-  <p class="  col p-0 text-right" style="font-weight: bold; ">  {{formatoPesosColombianos( calcularTotalConjuntoOrdenes(filtrarPorEstado(ordenes_de_hoy,'enviada')) )}}</p>
-</div>
-
-
-
-
 </div>
 
 
