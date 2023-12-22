@@ -55,6 +55,28 @@ class Order:
 
     def create_order(self, order_data: order_schema_post):
         insert_query = """
+        INSERT INTO orders (order_products, user_id, site_id, order_status, payment_method, delivery_person_id, status_history, delivery_price, order_notes, user_data)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING *;
+        """
+        self.cursor.execute(insert_query, (
+            json.dumps(order_data.order_products),
+            order_data.user_id,
+            order_data.site_id,
+            json.dumps(order_data.order_status),
+            order_data.payment_method,
+            order_data.delivery_person_id,
+            json.dumps(order_data.status_history),
+            order_data.delivery_price,
+            order_data.order_notes,
+            json.dumps(order_data.user_data)  # Asegúrate de serializar el user_data
+        ))
+        self.conn.commit()
+        columns = [desc[0] for desc in self.cursor.description]
+        updated_order_id = dict(zip(columns, self.cursor.fetchone()))["order_id"]
+
+        return updated_order_id
+
+        insert_query = """
         INSERT INTO orders (order_products, user_id, site_id, order_status, payment_method, delivery_person_id, status_history, delivery_price, order_notes)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s ) RETURNING *;
         """
@@ -87,7 +109,8 @@ class Order:
             delivery_person_id = COALESCE(%s, delivery_person_id),
             status_history = COALESCE(%s, status_history),
             delivery_price = COALESCE(%s, delivery_price),
-            order_notes = COALESCE(%s, order_notes)
+            order_notes = COALESCE(%s, order_notes),
+            user_data = COALESCE(%s, user_data)  
         WHERE order_id = %s
         RETURNING *;
         """
@@ -101,6 +124,7 @@ class Order:
             json.dumps(order_data.status_history) if order_data.status_history is not None else None,
             order_data.delivery_price if order_data.delivery_price is not None else None,
             order_data.order_notes if order_data.order_notes is not None else None,
+            json.dumps(order_data.user_data) if order_data.user_data is not None else None,  # Asegúrate de serializar el user_data
             order_id
         ))
         self.conn.commit()

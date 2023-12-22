@@ -51,6 +51,8 @@ const getUserID = async (userData) => {
 
 const send_order = async () => {
 
+
+
     const serverTimeResponse = await fetch( `${URI}/server_time`);
     const serverTimeData = await serverTimeResponse.json();
 
@@ -58,12 +60,36 @@ const send_order = async () => {
     const { fecha, hora } = serverTimeData;
 
     const user = user_data.value
+
+    if (!user.user_name || !user.user_name.trim()) {
+        alert("El nombre es obligatorio.");
+        return;
+    }
+    
+    if (!user.user_phone || !user.user_phone.trim()) {
+        alert("El teléfono es obligatorio.");
+        return;
+    }
+    
+    if (!user.user_address || !user.user_address.trim()) {
+        alert("La dirección es obligatoria.");
+        return;
+    }
+    if (!payMethod.value){
+        alert("Por favor seleccione un metodo de pago");
+        return;
+
+    }
+    
+
+    
     user.site_id = JSON.parse(localStorage.getItem('currentNeigborhood')).currenSiteId
     const user_id = await getUserID(user);
 
     const data = {
         "order_products": JSON.parse(localStorage.getItem('cart')).products,
         "user_id": user_id,
+        "user_data":user,
         "site_id":JSON.parse(localStorage.getItem('currentNeigborhood')).currenSiteId,
         // "site_id":12,
         "order_status": {

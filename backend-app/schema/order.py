@@ -12,3 +12,4 @@ class order_schema_post(BaseModel):
     status_history: List[dict]
     delivery_price: Decimal
     order_notes:str
+    user_data: dict
