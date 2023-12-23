@@ -4,7 +4,7 @@
 
 <p class="text-center text-xl " style="font-weight: bold;"> VENTAS {{ formatearFechaHora(fecha_del_server).toUpperCase() }} </p>
 
-<p class=" text-center mb-1" style="font-weight: bold; background-color: rgb(191, 255, 96); border-radius: 1rem;"> PEDIDOS ENVIADOS  {{  filtrarPorEstado(ordenes_de_hoy,'enviada').length }}</p>
+<p class=" text-center mb-1" style="font-weight: bold; background-color: rgb(191, 255, 96); border-radius: 1rem;"> PEDIDOS ENVIADOS  {{  filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),'enviada').length }}</p>
 
 <div >
   <div class=" pedido" v-for="order in filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),'enviada')" style="display: flex;">
@@ -31,7 +31,7 @@
 
 
 
-<p class=" text-center mb-1 pt-0" style="font-weight: bold; background-color: rgb(255, 165, 180);border-radius: 1rem;"> PEDIDOS CANCELADOS {{  filtrarPorEstado(ordenes_de_hoy,'cancelada').length }}</p>
+<p class=" text-center mb-1 pt-0" style="font-weight: bold; background-color: rgb(255, 165, 180);border-radius: 1rem;"> PEDIDOS CANCELADOS {{  filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),'cancelada').length }}</p>
 
 <div >
   <div class="grid" v-for="order in filtrarPorEstado(ordenes_de_hoy,'cancelada')">
@@ -91,8 +91,9 @@ function calcularTotalConjuntoOrdenes(orders) {
   // Iterar sobre cada orden en el conjunto de órdenes
   for (let i = 0; i < orders.length; i++) {
     // Calcular el total de la orden actual utilizando la función calcularTotalCarrito
-    const totalOrden = calcularTotalCarrito(orders[i]);
+    const totalOrden = sumarProductos(contarObjetosRepetidos(orders[i].order_products))
 
+    
     // Sumar el total de la orden actual al total global
     totalGlobal += totalOrden;
   }
