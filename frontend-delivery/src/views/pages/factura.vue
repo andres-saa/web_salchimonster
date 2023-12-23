@@ -27,7 +27,7 @@
                     </p>
 
 
-                    <p style="font-weight: bold;height: ;">{{ formatoPesosColombianos(product.quantity * product.product.price) }}
+                    <p :class="product.product.adiciones.length < 1?'sin-adiciones':''" >{{ formatoPesosColombianos(product.quantity * product.product.price) }}
                     </p>
                 </div>
 
@@ -85,10 +85,15 @@
                 </div>
 
               
-                    
-                    <p v-if="product.product.adiciones.length > 0" class="col-12 p-0 pl-2 mb-0 text-right" style="font-weight: bold ;">
+
+               <div v-if="product.product.adiciones.length>0" class="grid col-12 m-0 p-0">
+                
+                <p  class="col-12 p-0 pl-2 mb-0 text-right" style="font-weight: bold ;">
                         {{ formatoPesosColombianos(
                         sumarAdicionesAlProducto(product)) }}</p>
+               </div>
+                    
+                    
 
                      
 
@@ -125,7 +130,7 @@
         <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
             <span style="font-weight: bold;"> SUBTOTAL </span>
-            <span style="font-weight: bold;"> {{ sumarProductos(contarObjetosRepetidos(pedido.order_products)) }} </span>
+            <span style="font-weight: bold;">{{formatoPesosColombianos(sumarProductos(contarObjetosRepetidos(pedido.order_products)))  }} </span>
 
         </div>
 
@@ -140,7 +145,7 @@
 
 
             <span style="font-weight: bold;"> TOTAL </span>
-            <span style="font-weight: bold;"> {{ formatoPesosColombianos(calcularTotalCarrito(pedido) + pedido.delivery_price)
+            <span style="font-weight: bold;"> {{ formatoPesosColombianos(sumarProductos(contarObjetosRepetidos(pedido.order_products)) + pedido.delivery_price)
             }} </span>
 
         </div>
@@ -176,6 +181,8 @@
             <span style="font-weight:;text-transform: uppercase;"> {{ pedido.user_data.user_phone }} </span>
 
         </div>
+
+        <!-- {{ pedido }} -->
 
 
         <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
@@ -279,6 +286,9 @@ onMounted(async () => {
     transform: scale(2);
 }
 
+.sin-adiciones{
+font-weight: bold;
+}
 /*  */
 </style>
 
