@@ -89,9 +89,9 @@ const send_order = async () => {
     const data = {
         "order_products": JSON.parse(localStorage.getItem('cart')).products,
         "user_id": user_id,
-        "user_data":user,
-        "site_id":JSON.parse(localStorage.getItem('currentNeigborhood')).currenSiteId,
-        // "site_id":12,
+        "user_data":{...user},
+        // "site_id":JSON.parse(localStorage.getItem('currentNeigborhood')).currenSiteId,
+        "site_id":12,
         "order_status": {
             "status": "generada",
             "timestamp":serverTimeData
@@ -106,6 +106,7 @@ const send_order = async () => {
         "delivery_price":domicilio.value.deliveryPrice,
         "order_notes":order_notes.value == null || order_notes.value == "" ? 'sin notas': order_notes.value
     }
+    console.log(data)
 
 
     let Method = "POST"

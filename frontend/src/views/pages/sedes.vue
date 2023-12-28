@@ -118,7 +118,7 @@ const sedes  = [
     "site_id":6,
     "Nombre": "TULUA",
     "Dirección": "Carrera 40 # 21 -22",
-    "WSP": "304 3783714",
+    "WSP": "315 8625080",
     "Google Maps": "https://maps.app.goo.gl/a79GpFei41mWNYeG9",
     "Ciudad": "Tulua",
     "Foto": "https://lh3.googleusercontent.com/p/AF1QipNacg4X8DwsUhEkQ9a-VMWg6RUgCX-NdrrExueh=s680-w680-h510"

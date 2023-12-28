@@ -522,7 +522,7 @@ const sedeTulua = {
         },
     ],
     site_id:6,
-    wsp:"https://wa.link/bcfp9z"
+    wsp:"https://wa.link/74d9s1"
   }
 
   export {sedeTulua}

@@ -11,7 +11,7 @@
    
 </div>
 </div>
-{{ ruta.params.menu_name }}
+<!-- {{ ruta.params.menu_name }} -->
 
 </template>
 
