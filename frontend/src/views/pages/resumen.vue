@@ -146,13 +146,7 @@
 
 
 
-                            <p style="font-weight: ;height: ;"> {{ formatoPesosColombianos(
-                                    product.quantity * product.product.price +
-                                    product.quantity * sumarAdiciones(product.product.adiciones) +
-                                    product.quantity * sumarAdiciones(product.product.toppings) +
-                                    product.quantity * sumarAdiciones(product.product.cambios) +  
-                                    product.quantity * sumarAdiciones(product.product.acompanantes)    ) 
-                                      }} 
+                            <p style="font-weight: ;height: ;">{{ formatoPesosColombianos(product.quantity * adicion.price) }}
                             </p>
 
 

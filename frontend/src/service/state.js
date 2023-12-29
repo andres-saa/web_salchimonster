@@ -44,9 +44,12 @@ function calcularPrecioTotal(producto) {
   if (producto.price ) {
       // Calcular la suma de los precios de las adiciones
       const sumaAdiciones = sumarAdiciones(producto.adiciones)
+      const sumaCambios = sumarAdiciones(producto.cambios)
+      const sumaAcompanantes = sumarAdiciones(producto.acompanantes)
+      const sumaToppings = sumarAdiciones(producto.toppings)
 
       // Calcular el precio total sumando el precio base y la suma de las adiciones
-      const precioTotal = producto.price + sumaAdiciones;
+      const precioTotal = producto.price + sumaAdiciones + sumaAcompanantes + sumaCambios + sumaToppings ;
 
       // Devolver el precio total
       return precioTotal;
