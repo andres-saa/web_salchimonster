@@ -112,7 +112,7 @@ const sumarProductos = (productos) => {
   let sumaProductos = 0
 
   for (const product of productos) {
-    sumaProductos += sumarAdicionesAlProducto(product)
+    sumaProductos += calcularPrecioTotal(product.product)
   }
 
   return sumaProductos
