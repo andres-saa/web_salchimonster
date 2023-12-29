@@ -46,7 +46,7 @@
                         <p class="text-2xl lg:text-4xl text-center " style="font-weight: bold;color: black;">Vamos a buscar
                             tu sede mas cercana</p>
                     </div>
-                    <img :src="`${URI}/read_product_image/600/site-${currenNeigborhood.site?.site_id}`"
+                    <img :src="`${URI}/read-product-image/600/site-${currenNeigborhood.site?.site_id}`"
                         :class="currenNeigborhood.site?.name == 'default' ? 'default-image' : ''"
                         style="border: 1px solid rgb(255, 255, 255); width: 100%; height: 100%; object-fit: cover; border-radius: 5px;"
                         alt="">

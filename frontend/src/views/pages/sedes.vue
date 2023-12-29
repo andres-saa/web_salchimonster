@@ -14,7 +14,7 @@
 
                 <img style="object-fit:cover
                 ; border-radius: 1rem; width: 100%;height: 30rem;"
-                    :src="`${URI}/read_product_image/600/site-${ sede.site_id }`"
+                    :src="`${URI}/read-product-image/600/site-${ sede.site_id }`"
                     alt="">
 
                 <div class="xl:pl-4 pl-2" style="
