@@ -34,7 +34,7 @@ const thanks_data = ref()
 
 const getUserID = async (userData) => {
     const userUrl = `${URI}/user`;
-    userData.user_address = `${userData.user_address} ${currenNeigborhood} `
+    userData.user_address = `${userData.user_address} ${currenNeigborhoodName} `
     console.log(userData)
     const userRequestOptions = {
         method: "POST",
