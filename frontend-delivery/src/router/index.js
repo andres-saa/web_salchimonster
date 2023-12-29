@@ -43,6 +43,26 @@ const router = createRouter({
               component: () => import('@/views/pages/views_admin/resumen_sedes.vue'),
               
             },
+
+            {
+              path: '/tienda-menu',
+              name: 'menuTienda',
+              component: () => import('@/views/pages/tienda/MenuTienda.vue'),
+              children:[
+                  {
+                      path: '/tienda-menu/:adicionales',
+                      name: 'tienda-adicionales',
+                      component: () => import('@/views/pages/tienda/sesionAdicionales.vue')
+                  },
+                  {
+                      path: '/tienda-menu/productos/:sesion',
+                      name: 'tienda-productos',
+                      component: () => import('@/views/pages/tienda/sesion.vue')
+                  },
+                  
+
+              ]
+          },
           
           ]
         },

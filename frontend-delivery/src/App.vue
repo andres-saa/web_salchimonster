@@ -331,7 +331,7 @@ onBeforeUnmount(async() => {
  border: none;
  outline: none;
 }
-.default-image::before {
+/* .default-image::before {
   content: 'hola';
   width: 100%;
   background-color: rgba(177, 99, 9, 0.1);
@@ -339,7 +339,7 @@ onBeforeUnmount(async() => {
   position: absolute;
   top: 0;
   left: 0;
-}
+} */
 
 .selected{
   background-color:#ff620050 

@@ -107,9 +107,10 @@ const changeCurrentGroupMenu = (grupoMenu) => {
 
 }
 const menus = [
-    { name: 'ATENDER', to: '/' },
-    { name: 'HISTORIAL DE PEDIDOS', to: '/historial' },
-    { name: ' CUADRE DE CAJA', to: '/cuadre' },
+    { name: 'Atender', to: '/' },
+    { name: 'Historial de pedidos', to: '/historial' },
+    { name: ' Cuadre de caja', to: '/cuadre' },
+    { name: ' Menu', to: '/tienda-menu' },
 
 ]
 
@@ -197,8 +198,6 @@ const cerrar_sesion = () => {
 
         <router-link to="/" class="layout-topbar-logo" style="z-index: 99999;">
             <img :src="'images/logo.png'" alt="logo" />
-
-
         </router-link>
 
         
@@ -214,7 +213,7 @@ const cerrar_sesion = () => {
 
                 <span style="
                 margin-left: 0.5rem; 
-                text-transform:uppercase; 
+                text-transform:; 
                 font-size: 1rem;
                 color: var(--primary-color);">
 
@@ -225,7 +224,7 @@ const cerrar_sesion = () => {
 
                 <span style="
             margin-left: 0.5rem; 
-            text-transform:uppercase; 
+            text-transform:capitalize; 
             font-size: 1rem;
             font-weight: normal;
             white-space: nowrap;
@@ -248,39 +247,30 @@ const cerrar_sesion = () => {
 
 
         <div class="" style="left: 0; position: absolute; display: flex; width: 100%;justify-content: center;"> 
-            <div v-for=" menu in menus" class="p-3 " style="width: max-content;">
+            <div v-for=" menu in menus" class="p-0 " style="width: max-content;">
 
                 <RouterLink :to="menu.to" class="link-menu  " style="text-decoration: none;color: black;">
 
-                    <p class="col-12 text-l text-center " :class="ruta.fullPath == menu.to ? 'selected' : 'menu'"
-                        style="font-weight: bold"> {{ menu.name }}</p>
+                    <p class="col-12 text-md text-center p-1 px-3" :class="ruta.fullPath == menu.to ? 'selected' : 'menu'"
+                        style="font-weight: "> {{ menu.name }}</p>
 
 
                 </RouterLink>
 
             </div>
+            
         </div>
+        <button @click="cerrar_sesion" class="ml-5 px-2" style="position: absolute;right: 5rem; background-color: white;border-radius: 10rem; color:var(--primary-color); font-weight: bold; border: none;z-index: 999; cursor: pointer;" > Cerrar sesión </button>
 
 
-        <!-- <div class="" style="left: 0; position: absolute; display: flex; width: 100%;justify-content: center;"> 
-            <div v-for=" menu in menusAdmin" class="p-3 " style="width: max-content;">
 
-                <RouterLink :to="menu.to" class="link-menu  " style="text-decoration: none;color: black;">
+       
 
-                    <p class="col-12 text-l text-center " :class="ruta.fullPath == menu.to ? 'selected' : 'menu'"
-                        style="font-weight: bold"> {{ menu.name }}</p>
-
-
-                </RouterLink>
-
-            </div>
-        </div> -->
-
-        <button @click="cerrar_sesion" class="ml-5 p-2" style="background-color: var(--primary-color);border-radius: 1rem; color: white; font-weight: bold; border: none;z-index: 999; cursor: pointer;" > cerrar sesión </button>
 
 
 
     </div>
+    
 </template>
 
 <style lang="scss" scoped>
@@ -443,7 +433,7 @@ const cerrar_sesion = () => {
 
 .selected {
     // border: 1px solid red;
-    box-shadow: 0px 5px 0px var(--primary-color);
+    box-shadow: 0px 3px 0px var(--primary-color);
     border-radius: 0;
 }
 </style>

@@ -1,32 +1,31 @@
 <template>
 
-<Dialog class="dialogo" style="padding-bottom: 7rem; border-radius: 1rem; overflow: hidden; background-color: rgb(255, 255, 255); color: black" v-model:visible="dialog_pedido_visible" modals header="name" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+<Dialog class="dialogo" style="padding-bottom: 7rem; border-radius: 1rem; overflow: ; background-color: rgb(255, 255, 255); color: black" v-model:visible="dialog_pedido_visible" modal header="name" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
 
 <button class="btn_cerrar" @click="dialog_pedido_visible = !dialog_pedido_visible"
-                            style="z-index: 99; background-color: var(--primary-color); padding: 0.5rem 1rem; border: none;border-radius: 0.5rem; color: white; position: absolute; right: 2rem;">
-                            <i style="color: white; font-weight: bold; border-radius: 1rem;" :class="PrimeIcons.TIMES" ></i>
+                            style="z-index: 99; background-color: red;width: 3rem;height: 3rem; border-radius: 50rem; padding: 0.5rem; border: none; color: white; position: absolute; right: -1rem; top: -1rem;">
+                            <i style="color: white; font-weight: bold; " :class="PrimeIcons.TIMES" ></i>
                     </button>
 
 
 <Factura class="factura" id="factura">
 
-
-
 </Factura>
 
 
 
-<div class="btn_accion_dialogo" style="position: absolute; top:90%; display: flex; gap: 2rem">
+<div class="btn_accion_dialogo" style="position: absolute; bottom:1rem; display: flex; gap: 2rem">
+    
 <button v-if="pedido.order_status.status == 'generada' && pedido.order_status.status != 'enviada' " @click="prepararPedido(pedido) " style="border: none;box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5); padding: 0rem 2rem;border-radius: 0.5rem; background-color: rgb(0, 255, 106);" ><span class="text-xl p-0" style="border: none; font-weight: bold; ">PREPARAR</span>
 </button>
 
 <button v-if="pedido.order_status.status == 'en preparacion' && pedido.order_status.status != 'enviada'  "  @click="marcarComoEnviado(pedido)" style="border: none;box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5); padding: 0rem 2rem;border-radius: 0.5rem; background-color: rgb(0, 255, 0);" ><span class="text-xl p-0" style="border: none; font-weight: bold; ">ENVIAR</span>
 </button>
 
-<button @click="cancelarPedido(pedido)" v-if="pedido.order_status.status != 'enviada'  " style="border: none;box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5); padding: 1rem 2rem;border-radius: 0.5rem; background-color: rgb(255, 120, 120);" ><span class="text-xl" style="border: none; font-weight: bold; ">CANCELAR</span>
+<button @click="cancelarPedido(pedido)" v-if="pedido.order_status.status != 'enviada'  " style="border: none;box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5); padding: 0.5rem 1rem;border-radius: 0.5rem; background-color: rgb(255, 120, 120);" ><span class="text-xl" style="border: none; font-weight: bold; ">CANCELAR</span>
 </button>
 
-<button @click="IMPRIMIR" style="border: none;box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5); padding: 1rem 2rem;border-radius: 0.5rem; background-color: rgb(255, 246, 120);" ><span class="text-xl" style="border: none; font-weight: bold; ">IMPRIMIR</span>
+<button @click="IMPRIMIR" style="border: none;box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5); padding: 0.5rem 2rem;border-radius: 0.5rem; background-color: rgb(255, 246, 120);" ><span class="text-xl p-0" style="border: none; font-weight: bold; ">IMPRIMIR</span>
 </button>
 
 
@@ -36,6 +35,11 @@
 
 
 </Dialog>
+
+
+
+
+
 </template>
 
 <script setup>
@@ -56,7 +60,6 @@ import { prepararPedido,marcarComoEnviado, cancelarPedido } from '../../service/
 import factura from './factura.vue';
 
 
-
 const IMPRIMIR = () => {
     const contenidoFactura = document.getElementById('factura').innerHTML;
 
@@ -72,7 +75,7 @@ const IMPRIMIR = () => {
         ventanaImpresion.document.write(estilosPagina[i].outerHTML);
     }
 
-    ventanaImpresion.document.write('<style> @media print { html{height: min-content;} .negrilla{background-color:black !IMPORTANT; color:white !IMPORTANT;} *{ font-family: sans-serif; padding: 0 !IMPORTANT; margin: 0.2rem !IMPORTANT; font-size:0.9rem !IMPORTANT} body { -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } } </style>');
+    ventanaImpresion.document.write('<style> @media print { html{height: min-content;} .negrilla{background-color:black !IMPORTANT; color:white !IMPORTANT;} *{ font-family: sans-serif; padding: 0 !IMPORTANT; margin: 0rem !IMPORTANT; font-size:0.95rem !IMPORTANT} body { -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } } </style>');
     ventanaImpresion.document.write('</head><body>');
     ventanaImpresion.document.write(contenidoFactura);
    
@@ -86,7 +89,7 @@ const IMPRIMIR = () => {
     // Cerrar la ventana después de 1 segundo (puedes ajustar este tiempo)
     setTimeout(() => {
         ventanaImpresion.close();
-    }, 0.1);
+    }, 0.01);
 };
 
 

@@ -5,7 +5,7 @@
       <div  class="col-12 mb" :class="estado.name.split(' ')[0]" 
         style=";border-radius: 1rem; box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.3);">
 
-        <div class="col-12 m-0 mb-3" style="background-color: rgba(255, 255, 255, 0.493); border-radius: 0.5rem;" ><span class="text-2xl m-auto col-12"
+        <div class="col-12 m-0 mb-3" style="background-color: rgba(255, 255, 255, 0.493); border-radius: 0.5rem;" ><span class="text-l m-auto col-12"
             style="font-weight: bold;"> {{ estado.name }}</span></div>
  
 

@@ -34,7 +34,7 @@
 <p class=" text-center mb-1 pt-0" style="font-weight: bold; background-color: rgb(255, 165, 180);border-radius: 1rem;"> PEDIDOS CANCELADOS {{  filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),'cancelada').length }}</p>
 
 <div >
-  <div class="grid" v-for="order in filtrarPorEstado(ordenes_de_hoy,'cancelada')">
+  <div class="grid" v-for="order in filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),'cancelada')">
 
    <div class="col pb-0 text-left">
     Pedido #{{ order.order_id }} 

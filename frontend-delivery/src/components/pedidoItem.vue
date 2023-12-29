@@ -3,14 +3,14 @@
     <div class="grid  pedido align-items-center" style="color: white; cursor: pointer;">
       <div v-for="product in order.order_products">
         <img class="" style="width: 60px; height: 60px; object-fit: contain;"
-          :src="`${URI}/read_product_image/96/${product.id}`" alt="" />
+          :src="`${URI}/read-product-image/96/${product.name}`" alt="" />
       </div>
 
      
       <i v-if="estado.order_status == 'enviada'" class="pi pi-check "
-        style="font-size: 3rem; color: var(--primary-color); font-weight: bold;"></i>
+        style="font-size: 2rem; color: var(--primary-color); font-weight: bold;"></i>
       <i v-if="estado.order_status == 'generada'" class="pi pi-star-fill p-3"
-        style="font-size: 3rem; color: var(--primary-color); font-weight: bold;"></i>
+        style="font-size: 2rem; color: var(--primary-color); font-weight: bold;"></i>
 
       <span class="col text-right m-3 p-0" style="color: black; font-weight: bold; min-width: max-content;"> #{{
         order.order_id }}  <span class="col text-right m-3 p-0" style="color: black; font-weight: bold; min-width: max-content;"> {{
