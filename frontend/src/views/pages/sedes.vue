@@ -1,7 +1,7 @@
 
 
 <template>
-    <div class=" grid col-12 lg:col-10 m-auto p-3 m-0 mb-8" style="">
+    <div class=" grid col-12 lg:col-10 m-auto p-3 m-0 mb-8" style="max-width: 1024px">
 
         <div style=" ;
         border-radius: 1rem; overflow: hidden;" class="col-12 lg:col-6 p-0 mb-3 lg:p-3 m-0" v-for=" sede in sedes">
@@ -118,7 +118,7 @@ const sedes  = [
     "site_id":6,
     "Nombre": "TULUA",
     "Dirección": "Carrera 40 # 21 -22",
-    "WSP": "315 8625080",
+    "WSP": "304 3783714",
     "Google Maps": "https://maps.app.goo.gl/a79GpFei41mWNYeG9",
     "Ciudad": "Tulua",
     "Foto": "https://lh3.googleusercontent.com/p/AF1QipNacg4X8DwsUhEkQ9a-VMWg6RUgCX-NdrrExueh=s680-w680-h510"

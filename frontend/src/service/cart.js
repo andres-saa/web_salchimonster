@@ -2,11 +2,12 @@ import { ref } from "vue";
 import { calcularPrecioTotal } from "./state";
 
 
-const carro = ref({products:[],total:0})
+const carro_para_la_barra_de_abajo = ref({products:[],total:0})
 import { calcularTotalCarrito } from "./state";
 
 const products = ref([])
 const quantity = ref(0);
+
 const add = (product) => {
     try {
       // Check if 'cart' exists in localStorage
@@ -19,15 +20,16 @@ const add = (product) => {
   
       // Add the new product to the cart
       cart.products.push(product);
+      carro_para_la_barra_de_abajo.value.products = cart.products
   
       // Update the total
-      cart.total = Number(cart.total) + product.price;
+    //   cart.total = Number(cart.total) + product.price;
   
       // Save the updated cart back to localStorage
       localStorage.setItem('cart', JSON.stringify(cart));
   
       // Update the value of 'carro'
-      carro.value = cart;
+    //   carro.value = cart;
   
       // Call the updateCart function (assuming it's defined elsewhere)
       updateCart();
@@ -36,6 +38,7 @@ const add = (product) => {
       console.error('Error updating cart:', error);
       // Handle the error as needed, for example, show an error message to the user.
     }
+      updateCart();
   };
 
 
@@ -76,7 +79,7 @@ const remove = (productToRemove) => {
             const removedProduct = cart.products.splice(indexToRemove, 1)[0];
             cart.total = Number(cart.total) - removedProduct.price;
             localStorage.setItem('cart', JSON.stringify(cart));
-            carro.value = cart;
+            carro_para_la_barra_de_abajo.value = cart;
             console.log(localStorage.getItem('cart'));
             updateCart()
         }
@@ -102,30 +105,38 @@ if (localStorage.getItem('currentNeigborhood')){
 function contarObjetosRepetidos(arr) {
     const objetoContador = {};
 
-    // Contar la cantidad de veces que se repite cada objeto por su nombre "producto"
+    // Contar la cantidad de veces que se repite cada objeto por su nombre "producto", adiciones, salsas, toppings y acompanantes
     arr.forEach((objeto) => {
         const nombre = objeto.name;
-        if (objetoContador[nombre]) {
-            objetoContador[nombre].quantity++;
+        const adiciones = JSON.stringify(objeto.adiciones); // Convertir adiciones a cadena para comparar
+        const salsas = JSON.stringify(objeto.salsas); // Convertir salsas a cadena para comparar
+        const toppings = JSON.stringify(objeto.toppings); // Convertir toppings a cadena para comparar
+        const acompanantes = JSON.stringify(objeto.acompanantes); // Convertir acompanantes a cadena para comparar
+
+        // Crear una clave única incluyendo salsas, adiciones, toppings y acompanantes
+        const clave = `${nombre}-${adiciones}-${salsas}-${toppings}-${acompanantes}`;
+
+        if (objetoContador[clave]) {
+            objetoContador[clave].quantity++;
         } else {
-            objetoContador[nombre] = {
+            objetoContador[clave] = {
                 product: objeto,
                 quantity: 1
             };
         }
     });
-
-    // Crear un nuevo array con los resultados
-    const resultado = Object.values(objetoContador).map((item) => item);
-
-    return resultado;
+    
+    // Retornar el array de resultados
+    return Object.values(objetoContador);
 }
+
+
 
 const updateCart = () =>{
     products.value = contarObjetosRepetidos(JSON.parse(localStorage.getItem('cart')).products);
     // domicilio.value = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood.deliveryPrice
     
-    
+    // carro_para_la_barra_de_abajo.value.products = products.value
 
     const cartDataString = localStorage.getItem('cart');
 
@@ -166,7 +177,7 @@ function eliminarAdicionDelCarrito(adicionAEliminar, producto) {
             localStorage.setItem('cart', JSON.stringify(carritoEnLocalStorage));
 
             // Devolver el carrito modificado
-            carro.value = carritoEnLocalStorage
+            carro_para_la_barra_de_abajo.value = carritoEnLocalStorage
             updateCart()
 
             return carritoEnLocalStorage;
@@ -197,7 +208,7 @@ function eliminarSalsaDelCarrito(salsaAEliminar, producto) {
             localStorage.setItem('cart', JSON.stringify(carritoEnLocalStorage));
 
             // Devolver el carrito modificado
-            carro.value = carritoEnLocalStorage
+            carro_para_la_barra_de_abajo.value = carritoEnLocalStorage
             updateCart()
 
             return carritoEnLocalStorage;
@@ -243,7 +254,7 @@ function agregarAdicionAlCarrito(adicionAAgregar, producto) {
           localStorage.setItem('cart', JSON.stringify(carritoEnLocalStorage));
   
           // Devolver el carrito modificado
-          carro.value = carritoEnLocalStorage;
+          carro_para_la_barra_de_abajo.value = carritoEnLocalStorage;
           updateCart();
   
           return carritoEnLocalStorage;
@@ -294,7 +305,7 @@ function agregarSalsasAlCarrito(salsaAAgregar, producto) {
                 localStorage.setItem('cart', JSON.stringify(carritoEnLocalStorage));
 
                 // Devolver el carrito modificado
-                carro.value = carritoEnLocalStorage;
+                carro_para_la_barra_de_abajo.value = carritoEnLocalStorage;
                 updateCart();
 
                 return carritoEnLocalStorage;
@@ -317,4 +328,4 @@ function agregarSalsasAlCarrito(salsaAAgregar, producto) {
 
 
 
-export {deleteAllCookies, quitarSalsas, eliminarSalsaDelCarrito,agregarSalsasAlCarrito,domicilio, quantity,useCart,carro,eliminarAdicionDelCarrito,products,updateCart,contarObjetosRepetidos,quitarElementos,agregarAdicionAlCarrito}
+export {deleteAllCookies, quitarSalsas, eliminarSalsaDelCarrito,agregarSalsasAlCarrito,domicilio, quantity,useCart,carro_para_la_barra_de_abajo,eliminarAdicionDelCarrito,products,updateCart,contarObjetosRepetidos,quitarElementos,agregarAdicionAlCarrito}

@@ -1,7 +1,7 @@
 <template >
 
 
-<div class="p-0 m-0" style="min-height: 200vh;">
+<div class="p-0 m-0" style="min-height: 100vh;">
 
     
 
@@ -9,22 +9,8 @@
   <CarouselBanner></CarouselBanner>
   <!-- <img src="/images/banners/banner-1.jpeg" class="pb-6" alt="" style="width: 100%; "> -->
     
+  <BarraCategorias></BarraCategorias>
 
-    <div class=" col-12 d-flex p lg:justify-content-center align-items-center mb-5 p-1 md:p-1" style="overflow-x: auto;position: sticky; z-index: 999;top:5rem; background-color: rgb(255, 255, 255);box-shadow: 0 0 1rem rgba(0, 0, 0, 0.337); ">
-        <div v-for="section in menuOptions[0].menus" :key="section.category.name" class="p-1">
-
-
-
-            <RouterLink :to="`/${section.category.name}`">
-                <button class="p-2 text-lg"   :class="ruta.params.menu_name == section.category.name? 'selected menu-button':
-                ruta.fullPath == '/' && section.category.name == 'Salchipapas'? 'selected menu-button': 'menu-button' " style="font-weight: 500; text-transform: uppercase;">
-                {{ section.category.name }}
-            </button>
-            </RouterLink>
-            
-
-        </div>
-    </div>
 
 
 
@@ -68,11 +54,12 @@ import { ableMenu } from '../../service/menuOptions';
 import { formatoPesosColombianos } from '../../service/formatoPesos';
 import CarouselBanner from '../../components/CarouselBanner.vue'
 import sesion from './sesion.vue';
+import BarraCategorias from '../../components/BarraCategorias.vue';
 
-import router from '@/router/index.js'
+
 import {ref} from 'vue'
 import { comprobar_sede } from '../../service/state';
-
+import router from '@/router/index.js'
 const ruta = ref(router.currentRoute)
 const hola = ref( localStorage.getItem('currentNeigborhood') )
 

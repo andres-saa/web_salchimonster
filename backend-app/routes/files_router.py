@@ -63,7 +63,7 @@ async def upload_user_photo(product_id: str, file: UploadFile = File(...), backg
 
 
 
-@router.get('/read_product_image/{height}/{product_id}')
+@router.get('/read-product-image/{height}/{product_id}')
 def get_photo_profile(product_id: str,height:str):
     base_dir = getcwd() + "/files" + "/images" + "/products" + "/" + product_id
 

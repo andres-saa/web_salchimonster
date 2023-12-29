@@ -91,6 +91,12 @@ const model = ref([
                 icon: 'pi pi-fw pi-info-circle',
                 to: '/menu'
             },
+
+            {
+                label: 'Rastrear pedido',
+                icon: 'pi pi-fw pi-info-circle',
+                to: '/rastrear-pedido'
+            },
             {
                 label: 'Carrito de compras',
                 icon: 'pi pi-fw pi-shopping-cart',

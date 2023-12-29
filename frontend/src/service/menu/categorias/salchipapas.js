@@ -1,5 +1,6 @@
 
 import { fotos } from "../fotos"
+import { URI } from "../../conection";
 const categorySalchipapa = {
     "category": { "id": 1, "name": "Salchipapas" },
     "products": [
@@ -135,4 +136,10 @@ const categorySalchipapa = {
 ]
 }
 
+
+
+
+
+
+// console.log(productos)
 export {categorySalchipapa}

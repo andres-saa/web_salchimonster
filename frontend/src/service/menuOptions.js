@@ -203,6 +203,12 @@ const menuOptions = ref(
             menus: [],
             to:'menu'
         },
+
+        {
+            name: 'Rastrear pedido',
+            menus: [],
+            to:'rastrear-pedido'
+        },
         
     ]
 )

@@ -15,7 +15,7 @@ import { productDialog, setProductDialog } from '../service/state';
 import router from '../router';
 import { useRoute } from 'vue-router';
 const { layoutConfig, onMenuToggle } = useLayout();
-const screenWidth = ref(window.innerWidth);
+
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 
@@ -25,7 +25,7 @@ const selectedMenu = ref({})
 const products = ref([])
 
 const categories = ref([{}])
-
+const screenWidth = ref(window.innerWidth);
 const isSmallScreen = computed(() => screenWidth.value < 992);
 
 const updateScreenWidth = () => {
@@ -209,7 +209,7 @@ const fondoVisible = ref(false)
 
                 <span style="
                 margin-left: 0.5rem; 
-                text-transform:uppercase; 
+               
                 font-size: 1rem;
                 color: var(--primary-color);">
 
@@ -219,15 +219,14 @@ const fondoVisible = ref(false)
 
                 <span style="
             margin-left: 0.5rem; 
-            text-transform:uppercase; 
+            /* text-transform:uppercase;  */
             font-size: 1rem;
             font-weight: normal;
             white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 200px;">
-                    <span v-if="!isSmallScreen" class="sm:d-none">salchimonster -</span> <span v-else class="sm:d-none">sede
-                        -</span> {{ currentCity ? currentCity.currenSite : 'Definir ubicacion' }}
+                      <span >sede -  </span>  <span class="site-name">{{ currentCity ?  currentCity.currenSite : 'Definir ubicacion' }}</span>
                 </span>
 
             </div>
@@ -249,17 +248,16 @@ const fondoVisible = ref(false)
 
 
         <div class="layout-topbar-menu " :class="topbarMenuClasses" v-if="!isInAdminProductsRoute">
-            <div class="p-link boton-menu " style="padding:  30px; ">
-            </div>
+           
 
             <!--  -->
 
             <div class=" botones-menu" :class="topbarMenuClasses" v-for=" menuTopbar in menuOptions"
-                style="display: flex; text-transform: uppercase;">
+                style="display: flex; ">
 
 
                 <router-link :to="`/${menuTopbar.to}`" @click="handleDropDownMenu(false)" class="col-12">
-                    <button class="p-link boton-menu text-xl" style="text-transform: uppercase;"
+                    <button class="p-link boton-menu text-xl" style=""
                         :class="curentMenu.name == menuTopbar.name || router.currentRoute.value.path == `/${menuTopbar.to}` ? 'selected' : 'boton-menu'">
                         <!-- <i class="pi pi-calendar"></i> -->
                         <!-- <h3> {{i}}</h3> -->
@@ -269,8 +267,6 @@ const fondoVisible = ref(false)
                 </router-link>
             </div>
 
-            <div class="p-link boton-menu " style="padding:  30px; width: px; background-color:#fff;">
-            </div>
 
         </div>
 
@@ -304,80 +300,7 @@ const fondoVisible = ref(false)
 
         </div>
 
-
-        <div class="dropDownMenu grid col-12  m-auto " v-if="dropDownMenuVisible" style=";">
-
-            <!-- <p style="text-align: center; width: 100%; font-size: 36px; font-weight: bold;">
-                {{ curentMenu.name }}
-            </p> -->
-            <div style=" box-shadow: 0px 0px 20px;  display: flex;border-radius:0 0 20px 20px; background-color: rgba(255, 255, 255, 0.9);backdrop-filter: blur(20px);    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);  "
-                class=" grid pl-0 pr-0 m-auto xl:col-10 lg:col-12" @mouseleave="handleDropDownMenu(false)">
-
-                <!-- <carousel-banner class="col-12"></carousel-banner> -->
-                <!-- <carousel-sites class="col-12" v-if="curentMenu.name == 'Sedes' "></carousel-sites> -->
-
-
-
-                <div st v-for=" grupoMenu in curentMenu.menus.slice(0, 4) "
-                    :class="curentMenu.name == 'Sedes' ? 'col-12' : 'col-3'"
-                    style=" border-left: 1px solid var(--primary-color) ; border-left-style: dotted; align-items: center; justify-content:start;   ">
-                    <div v-if="curentMenu.name != 'Sedes'" style=" display: flex; flex-direction: column;">
-                        <!-- aqui es el name del apartado del menu -->
-                        <p style="text-align: center; width: 100%;  ;font-weight:bold ; margin-bottom: 1rem"
-                            class="text-2xl">
-                            {{ grupoMenu.category.name }}
-                        </p>
-
-                    </div>
-
-
-
-
-                    <div class="img-product-cont" v-if="curentMenu.name != 'Sedes'"
-                        v-for="product in grupoMenu.products.slice(0, 4)">
-                        <div class="img-product-cont"
-                            style="overflow: hidden; color: inherit; display: flex; align-items: center; justify-content:start;"
-                            @click="{ handleDropDownMenu(false); changeProduct(product); setProductDialog(product) }">
-
-                            <img @error="" @load="fondoVisible = false"
-                                :class="curentMenu.name == 'sedes' ? 'img-product-sede' : 'img-product'"
-                                style=" object-fit:content;" :src="`${URI}/read_product_image/96/${product.id}`" alt="">
-
-
-
-                            <!-- <ProgressSpinner v-if="fondoVisible" style="width: 100%; color: #fff; height: 50px"
-                                strokeWidth="10" animationDuration=".2s" aria-label="Custom ProgressSpinner" />
- -->
-
-
-                            <p class="name-product text-l" style="font-size: 1rem; text-transform: uppercase; /* Oculta el texto que desborda el párrafo */
-                                " v-if="curentMenu.name != 'sedes'">
-                                {{ product.name }}
-                            </p>
-
-                        </div>
-                    </div>
-
-
-
-
-                </div>
-
-                <router-link to="/menu" class="col-12  ">
-
-                    <button v-if="curentMenu.name == 'Menu'" class=" col-2 m-auto p-1 ver-mas  "
-                        style="margin: auto; ;display: flex; align-items: center; justify-content: center;gap: 20px;"
-                        @click="handleDropDownMenu(false)">
-                        <i style="font-size: 20px; " class="icono" :class="PrimeIcons.ANGLE_DOUBLE_RIGHT"> </i>
-                        <span>
-                            Ver todo
-                        </span>
-                    </button>
-
-                </router-link>
-            </div>
-
-        </div>
+<!--  -->
 
     </div>
 
@@ -459,9 +382,9 @@ const fondoVisible = ref(false)
     // margin: 0;
     border: none;
     background-color: transparent;
-    font-size: 20px;
+    // font-size: 20px; 
     padding: 0 5px;
-    font-weight: bold;
+    // font-weight: bold;
 }
 
 .ver-mas {
@@ -522,6 +445,9 @@ const fondoVisible = ref(false)
     transition: all 0.2s ease;
 }
 
+.site-name{
+    text-transform: capitalize;
+}
 .img-product-sede {
     // transform: scale(1.1);
     transition: all 0.1s ease;
@@ -547,9 +473,10 @@ const fondoVisible = ref(false)
     color: var(--primary-color);
     font-weight: bold;
 
-
-
 }
+
+
+
 
 .img-product-cont:hover {
     cursor: pointer;
@@ -560,5 +487,14 @@ const fondoVisible = ref(false)
     box-shadow: 0px 5px 0px var(--primary-color);
     border-radius: 0;
 }
+
+*{ text-transform: lowercase;}
+
+*::first-letter{
+    text-transform: uppercase;
+}
+
+
+
 </style>
 

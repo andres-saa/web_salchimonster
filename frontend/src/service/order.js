@@ -3,14 +3,33 @@ import { ref } from "vue";
 import {URI} from '@/service/conection'
 import { domicilio } from "./cart";
 import router from '@/router/index.js'
+import { antojoVisible } from "./state";
 const user_data = ref({})
 const order_notes = ref("")
 const showThaks = ref(false)
-const currenNeigborhood = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood.name
+
+let currenNeigborhoodName = 'Valor por defecto'; // Establece un valor por defecto
+
+try {
+    // Intenta obtener el valor de 'currentNeigborhood' de localStorage
+    const storedData = localStorage.getItem('currentNeigborhood');
+    if (storedData) {
+        const currenNeigborhood = JSON.parse(storedData).currenNeigborhood;
+        if (currenNeigborhood && currenNeigborhood.name) {
+            // Actualiza el nombre si existe en los datos almacenados
+            currenNeigborhoodName = currenNeigborhood.name;
+        }
+    }
+} catch (error) {
+    // Manejo de errores si JSON.parse falla o los datos no son como se esperaban
+    console.error("Error al obtener 'currenNeigborhood.name':", error);
+}
+
+
 const payMethod = ref('')
 const payMethods = ref(["Recoger en local", "Efectivo", "Pago con tarjeta (datafono),"])
-
-
+const invalid = ref({})
+const thanks_data = ref()
 
 
 const getUserID = async (userData) => {
@@ -52,6 +71,7 @@ const getUserID = async (userData) => {
 const send_order = async () => {
 
 
+    
 
     const serverTimeResponse = await fetch( `${URI}/server_time`);
     const serverTimeData = await serverTimeResponse.json();
@@ -62,28 +82,49 @@ const send_order = async () => {
     const user = user_data.value
 
     if (!user.user_name || !user.user_name.trim()) {
+        invalid.value.user_name = true
         alert("El nombre es obligatorio.");
+        antojoVisible.value = false
+        
         return;
     }
     
     if (!user.user_phone || !user.user_phone.trim()) {
         alert("El teléfono es obligatorio.");
+        antojoVisible.value = false
         return;
     }
     
     if (!user.user_address || !user.user_address.trim()) {
         alert("La dirección es obligatoria.");
+        antojoVisible.value = false
         return;
     }
     if (!payMethod.value){
         alert("Por favor seleccione un metodo de pago");
+        antojoVisible.value = false
         return;
 
     }
     
 
     
-    user.site_id = JSON.parse(localStorage.getItem('currentNeigborhood')).currenSiteId
+    user.site_id = 12; // Valor por defecto
+
+// Intenta obtener el valor de 'currentNeighborhood' de localStorage
+    let currentNeighborhood = localStorage.getItem('currentNeigborhood');
+        if (currentNeighborhood) {
+            try {
+                // Parsea el JSON y verifica si el objeto tiene la propiedad 'currenSiteId'
+                let neighborhoodData = JSON.parse(currentNeighborhood);
+                if (neighborhoodData && typeof neighborhoodData.currenSiteId === 'number') {
+                    user.site_id = neighborhoodData.currenSiteId;
+                }
+            } catch (error) {
+                // Manejo de errores si JSON.parse falla
+                console.error("Error al parsear 'currentNeigborhood':", error);
+            }
+        }
     const user_id = await getUserID(user);
 
     const data = {
@@ -109,6 +150,7 @@ const send_order = async () => {
     console.log(data)
 
 
+    thanks_data.value = {...data}
     let Method = "POST"
     const queryUrl = `${URI}/order`
     const requestOptions = {
@@ -127,15 +169,26 @@ const send_order = async () => {
             }
             // file.value? uploadUserPhotoProfile(file.value,data.dni): '' 
 
+
+            
             return response.json();
+            
         })
         .then(data => {
             // Aquí puedes trabajar con los datos actualizados
             console.log('Datos actualizados:', data);
+            thanks_data.value.order_id = data.order_id
             // localStorage.removeItem('cart')
+            antojoVisible.value = false
+           
+           
+            
             eliminarProductosDelCarrito();
+            user_data.value = {}
 
-            showThaks.value = true
+            router.push('/gracias')
+            // showThaks.value = true
+            
             // router.push('/')
 
         })
@@ -172,4 +225,4 @@ function eliminarProductosDelCarrito() {
   }
 
 
-export{payMethods,payMethod,showThaks,send_order,order_notes,user_data}
+export{payMethods,payMethod,showThaks,send_order,order_notes,user_data,invalid,thanks_data}

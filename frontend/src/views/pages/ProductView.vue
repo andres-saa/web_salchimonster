@@ -1,23 +1,7 @@
 <template style="" >
     <div class="  m-auto  grid lg:col-12     "
         style="; border-radius:20px; ; height: min-content; margin-bottom:30vh ; ">
-        <div class="img-cont   xl:col-6 grid  mb-6 "
-            style="  display: flex; align-items: start; overflow: hidden; border-radius: 20px;">
-            <img @error="errorImage" style="padding-top: 15vh; z-index: 100 ;
-
-            " class="imagen col-12 "
-                :src="curentProduct.img_600x600"
-                alt="">
-
-
-
-
-            <div class="before"
-                style="top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; position: ;  position: absolute;">
-                <img :src="curentProduct.img_96x96" alt=""
-                    style="width: 110%; height: 110%; opacity: 0.3; object-fit:  cover; filter: blur(5px);">
-            </div>
-        </div>
+   
 
         <div class=" xl:col  ml-4 "
             style=" display: flex; align-items: start; border-radius: 20px;background-color: ;   ">
@@ -151,7 +135,7 @@
                                                     
   <button class="    ver-mas mt-4 cl-12 mr-4 "
                         style="  display: flex;
-                            padding: 1rem;
+                        padding: 1rem;
                          background-color:var(--primary-color)  ; 
                          color: white; 
                          align-items: center; 

@@ -21,6 +21,7 @@ def get_order_by_id(order_id: int):
     order_instance.close_connection()
     return order
 
+
 @order_router.delete("/order/{order_id}")
 def delete_order(order_id: int):
     order_instance = Order()

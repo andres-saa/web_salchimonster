@@ -6,5 +6,3 @@ class site_schema_post(BaseModel):
     site_phone: str
     site_business_hours: str
 
-class site_schema(site_schema_post):
-    site_id: int

@@ -8,11 +8,14 @@ const productDialog = ref({})
 const checkedSalsas = ref({ })
 const checkedAdiciones = ref({ })
 const checkedAcomp = ref({ })
-import { carro } from "./cart";
+import {carro_para_la_barra_de_abajo } from "./cart";
+const antojoVisible = ref(false)
 
 const currentAditions=ref([]);
+const currentCambios=ref([]);
+const currentToppings=ref([]);
 const currentSalsas=ref([]);
-const currentAcomp=ref([]);
+const currentAcompanantes=ref([]);
 
 
 const ruta = ref(router.currentRoute)
@@ -20,42 +23,13 @@ const ruta = ref(router.currentRoute)
             
 
 
-// const countAditions  = () => {
-
-//   if (productDialog.category_id == 2){
-//     currentAditions.value = adiciones.hamburguesas
-//   }else if (productDialog.category_id == 2) {
-//     currentAditions.value = adiciones.salchipapas
-//   }
-
-//   for (const product of currentAditions) {
-//     // Obtener el nombre del producto actual
-//     const productName = product.name.toUpperCase();
-
-//     // Verificar si el nombre está en el primer JSON
-//     if (quesoJson[productName]) {
-//         // Si está, agregar el producto completo al array filtrado
-//         filteredProducts.push({
-//             id: product.id,
-//             name: product.name,
-//             price: product.price
-//         });
-//     }
-// }
-
-
-
-// }
-   
-
-// Iterar sobre los productos del segundo JSON
-
-
-
 
 function sumarAdiciones(adiciones) {
   let suma = 0;
 
+  if(!adiciones?.length) {
+    return 0
+  }
   for (let i = 0; i < adiciones.length; i++) {
       suma += adiciones[i].price;
   }
@@ -84,14 +58,18 @@ function calcularPrecioTotal(producto) {
 }
 
 
+const subtotal  = ref()
+
 function calcularTotalCarrito() {
   let totalCarrito = 0;
 
-  for (const producto of carro.value.products) {
+  for (const producto of carro_para_la_barra_de_abajo.value.products) {
     totalCarrito += calcularPrecioTotal(producto);
   }
 
+  subtotal.value = totalCarrito
   return totalCarrito;
+ 
 }
 
 const c_neigbor = ref(localStorage.getItem('currentNeigborhood'))
@@ -144,4 +122,4 @@ const comprobar_sede = () => {
 }
 
 
-export {comprobar_sede, check_site,checkedAcomp,calcularTotalCarrito,calcularPrecioTotal,sumarAdiciones, showSiteDialog,setShowDialog,showProductDialog,setProductDialog,productDialog,checkedSalsas,checkedAdiciones,currentAditions,currentSalsas}
+export {antojoVisible,currentCambios, currentToppings, currentAcompanantes, subtotal, comprobar_sede, check_site,checkedAcomp,calcularTotalCarrito,calcularPrecioTotal,sumarAdiciones, showSiteDialog,setShowDialog,showProductDialog,setProductDialog,productDialog,checkedSalsas,checkedAdiciones,currentAditions,currentSalsas}

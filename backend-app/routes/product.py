@@ -19,6 +19,42 @@ def create_product(product: ProductSchemaPost):
     product_instance.close_connection()
     return {"product_id": created_product[0]}
 
+
+@product_router.get("/products/category/name/{category_name}/site/{site_id}")
+def get_products_by_category_name_and_site(category_name: str, site_id: int):
+    product_instance = Product()
+    try:
+        products = product_instance.select_products_by_category_name_and_site(category_name, site_id)
+        if not products:
+            raise HTTPException(status_code=404, detail="No products found for the given category name and site")
+        return products
+    finally:
+        product_instance.close_connection()
+
+@product_router.get("/products/category/{category_id}")
+def get_products_by_category(category_id: int):
+    product_instance = Product()
+    try:
+        products = product_instance.select_products_by_category(category_id)
+        if not products:
+            raise HTTPException(status_code=404, detail="No products found for the given category")
+        return products
+    finally:
+        product_instance.close_connection()
+
+
+@product_router.get("/products/category/name/{category_name}")
+def get_products_by_category_name(category_name: str):
+    product_instance = Product()
+    try:
+        products = product_instance.select_products_by_category_name(category_name)
+        if not products:
+            raise HTTPException(status_code=404, detail="No products found for the given category name")
+        return products
+    finally:
+        product_instance.close_connection()
+
+
 @product_router.put("/products/{product_id}")
 def update_product(product_id: int, product: ProductSchemaPost):
     product_instance = Product()

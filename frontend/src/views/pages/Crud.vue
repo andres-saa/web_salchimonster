@@ -1,4 +1,4 @@
-<!-- <script setup>
+<script setup>
 
 import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted, onBeforeMount,computed } from 'vue';
@@ -21,6 +21,7 @@ import {
     vehicleTypesDropValues,
     findSiteById,
     getSites
+
 } from '@/service/dropDownAux';
 import { getUsers, } from '@/service/userServices'
 import { URI } from "@/service/conection.js" 
@@ -1202,4 +1203,4 @@ button{
 
 
 
-</style> -->
+</style>

@@ -1,16 +1,21 @@
 <template>
-    <div class="cont" style="background-color: white; "  >
+ 
+
+
+    <div class="cont p-3" style="background-color: white; height: 100%;position: relative"  >
         <!-- <router-link :to="`product/${props.product.id}` " @click="changeProduct(product)"> -->
 
-            <div class="imagen-cont" style="position: ;" @click="setProductDialog(product)">
-                <img class="imagen" @error="imagenError" :src="`${URI}/read_product_image/300/${props.product.id}`" alt="">
-                
+            <button style="position: absolute;top: -1rem;right: -1rem;background-color:red; width: 2.5rem;height: 2.5rem;border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;z-index: 99;" @click="addcar(prepare_product(props.product))" class="add-cart-btn text-xl"><i style="font-weight: bold;"   class="icono text-2xl  p-0 m-0 " :class="PrimeIcons.PLUS"> </i>  </button>
 
-            <!-- <div class="before"
-                style="top: 0; left: 0; transform: scale(2); height: 100%; overflow: hidden; position: ;  position: absolute;">
-                <img :src="props.product.img_96x96" alt=""
-                    style="width: 110%; height: 110%; opacity: 0.1; object-fit:  cover; filter: blur(10px);">
-            </div> -->
+            
+
+
+
+            <div class="imagen-cont " style="position: ;" @click="setProductDialog(product)">
+                <!-- <img class="imagen" @error="imagenError" :src="`${URI}/read_product_image/300/${props.product.id}`" alt=""> -->
+                <img class="imagen" @error="imagenError" style="height: 50;" :src="`${URI}/read-product-image/300/${props.product.name}`" alt="">
+                
+            
             </div>
            
 
@@ -18,10 +23,10 @@
         <!-- <img class="imagen" src="src/images/iconos menu/salchipapa-icono.png" alt=""> -->
 
         
-            <div style="height: 2rem; display: flex; padding-top: 1rem;" >
-                <p style="font-size: 1rem;font-weight: bold;  /* Establece el ancho máximo para el párrafo */
-                     /* Oculta el texto que desborda el párrafo */
-                  /* Agrega puntos suspensivos (...) al final del texto truncado */ "> {{ props.product.name }}</p>
+            <div style=" display: ; " >
+                <p class="nombre-producto mt-4 " style="font-weight: bold;" > {{ props.product.name }}</p>
+                <p class="descripcion-producto mt-2 text-sm mb-4">{{ truncatedDescription }}</p>
+
                 
             </div>
 
@@ -29,12 +34,14 @@
             <Toast style="box-shadow: none;"  />
        
 
-        <div class="info">
+        <div class="info col-12 " >
+            <!-- {{ showEditarProducto }} -->
             
-            <div class="text-xl" style="font-size: 2rem; font-weight: bold;"> {{ formatoPesosColombianos(props.product.price) }}</div>
-            <button @click="addcar(prepare_product(props.product))" class="add-cart-btn text-xl"><i style="color: red;z-index: 99;"  class="icono text-5xl lg:text-6xl p-0 m-0 " :class="PrimeIcons.PLUS_CIRCLE"> </i>  </button>
-            <!-- <button class="mas-detalles"> + </button> -->
+            <div class="text-l text-right" style="font-weight: bold; "> {{ formatoPesosColombianos(props.product.price) }}</div>
         </div> 
+
+
+        
     </div>
 </template>
 
@@ -48,9 +55,11 @@ import  {formatoPesosColombianos} from '../service/formatoPesos'
 import { check_site, setProductDialog,showProductDialog } from '../service/state';
 import { useToast } from 'primevue/usetoast';
 import { comprobar_sede } from '../service/state';
+import { computed } from 'vue';
+
 const toast = useToast();
 
-// console.log(menuGlobal[0].products)
+
 
 const prepare_product = (product) => {
     product.adiciones = []
@@ -68,13 +77,20 @@ const props = defineProps({
 
 });
 
+
+const truncatedDescription = computed(() => {
+  const description = props.product.description;
+  return description.substring(0, 70) + '...'
+});
+
 const addcar =(product) => {
 
     comprobar_sede()
     useCart.add(product)  
     toast.add({ severity: 'success', summary: 'Agregado al carrito', detail: props.product.name, life: 3000 });
-    check_site()
+
 }
+
 
 const imagenError = (Event) => {
     Event.target.src = 'https://salchimonster.com/images/logo.png'
@@ -87,7 +103,7 @@ const imagenError = (Event) => {
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: end;
     background-attachment: fixed;
     position: absolute;
     bottom: 0;
@@ -104,9 +120,13 @@ const imagenError = (Event) => {
 
 
 
+.descripcion-producto, .nombre-producto{
+    text-transform: lowercase;
+}
 
-
-
+.descripcion-producto::first-letter,.nombre-producto::first-letter{
+    text-transform: uppercase;
+}
 
 .add-cart-btn{
     /* transition: all  0.2s ease; */

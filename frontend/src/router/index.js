@@ -6,6 +6,7 @@ import { setShowDialog } from '../service/state';
 import { URI } from '@/service/conection'
 import { menuOptions } from '@/service/menuOptions';
 import { ableMenu } from '../service/menuOptions';
+import { thanks_data } from '../service/order';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -49,6 +50,16 @@ const router = createRouter({
           component: () => import('@/views/pages/entregas.vue'),
           meta: { requirelocation: true },
         },
+
+        {
+          path: '/gracias',
+          name: 'gracias',
+          component: () => import('@/views/pages/gracias.vue'),
+          meta: { requirePay: true },
+      },
+
+     
+
         {
           path: '/admin-products',
           name: 'admin-product',
@@ -84,6 +95,12 @@ const router = createRouter({
           // meta: { requireMenu: true },
           
         },
+        {
+          path: '/rastrear-pedido',
+          name: 'rastrear-pedido',
+          component: () => import('@/views/pages/rastrear.vue'),
+          // meta: { requirePay: true },
+      },
 
         {
           path: '/cart',
@@ -96,7 +113,7 @@ const router = createRouter({
           path: '/pay',
           name: 'pay',
           component: () => import('@/views/pages/pay.vue'),
-          meta: { requirelocation: true },
+          // meta: { requirelocation: true },
         },
 
        
@@ -326,6 +343,24 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
+
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requirePay)) {
+    const token = thanks_data.value?.user_data;
+    if (!token) {
+      // Si no hay token, redirige a la página de inicio de sesión
+      next('/');
+    } else {
+      // Si hay token, permite el acceso
+      next();
+    }
+  } else {
+    // Si la ruta no requiere autenticación, permite el acceso
+    next();
+  }
+});
+
 
 
 export default router;

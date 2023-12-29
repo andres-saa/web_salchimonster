@@ -43,13 +43,17 @@ class Product:
     def insert_product(self, product_data: ProductSchemaPost):
         insert_query = """
         INSERT INTO products (
-            name, price, description,
-            category_id, porcion, state
-        ) VALUES (%s, %s, %s, %s, %s, %s) RETURNING product_id;
+            name, price, description, category_id, porcion, state, 
+            grupo_salsa_id, grupo_topping_id, grupo_acompanante_id, 
+            grupo_cambio_id, grupo_adicional_id, site_id
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING product_id;
         """
         self.cursor.execute(insert_query, (
             product_data.name, product_data.price, product_data.description,
-            product_data.category_id, product_data.porcion, product_data.state
+            product_data.category_id, product_data.porcion, product_data.state,
+            product_data.grupo_salsa_id, product_data.grupo_topping_id,
+            product_data.grupo_acompanante_id, product_data.grupo_cambio_id,
+            product_data.grupo_adicional_id, product_data.site_id  # Incluir los nuevos campos
         ))
         product_id = self.cursor.fetchone()[0]
         self.conn.commit()
@@ -66,23 +70,72 @@ class Product:
         self.cursor.execute(select_query, (product_id,))
         return self.cursor.fetchone()
 
+
     def update_product(self, product_id, product_data: ProductSchemaPost):
-        update_query = """
-        UPDATE products SET
-            name = %s,
-            price = %s,
-            description = %s,
-            category_id = %s,
-            porcion = %s,
-            state = %s
-        WHERE product_id = %s;
+        try:
+            update_query = """
+            UPDATE products SET
+                name = %s, price = %s, description = %s, category_id = %s,
+                porcion = %s, state = %s, grupo_salsa_id = %s, grupo_topping_id = %s,
+                grupo_acompanante_id = %s, grupo_cambio_id = %s,
+                grupo_adicional_id = %s, site_id = %s
+            WHERE product_id = %s;
+            """
+            self.cursor.execute(update_query, (
+                product_data.name, product_data.price, product_data.description,
+                product_data.category_id, product_data.porcion, product_data.state,
+                product_data.grupo_salsa_id, product_data.grupo_topping_id,
+                product_data.grupo_acompanante_id, product_data.grupo_cambio_id,
+                product_data.grupo_adicional_id, product_data.site_id,
+                product_id
+            ))
+            self.conn.commit()
+        except psycopg2.Error as e:
+            print("Error updating product:", e)
+            self.conn.rollback()
+
+
+
+    def select_products_by_category_name(self, category_name: str):
+            select_query = """
+            SELECT p.* FROM products p
+            JOIN categories c ON p.category_id = c.category_id
+            WHERE c.category_name = %s;
+            """
+            self.cursor.execute(select_query, (category_name,))
+            columns = [desc[0] for desc in self.cursor.description]
+            return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+
+    def select_products_by_category_name_and_site(self, category_name: str, site_id: int):
+        select_query = """
+        SELECT p.* FROM products p
+        JOIN categories c ON p.category_id = c.category_id
+        WHERE c.category_name = %s AND p.site_id = %s;
         """
-        self.cursor.execute(update_query, (
-            product_data.name, product_data.price, product_data.description,
-            product_data.category_id, product_data.porcion, product_data.state,
-            product_id
-        ))
-        self.conn.commit()
+        self.cursor.execute(select_query, (category_name, site_id))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+        
+
+    def select_products_by_category_and_state(self, category_id: int, state: str):
+        select_query = """
+        SELECT * FROM products WHERE category_id = %s AND state = %s;
+        """
+        self.cursor.execute(select_query, (category_id, state))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+
+    def select_products_by_category(self, category_id: int):
+        select_query = """
+        SELECT * FROM products WHERE category_id = %s;
+        """
+        self.cursor.execute(select_query, (category_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
  
     def delete_product(self, product_id):
         delete_query = "DELETE FROM products WHERE product_id = %s;"
@@ -92,46 +145,3 @@ class Product:
     def close_connection(self):
         self.conn.close()
 
-# Ejemplo de uso:
-if __name__ == "__main__":
-    producto_instance = Product()
-    producto_instance.create_table()
-
-    # Insertar un producto
-    product_data = ProductSchemaPost(name="Producto1", price=10, description="Descripción del Producto1", porcion="Unit", category_id=1)
-    product_id = producto_instance.insert_product(product_data)
-    print(f"Producto insertado con ID: {product_id}")
-
-    # Seleccionar todos los productos
-    all_products = producto_instance.select_all_products()
-    print("Todos los productos:")
-    for product in all_products:
-        print(product)
-
-    # Seleccionar un producto por ID
-    selected_product = producto_instance.select_product_by_id(product_id)
-    print(f"Producto seleccionado por ID ({product_id}): {selected_product}")
-
-    # Actualizar un producto
-    updated_product_data = ProductSchemaPost(name="Producto1_actualizado", price=15, description="Nueva descripción", porcion="Kg", category_id=2)
-    producto_instance.update_product(product_id, updated_product_data)
-    print("Producto actualizado")
-
-    # Seleccionar todos los productos después de la actualización
-    all_products_after_update = producto_instance.select_all_products()
-    print("Todos los productos después de la actualización:")
-    for product in all_products_after_update:
-        print(product)
-
-    # Eliminar un producto
-    producto_instance.delete_product(product_id)
-    print("Producto eliminado")
-
-    # Seleccionar todos los productos después de la eliminación
-    all_products_after_delete = producto_instance.select_all_products()
-    print("Todos los productos después de la eliminación:")
-    for product in all_products_after_delete:
-        print(product)
-
-    # Cerrar la conexión
-    producto_instance.close_connection()

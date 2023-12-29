@@ -11,11 +11,7 @@ const modelia = {
     },
     {
       name: 'ALAMOS',
-      deliveryPrice: 6000
-    },
-    {
-      name: 'VILLA ANDREA',
-      deliveryPrice: 9000
+      deliveryPrice: 4500
     },
     {
       name: 'BARRIOS UNIDOS',
@@ -23,15 +19,15 @@ const modelia = {
     },
     {
       name: 'BOYACA REAL',
-      deliveryPrice: 6000
+      deliveryPrice: 4500
     },
     {
       name: 'EL MUELLE',
-      deliveryPrice: 8000
+      deliveryPrice: 8500
     },
     {
       name: 'ENGATIVA',
-      deliveryPrice: 8000
+      deliveryPrice: 4500
     },
     {
       name: 'FERIAS',
@@ -39,11 +35,11 @@ const modelia = {
     },
     {
       name: 'GARCES NAVAS',
-      deliveryPrice: 7000
+      deliveryPrice: 4500
     },
     {
       name: 'MINUTO DE DIOS',
-      deliveryPrice: 8000
+      deliveryPrice: 4500
     },
     {
       name: 'PALO BLANCO',
@@ -51,7 +47,7 @@ const modelia = {
     },
     {
       name: 'SANTA CECILIA',
-      deliveryPrice: 5000
+      deliveryPrice: 4500
     },
     {
       name: 'TINTAL',
@@ -71,7 +67,7 @@ const modelia = {
     },
     {
       name: 'BELEN',
-      deliveryPrice: 7000
+      deliveryPrice: 4500
     },
     {
       name: 'BOSQUE POPULAR',
@@ -79,23 +75,23 @@ const modelia = {
     },
     {
       name: 'BOSQUES DE HAYUELOS',
-      deliveryPrice: 5000
+      deliveryPrice: 4000
     },
     {
       name: 'CAPELLANIA',
-      deliveryPrice: 5000
+      deliveryPrice: 4500
     },
     {
       name: 'CIUDAD SALITRE OCCIDENTAL',
-      deliveryPrice: 5000
+      deliveryPrice: 3500
     },
     {
       name: 'COFRADIA',
-      deliveryPrice: 5000
+      deliveryPrice: 4500
     },
     {
       name: 'EL RUBY',
-      deliveryPrice: 5000
+      deliveryPrice: 4000
     },
     {
       name: 'ESTRADA',
@@ -103,27 +99,27 @@ const modelia = {
     },
     {
       name: 'EXITO FONTIBON',
-      deliveryPrice: 8000
+      deliveryPrice: 4500
     },
     {
       name: 'FONTIBON',
-      deliveryPrice: 7000
+      deliveryPrice: 4000
     },
     {
       name: 'FONTIBON SAN PABLO',
-      deliveryPrice: 8000
+      deliveryPrice: 4500
     },
     {
       name: 'GRANJAS DE TECHO',
-      deliveryPrice: 5000
+      deliveryPrice: 4500
     },
     {
       name: 'HAYUELOS',
-      deliveryPrice: 5000
+      deliveryPrice: 4000
     },
     {
       name: 'HAYUELOS CENTRO COMERCIAL',
-      deliveryPrice: 5000
+      deliveryPrice: 4000
     },
     {
       name: 'LA ROSITA',
@@ -131,23 +127,23 @@ const modelia = {
     },
     {
       name: 'MALLORCA',
-      deliveryPrice: 5000
+      deliveryPrice: 3500
     },
     {
       name: 'MALOKA',
-      deliveryPrice: 5000
-    },
-    {
-      name: 'METRO FONTIBON',
-      deliveryPrice: 7000
-    },
-    {
-      name: 'SAN FELIPE',
       deliveryPrice: 4000
     },
     {
+      name: 'METRO FONTIBON',
+      deliveryPrice: 4500
+    },
+    {
+      name: 'SAN FELIPE',
+      deliveryPrice: 3000
+    },
+    {
       name: 'SAN JOAQUIN',
-      deliveryPrice: 5000
+      deliveryPrice: 7000
     },
     {
       name: 'SAN JOSE',
@@ -155,23 +151,23 @@ const modelia = {
     },
     {
       name: 'SANTA HELENA',
-      deliveryPrice: 8000
+      deliveryPrice: 8500
     },
     {
       name: 'TARRAGONA',
-      deliveryPrice: 5000
+      deliveryPrice: 3000
     },
     {
       name: 'TITAN PLAZA',
-      deliveryPrice: 8000
+      deliveryPrice: 7000
     },
     {
       name: 'VERSALLES',
-      deliveryPrice: 7000
+      deliveryPrice: 4500
     },
     {
       name: 'VILLA BEATRIZ',
-      deliveryPrice: 7000
+      deliveryPrice: 4500
     },
     {
       name: 'VILLA LUZ',
@@ -183,27 +179,27 @@ const modelia = {
     },
     {
       name: 'ZONA FRANCA',
-      deliveryPrice: 8000
+      deliveryPrice: 4500
     },
     {
       name: 'CASTILLA',
-      deliveryPrice: 7000
+      deliveryPrice: 6000
     },
     {
       name: 'SAN JOSE DE BAVARIA',
-      deliveryPrice: 7000
+      deliveryPrice: 4500
     },
     {
       name: 'TODA',
-      deliveryPrice: 4000
+      deliveryPrice: 6000
     },
     {
       name: 'CORFERIAS',
-      deliveryPrice: 8000
+      deliveryPrice: 8500
     },
     {
       name: 'JARDIN BOTANICO',
-      deliveryPrice: 6000
+      deliveryPrice: 4000
     },
     {
       name: 'QUINTA PAREDEZ',
@@ -219,21 +215,8 @@ const modelia = {
     },
     {
       name: 'ZONA INDUSTRIAL',
-      deliveryPrice: 8000
+      deliveryPrice: 6000
     },
-    {
-      name: 'VILLAS DE GRANADA',
-      deliveryPrice: 9000
-    },
-    {
-      name: 'GRAN GRANADA',
-      deliveryPrice: 9000
-    },
-    {
-      name: 'EL RECODO',
-      deliveryPrice: 9000
-    },
-    
   ],
   site_id:7,
   wsp:"https://wa.link/6v0usl"

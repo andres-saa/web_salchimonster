@@ -18,6 +18,18 @@ class Order:
         self.cursor = self.conn.cursor()
         self.order_id = order_id
 
+
+
+    def select_order_by_id(self, order_id):
+        select_query = "SELECT * FROM orders WHERE order_id = %s;"
+        self.cursor.execute(select_query, (order_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        result = self.cursor.fetchone()
+        if result:
+            return dict(zip(columns, result))
+        else:
+            return None
+            
     def select_all_orders(self):
         select_query = "SELECT * FROM orders;"
         self.cursor.execute(select_query)

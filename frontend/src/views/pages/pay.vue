@@ -1,177 +1,45 @@
 <template>
 
-    <p class="col-12 md:col-7 p-1 text-center text-4xl m-auto mb-5 lg:col-7 md:col-12 sm:col-12 m-auto mb-8" style="border-radius: 2rem; font-weight: bold; color: white; background-color: black;" > <i class="text-4xl pr-3 p-0" :class="PrimeIcons.SHOPPING_CART" style="color: white;"></i>FINALIZAR COMPRA </p>
-
     <!-- {{ domici }} -->
-    <div class=" col-12 grid container lg:col-10 xl:col-8  m-auto mb-8 p-0 md:p-4" style="background-color: white; border-radius: 2rem;   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);" v-if="products.length>0">
+    <div class=" col-12  grid container lg:col-10 xl:col-8   m-auto mb-8  md:p-4" style="background-color: rgb(255, 255, 255); border-radius: 2rem;   " v-if="products.length>0">
 
-       <div class="col-12 xl:col-6 p-0 md:p-3 " style="background-color: ;"> 
 
-        <div class=" col-12 p-4  "
-            style="position: relative; border-radius: 1rem;height:max-content;  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2); ; ;padding:0 1rem ;background-color: white; ">
+  
 
-            <p class="text-2xl" style="font-weight: bold;">RESUMEN </p>
+            <resumen ></resumen>
 
-            <!-- <input style="border-radius: 20px; " class="col-12 " type="text" name="" id=""> -->
+       <div  class="col-12 xl:col-7 xl:p-5 p-0 " style="height: 100%;">
 
-            <div class="productos">
-                <div class="producto" v-for="product in products"
-                    style="display: flex; justify-content: space-between; align-items:center ; flex-direction: column;">
-
-
-
-                    <div class="col-12 p-0" style="display: flex; justify-content: space-between; align-items:center ;">
-                        <p class=""
-                            style="font-weight: bold; text-transform: uppercase; min-width: max-content;margin: 0; padding: 0.5rem 0">
-                            <span>{{ product.quantity }}</span> <span>{{ product.product.name
-                            }}</span>
-                        </p>
-
-
-                        <p style="font-weight: bold;height: ;">{{ formatoPesosColombianos(product.quantity *
-                            calcularPrecioTotal(product.product)) }}
-                        </p>
-                    </div>
-
-           
-
-
-
-                    <!-- {{ product.product.salsas }} -->
-
-                    <p v-if="product.product.adiciones.length > 0" class="col-12 p-0 pl-2 mb-0" style="font-weight: bold ;">ADICIONES</p>
-                    <div class="col-12 p-0 pl-3 "
-                        style="display: flex; justify-content: space-between; align-items:center ;"
-                        v-for="adicion in product.product.adiciones">
-
-                        <!-- <button @click="eliminarAdicionDelCarrito(adicion, product.product)"
-                            style="background-color: var(--primary-color); border: none;border-radius: 0.5rem; color: white;">
-                            <i style="color: white; border-radius: 1rem;" :class="PrimeIcons.TIMES"></i></button> -->
-                        <p class="pl-2"
-                            style="text-transform: uppercase; min-width: ;margin: 0; padding: 0.1rem 0;width: 100%">
-                            <span>{{ adicion.name
-                            }}</span>
-                        </p>
-
-
-
-
-                        <p style="font-weight: ;height: ;">{{ formatoPesosColombianos(adicion.price) }}
-                        </p>
-
-
-
-                    </div>
-
-                    <p v-if="product.product.salsas.length > 0" class="col-12 p-0 pl-2 mb-0" style="font-weight: bold;">
-                        SALSAS</p>
-                    <div class="col-12 p-0 pl-4 mt-0 "
-                        style="display: flex; justify-content: space-between; align-items:center ;"
-                        v-for="salsa in product.product.salsas">
-
-    
-                        <p class="m-0"
-                            style="text-transform: uppercase; min-width: max-content;margin: 0; padding: 0.1rem 0;width: 100%">
-                            <span>{{ salsa
-                            }}</span>
-                        </p>
-
-
-
-
-                        <!-- <p style="font-weight: ;height: ;">{{ formatoPesosColombianos(adicion.price) }}
-                        </p> -->
-
-
-
-
-                    </div>
-
-                   <div style="width: 100%; background-color:gray;padding-bottom: 0.1rem; " class="m-0 mt-2 mb-2"></div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                </div>
-            </div>
-
-
-            <!-- <div style="width: 100%; border-bottom: 2px solid; margin-top:0rem;"></div> -->
-            <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
-
-                <span style="font-weight: bold;"> SUBTOTAL </span>
-                <span style="font-weight: bold;"> {{ formatoPesosColombianos(calcularTotalCarrito()) }} </span>
-
-                </div>
-
-                <div class="text-l" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
-
-                <span style="font-weight: bold; text-transform: uppercase;"> DOMICILIO A {{ domicilio.name }}</span>
-                <span style="font-weight: bold;"> {{ formatoPesosColombianos(domicilio.deliveryPrice) }} </span>
-
-                </div>
-
-                <div class="text-xl" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
-
-<span style="font-weight: bold;"> TOTAL </span>
-<span style="font-weight: bold;"> {{ formatoPesosColombianos(calcularTotalCarrito() +
-    domicilio.deliveryPrice) }} </span>
-
-</div>
-
-            <p class="text-2xl mt-4" style="font-weight: bold;">NOTAS DE TU PEDIDO</p>
-
-            <textarea v-model="order_notes" style=" min-height:5rem ;margin-bottom: 2rem; border;" class="col-12 " type="text" name="" id="dynamicTextarea" ></textarea>
-            
-            <!-- <textarea cla style=" font-size: 1.5rem; resize: none; height: max-content;" class="col-12 text-xl" name="" id="" cols="30" rows="10"></textarea> -->
-
-
-        </div>
-
-       </div>
-       <div class="col-12 xl:col-6 p-0 md:p-3" style="height: 100%;">
-
-        <div class=" col-12 p-4 md:p-0   "
-            style="position: relative; border-radius: 1rem;height:max-content;  ; ;padding:0 1rem ;background-color: white; ">
+        <div class=" col-12 p-2  "
+            style="position: relative; border-radius: 1rem;height:max-content;  ; ;padding:0 1rem ; ">
 
             <div style="font-weight: bold;" class="col-12 pl-0 text-center text-xl">
                 DATOS DE USUARIO
             </div>
             <label for="year">NOMBRE</label> 
-            <InputText type="text" class="col-12 p-1  mb-4" v-model="user_data.user_name" />
+            <InputText type="text" class="col-12 p-1  mb-4  " v-model="user_data.user_name" :class="invalid.user_name? 'p-invalid': ''" />
+            <!-- {{ invalid }} -->
             <label for="year">BARRIO (click para modificar)</label>
             <InputText @click="showSiteDialog = !showSiteDialog" :value="currenNeigborhood" type="text" readonly class="col-12 p-1  mb-4" v-model="user_data.barrio" />
             <label for="year">DIRECCION</label>
-            <InputText type="text" class="col-12 p-1  mb-4" v-model="user_data.user_address" />
+            <InputText type="text" class="col-12 p-1  mb-4" v-model="user_data.user_address" :class="invalid.user_address? 'p-invalid': ''" />
             <label for="year">TELEFONO</label>
-            <InputText  max="10" type="Number" class="col-12 p-1  mb-4" v-model="user_data.user_phone" />
+            <InputText  max="10" type="Number" class="col-12 p-1  mb-4" v-model="user_data.user_phone" :class="invalid.user_phone? 'p-invalid': ''" />
             <label for="year">METODO DE PAGO</label>
-            <Dropdown class="col-12 p-0"  v-model.trim="payMethod" :options="payMethods" placeholder=""
-                            required="true" :class="{ 'p-invalid': submitted && !currentUser.position }" />
+            <Dropdown  class="col-12 p-0"  v-model.trim="payMethod" :options="payMethods" placeholder=""
+                            required="true" :class="{ 'p-invalid': invalid.payMethod }"  />
 
 
-        
-        
         </div>
 
             <div class="col-12 p-6 d-flex justify-content-center">
-                <button @click="send_order()" class="col "
+                <button @click="mostrarAntojos()" class="col "
                         style=" width: 100%;border:none; background-color: var(--primary-color); color: white; border-radius: 0.6rem; padding: 0.5rem;">
                         <span class="text-xl" style="min-width:max-content; font-weight: bold;margin-top: 5rem;">FINALIZAR COMPRA</span></button>
 
             </div>
+
+          
             
        </div>
 
@@ -180,11 +48,11 @@
 
     </div>
 
-    <div class="col-12 m-auto d-flex" v-else style="display: flex; flex-direction: column; justify-content: center; text-align: center; height: 80vh; align-items: center; ">
-        <i class="col-12" style="font-size: 30vh;" :class="PrimeIcons.SHOPPING_CART"></i>
-        <i class="col-12" style="font-size: 5vh;"> Tu carrito esta vacio </i>
-    
-    </div>
+    <div class="col-12 m-auto d-flex w-100" v-else
+            style="display: flex; flex-direction: column; justify-content: center; text-align: center; height: 80vh; align-items: center; ">
+            <img style="width: 100%; max-width: 640px;" src="/images/empty-cart.png" alt="">
+
+        </div>
 
 
 
@@ -206,6 +74,42 @@
 
 
 
+
+
+
+
+<Dialog class="dialogo pt-6" style=" border-radius: 1rem;  overflow: ; background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.663)" v-model:visible="antojoVisible" modal header="name" :style="{ width: 'max-content' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+
+
+    <span  style="border-radius: 10rem; color: black;  position:absolute ; top: 1rem;background-color: rgb(255, 255, 255); font-weight: bold;" class="text-center text-3xl px-6 py-2" > Mata el antojo</span>
+
+
+
+    <div class="p-5" style="display: flex; align-items: center; gap:2rem; overflow-x: auto; color: black; height: 100%;">
+
+        <div v-for="malteada in malteadas">
+    
+    
+    <TarjetaMenu :product="malteada" style="height: 100%; width: 100%; min-width: 15rem; max-width: 15rem; box-shadow: 0 0 20px rgba(0, 0, 0, 0.227) ;"></TarjetaMenu>
+
+    <button style="position: absolute;top: -1rem;right: -1rem;background-color:red; width: 3rem;height: 3rem;border-radius: 50%; display: flex; align-items: center;border: none; justify-content: center; color: white;z-index: 99;" @click="antojoVisible = ! antojoVisible" class="add-cart-btn text-xl"><i style="font-weight: bold;"   class="icono text-2xl  p-0 m-0 " :class="PrimeIcons.TIMES"> </i>  </button>
+
+    <RouterLink to="/cart">
+        <button style="position: absolute;top: -1rem;right: 3rem;background-color:var(--primary-color); width: 3rem;height: 3rem;border-radius: 50%; display: flex; align-items: center;border: none; justify-content: center; color: white;z-index: 99;" @click="antojoVisible = ! antojoVisible" class="add-cart-btn text-xl"><i style="font-weight: bold;"   class="icono text-2xl  p-0 m-0 " :class="PrimeIcons.SHOPPING_CART"> </i>  </button>
+
+    </RouterLink>
+    
+    
+</div>
+
+    </div>
+
+
+
+    <p   style="border-radius: 10rem; color: black;  position: absolute; bottom: -2rem;background-color:var(--primary-color); font-weight: bold;" class="text-center text-2xl px-4 py-1" > <button  @click="send_order()" style="font-weight: bold; background-color: transparent;color: white; border: none;">  Finalizar compra</button></p>
+</Dialog>
+
+
 </template>
 
 
@@ -213,23 +117,44 @@
 
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { formatoPesosColombianos } from '../../service/formatoPesos';
+import { URI } from '../../service/conection';
 import { PrimeIcons } from 'primevue/api';
+
 import { useCart,domicilio, eliminarAdicionDelCarrito,agregarAdicionAlCarrito, products, updateCart, contarObjetosRepetidos, quitarElementos } from '../../service/cart';
 import { useRoute } from 'vue-router';
-import { calcularPrecioTotal, calcularTotalCarrito, showSiteDialog } from '../../service/state';
+import { calcularPrecioTotal, calcularTotalCarrito, showSiteDialog,antojoVisible } from '../../service/state';
 import { adiciones } from '../../service/menu/adiciones/adiciones';
-import {showThaks, send_order,order_notes,user_data,payMethod,payMethods } from '../../service/order';
+import {showThaks, send_order,order_notes,user_data,payMethod,payMethods,invalid } from '../../service/order';
+import { subtotal } from '../../service/state';
 import router from '@/router/index.js'
+import resumen from './resumen.vue';
+import Sesion_main from './sesion_main.vue';
+import TarjetaMenu from '../../components/TarjetaMenu.vue';
 const changeThanks = () =>{
     showThaks.value = false
     // router.push('/')
     location.reload()
 
 }
+const currentCity = ref(JSON.parse(localStorage.getItem('currentNeigborhood')));
+
+const malteadas = ref([])
 const currenNeigborhood = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood.name
 
 
 
+const getProducts = async (category_name) => {
+    try {
+        let response = await fetch(`${URI}/products/category/name/${category_name}/site/${currentCity.value.currenSiteId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        let data = await response.json();
+        malteadas.value = data;
+    } catch (error) {
+        console.error('Error fetching data: ', error);
+    }
+}
 
 
 
@@ -244,9 +169,39 @@ const currenNeigborhood = JSON.parse(localStorage.getItem('currentNeigborhood'))
 
 
 
+const mostrarAntojos = () => {
+const user = user_data.value
 
+if (!user.user_name || !user.user_name.trim()) {
+    alert("El nombre es obligatorio.");
+    invalid.value.user_name = true
+    antojoVisible.value = false
+    return;
+}
 
+if (!user.user_phone || !user.user_phone.trim()) {
+    alert("El teléfono es obligatorio.");
+    invalid.value.user_phone = true
+    antojoVisible.value = false
+    return;
+}
 
+if (!user.user_address || !user.user_address.trim()) {
+    invalid.value.user_address = true
+    alert("La dirección es obligatoria.");
+    antojoVisible.value = false
+    return;
+}
+if (!payMethod.value){
+    invalid.value.payMethod = true
+    alert("Por favor seleccione un metodo de pago");
+    antojoVisible.value = false
+    return;
+
+}
+
+antojoVisible.value = true
+}
 
 
 
@@ -278,6 +233,7 @@ const total = ref()
 onMounted(() => {
     products.value = contarObjetosRepetidos(JSON.parse(localStorage.getItem('cart')).products);
     total.value = JSON.parse(localStorage.getItem('cart')).total
+    getProducts('malteadas')
 
 })
 // Ejemplo de uso
@@ -323,6 +279,12 @@ console.log(resultado);
     outline: none;
 
 }
+
+
+.invalid{
+    box-shadow: 0 0 10px red;
+}
+
 
 i {
     font-weight: bold;
