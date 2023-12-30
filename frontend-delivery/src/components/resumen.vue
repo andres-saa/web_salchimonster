@@ -361,6 +361,15 @@
             </p>
         </div>
 
+        <div class="col-12  grid p-0 m-0 " style="display: flex; justify-content: space-between; align-items:center ;">
+            <p class="col p-0 m-0" style="text-transform: uppercase; ;margin: 0;width: 100%">
+                <span> Metodo de pago</span>
+            </p>
+            <p class="col text-right p-0 m-0" style="font-weight: ;height: ;">{{ pedido.payment_method }}
+                
+            </p>
+        </div>
+
 
 
 
