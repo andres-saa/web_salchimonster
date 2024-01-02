@@ -20,6 +20,12 @@ class SiteDocument:
         self.cursor = self.conn.cursor()
         self.document_id = document_id
 
+    def select_documents_by_site_id(self, site_id):
+        select_query = "SELECT * FROM site_documents WHERE site_id = %s;"
+        self.cursor.execute(select_query, (site_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
     def select_all_documents(self):
         select_query = "SELECT * FROM site_documents;"
         self.cursor.execute(select_query)
@@ -66,6 +72,7 @@ class SiteDocument:
         updated_document_data = self.cursor.fetchone()
 
         if updated_document_data:
+            self.conn.commit()  # ¡Agrega el commit aquí para guardar los cambios!
             return dict(zip(columns, updated_document_data))
         else:
             return None

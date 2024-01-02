@@ -12,9 +12,10 @@ from routes.adicional import adicional_router,salsa_router,topping_router,acompa
 from routes.grupo_adicionales import grupo_adicionales_router,grupo_toppings_router,grupo_salsas_router,grupo_cambios_router,grupo_acompanantes_router
 from routes.employer import employer_router
 from routes.site_document import site_document_router
+from routes.login import login
 app = FastAPI()
 from routes.area import area_router
-# Configuración para permitir todos los orígenes (CORS)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -44,3 +45,4 @@ app.include_router(grupo_acompanantes_router)
 app.include_router(employer_router) 
 app.include_router(site_document_router)
 app.include_router(area_router)
+app.include_router(login)

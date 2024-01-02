@@ -1,10 +1,16 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,Depends
 from models.employer import Employer
 # Importa tu esquema de validación para employer, si existe
 from schema.employer import EmployerSchemaPost
 # from schema.employer import EmployerSchemaPost
+from models.employer import Employer
+from schema.employer import EmployerSchemaPost
+from auth_utils.Security import Security,authenticate_user,create_access_token
 
 employer_router = APIRouter()
+security = Security()
+
+
 
 @employer_router.get("/employers")
 def get_employers():
