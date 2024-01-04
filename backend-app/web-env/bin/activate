@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/home/ludi/web_salchimonster/backend-app/web-env"
+VIRTUAL_ENV="/root/web_salchimonster/backend-app/web-env"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
