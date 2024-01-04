@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/root/web_salchimonster/backend-app/web-env"
+set -gx VIRTUAL_ENV "/home/ludi/Documents/backend/web_salchimonster/backend-app/web-env"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

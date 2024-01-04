@@ -13,6 +13,7 @@ from routes.grupo_adicionales import grupo_adicionales_router,grupo_toppings_rou
 from routes.employer import employer_router
 from routes.site_document import site_document_router
 from routes.login import login
+from routes.permission import permission_router
 app = FastAPI()
 from routes.area import area_router
 
@@ -46,3 +47,4 @@ app.include_router(employer_router)
 app.include_router(site_document_router)
 app.include_router(area_router)
 app.include_router(login)
+app.include_router(permission_router)
