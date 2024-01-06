@@ -7,5 +7,6 @@ class PermissionSchemaPost(BaseModel):
     start_date: date
     end_date: date
     observations: Optional[str] = None
-    status: dict  # Representa un campo JSON
-    history: List[dict]  # Historial de cambios como lista de objetos JSON
+    status: dict  # Represents a JSON field
+    history: List[dict]  # History of changes as a list of JSON objects
+    tipo: str  # New field  # Historial de cambios como lista de objetos JSON
