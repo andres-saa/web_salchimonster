@@ -1,1 +1,0 @@
-const color = "ff9f06"

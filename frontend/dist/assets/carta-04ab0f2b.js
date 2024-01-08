@@ -1,1 +1,0 @@
-import{_ as a,o as s,c,r,F as o,a as e}from"./index-2f47e5f3.js";const n={},l={class:"col-12 lg:col-9 mr-auto ml-auto m-0 p-0",style:{"max-width":"1024px"}},_=["src"];function i(m,d){return s(),c(o,null,r([1,2,3,4,5,6],t=>e("div",l,[e("img",{style:{width:"100%"},src:`/images/carta/${t}.jpeg`,alt:""},null,8,_)])),64)}const p=a(n,[["render",i]]);export{p as default};
