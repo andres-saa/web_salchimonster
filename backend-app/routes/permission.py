@@ -38,6 +38,45 @@ def update_permission(permission_id: int, updated_permission: PermissionSchemaPo
     else:
         raise HTTPException(status_code=404, detail="Permission not found")
 
+
+@permission_router.get("/permission/user/{user_id}/status/{status}")
+def get_permissions_by_user_id_and_status(user_id: int, status: str):
+    permission_instance = Permission()
+    permissions = permission_instance.select_permissions_by_user_id_and_status(user_id, status)
+    permission_instance.close_connection()
+
+    if permissions:
+        return permissions
+    else:
+        return []
+
+
+@permission_router.get("/permissions/user/{user_id}/status/{status}/type/{tipo}")
+def get_permissions_by_status_userid_and_tipo(user_id: int, status: str, tipo: str):
+    permission_instance = Permission()
+    permissions = permission_instance.select_permissions_by_status_userid_and_type(status, user_id, tipo)
+    permission_instance.close_connection()
+
+    if permissions:
+        return permissions
+    else:
+        return []
+        
+
+@permission_router.get("/permissions/status/{status}")
+def get_permissions_by_status(status: str):
+    permission_instance = Permission()
+    permissions = permission_instance.select_permissions_by_status(status)
+    permission_instance.close_connection()
+    return permissions
+
+@permission_router.get("/permissions/status/{status}/type/{tipo}")
+def get_permissions_by_status_and_tipo(status: str, tipo: str):
+    permission_instance = Permission()
+    permissions = permission_instance.select_permissions_by_status_and_tipo(status, tipo)
+    permission_instance.close_connection()
+    return permissions
+
 @permission_router.delete("/permission/{permission_id}")
 def delete_permission(permission_id: int):
     permission_instance = Permission()

@@ -78,6 +78,37 @@ class Permission:
             return None
 
 
+    def select_permissions_by_status_userid_and_type(self, status, user_id, tipo):
+        select_query = """
+        SELECT * FROM permissions 
+        WHERE status ->> 'status' = %s AND employer_id = %s AND tipo = %s;
+        """
+        self.cursor.execute(select_query, (status, user_id, tipo))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+    def select_permissions_by_user_id_and_status(self, user_id, status):
+        select_query = """
+        SELECT * FROM permissions 
+        WHERE employer_id = %s AND status ->> 'status' = %s;
+        """
+        self.cursor.execute(select_query, (user_id, status,))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+
+    def select_permissions_by_status(self, status):
+        select_query = "SELECT * FROM permissions WHERE status ->> 'status' = %s;"
+        self.cursor.execute(select_query, (status,))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+    def select_permissions_by_status_and_tipo(self, status, tipo):
+        select_query = "SELECT * FROM permissions WHERE status ->> 'status' = %s AND tipo = %s;"
+        self.cursor.execute(select_query, (status, tipo,))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
     def delete_permission(self, permission_id):
         delete_query = "DELETE FROM permissions WHERE id = %s;"
         self.cursor.execute(delete_query, (permission_id,))

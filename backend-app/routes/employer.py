@@ -31,6 +31,7 @@ def get_employer_by_dni(dni: str):
         raise HTTPException(status_code=404, detail="Employer not found")
 
 
+
 @employer_router.get("/employer/{employer_id}")
 def get_employer_by_id(employer_id: int):
     employer_instance = Employer()
