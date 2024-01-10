@@ -1,0 +1,10 @@
+# Ignorar archivos .env en cualquier lugar del repositorio
+**/.env
+
+# Ignorar directorios llamados 'web-env' y 'web-envi' en cualquier lugar
+**/web-env/
+**/web-envi/
+
+
+# Ignorar directorios '__pycache__' en cualquier lugar
+**/__pycache__/

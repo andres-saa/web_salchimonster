@@ -36,7 +36,7 @@
             
             <div class="text-l" style="font-weight: bold;border-radius: 100px; "> {{ formatoPesosColombianos(props.product.price) }}</div>
 
-            <InputSwitch class="p-0 m-0" v-model="isActive" @change="updateProductState" style=""/>
+            <InputSwitch class="p-0 m-0" v-model="isActive" @change="updateProductState()" style=""/>
 
         </div> 
 
@@ -69,7 +69,7 @@ import { useToast } from 'primevue/usetoast';
 // import dialogoAgregarProducto from './dialogos/dialogoAgregarProducto.vue';
 import { productoAEliminar, showEditarProducto, showEliminarProducto } from '../service/valoresReactivosCompartidos';
 // import dialogoEditarProducto from './dialogos/dialogoEditarProducto.vue';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 // import { productoAEditar } from '../service/valoresReactivosCompartidos';
 const toast = useToast();
 const isActive = ref(false);
@@ -101,6 +101,10 @@ onMounted(async () => {
 });
 
 
+watch(props.product.state, () => {
+    isActive.value = props.product.state == 'active';
+})
+
 const pregpararParaEliminar = () => {
     
     showEliminarProducto.value = !showEliminarProducto.value
@@ -125,8 +129,9 @@ const updateProductState = () => {
             throw new Error('Network response was not ok');
         }
         toast.add({ severity: `${!isActive.value? 'error':'success'}`, summary: `${!isActive.value? 'Desactivado':'Activado'}`, detail: props.product.name, life: 3000 });
-
-        return response.json();
+        isActive.value = props.product.state == 'active';
+        // location.reload()
+        return response.json(); 
     })
     .then(data => {
         // Manejar la respuesta (puedes mostrar un mensaje de éxito, por ejemplo)
