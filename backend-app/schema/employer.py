@@ -38,3 +38,5 @@ class EmployerSchemaPost(BaseModel):
     food_handling_certificate: Optional[bool]
     food_handling_certificate_number: Optional[str]
     salary: Optional[int]
+    boss_id: Optional[int]  # Nuevo campo boss_id
+

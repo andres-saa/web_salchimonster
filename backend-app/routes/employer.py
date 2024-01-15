@@ -6,6 +6,7 @@ from schema.employer import EmployerSchemaPost
 from models.employer import Employer
 from schema.employer import EmployerSchemaPost
 from auth_utils.Security import Security,authenticate_user,create_access_token
+from fastapi import HTTPException
 
 employer_router = APIRouter()
 security = Security()
@@ -45,6 +46,17 @@ def create_employer(employer: EmployerSchemaPost):  # Asume que tienes un esquem
     employer_id = employer_instance.insert_employer(employer)
     employer_instance.close_connection()
     return {"employer_id": employer_id}
+
+@employer_router.get("/employer/position/{position}")
+def get_employer_by_position(position: str):
+    employer_instance = Employer()
+    employers = employer_instance.select_employer_by_position(position)
+    employer_instance.close_connection()
+    if employers:
+        return employers
+    else:
+        raise HTTPException(status_code=404, detail="No employers found for this position")
+
 
 @employer_router.put("/employer/{employer_id}")
 def update_employer(employer_id: int, updated_employer: EmployerSchemaPost):  # Asume que tienes un esquema EmployerSchemaPost

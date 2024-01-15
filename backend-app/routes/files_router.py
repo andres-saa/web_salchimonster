@@ -5,12 +5,48 @@ from os.path import splitext
 from pathlib import Path
 # from model.files_connection import siteDocumentConnection
 # from schema.site_document_schema import SiteDocumentSchemaPost,SiteDocumentSchema
-from PIL import Image
+from PIL import Image , ExifTags
+
 from os import remove
 from fastapi.responses import JSONResponse
 # conn = siteDocumentConnection()
+from fastapi.middleware.cors import CORSMiddleware
+import time
+app = FastAPI()
 
+# Configuración del middleware CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permite todas los orígenes, ajusta según tus necesidades
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos los métodos
+    allow_headers=["*"],  # Permite todos los headers
+)
 router = APIRouter()
+
+def rotate_image(path):
+    try:
+        image = Image.open(path)
+
+        # Corregir la orientación si es necesario
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation] == 'Orientation':
+                break
+
+        exif = dict(image._getexif().items())
+
+        if exif[orientation] == 3:
+            image = image.rotate(180, expand=True)
+        elif exif[orientation] == 6:
+            image = image.rotate(270, expand=True)
+        elif exif[orientation] == 8:
+            image = image.rotate(90, expand=True)
+
+        image.save(path)
+        image.close()
+    except (AttributeError, KeyError, IndexError):
+        # Casos donde no se encuentren los metadatos EXIF
+        pass
 
 
 def resize_image(path: str, upload_dir: str, product_id: str, file_extension: str):
@@ -54,9 +90,12 @@ async def upload_user_photo(product_id: str, file: UploadFile = File(...), backg
     with open(file_path, "wb") as myflle:
         content = await file.read()
         myflle.write(content)
+    
+    
+    rotate_image(file_path)
 
     background_tasks.add_task(resize_image, file_path, upload_dir, product_id, file_extension)
-
+ 
     return JSONResponse(content={"message": "hecho"}, status_code=200)
 
 
@@ -65,6 +104,8 @@ async def upload_user_photo(product_id: str, file: UploadFile = File(...), backg
 
 @router.get('/read-product-image/{height}/{product_id}')
 def get_photo_profile(product_id: str,height:str):
+    timestamp = int(time.time())  # Obtener el timestamp actual
+
     base_dir = getcwd() + "/files" + "/images" + "/products" + "/" + product_id
 
     # Lista de extensiones de archivo a buscar en orden de preferencia
@@ -76,7 +117,7 @@ def get_photo_profile(product_id: str,height:str):
         print(file)
 
         if file.exists():
-            return FileResponse(file)
+            return FileResponse(file_path, headers={"Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache", "Expires": "0", "Version": str(timestamp)})
 
     # Si no se encuentra ninguna de las extensiones, puedes devolver un error o un archivo predeterminado
     return "Archivo no encontrado", 404

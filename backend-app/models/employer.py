@@ -30,6 +30,17 @@ class Employer:
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
+    def select_employer_by_position(self, position):
+        select_query = "SELECT * FROM employers WHERE position = %s;"
+        self.cursor.execute(select_query, (position,))
+        columns = [desc[0] for desc in self.cursor.description]
+        employer_data = self.cursor.fetchall()
+
+        if employer_data:
+            return [dict(zip(columns, row)) for row in employer_data]
+        else:
+            return None
+
     def select_employer_by_id(self, employer_id):
         select_query = "SELECT * FROM employers WHERE id = %s;"
         self.cursor.execute(select_query, (employer_id,))
@@ -60,8 +71,8 @@ class Employer:
             birth_department, birth_city, blood_type, marital_status, education_level, contract_type, 
             eps, pension_fund, severance_fund, has_children, housing_type, has_vehicle, vehicle_type, 
             household_size, emergency_contact, shirt_size, jeans_sweater_size, food_handling_certificate, 
-            food_handling_certificate_number, salary
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            food_handling_certificate_number, salary, boss_id
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id;
         """
         self.cursor.execute(insert_query, (
@@ -73,13 +84,11 @@ class Employer:
             employer_data.eps, employer_data.pension_fund, employer_data.severance_fund, employer_data.has_children, employer_data.housing_type, 
             employer_data.has_vehicle, employer_data.vehicle_type, employer_data.household_size, employer_data.emergency_contact, 
             employer_data.shirt_size, employer_data.jeans_sweater_size, employer_data.food_handling_certificate, 
-            employer_data.food_handling_certificate_number, employer_data.salary
+            employer_data.food_handling_certificate_number, employer_data.salary, employer_data.boss_id  # Agregar boss_id
         ))
         employer_id = self.cursor.fetchone()[0]
         self.conn.commit()
         return employer_id
-
-
     def select_employer_by_dni(self, dni):
         select_query = "SELECT * FROM employers WHERE dni = %s;"
         self.cursor.execute(select_query, (dni,))
@@ -91,7 +100,6 @@ class Employer:
         else:
             return None
 
-
     def update_employer(self, employer_id, updated_data):
         update_query = """
         UPDATE employers
@@ -101,7 +109,7 @@ class Employer:
             marital_status = %s, education_level = %s, contract_type = %s, eps = %s, pension_fund = %s, severance_fund = %s, 
             has_children = %s, housing_type = %s, has_vehicle = %s, vehicle_type = %s, household_size = %s, 
             emergency_contact = %s, shirt_size = %s, jeans_sweater_size = %s, food_handling_certificate = %s, 
-            food_handling_certificate_number = %s, salary = %s
+            food_handling_certificate_number = %s, salary = %s, boss_id = %s
         WHERE id = %s
         RETURNING *;
         """
@@ -114,7 +122,7 @@ class Employer:
             updated_data.eps, updated_data.pension_fund, updated_data.severance_fund, updated_data.has_children, updated_data.housing_type, 
             updated_data.has_vehicle, updated_data.vehicle_type, updated_data.household_size, updated_data.emergency_contact, 
             updated_data.shirt_size, updated_data.jeans_sweater_size, updated_data.food_handling_certificate, 
-            updated_data.food_handling_certificate_number, updated_data.salary, 
+            updated_data.food_handling_certificate_number, updated_data.salary, updated_data.boss_id,  # Agregar boss_id
             employer_id
         ))
 
@@ -126,6 +134,7 @@ class Employer:
             return dict(zip([desc[0] for desc in self.cursor.description], updated_employer_data))
         else:
             return None
+
 
     def delete_employer(self, employer_id):
         delete_query = "DELETE FROM employers WHERE id = %s;"
