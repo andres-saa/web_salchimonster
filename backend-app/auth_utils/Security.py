@@ -26,9 +26,10 @@ class LoginSchema(BaseModel):
 def authenticate_user(dni: str, password: str):
     employer_instance = Employer()
     user = employer_instance.select_employer_by_dni(dni)
+    # print(user)
     employer_instance.close_connection()
 
-    # print(user)
+    print(user)
     if user and user.get("password") == password:  # Access the 'password' key in the dictionary
         return user
 

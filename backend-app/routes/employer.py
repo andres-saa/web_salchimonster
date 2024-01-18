@@ -56,7 +56,17 @@ def get_employer_by_position(position: str):
         return employers
     else:
         raise HTTPException(status_code=404, detail="No employers found for this position")
+        
+@employer_router.get("/employer/site/{site_id}")
+def get_employers_by_site_id(site_id: int):
+    employer_instance = Employer()
+    employers = employer_instance.select_employers_by_site_id(site_id)
+    employer_instance.close_connection()
 
+    if employers:
+        return employers
+    else:
+        raise HTTPException(status_code=404, detail="No employers found for this site ID")
 
 @employer_router.put("/employer/{employer_id}")
 def update_employer(employer_id: int, updated_employer: EmployerSchemaPost):  # Asume que tienes un esquema EmployerSchemaPost

@@ -67,6 +67,29 @@ def update_product(product_id: int, product: ProductSchemaPost):
     product_instance.close_connection()
     return {"message": "Product updated successfully", "product_id": product_id}
 
+
+@product_router.get("/products/name/{product_name}/sites")
+def get_sites_by_product_name(product_name: str):
+    product_instance = Product()
+    try:
+        sites = product_instance.select_sites_by_product_name(product_name)
+        if not sites:
+            raise HTTPException(status_code=404, detail="No sites found for the given product name")
+        return sites
+    finally:
+        product_instance.close_connection()
+
+@product_router.get("/products/name/{name}")
+def get_products_by_name(name: str):
+    product_instance = Product()
+    try:
+        products = product_instance.select_products_by_name(name)
+        if not products:
+            raise HTTPException(status_code=404, detail="No products found with given name")
+        return products
+    finally:
+        product_instance.close_connection()
+
 @product_router.delete("/products/{product_id}")
 def delete_product(product_id: int):
     product_instance = Product()
