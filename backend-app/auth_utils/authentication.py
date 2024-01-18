@@ -35,6 +35,7 @@ class LoginSchema(BaseModel):
 
 # Función para autenticar al usuario sin encriptación de contraseña
 def authenticate_user(dni: str, password: str):
+    print(hola)
     employer_instance = Employer()
     user = employer_instance.select_employer_by_dni(dni)
     employer_instance.close_connection()

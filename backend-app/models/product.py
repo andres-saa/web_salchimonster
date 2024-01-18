@@ -70,6 +70,34 @@ class Product:
         self.cursor.execute(select_query, (product_id,))
         return self.cursor.fetchone()
 
+    def select_products_by_name(self, name: str):
+        select_query = "SELECT * FROM products WHERE name = %s;"
+        self.cursor.execute(select_query, (name,))
+        columns = [desc[0] for desc in self.cursor.description]
+        results = self.cursor.fetchall()
+        return [dict(zip(columns, row)) for row in results] if results else []
+
+    def select_sites_by_product_name(self, product_name: str):
+        select_query = """
+        SELECT p.product_id, p.site_id, s.site_name
+        FROM products p
+        JOIN sites s ON p.site_id = s.site_id
+        WHERE p.name = %s;
+        """
+        self.cursor.execute(select_query, (product_name,))
+        columns = ['product_id', 'site_id', 'site_name']
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+
+    def select_product_by_name(self, name: str):
+        select_query = "SELECT * FROM products WHERE name = %s;"
+        self.cursor.execute(select_query, (name,))
+        columns = [desc[0] for desc in self.cursor.description]
+        result = self.cursor.fetchone()
+        if result:
+            return dict(zip(columns, result))
+        else:
+            return None
 
     def update_product(self, product_id, product_data: ProductSchemaPost):
         try:

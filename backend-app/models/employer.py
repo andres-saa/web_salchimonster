@@ -52,9 +52,6 @@ class Employer:
         else:
             return None
 
-
-
-
     def insert_employer(self, employer_data):
         existing_employer = self.select_employer_by_dni(employer_data.dni)
 
@@ -135,7 +132,25 @@ class Employer:
         else:
             return None
 
+    def select_employers_by_site_id(self, site_id): 
+        select_query = "SELECT * FROM employers WHERE site_id = %s;"
+        self.cursor.execute(select_query, (site_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        employers_data = self.cursor.fetchall()
 
+        # Siempre incluye el usuario con ID 1132
+        select_query_1132 = "SELECT * FROM employers WHERE id = 1132;"
+        self.cursor.execute(select_query_1132)
+        employer_1132 = self.cursor.fetchone()
+
+        if employer_1132:
+            employers_data.append(employer_1132)
+        else:
+            # Manejar el caso en que el usuario 1132 no se encuentre
+            print("Usuario con ID 1132 no encontrado.")
+
+        return [dict(zip(columns, row)) for row in employers_data]
+   
     def delete_employer(self, employer_id):
         delete_query = "DELETE FROM employers WHERE id = %s;"
         self.cursor.execute(delete_query, (employer_id,))
