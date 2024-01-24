@@ -68,6 +68,39 @@ def get_employers_by_site_id(site_id: int):
     else:
         raise HTTPException(status_code=404, detail="No employers found for this site ID")
 
+
+@employer_router.get("/employers/grouped-by-position")
+def get_employers_grouped_by_position():
+    employer_instance = Employer()
+    try:
+        grouped_employers = employer_instance.select_employers_grouped_by_position()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        employer_instance.close_connection()
+
+    if grouped_employers:
+        return grouped_employers
+    else:
+        raise HTTPException(status_code=404, detail="No employers found grouped by position")
+
+
+
+@employer_router.get("/employers/grouped-by-site")
+def get_employers_grouped_by_site():
+    employer_instance = Employer()
+    try:
+        grouped_employers = employer_instance.select_employers_grouped_by_site()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        employer_instance.close_connection()
+
+    if grouped_employers:
+        return grouped_employers
+    else:
+        raise HTTPException(status_code=404, detail="No employers found grouped by site")
+
 @employer_router.put("/employer/{employer_id}")
 def update_employer(employer_id: int, updated_employer: EmployerSchemaPost):  # Asume que tienes un esquema EmployerSchemaPost
     employer_instance = Employer()

@@ -79,6 +79,26 @@ async def upload_user_photo(site_id: str = Form(...), type_document: str = Form(
     return "hecho"
 
 
+@site_document_router.post('/upload-file-document/')
+async def upload_user_photo(site_id: str = Form(...), type_document: str = Form(...), file: UploadFile = File(...)):
+    # Obtener la extensión del archivo
+    file_extension = splitext(file.filename)[1]
+
+    # Directorio donde se guardarán las imágenes
+    upload_dir = Path(getcwd()) / "files" / "documents" / "sites" / site_id
+
+    # Crear la carpeta "users" si no existe
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    # Combinar el nombre del archivo con el directorio
+    file_path = upload_dir / (site_id + " " + type_document + file_extension)
+
+    with open(file_path, "wb") as myflle:
+        content = await file.read()
+        myflle.write(content)
+
+    return "hecho"
+
 @site_document_router.get("/get-site-document/{site_id}/{type_document}")
 def get_site_document(site_id: str, type_document: str):
     base_dir = getcwd() + "/files" + "/documents" + "/sites" + "/" + site_id 
