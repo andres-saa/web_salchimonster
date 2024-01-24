@@ -14,6 +14,9 @@ from routes.employer import employer_router
 from routes.site_document import site_document_router
 from routes.login import login
 from routes.permission import permission_router
+from routes.form import form_router
+from routes.training import training_router, attendee_router, assigned_attendee_router
+from routes.training_document import training_document_router
 app = FastAPI()
 from routes.area import area_router
 
@@ -48,3 +51,8 @@ app.include_router(site_document_router)
 app.include_router(area_router)
 app.include_router(login)
 app.include_router(permission_router)
+app.include_router(form_router)
+app.include_router(training_router)
+app.include_router(attendee_router)
+app.include_router(assigned_attendee_router)
+app.include_router(training_document_router)
