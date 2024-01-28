@@ -42,14 +42,19 @@ class TrainingModel:
             creator_id, name, topic, material_url, scheduled_time, status, location
         ) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;
         """
+        # Convert URL object to a string
+        material_url_str = str(training_data.material_url) if training_data.material_url else None
+
         self.cursor.execute(insert_query, (
             training_data.creator_id, training_data.name, training_data.topic, 
-            training_data.material_url, training_data.scheduled_time, 
+            material_url_str, training_data.scheduled_time, 
             training_data.status, training_data.location
         ))
         training_id = self.cursor.fetchone()[0]
         self.conn.commit()
         return training_id
+
+
 
     def update_training(self, training_id, updated_data: Training):
         try:
@@ -92,6 +97,14 @@ class TrainingModel:
             return dict(zip([desc[0] for desc in self.cursor.description], deleted_training))
         else:
             return None
+
+
+    def select_trainings_by_creator_id(self, creator_id):
+        select_query = "SELECT * FROM trainings WHERE creator_id = %s;"
+        self.cursor.execute(select_query, (creator_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
 
     def close_connection(self):
         self.conn.close()

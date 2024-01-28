@@ -17,6 +17,8 @@ from routes.permission import permission_router
 from routes.form import form_router
 from routes.training import training_router, attendee_router, assigned_attendee_router
 from routes.training_document import training_document_router
+from routes.training_file import training_file_router
+from routes.mail import mail_router
 app = FastAPI()
 from routes.area import area_router
 
@@ -56,3 +58,6 @@ app.include_router(training_router)
 app.include_router(attendee_router)
 app.include_router(assigned_attendee_router)
 app.include_router(training_document_router)
+app.include_router(training_file_router)
+app.include_router(mail_router)
+

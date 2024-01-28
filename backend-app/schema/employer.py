@@ -31,7 +31,6 @@ class EmployerSchemaPost(BaseModel):
     housing_type: Optional[str]
     has_vehicle: Optional[bool]
     vehicle_type: Optional[str]
-    password: Optional[str]
     household_size: Optional[int]
     emergency_contact: Optional[str]
     shirt_size: Optional[str]

@@ -33,6 +33,11 @@ import router from '@/router/index.js';
 import { URI } from '@/service/conection';
 import { useRoute } from 'vue-router';
 
+
+
+
+const currentCity = ref(JSON.parse(localStorage.getItem('currentNeigborhood')));
+
 const route = useRoute()
 const categories = ref([]);
 const ruta = ref(router.currentRoute);
@@ -40,13 +45,18 @@ const ruta = ref(router.currentRoute);
 
 const getCategories = async () => {
     try {
-        let response = await fetch(`${URI}/categories`);
+        let siteId = currentCity.value.currenSiteId; // Asegúrese de que esta es la forma correcta de obtener el site_id
+        let response = await fetch(`${URI}/site/${siteId}/active-categories`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         let data = await response.json();
         categories.value = data;
     } catch (error) {
         console.error('Error fetching data: ', error);
     }
 }
+
 
 const navigateToCategory = (categoryName) => {
     router.push({ name: 'sesion', params: { menu_name: categoryName }});

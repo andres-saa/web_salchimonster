@@ -95,6 +95,14 @@ class Permission:
         self.cursor.execute(select_query, (user_id, status,))
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+    
+
+    def select_permissions_by_user_id(self, user_id):
+        select_query = "SELECT * FROM permissions WHERE employer_id = %s;"
+        self.cursor.execute(select_query, (user_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
 
 
     def select_permissions_by_status(self, status):

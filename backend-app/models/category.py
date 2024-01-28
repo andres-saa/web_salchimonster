@@ -41,6 +41,30 @@ class Category:
         self.cursor.execute(select_query, (category_id,))
         return self.cursor.fetchone()
 
+
+    
+    def select_categories_with_active_products_by_site(self, site_id: int):
+        select_query = """
+        SELECT DISTINCT c.category_id, c.category_name FROM categories c
+        JOIN products p ON c.category_id = p.category_id
+        WHERE p.state = 'active' AND p.site_id = %s;
+        """
+        self.cursor.execute(select_query, (site_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+
+    def select_categories_with_active_products(self):
+        select_query = """
+        SELECT DISTINCT c.category_id, c.category_name FROM categories c
+        JOIN products p ON c.category_id = p.category_id
+        WHERE p.state = 'active';
+        """
+        self.cursor.execute(select_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+
     def update_category(self, category_id, category_data: CategorySchemaPost):
         update_query = "UPDATE categories SET category_name = %s WHERE category_id = %s;"
         self.cursor.execute(update_query, (category_data.category_name, category_id))

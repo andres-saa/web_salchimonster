@@ -20,6 +20,16 @@ def get_permission_by_id(permission_id: int):
     permission_instance.close_connection()
     return permission
 
+@permission_router.get("/permissions/user/{user_id}")
+def get_permissions_by_user_id(user_id: int):
+    permission_instance = Permission()
+    permissions = permission_instance.select_permissions_by_user_id(user_id)
+    permission_instance.close_connection()
+
+    if permissions:
+        return permissions
+    else:
+        return [] 
 @permission_router.post("/permission")
 def create_permission(permission: PermissionSchemaPost):
     permission_instance = Permission()

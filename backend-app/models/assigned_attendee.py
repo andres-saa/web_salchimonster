@@ -44,13 +44,22 @@ class AssignedAttendeeModel:
     def insert_assigned_attendee(self, attendee_data: AssignedAttendee):
         insert_query = """
         INSERT INTO assigned_attendees (training_id, attendee_id, assigned_time)
-        VALUES (%s, %s, %s) RETURNING training_id, attendee_id;
+        VALUES (%s, %s, %s) RETURNING training_id, attendee_id, assigned_time;
         """
         self.cursor.execute(insert_query, (
             attendee_data.training_id, attendee_data.attendee_id, attendee_data.assigned_time
         ))
         self.conn.commit()
-        return attendee_data.dict()
+        
+        # Obtener los valores insertados desde la base de datos y devolverlos como un diccionario
+        inserted_values = self.cursor.fetchone()
+        
+        return {
+            "training_id": inserted_values[0],
+            "attendee_id": inserted_values[1],
+            "assigned_time": inserted_values[2]
+        }
+
 
     def delete_assigned_attendee(self, training_id, attendee_id):
         delete_query = "DELETE FROM assigned_attendees WHERE training_id = %s AND attendee_id = %s RETURNING *;"
