@@ -1,6 +1,7 @@
 from pydantic import BaseModel, HttpUrl
 from typing import Optional
 from datetime import datetime
+from typing import List
 
 class Training(BaseModel):
     id: Optional[int] = None
@@ -25,3 +26,6 @@ class AssignedAttendee(BaseModel):
     assigned_time: Optional[datetime] = None
 
 
+
+class TrainingAttendeeList(BaseModel):
+    attendees: List[TrainingAttendee]

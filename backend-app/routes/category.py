@@ -11,6 +11,17 @@ def get_categories():
     category_instance.close_connection()
     return categories
 
+
+@category_router.get("/site/{site_id}/active-categories")
+def get_active_categories_by_site(site_id: int):
+    category_instance = Category()
+    try:
+        active_categories = category_instance.select_categories_with_active_products_by_site(site_id)
+    finally:
+        category_instance.close_connection()
+    return active_categories
+
+
 @category_router.post("/categories")
 def create_category(category: CategorySchemaPost):
     category_instance = Category()

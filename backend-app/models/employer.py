@@ -59,45 +59,33 @@ class Employer:
             return self.update_employer(existing_employer['id'], employer_data)
         else:
             return self.insert_new_employer(employer_data)
-    
 
-
-    def insert_employer(self, employer_data):
-        existing_employer = self.select_employer_by_dni(employer_data.dni)
-
-        if existing_employer:
-            return self.update_employer(existing_employer['id'], employer_data)
-        else:
-            insert_query = """
-            INSERT INTO employers (
-                name, dni, address, position, site_id, status, gender, birth_date, phone, email, 
-                entry_date, exit_date, exit_reason, comments_notes, authorization_data, birth_country, 
-                birth_department, birth_city, blood_type, marital_status, education_level, contract_type, 
-                eps, pension_fund, severance_fund, has_children, housing_type, has_vehicle, vehicle_type, 
-                household_size, emergency_contact, shirt_size, jeans_sweater_size, food_handling_certificate, 
-                food_handling_certificate_number, salary, boss_id, password
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING id;
-            """
-            self.cursor.execute(insert_query, (
-                employer_data.name, employer_data.dni, employer_data.address, employer_data.position, employer_data.site_id, 
-                employer_data.status, employer_data.gender, employer_data.birth_date, employer_data.phone, employer_data.email,
-                employer_data.entry_date, employer_data.exit_date, employer_data.exit_reason, employer_data.comments_notes, 
-                employer_data.authorization_data, employer_data.birth_country, employer_data.birth_department, employer_data.birth_city, 
-                employer_data.blood_type, employer_data.marital_status, employer_data.education_level, employer_data.contract_type, 
-                employer_data.eps, employer_data.pension_fund, employer_data.severance_fund, employer_data.has_children, employer_data.housing_type, 
-                employer_data.has_vehicle, employer_data.vehicle_type, employer_data.household_size, employer_data.emergency_contact, 
-                employer_data.shirt_size, employer_data.jeans_sweater_size, employer_data.food_handling_certificate, 
-                employer_data.food_handling_certificate_number, employer_data.salary, employer_data.boss_id,  # Agregar boss_id
-                employer_data.password  # Agregar contraseña
-            ))
-            employer_id = self.cursor.fetchone()[0]
-            self.conn.commit()
-            return employer_id
-
-
-
-
+    def insert_new_employer(self, employer_data):
+        insert_query = """
+        INSERT INTO employers (
+            name, dni, address, position, site_id, status, gender, birth_date, phone, email, 
+            entry_date, exit_date, exit_reason, comments_notes, authorization_data, birth_country, 
+            birth_department, birth_city, blood_type, marital_status, education_level, contract_type, 
+            eps, pension_fund, severance_fund, has_children, housing_type, has_vehicle, vehicle_type, 
+            household_size, emergency_contact, shirt_size, jeans_sweater_size, food_handling_certificate, 
+            food_handling_certificate_number, salary, boss_id
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id;
+        """
+        self.cursor.execute(insert_query, (
+            employer_data.name, employer_data.dni, employer_data.address, employer_data.position, employer_data.site_id, 
+            employer_data.status, employer_data.gender, employer_data.birth_date, employer_data.phone, employer_data.email,
+            employer_data.entry_date, employer_data.exit_date, employer_data.exit_reason, employer_data.comments_notes, 
+            employer_data.authorization_data, employer_data.birth_country, employer_data.birth_department, employer_data.birth_city, 
+            employer_data.blood_type, employer_data.marital_status, employer_data.education_level, employer_data.contract_type, 
+            employer_data.eps, employer_data.pension_fund, employer_data.severance_fund, employer_data.has_children, employer_data.housing_type, 
+            employer_data.has_vehicle, employer_data.vehicle_type, employer_data.household_size, employer_data.emergency_contact, 
+            employer_data.shirt_size, employer_data.jeans_sweater_size, employer_data.food_handling_certificate, 
+            employer_data.food_handling_certificate_number, employer_data.salary, employer_data.boss_id  # Agregar boss_id
+        ))
+        employer_id = self.cursor.fetchone()[0]
+        self.conn.commit()
+        return employer_id
     def select_employer_by_dni(self, dni):
         select_query = "SELECT * FROM employers WHERE dni = %s;"
         self.cursor.execute(select_query, (dni,))
@@ -133,7 +121,6 @@ class Employer:
 
         return result
 
-    
     def update_employer(self, employer_id, updated_data):
         update_query = """
         UPDATE employers
@@ -143,7 +130,7 @@ class Employer:
             marital_status = %s, education_level = %s, contract_type = %s, eps = %s, pension_fund = %s, severance_fund = %s, 
             has_children = %s, housing_type = %s, has_vehicle = %s, vehicle_type = %s, household_size = %s, 
             emergency_contact = %s, shirt_size = %s, jeans_sweater_size = %s, food_handling_certificate = %s, 
-            food_handling_certificate_number = %s, salary = %s, boss_id = %s, password = %s
+            food_handling_certificate_number = %s, salary = %s, boss_id = %s
         WHERE id = %s
         RETURNING *;
         """
@@ -156,8 +143,7 @@ class Employer:
             updated_data.eps, updated_data.pension_fund, updated_data.severance_fund, updated_data.has_children, updated_data.housing_type, 
             updated_data.has_vehicle, updated_data.vehicle_type, updated_data.household_size, updated_data.emergency_contact, 
             updated_data.shirt_size, updated_data.jeans_sweater_size, updated_data.food_handling_certificate, 
-            updated_data.food_handling_certificate_number, updated_data.salary, updated_data.boss_id,  # Asegúrate de que boss_id es incluido si es necesario
-            updated_data.password,  # Agregar contraseña
+            updated_data.food_handling_certificate_number, updated_data.salary, updated_data.boss_id,  # Agregar boss_id
             employer_id
         ))
 
@@ -169,7 +155,6 @@ class Employer:
             return dict(zip([desc[0] for desc in self.cursor.description], updated_employer_data))
         else:
             return None
-
 
     def select_employers_by_site_id(self, site_id): 
         select_query = "SELECT * FROM employers WHERE site_id = %s;"
