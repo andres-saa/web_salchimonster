@@ -10,6 +10,7 @@ class EmployerSchemaPost(BaseModel):
     status: str
     gender: str
     birth_date: str
+    password: str
     phone: str
     email:Optional[str] 
     entry_date: str

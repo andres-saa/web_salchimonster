@@ -21,7 +21,7 @@ class Order:
 
 
     def select_order_by_id(self, order_id):
-        select_query = "SELECT * FROM orders WHERE order_id = %s;"
+        select_query = "SELECT * FROM orders WHERE order_id = %s ORDER BY order_id DESC LIMIT 50;"
         self.cursor.execute(select_query, (order_id,))
         columns = [desc[0] for desc in self.cursor.description]
         result = self.cursor.fetchone()
@@ -31,27 +31,28 @@ class Order:
             return None
             
     def select_all_orders(self):
-        select_query = "SELECT * FROM orders;"
+        select_query = "SELECT * FROM orders ORDER BY order_id DESC LIMIT 50;"
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+      
 
 
         
     def select_orders_by_site(self, site_id):
-        select_query = "SELECT * FROM orders WHERE site_id = %s;"
+        select_query = "SELECT * FROM orders WHERE site_id = %s ORDER BY order_id DESC LIMIT 50;"
         self.cursor.execute(select_query, (site_id,))
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
     def select_orders_by_delivery_person(self, delivery_person_id):
-        select_query = "SELECT * FROM orders WHERE delivery_person_id = %s;"
+        select_query = "SELECT * FROM orders WHERE delivery_person_id = %s ORDER BY order_id DESC LIMIT 50;"
         self.cursor.execute(select_query, (delivery_person_id,))
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
-
+    
     def select_orders_by_user(self, user_id):
-        select_query = "SELECT * FROM orders WHERE user_id = %s;"
+        select_query = "SELECT * FROM orders WHERE user_id = %s ORDER BY order_id DESC LIMIT 50;"
         self.cursor.execute(select_query, (user_id,))
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
@@ -88,26 +89,7 @@ class Order:
 
         return updated_order_id
 
-        insert_query = """
-        INSERT INTO orders (order_products, user_id, site_id, order_status, payment_method, delivery_person_id, status_history, delivery_price, order_notes)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s ) RETURNING *;
-        """
-        self.cursor.execute(insert_query, (
-            json.dumps(order_data.order_products),
-            order_data.user_id,
-            order_data.site_id,
-            json.dumps(order_data.order_status),
-            order_data.payment_method,
-            order_data.delivery_person_id,
-            json.dumps(order_data.status_history),
-            order_data.delivery_price,
-            order_data.order_notes
-        ))
-        self.conn.commit()
-        columns = [desc[0] for desc in self.cursor.description]
-        updated_order_id = dict(zip(columns, self.cursor.fetchone()))["order_id"]
-
-        return updated_order_id
+        
     
     def update_order(self, order_id: int, order_data: order_schema_post):
         update_query = """

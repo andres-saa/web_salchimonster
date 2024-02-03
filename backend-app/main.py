@@ -21,6 +21,8 @@ from routes.training_file import training_file_router
 from routes.mail import mail_router
 app = FastAPI()
 from routes.area import area_router
+from routes.role import role_router, rolegroup_router
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -60,4 +62,6 @@ app.include_router(assigned_attendee_router)
 app.include_router(training_document_router)
 app.include_router(training_file_router)
 app.include_router(mail_router)
+app.include_router(role_router)
+app.include_router(rolegroup_router)
 

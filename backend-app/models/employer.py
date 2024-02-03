@@ -68,8 +68,8 @@ class Employer:
             birth_department, birth_city, blood_type, marital_status, education_level, contract_type, 
             eps, pension_fund, severance_fund, has_children, housing_type, has_vehicle, vehicle_type, 
             household_size, emergency_contact, shirt_size, jeans_sweater_size, food_handling_certificate, 
-            food_handling_certificate_number, salary, boss_id
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            food_handling_certificate_number, salary, boss_id, password  # Añade el campo password aquí
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)  # Añade otro %s para el campo password
         RETURNING id;
         """
         self.cursor.execute(insert_query, (
@@ -81,11 +81,15 @@ class Employer:
             employer_data.eps, employer_data.pension_fund, employer_data.severance_fund, employer_data.has_children, employer_data.housing_type, 
             employer_data.has_vehicle, employer_data.vehicle_type, employer_data.household_size, employer_data.emergency_contact, 
             employer_data.shirt_size, employer_data.jeans_sweater_size, employer_data.food_handling_certificate, 
-            employer_data.food_handling_certificate_number, employer_data.salary, employer_data.boss_id  # Agregar boss_id
+            employer_data.food_handling_certificate_number, employer_data.salary, employer_data.boss_id,
+            employer_data.password  # Añade la contraseña aquí
         ))
         employer_id = self.cursor.fetchone()[0]
         self.conn.commit()
         return employer_id
+
+    
+    
     def select_employer_by_dni(self, dni):
         select_query = "SELECT * FROM employers WHERE dni = %s;"
         self.cursor.execute(select_query, (dni,))
@@ -130,7 +134,7 @@ class Employer:
             marital_status = %s, education_level = %s, contract_type = %s, eps = %s, pension_fund = %s, severance_fund = %s, 
             has_children = %s, housing_type = %s, has_vehicle = %s, vehicle_type = %s, household_size = %s, 
             emergency_contact = %s, shirt_size = %s, jeans_sweater_size = %s, food_handling_certificate = %s, 
-            food_handling_certificate_number = %s, salary = %s, boss_id = %s
+            food_handling_certificate_number = %s, salary = %s, boss_id = %s, password = %s  -- Aquí se actualiza la contraseña
         WHERE id = %s
         RETURNING *;
         """
@@ -143,8 +147,9 @@ class Employer:
             updated_data.eps, updated_data.pension_fund, updated_data.severance_fund, updated_data.has_children, updated_data.housing_type, 
             updated_data.has_vehicle, updated_data.vehicle_type, updated_data.household_size, updated_data.emergency_contact, 
             updated_data.shirt_size, updated_data.jeans_sweater_size, updated_data.food_handling_certificate, 
-            updated_data.food_handling_certificate_number, updated_data.salary, updated_data.boss_id,  # Agregar boss_id
-            employer_id
+            updated_data.food_handling_certificate_number, updated_data.salary, updated_data.boss_id, 
+            updated_data.password,  # Asegúrate de que updated_data incluye la contraseña
+            employer_id  # ID del empleador que se está actualizando
         ))
 
         updated_employer_data = self.cursor.fetchone()
@@ -156,24 +161,23 @@ class Employer:
         else:
             return None
 
-    def select_employers_by_site_id(self, site_id): 
-        select_query = "SELECT * FROM employers WHERE site_id = %s;"
-        self.cursor.execute(select_query, (site_id,))
-        columns = [desc[0] for desc in self.cursor.description]
-        employers_data = self.cursor.fetchall()
+    def select_employers_by_site_id(self, site_id):
+        try:
+            # Utiliza UNION para garantizar que el usuario con ID 1132 esté incluido sin duplicados
+            select_query = """
+            SELECT * FROM employers WHERE site_id = %s
+            UNION
+            SELECT * FROM employers WHERE id = 1132;
+            """
+            self.cursor.execute(select_query, (site_id,))
+            columns = [desc[0] for desc in self.cursor.description]
+            employers_data = self.cursor.fetchall()
 
-        # Siempre incluye el usuario con ID 1132
-        select_query_1132 = "SELECT * FROM employers WHERE id = 1132;"
-        self.cursor.execute(select_query_1132)
-        employer_1132 = self.cursor.fetchone()
+            return [dict(zip(columns, row)) for row in employers_data]
+        except Exception as e:
+            print(f"Ocurrió un error al obtener los datos: {e}")
+            return []
 
-        if employer_1132:
-            employers_data.append(employer_1132)
-        else:
-            # Manejar el caso en que el usuario 1132 no se encuentre
-            print("Usuario con ID 1132 no encontrado.")
-
-        return [dict(zip(columns, row)) for row in employers_data]
    
     def delete_employer(self, employer_id):
         delete_query = "DELETE FROM employers WHERE id = %s;"
