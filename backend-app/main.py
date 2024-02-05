@@ -22,6 +22,8 @@ from routes.mail import mail_router
 app = FastAPI()
 from routes.area import area_router
 from routes.role import role_router, rolegroup_router
+from routes.city import city_router
+from routes.neighborhood import neighborhood_router
 
 
 app.add_middleware(
@@ -64,4 +66,6 @@ app.include_router(training_file_router)
 app.include_router(mail_router)
 app.include_router(role_router)
 app.include_router(rolegroup_router)
+app.include_router(city_router)
+app.include_router(neighborhood_router)
 
