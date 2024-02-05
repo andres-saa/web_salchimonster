@@ -52,3 +52,14 @@ def get_neighborhoods_by_city_id(city_id: int):
     if not neighborhoods:
         raise HTTPException(status_code=404, detail="No neighborhoods found for the given city_id")
     return neighborhoods
+
+
+@neighborhood_router.get("/neighborhoods/by-site/{site_id}")
+def get_neighborhoods_by_site_id(site_id: int):
+    neighborhood_instance = Neighborhood()
+    neighborhoods = neighborhood_instance.select_neighborhoods_by_site_id(site_id)
+    neighborhood_instance.close_connection()
+
+    if not neighborhoods:
+        raise HTTPException(status_code=404, detail="No neighborhoods found for the given site_id")
+    return neighborhoods

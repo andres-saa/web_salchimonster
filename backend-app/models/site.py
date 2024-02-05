@@ -24,6 +24,19 @@ class Site:
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
+
+    def select_sites_by_city_id(self, city_id):
+        select_query = "SELECT * FROM sites WHERE city_id = %s;"
+        self.cursor.execute(select_query, (city_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        sites_data = self.cursor.fetchall()
+
+        if sites_data:
+            return [dict(zip(columns, row)) for row in sites_data]
+        else:
+            return []
+
+
     def select_site_by_id(self, site_id):
         select_query = "SELECT * FROM sites WHERE site_id = %s;"
         self.cursor.execute(select_query, (site_id,))
