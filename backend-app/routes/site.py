@@ -11,6 +11,14 @@ def get_sites():
     site_instance.close_connection()
     return sites
 
+
+@site_router.get("/sites/city/{city_id}")
+def get_sites_by_city_id(city_id: int):
+    site_instance = Site()
+    sites = site_instance.select_sites_by_city_id(city_id)
+    site_instance.close_connection()
+    return sites
+    
 @site_router.get("/site/{site_id}")
 def get_site_by_id(site_id: int):
     site_instance = Site()
