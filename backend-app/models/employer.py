@@ -68,8 +68,8 @@ class Employer:
             birth_department, birth_city, blood_type, marital_status, education_level, contract_type, 
             eps, pension_fund, severance_fund, has_children, housing_type, has_vehicle, vehicle_type, 
             household_size, emergency_contact, shirt_size, jeans_sweater_size, food_handling_certificate, 
-            food_handling_certificate_number, salary, boss_id, password  # Añade el campo password aquí
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)  # Añade otro %s para el campo password
+            food_handling_certificate_number, salary, boss_id, password
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)  
         RETURNING id;
         """
         self.cursor.execute(insert_query, (
@@ -82,7 +82,7 @@ class Employer:
             employer_data.has_vehicle, employer_data.vehicle_type, employer_data.household_size, employer_data.emergency_contact, 
             employer_data.shirt_size, employer_data.jeans_sweater_size, employer_data.food_handling_certificate, 
             employer_data.food_handling_certificate_number, employer_data.salary, employer_data.boss_id,
-            employer_data.password  # Añade la contraseña aquí
+            employer_data.password  
         ))
         employer_id = self.cursor.fetchone()[0]
         self.conn.commit()
