@@ -284,17 +284,45 @@
                 <div class="text-xl p-0 mb-0" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
                     <span style="font-weight: bold;"> SUBTOTAL </span>
-                    <span class="bold" style="font-weight: bold;"> {{ formatoPesosColombianos(subtotal)  }} </span>
+                    <span class="bold" style="font-weight: bold;">
+                        
+                        <span v-if="subtotal">
+                            {{ formatoPesosColombianos(subtotal)  }}
+                        </span>
+                        
+                    
+
+                        <ProgressSpinner v-else style="width: 20px; height: 20px" strokeWidth="8" fill="var(--white)"
+                
+    animationDuration=".5s" aria-label="Custom ProgressSpinner" /> 
+
+                    
+                    
+                    
+                    </span>
 
                 </div>
 
                 <div class="text-xl p-0 col-12 my-0 " style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
                     <span style="font-weight: bold; text-transform: ;"> Domicilio a  <span @click="setShowDialog()"
-                            style="margin-right: 1rem; cursor: pointer; color: var(--primary-color);"><span class="domi-name">{{ domicilio.name
-                            }}</span> </span> </span>
-                    <span class="bold" style="font-weight: bold;"> {{ formatoPesosColombianos(domicilio.deliveryPrice)
-                    }}
+                            style="margin-right: 1rem; cursor: pointer; color: var(--primary-color);">
+                            <span class="domi-name">
+                                {{ domicilio.name
+                            }}
+                            
+                        
+                        
+                        </span> </span> </span>
+                    <span class="bold" style="font-weight: bold;" >
+                    
+                    <span v-if="domicilio.delivery_price">{{ formatoPesosColombianos(domicilio.delivery_price)}}</span>
+                    
+
+
+<ProgressSpinner v-if="!domicilio.delivery_price" style="width: 20px; height: 20px" strokeWidth="8" fill="var(--white)"
+                
+    animationDuration=".5s" aria-label="Custom ProgressSpinner" /> 
                     </span>
 
                 </div>
@@ -303,8 +331,22 @@
                 <div class="text-xl mt-0" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
 
                     <span style="font-weight: bold;"> TOTAL </span>
-                    <span class="bold" style="font-weight: bold;"> {{ formatoPesosColombianos(calcularTotalCarrito() +
-                        domicilio.deliveryPrice) }} </span>
+                    <span class="bold" style="font-weight: bold;">
+                    
+                    <span v-if="domicilio.delivery_price">
+                        {{ formatoPesosColombianos(calcularTotalCarrito() +
+                        domicilio.delivery_price) }} 
+                    </span>
+                        
+                    
+                    
+                        <ProgressSpinner v-if="!domicilio.delivery_price" style="width: 20px; height: 20px" strokeWidth="8" fill="var(--white)"
+                
+    animationDuration=".5s" aria-label="Custom ProgressSpinner" /> 
+                    
+                    
+                    
+                    </span>
 
                 </div>
 
@@ -341,16 +383,19 @@
 <script setup>
 
 import { ref, onMounted,} from 'vue';
-import { formatoPesosColombianos } from '../../service/formatoPesos';
+import { formatoPesosColombianos } from '@/service/formatoPesos';
+import { setShowDialog } from '@/service/state';
+import { products,contarObjetosRepetidos} from '@/service/cart';
 
-import { domicilio,products,contarObjetosRepetidos} from '../../service/cart';
+import { calcularPrecioTotal, calcularTotalCarrito} from '@/service/state';
+import {URI} from '@/service/conection.js'
 
-import { calcularPrecioTotal, calcularTotalCarrito} from '../../service/state';
+import { domicilio} from '@/service/cart';
 
-import {order_notes} from '../../service/order';
-import { subtotal } from '../../service/state';
+import {order_notes} from '@/service/order';
+import { subtotal } from '@/service/state';
 import router from '@/router';
-import { sumarAdiciones } from '../../service/state';
+import { sumarAdiciones } from '@/service/state';
 
 const ruta = ref(router.currentRoute)
 const total = ref()
@@ -362,6 +407,41 @@ onMounted(() => {
 // Ejemplo de uso
 
 
+
+
+
+
+
+onMounted( async() => {
+
+    let barrio = {}
+
+    if (localStorage.getItem('currentNeigborhood')){
+        barrio = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
+        console.log(barrio.neighborhood_id)
+        getNeighborhood(barrio.neighborhood_id).then(data => domicilio.value = data)
+
+    }else{
+        barrio = 'definir domicilio'
+    } 
+
+    
+})
+
+
+const getNeighborhood = async(neighborhood_id) => {
+    try {
+     const response = await fetch(`${URI}/neighborhood/${neighborhood_id}`)
+     if(response.ok){
+        const data = await response.json()
+        // cities.value = data
+        return data
+     }
+     
+   } catch (error) {
+    
+   }
+}
 
 
 

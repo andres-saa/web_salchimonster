@@ -1,6 +1,6 @@
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { calcularPrecioTotal } from "./state";
-
+import {URI} from '@/service/conection.js'
 
 const carro_para_la_barra_de_abajo = ref({products:[],total:0})
 import { calcularTotalCarrito } from "./state";
@@ -95,12 +95,42 @@ const useCart = {
 
 const domicilio = ref()
 
-if (localStorage.getItem('currentNeigborhood')){
-    domicilio.value = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
-}else{
-    domicilio.value = 'definir domicilio'
-}
 
+
+
+
+onMounted( async() => {
+
+    let barrio = {}
+
+    if (localStorage.getItem('currentNeigborhood')){
+        barrio = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
+        getNeighborhood(barrio.neighborhood_id).then(data => domicilio.value = data)
+
+    }else{
+        barrio = 'definir domicilio'
+    } 
+
+    
+})
+
+
+const getNeighborhood = async(neighborhood_id) => {
+    try {
+        const response = await fetch(`${URI}/neighborhood/${neighborhood_id}`)
+        if (!response.ok){
+            console.log('paila')
+        } else{
+            data = await response.json()
+            return data
+        }
+
+
+
+    } catch (error) {
+        
+    }
+}
 
 function contarObjetosRepetidos(arr) {
     const objetoContador = {};

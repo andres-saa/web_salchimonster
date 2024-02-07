@@ -299,7 +299,7 @@
 
                     <span style="font-weight: bold;"> TOTAL </span>
                     <span class="bold" style="font-weight: bold;"> {{ formatoPesosColombianos(calcularTotalCarrito() +
-                        domicilio.deliveryPrice) }} </span>
+                        domicilio.delivery_price) }} </span>
 
                 </div>
 

@@ -2,6 +2,7 @@
  
 
 
+
     <div class="cont p-3" style="background-color: white; height: 100%;position: relative"  >
         <!-- <router-link :to="`product/${props.product.id}` " @click="changeProduct(product)"> -->
 
@@ -43,6 +44,7 @@
 
         
     </div>
+
 </template>
 
 <script setup>
@@ -115,7 +117,15 @@ const imagenError = (Event) => {
 }
 
 
-
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 2s ease-in-out;
+}
+.fade-enter-from, .fade-leave-to {
+    opacity: 0;
+}
+.fade-enter-to, .fade-leave-from {
+    opacity: 1;
+}
 
 
 
@@ -204,10 +214,20 @@ const imagenError = (Event) => {
     /* box-shadow: 0px 0px 30px var(--primary-color); */
     background-color: #ff620035;
 }
+
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 .imagen{
     width: 100%;
     object-fit: contain;
-    transition: transform ease .3s ;;
+    /* transition: transform ease .3s ; */
+
+    animation: fadeIn 1s ease-in-out 0s 1 forwards;
+
  
     /* background-image: url('https://i.ytimg.com/vi/yvIhfmAfsck/maxresdefault.jpg'); */
     height: 100%;
@@ -221,6 +241,8 @@ const imagenError = (Event) => {
     border-radius: 20px;
     /* height: max-content; */
     /* background-color: green; */
+    animation: fadeIn 1s ease;
 
 }
+
 </style>

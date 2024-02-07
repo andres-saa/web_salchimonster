@@ -20,6 +20,8 @@
 
 
 <resumen></resumen>
+
+<p v-if="pedido?.order_status?.status == 'cancelada'" class="text-xl p-2 mt-4" style="color: rgb(0, 0, 0);background-color: rgba(255, 0, 0, 0.307);">{{ pedido?.order_status.reazon}}</p>
     </div>
 </template>
 

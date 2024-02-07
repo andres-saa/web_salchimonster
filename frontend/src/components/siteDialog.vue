@@ -17,21 +17,51 @@
 
             <!-- <img style="width: 50px;" src="http://localhost:5173/src/images/logo.png" alt=""> -->
 
+    
             <div class="field col-12 pb-0 p-0" style="width: 100%;">
-                <label for="site_id" style="color: black;">Ciudad</label>
+                <div style="display: flex; ;width: min-content; justify-content:start;gap: 1rem;align-items: center;"> 
+                <label for="site_id" style="color: black;">Ciudad   </label> 
+                
+                
+                
+                <ProgressSpinner v-if="spinnersView.ciudad" style="width: 20px; height: 20px" strokeWidth="8" fill="var(--white)"
+                
+    animationDuration=".5s" aria-label="Custom ProgressSpinner" /> 
+
+</div>
                 <Dropdown @click="() => currenNeigborhood = {
                     site: {
                         name: 'default'
                     }   
-                }" v-model="currenCity" :options="cities" placeholder="" optionLabel="name" required="true" />
+                }" v-model="currenCity" :options="cities" placeholder="" optionLabel="city_name" required="true" />
 
             </div>
-            <div class="field col-12 mt-0 pt-0 p-0" style="width: 100%; display: block;">
-                <label for="site_id" style="color: black;">Barrio</label>
+            <p style="color: black;">
+                <!-- {{ currenCity }} -->
+            </p>
 
-                <Dropdown filter v-model="currenNeigborhood" :disabled="!possibleNeigborhoods"
+            <div class="field col-12 mt-0 pt-0 p-0" style="width: 100%;gap: ; display: block;">
+                <div style="display: flex;width: min-content; justify-content:start;gap: 1rem;align-items: center;"> 
+                <label for="site_id" style="color: black;">Barrio   </label> 
+                
+                
+                <div v-if="spinnersView.barrio" style="display: flex; min-width: max-content;">
+                    <ProgressSpinner  style="width: 20px;  height: 20px" strokeWidth="8" fill="var(--white)"
+                
+                animationDuration=".5s" aria-label="Custom ProgressSpinner" /> 
+                
+                <p class="pl-2" style="color: black;">buscando barrios...</p>
+                </div>
+                
+                
+
+</div>
+ 
+                <Dropdown style="" filter v-model="currenNeigborhood" :disabled="!possibleNeigborhoods"
           :options="possibleNeigborhoods" optionLabel="name" required="true"
           placeholder="Selecciona una vecindad" />
+
+          
 
                 <!-- <Dropdown v-model="seleFcarrctedCity" editable :options="possibleNeigborhoods"  placeholder="Select a City" class="w-full md:w-14rem" /> -->
 
@@ -42,23 +72,34 @@
 
                 <div class="img-cont col-12 p-0" style="overflow: hidden;position: relative;">
 
-                    <div class="img-before" v-if="currenNeigborhood.site?.name == 'default'">
-                        <p class="text-2xl lg:text-4xl text-center " style="font-weight: bold;color: black;">Vamos a buscar
+                    <div class="img-before" style="display: flex; flex-direction: column;" v-if="currenNeigborhood.site?.name == 'default'">
+                        <p class="text-xl lg:text-xl text-center " style="font-weight: bold;color: black;">Vamos a buscar
                             tu sede mas cercana</p>
+
+                            
+                
+
+
+                            
                     </div>
-                    <img :src="`${URI}/read-product-image/600/site-${currenNeigborhood.site?.site_id}`"
+
+                    
+
+
+
+                    <img :src="`${URI}/read-product-image/600/site-${currenNeigborhood?.site_id}`"
                         :class="currenNeigborhood.site?.name == 'default' ? 'default-image' : ''"
-                        style="border: 1px solid rgb(255, 255, 255); width: 100%; height: 100%; object-fit: cover; border-radius: 5px;"
+                        style="border: 1px solid rgb(255, 255, 255); width: 100%;background-color: rgb(255, 255, 255); height: 100%; object-fit: cover; border-radius: 5px;"
                         alt="">
 
 
                     <div
-                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display:flex; padding: ; align-items: end;border-radius: 1rem; ">
-                        <p v-if="currenNeigborhood.site.name != 'default'" class="col-12 p-0"
-                            style="text-align: center; height: min-content;  width: 100%; font-size: 35px; font-weight: bold; background-color: rgba(0, 0, 0, 0);">
-                            <span class="text-xl lg:text-2xl" style=""> SALCHIMONSTER</span> <span
-                                style="text-transform: uppercase;" class="text-xl lg:text-2xl">{{
-                                    currenNeigborhood.site.name }}</span>
+                        style=" position: absolute; top: 0; left: 0; width: 100%; height: 100%; display:flex; padding: ; align-items: end;border-radius: 1rem; ">
+                        <p v-if="currenNeigborhood?.site_id" class="col-12 py-3"
+                            style="background-color: black; text-align: center; height: min-content;  width: 100%;  font-weight: bold; background-color: rgba(0, 0, 0, 0.7);">
+                            <span  class="text-xl lg:text-2xl p-0" style=""> SALCHIMONSTER</span> <span
+                                style="text-transform: uppercase;" class="text-xl lg:text-2xl p-0">{{
+                                    site.site_name }}</span>
                         </p>
                     </div>
                 </div>
@@ -71,7 +112,7 @@
             </div>
 
             <div class="field col-12" style="width: 100%;  ;">
-                <Button @click="setNeigborhood" :disabled="currenNeigborhood.site.name == 'default'"
+                <Button @click="setNeigborhood" :disabled="!currenNeigborhood?.name"
                     style="width: max-content; padding: 10px 20px;width: 100%; text-align: center;" class="menu-button-new">
                     <p style="width: 100%; padding: 0; margin: 0">
                         <i :class="PrimeIcons.SAVE"></i> GUARDAR
@@ -102,13 +143,16 @@
 
 
 // import { getProductsByCategory, getCategory, getMenu } from '@/service/productServices.js'
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { PrimeIcons } from 'primevue/api';
 import { showSiteDialog, setShowDialog } from '@/service/state';
 import { URI } from '@/service/conection'
-import { cities } from '@/service/citiesService';
+// import { cities } from '@/service/citiesService';
 
 
+const spinnersView = ref({ciudad:false, barrio:false})
+const cities = ref([]) 
+const site = ref({})
 const currenCity = ref({})
 const c_neigbor = ref(localStorage.getItem('currentNeigborhood'))
 const currenNeigborhood = ref({
@@ -119,37 +163,148 @@ const currenNeigborhood = ref({
 
 const possibleNeigborhoods = ref()
 const changePossiblesNeigborhoods = () => {
-    const neigborhoods = []
-
-    currenCity.value.sites.map(site => {
-        site.neigborhoods.map(neigborhood => {
-            neigborhoods.push({ name: neigborhood.name, neigborhood: neigborhood, site: site })
-            console.log(site)
-        })
-    })
-
-    possibleNeigborhoods.value = neigborhoods
+    getNeighborhoodsByCityId(currenCity.value.city_id).then(data => possibleNeigborhoods.value = data)
 }
+
+
+
 watch(currenCity, () => { changePossiblesNeigborhoods() })
 
-const setNeigborhood = () => {
-    localStorage.setItem('currentNeigborhood', JSON.stringify({
-        currenCity: currenCity.value.name,
-        currenNeigborhood: currenNeigborhood.value.neigborhood,
-        currenSite: currenNeigborhood.value.site.name,
-        currenSiteId: currenNeigborhood.value.site.site_id,
+
+
+
+watch(currenNeigborhood, () => { 
+    
+    getSiteById(currenNeigborhood.value.site_id).then((data) => site.value = data)
+ })
+
+
+
+const setNeigborhood = async() => {
+
+    getSiteById(currenNeigborhood.value.site_id).then( (data) => {
+
+
+        console.log(data)
+        
+
+
+        localStorage.setItem('currentNeigborhood', JSON.stringify({
+        currenCity: currenCity.value.city_name,
+        currenNeigborhood: currenNeigborhood.value,
+        currenSite: data.site_name,
+        currenSiteId: data.site_id,
+
+
+       
+
+        
     }))
 
-    localStorage.setItem('currenSiteWsp', currenNeigborhood.value.site.wsp)
-    showSiteDialog.value = false
 
 
-    location.reload()
+    localStorage.setItem('currenSiteWsp', data.wsp_link)
+        showSiteDialog.value = false
+
+
+        location.reload()
+
+
+
+
+    })
+    
+
+
 
 
 
 
 }
+
+
+const getCities = async() => {
+    try {
+    spinnersView.value.ciudad = true
+     const response = await fetch(`${URI}/cities`)
+     if(response.ok){
+        const data = await response.json()
+        spinnersView.value.ciudad = false
+        // cities.value = data
+        return data
+     }
+     
+   } catch (error) {
+    spinnersView.value.ciudad = false
+    
+   }
+   
+}
+
+
+        const getNeighborhoods = async() => {
+            try {
+            const response = await fetch(`${URI}/neighborhoods`)
+            if(response.ok){
+                const data = await response.json()
+                // cities.value = data
+                return data
+            }
+            
+        } catch (error) {
+            
+        }
+        }
+
+
+
+const getSiteById = async(site_id) => {
+    try {
+        // spinnersView.value.barrio = true
+     const response = await fetch(`${URI}/site/${site_id}`)
+     if(response.ok){
+        const data = await response.json()
+        // cities.value = data
+        spinnersView.value.barrio = false
+
+        return data
+     }
+     
+   } catch (error) {
+    spinnersView.value.barrio = false
+
+    
+   }
+}
+
+
+
+
+
+const getNeighborhoodsByCityId = async(city_Id) => {
+    try {
+        spinnersView.value.barrio = true
+     const response = await fetch(`${URI}/neighborhoods/by-city/${city_Id}`)
+     if(response.ok){
+        const data = await response.json()
+        // cities.value = data
+        spinnersView.value.barrio = false
+
+        return data
+     }
+     
+   } catch (error) {
+    spinnersView.value.barrio = false
+
+    
+   }
+}
+
+onMounted(async() => {
+    getCities().then(data => cities.value = data)
+})
+
+
 </script>
 
 
