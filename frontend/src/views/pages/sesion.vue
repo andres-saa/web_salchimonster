@@ -1,8 +1,12 @@
 <template>
 <div class="grid xl:col-10 xl:m-auto p-2 m-auto" style="border-radius:2rem; margin-bottom: 5rem;max-width: 1024px;">
-    <div v-for="product in products.filter(product => product.state === 'active')" :key="product.id" class="xl:col-3 lg:col-4 md:p-3 col-6 p-3">
-        <TarjetaMenu style="width: 100%;" :product="product"></TarjetaMenu>
+    
+    <div v-for="(product, index) in products.filter(product => product.state === 'active')" :key="product.id" class="xl:col-3 lg:col-4 md:p-3 col-6 p-3 aparecer">
+        <TarjetaMenu  :id="`tarjeta-${index}`" style="width: 100%;" :product="product"></TarjetaMenu>
     </div>
+
+
+    
 </div>
 
 
@@ -12,13 +16,41 @@
 
 <script setup>
 import TarjetaMenu from '@/components/TarjetaMenu.vue';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch,nextTick  } from 'vue';
 import { useRoute } from 'vue-router';
 import { URI } from '../../service/conection';
 import router from '@/router/index.js';
 
 const products = ref([]); // Definiendo la variable reactiva para almacenar los productos
 const ruta = useRoute(); // Usando useRoute para acceder a los parámetros de la ruta
+
+
+const applyAnimation = () => {
+    // Obtén todos los elementos que necesitan la animación
+    const cards = document.querySelectorAll('.aparecer');
+    // Remueve y añade la clase para resetear la animación
+    cards.forEach(card => {
+        card.classList.remove('aparecer');
+        void card.offsetWidth; // Provoca el reflow
+        card.classList.add('aparecer');
+    });
+};
+
+
+
+onMounted(async () => {
+    getProducts(ruta.params.menu_name);
+    await nextTick();
+    applyAnimation(); // Asegura que la animación se aplique al montar
+});
+
+watch(() => ruta.params.menu_name, async (newMenuName) => {
+    getProducts(newMenuName);
+    await nextTick(); // Espera a que el DOM se actualice
+    applyAnimation(); // Función para aplicar la animación
+});
+
+
 
 const getProducts = async (category_name) => {
     try {
@@ -65,6 +97,21 @@ const currentCity = ref(JSON.parse(localStorage.getItem('currentNeigborhood')));
     /* font-weight: bold; */
 }
 
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.aparecer {
+    animation: aparecer 0.5s ease-out forwards;
+}
+
 .menu-button:hover {
     /* box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5); */
     /* transform: scale(1.1); */
@@ -78,6 +125,10 @@ const currentCity = ref(JSON.parse(localStorage.getItem('currentNeigborhood')));
 *:focus{
     outline: none;
 }
+
+
+
+
 
 ::-webkit-scrollbar {
   width: 12px;

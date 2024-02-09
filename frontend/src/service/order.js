@@ -141,10 +141,10 @@ const send_order = async () => {
         "delivery_person_id": 4,
         "status_history": [
             {
-
+                
             }
         ],
-        "delivery_price":domicilio.value.deliveryPrice,
+        "delivery_price":domicilio.value.delivery_price,
         "order_notes":order_notes.value == null || order_notes.value == "" ? 'sin notas': order_notes.value
     }
     console.log(data)

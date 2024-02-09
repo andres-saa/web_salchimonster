@@ -37,15 +37,22 @@
   <div class="grid" v-for="order in filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),'cancelada')">
 
    <div class="col pb-0 text-left">
-    Pedido #{{ order.order_id }} 
-    
+    Pedido #{{ order.order_id }}  
 
    </div>
-   <div class="col pb-0 text-right" ref="hola" style="font-weight: bold;">
+
+
+   <div class="col pb-2 text-left">
+    <Button  @click="open_order(order)" class="py-0 m-0" size=""  severity="success" style="font-weight:;border:none">Detalles</Button>
+
+
+   </div>
+   <div class="col pb-2 text-right" ref="hola" style="font-weight: bold;">
     {{ formatoPesosColombianos(sumarProductos(contarObjetosRepetidos(order.order_products))) }}
 
    </div>
 
+  
     
 
   </div>
@@ -56,7 +63,7 @@
 
 </div>
 
-
+<DialogoPedido></DialogoPedido>
 
 </template>
  
@@ -76,6 +83,7 @@ import { formatoPesosColombianos } from '../../service/formatoPesos';
 import { calcularPrecioTotal, calcularTotalCarrito, contarObjetosRepetidos, sumarProductos } from '../../service/state';
 import { URI } from "@/service/conection";
 import dialogoPedido from './dialogo-pedido.vue';
+import DialogoPedido from './dialogo-pedido.vue';
 
 
  

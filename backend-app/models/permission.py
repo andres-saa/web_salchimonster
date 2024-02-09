@@ -24,7 +24,7 @@ class Permission:
         self.cursor = self.conn.cursor()
 
     def select_all_permissions(self):
-        select_query = "SELECT * FROM permissions;"
+        select_query = "SELECT * FROM permissions order by id desc;"
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]

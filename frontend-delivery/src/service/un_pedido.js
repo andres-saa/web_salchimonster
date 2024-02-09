@@ -117,6 +117,7 @@ const pedido = ref({
 
 
 
+const visibleCancelar = ref(false)
 
 
 
@@ -239,7 +240,8 @@ const prepararPedido = async (order) => {
   const serverTimeData = await serverTimeResponse.json();
   miAudio.pause();
   miAudio.currentTime = 0
-  const timestampActual = new Date().toLocaleString();
+  // const timestampActual = new Date().toLocaleString();
+  order.status_history.push(order.order_status);
   order.order_status.status = "en preparacion";
   order.order_status.timestamp = fecha_del_server.value;
 
@@ -257,22 +259,23 @@ const prepararPedido = async (order) => {
 }
 
 
-const cancelarPedido = async (order) => {
+const cancelarPedido = async (order, razon) => {
   const serverTimeResponse = await fetch('https://backend.salchimonster.com/server_time');
   const serverTimeData = await serverTimeResponse.json();
   // Cambiar el estado a "En preparación" con la hora actual
   miAudio.pause();
   miAudio.currentTime = 0
-  const timestampActual = new Date().toLocaleString();
-  order.order_status.status = "cancelada";
-  order.order_status.timestamp = fecha_del_server.value;
+  // const timestampActual = new Date().toLocaleString();
+  
 
   // Agregar el nuevo estado al historial de estados
   const nuevoEstado = {
     "status": "cancelada",
     "timestamp": serverTimeData,
-    "reazon": "faltaba"
+    "reazon": razon
   };
+
+  order.order_status = nuevoEstado
   order.status_history.push(nuevoEstado);
 
   // Enviar la orden actualizada al servidor
@@ -301,6 +304,7 @@ const marcarComoEnviado = async (order) => {
   enviarOrdenActualizada(order);
   dialog_pedido_visible.value = false
 
+
 }
 
 
@@ -324,6 +328,7 @@ function enviarOrdenActualizada(order) {
       return response.json();
     })
     .then(data => {
+      visibleCancelar.value = false
       getOrders()
       console.log('Orden enviada con éxito:', data);
     })
@@ -405,4 +410,4 @@ const open_order = (order) => {
 
 
 
-export {open_order, obtenerHoraFormateadaAMPM, fechaHoyFormateada,filtrarPedidosPorFecha, fecha_del_server, convertirA12h, ordenes_de_hoy, getOrders, curentSite, cancelarPedido, miAudio, gruposPedidos, grupos, pedido, pedidos, formatoPesosColombianos, dialog_pedido_visible, set_dialog_order, filtrarPorEstado, marcarComoEnviado, prepararPedido }
+export {open_order,visibleCancelar, obtenerHoraFormateadaAMPM, fechaHoyFormateada,filtrarPedidosPorFecha, fecha_del_server, convertirA12h, ordenes_de_hoy, getOrders, curentSite, cancelarPedido, miAudio, gruposPedidos, grupos, pedido, pedidos, formatoPesosColombianos, dialog_pedido_visible, set_dialog_order, filtrarPorEstado, marcarComoEnviado, prepararPedido }
