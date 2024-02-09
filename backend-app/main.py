@@ -20,11 +20,14 @@ from routes.training_document import training_document_router
 from routes.training_file import training_file_router
 from routes.mail import mail_router
 app = FastAPI()
-from routes.area import area_router
+# from routes.area import area_router
 from routes.role import role_router, rolegroup_router
 from routes.city import city_router
 from routes.neighborhood import neighborhood_router
-
+from routes.supply.supply import supply_router
+from routes.supply.supply_delivery import supply_delivery_router
+from routes.supply.supply_delivery_item import supply_delivery_item_router
+from routes.archived_file import archivedFiles_router,areas_router,types_router
 
 app.add_middleware(
     CORSMiddleware,
@@ -54,7 +57,7 @@ app.include_router(grupo_cambios_router)
 app.include_router(grupo_acompanantes_router) 
 app.include_router(employer_router) 
 app.include_router(site_document_router)
-app.include_router(area_router)
+# app.include_router(area_router)
 app.include_router(login)
 app.include_router(permission_router)
 app.include_router(form_router)
@@ -68,4 +71,9 @@ app.include_router(role_router)
 app.include_router(rolegroup_router)
 app.include_router(city_router)
 app.include_router(neighborhood_router)
-
+app.include_router(supply_router)
+app.include_router(supply_delivery_router)
+app.include_router(supply_delivery_item_router)
+app.include_router(archivedFiles_router)
+app.include_router(areas_router)
+app.include_router(types_router)

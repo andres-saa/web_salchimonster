@@ -29,6 +29,30 @@ class Employer:
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+    
+    def select_employers_basic(self):
+    # Consulta SQL que incluye un JOIN para obtener site_name
+        select_query = """
+        SELECT name, id from employers;
+        """
+        self.cursor.execute(select_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+    def select_employer_basic_by_id(self, employer_id):
+        """
+        Selecciona información básica de un empleado por su ID.
+        """
+        select_query = "SELECT id, name FROM employers WHERE id = %s;"
+        self.cursor.execute(select_query, (employer_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        employer_data = self.cursor.fetchone()
+
+        if employer_data:
+            return dict(zip(columns, employer_data))
+        else:
+            return None
+
 
     def select_employer_by_position(self, position):
         select_query = "SELECT * FROM employers WHERE position = %s;"

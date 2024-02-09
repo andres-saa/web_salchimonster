@@ -20,6 +20,24 @@ def get_employers():
     employer_instance.close_connection()
     return employers
 
+@employer_router.get("/employers-basic")
+def get_employers():
+    employer_instance = Employer()
+    employers = employer_instance.select_employers_basic()
+    employer_instance.close_connection()
+    return employers
+
+@employer_router.get("/employer-basic/{employer_id}")
+def get_employer_basic_by_id(employer_id: int):
+    employer_instance = Employer()
+    employer = employer_instance.select_employer_basic_by_id(employer_id)
+    employer_instance.close_connection()
+    if employer:
+        return employer
+    else:
+        raise HTTPException(status_code=404, detail="Employer not found")
+
+
 @employer_router.get("/employer/dni/{dni}")
 def get_employer_by_dni(dni: str):
     employer_instance = Employer()
