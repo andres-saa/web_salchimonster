@@ -114,31 +114,41 @@ class SupplyDelivery:
         
     
 
-    def insert_delivery_with_items(self, delivery_data: SupplyDeliverySchema, items_data: List[SupplyDeliveryItemSchema]):
-        # Insertar la entrega con los campos adicionales
-        insert_delivery_query = """
-        INSERT INTO supply_deliveries (delivery_date, user_delivery_id, user_receive_id)
-        VALUES (%s, %s, %s) RETURNING delivery_id;
+    def insert_delivery_with_items_for_multiple_receivers(self, delivery_data: SupplyDeliverySchema, items_data: List[SupplyDeliveryItemSchema], user_receive_ids: List[int]):
         """
-        self.cursor.execute(insert_delivery_query, (
-            delivery_data.delivery_date, delivery_data.user_delivery_id, delivery_data.user_receive_id
-        ))
-        delivery_id = self.cursor.fetchone()[0]
-
-        # Insertar cada item vinculado a la entrega
-        insert_item_query = """
-        INSERT INTO supply_delivery_items (name, quantity, delivery_id)
-        VALUES (%s, %s, %s) RETURNING item_id;
+        Inserta una entrega para múltiples receptores, con los mismos items para cada entrega.
+        
+        :param delivery_data: Datos de la entrega, sin incluir user_receive_id que será reemplazado por cada id en user_receive_ids.
+        :param items_data: Lista de items a entregar.
+        :param user_receive_ids: Lista de IDs de los usuarios receptores.
+        :return: Lista de IDs de las entregas creadas.
         """
-        for item in items_data:
-            self.cursor.execute(insert_item_query, (
-                item.name, item.quantity, delivery_id
-            ))
-
+        delivery_ids = []  # Para almacenar los IDs de las entregas insertadas
+        
+        for user_receive_id in user_receive_ids:
+            # Insertar la entrega con el ID del receptor actual
+            self.cursor.execute(
+                """
+                INSERT INTO supply_deliveries (delivery_date, user_delivery_id, user_receive_id)
+                VALUES (%s, %s, %s) RETURNING delivery_id;
+                """,
+                (delivery_data.delivery_date, delivery_data.user_delivery_id, user_receive_id)
+            )
+            delivery_id = self.cursor.fetchone()[0]
+            delivery_ids.append(delivery_id)
+            
+            # Insertar cada item vinculado a la entrega
+            for item in items_data:
+                self.cursor.execute(
+                    """
+                    INSERT INTO supply_delivery_items (name, quantity, delivery_id)
+                    VALUES (%s, %s, %s);
+                    """,
+                    (item.name, item.quantity, delivery_id)
+                )
+            
         self.conn.commit()
-        return delivery_id  # O podrías devolver más información si es necesario
-
-
+        return delivery_ids
     def insert_delivery(self, delivery_data: SupplyDeliverySchema):
         insert_query = """
         INSERT INTO supply_deliveries (delivery_date, user_delivery_id, user_receive_id)

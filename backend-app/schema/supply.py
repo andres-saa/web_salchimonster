@@ -21,5 +21,6 @@ class SupplyDeliveryItemSchema(BaseModel):
 
 
 class SupplyDeliveryWithItemsSchema(BaseModel):
-    delivery_data: SupplyDeliverySchema
+    delivery_data: SupplyDeliverySchema  # Este esquema ahora no incluye user_receive_id
     items_data: List[SupplyDeliveryItemSchema]
+    user_receive_ids: List[int]
