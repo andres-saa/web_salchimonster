@@ -81,13 +81,17 @@ def sign_delivery_as_received(delivery_id: int):
 
 
 @supply_delivery_router.post("/supply-delivery-with-items")
-def create_supply_delivery_with_items(delivery_with_items: SupplyDeliveryWithItemsSchema):
+async def create_supply_delivery_with_items(delivery_with_items: SupplyDeliveryWithItemsSchema):
     supply_delivery_instance = SupplyDelivery()
     try:
-        # Asumiendo que el método insert_delivery_with_items ya está implementado en SupplyDelivery
-        delivery_id = supply_delivery_instance.insert_delivery_with_items(delivery_with_items.delivery_data, delivery_with_items.items_data)
+        # Usando el nuevo método que maneja múltiples receptores
+        delivery_ids = supply_delivery_instance.insert_delivery_with_items_for_multiple_receivers(
+            delivery_data=delivery_with_items.delivery_data, 
+            items_data=delivery_with_items.items_data, 
+            user_receive_ids=delivery_with_items.user_receive_ids
+        )
         supply_delivery_instance.close_connection()
-        return {"delivery_id": delivery_id}
+        return {"delivery_ids": delivery_ids}
     except Exception as e:
         supply_delivery_instance.close_connection()
         raise HTTPException(status_code=400, detail=str(e))

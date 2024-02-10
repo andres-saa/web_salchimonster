@@ -43,7 +43,7 @@ class Employer:
         """
         Selecciona información básica de un empleado por su ID.
         """
-        select_query = "SELECT id, name FROM employers WHERE id = %s;"
+        select_query = "SELECT id, name, dni, gender FROM employers WHERE id = %s;"
         self.cursor.execute(select_query, (employer_id,))
         columns = [desc[0] for desc in self.cursor.description]
         employer_data = self.cursor.fetchone()
