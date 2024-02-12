@@ -116,3 +116,19 @@ def update_supply_delivery(delivery_id: int, updated_delivery: SupplyDeliverySch
     updated_delivery_data = supply_delivery_instance.update_delivery(delivery_id, updated_delivery)
     supply_delivery_instance.close_connection()
     return updated_delivery_data if updated_delivery_data else {"message": "Supply delivery not found"}
+
+
+
+@supply_delivery_router.get("/user/{user_id}/supply-deliveries")
+def get_supply_deliveries_by_user_id(user_id: int):
+    supply_delivery_instance = SupplyDelivery()
+    try:
+        deliveries = supply_delivery_instance.get_deliveries_by_user_id(user_id)
+        if deliveries:
+            return deliveries
+        else:
+            raise HTTPException(status_code=404, detail="No supply deliveries found for the given user ID")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    finally:
+        supply_delivery_instance.close_connection()
