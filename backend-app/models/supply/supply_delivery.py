@@ -29,6 +29,24 @@ class SupplyDelivery:
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
     
 
+    def get_deliveries_by_user_id(self, user_id: int) -> List[dict]:
+        """
+        Obtiene las entregas de suministros en las que el usuario especificado
+        es el que entrega o recibe la dotación.
+
+        :param user_id: ID del usuario para buscar las entregas de suministros.
+        :return: Lista de diccionarios con los datos de las entregas encontradas.
+        """
+        select_query = """
+        SELECT * FROM supply_deliveries
+        WHERE user_delivery_id = %s OR user_receive_id = %s
+        ORDER BY delivery_id DESC;
+        """
+        self.cursor.execute(select_query, (user_id, user_id))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+
     def sign_delivery_sent(self, delivery_id):
         """
         Marca una entrega como firmada por el que envía.

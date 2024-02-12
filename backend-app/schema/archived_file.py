@@ -17,3 +17,4 @@ class ArchivedFile(BaseModel):
     upload_date: Optional[datetime] = None
     id_area: int
     id_type: int
+    file_extension:str

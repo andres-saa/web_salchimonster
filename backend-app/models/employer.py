@@ -33,7 +33,7 @@ class Employer:
     def select_employers_basic(self):
     # Consulta SQL que incluye un JOIN para obtener site_name
         select_query = """
-        SELECT name, id from employers;
+        SELECT name, id, gender, dni from employers;
         """
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]

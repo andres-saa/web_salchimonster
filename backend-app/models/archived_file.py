@@ -21,13 +21,13 @@ class ArchivedFiles:
         self.file_id = file_id
 
     def select_all_files(self):
-        select_query = "SELECT * FROM archivedFiles;"
+        select_query = "SELECT * FROM archived_files;"
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
     def select_file_by_id(self, file_id):
-        select_query = "SELECT * FROM archivedFiles WHERE id_file = %s;"
+        select_query = "SELECT * FROM archived_files WHERE id_file = %s;"
         self.cursor.execute(select_query, (file_id,))
         columns = [desc[0] for desc in self.cursor.description]
         file_data = self.cursor.fetchone()
@@ -39,21 +39,22 @@ class ArchivedFiles:
 
     def insert_file(self, file_data: ArchivedFile):
         insert_query = """
-        INSERT INTO ArchivedFiles (
-            file_name, file_url, file_type, upload_date, id_area, id_type
-        ) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id_file;
+        INSERT INTO archived_files (
+            file_name, file_url, file_type, upload_date, id_area, id_type, file_extension
+        ) VALUES (%s, %s,%s, %s, %s, %s, %s) RETURNING id_file;
         """
         self.cursor.execute(insert_query, (
             file_data.file_name, file_data.file_url, file_data.file_type,
-            file_data.upload_date, file_data.id_area, file_data.id_type
+            file_data.upload_date, file_data.id_area, file_data.id_type,file_data.file_extension
         ))
         file_id = self.cursor.fetchone()[0]
         self.conn.commit()
         return file_id
 
+
     def update_file(self, file_id, updated_data: ArchivedFile):
         update_query = """
-        UPDATE ArchivedFiles
+        UPDATE archived_files
         SET file_name = %s, file_url = %s, file_type = %s, upload_date = %s, id_area = %s, id_type = %s
         WHERE id_file = %s
         RETURNING *;
