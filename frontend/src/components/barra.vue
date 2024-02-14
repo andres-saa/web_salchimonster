@@ -222,7 +222,7 @@ const handleScroll = () => {
       clearTimeout(scrollTimer);
       scrollTimer = setTimeout(() => {
         showElement.value = true;
-      }, 1000); // 2000ms (2 segundos) de inactividad antes de ocultar el elemento
+      }, 500); // 2000ms (2 segundos) de inactividad antes de ocultar el elemento
     };
 
     onMounted(() => {
