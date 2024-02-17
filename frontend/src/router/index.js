@@ -14,6 +14,7 @@ const router = createRouter({
     {
       path: '/',
       component: AppLayout,
+      // meta: { requirelocation: true },
       children: [
         {
           path: '/',
@@ -314,7 +315,8 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requirelocation) {
     // Obtener el token de acceso desde localStorage
     const location = localStorage.getItem('currentNeigborhood');
-    if (!location) {
+    const estado = localStorage.getItem('estado');
+    if (!location || !estado ) {
       // Si no hay un token de acceso, redirigir a la página de inicio de sesión
       setShowDialog()
       next('/');

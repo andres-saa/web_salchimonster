@@ -87,7 +87,7 @@ const setShowDialog =()=>{
   currentAditions.value=[]
   currentSalsas.value=[]
   
-    showSiteDialog.value = !showSiteDialog.value
+    showSiteDialog.value = true
     console.log('hola')
     if (showProductDialog.value) {
 
@@ -115,7 +115,7 @@ const setShowDialog =()=>{
 const comprobar_sede = () => {
   const c_neigbor = ref(localStorage.getItem('currentNeigborhood'))
 
-  if (!c_neigbor.value && ruta.value.fullPath == '/menu' || !c_neigbor.value && ruta.value.fullPath == '/sedes'   ) {
+  if (ruta.value.fullPath == '/menu' || ruta.value.fullPath == '/sedes'   ) {
     showSiteDialog.value = false
   }
 

@@ -124,7 +124,7 @@
 
         </div>
 
-        <button @click="setShowDialog"
+        <button @click="showSiteDialog = false"
             style="width: 3rem;height: 3rem; border: none; position: absolute; right: 2rem; top:1rem;background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center;justify-content: center;">
             <i :class="PrimeIcons.TIMES" style="color: white; font-weight: bold; " class="text-2xl"></i>
 
@@ -180,6 +180,40 @@ watch(currenNeigborhood, () => {
 
 
 
+
+const obtenerEstado = async () => {
+const siteId = localStorage.getItem("siteId")
+// alert(siteId)
+
+if(!siteId){
+    return
+}
+
+  try {
+    const response = await fetch(`${URI}/site/${siteId}/status`);
+    const data = await response.json();
+    
+    if (data.status === 'closed') {
+    //   estado.value = 'cerrado';
+      localStorage.setItem('estado', 'cerrado');
+    } else {
+    //   estado.value = 'abierto';
+      localStorage.setItem('estado', 'abierto');
+    }
+  } catch (error) {
+    console.error('Error al obtener el estado:', error);
+    // estado.value = 'cerrado';
+      localStorage.setItem('estado', 'cerrado');
+  }
+};
+
+
+
+
+
+
+
+
 const setNeigborhood = async() => {
 
     getSiteById(currenNeigborhood.value.site_id).then( (data) => {
@@ -206,21 +240,16 @@ const setNeigborhood = async() => {
 
 
     localStorage.setItem('currenSiteWsp', data.wsp_link)
-        showSiteDialog.value = false
+        // showSiteDialog.value = false
 
-
-        location.reload()
-
-
-
-
-    })
     
 
+    location.reload()
 
 
 
 
+    }).then(obtenerEstado())
 
 }
 
