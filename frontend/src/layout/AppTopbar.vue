@@ -248,8 +248,8 @@ const fondoVisible = ref(false)
 </script>
 
 <template>
-    <div v-if="!isInAdminProductsRoute && !isEntregasRoute" class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 "
-        style=" z-index:999 ">
+    <div v-if="!isInAdminProductsRoute && !isEntregasRoute" st class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 "
+        style=" z-index:999;background-color: white; ">
 
 
         <router-link to="/" class="layout-topbar-logo" style="z-index: 99999;">

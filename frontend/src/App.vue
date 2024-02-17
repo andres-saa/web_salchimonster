@@ -5,9 +5,22 @@ import siteDialog from './components/siteDialog.vue';
 // import siteDialog from './components/siteDialog.vue';
 import VistaProducto from './components/VistaProducto.vue'
 import restauranteCerrado from './components/restauranteCerrado.vue';
+import {onMounted} from 'vue'
+import { showSiteDialog } from './service/state';
 
 
 
+
+
+const verificarEstado = () => {
+  const estado = localStorage.getItem('estado')
+  if(!estado) {
+    showSiteDialog.value = true
+  }
+}
+
+
+onMounted(verificarEstado)
 </script>
 
 <template>
@@ -16,7 +29,7 @@ import restauranteCerrado from './components/restauranteCerrado.vue';
   
 
 <restauranteCerrado>
-  
+
 </restauranteCerrado>
 <router-view  class="p-0 pb-8" style="content:; background-color: rgba(0, 0, 0, 0.046); width: 100vw;left:0px;position: absolute;"/>
 
