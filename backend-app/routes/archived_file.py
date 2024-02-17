@@ -1,4 +1,12 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import FileResponse
+
+
+import os
+from fastapi import UploadFile, File,Form
+from pathlib import Path
+
+from os.path import splitext
 from typing import List
 from models.archived_file import ArchivedFiles,Areas,DocumentTypes  # Asume que has movido la clase a models/archived_files.py
 from schema.archived_file import ArchivedFile,Area,DocumentType  # Asume que este es tu esquema Pydantic
@@ -22,11 +30,58 @@ def get_file_by_id(file_id: int):
     return file
 
 @archivedFiles_router.post("/archived-file")
-def create_file(file: ArchivedFile):
+async def create_file(file: UploadFile = File(...), file_data: ArchivedFile = dict):
     files_instance = ArchivedFiles()
-    file_id = files_instance.insert_file(file)
+    file_id = files_instance.insert_file(file, file_data)
     files_instance.close_connection()
-    return {**file.dict(), "id_file": file_id}
+
+    # Crear la carpeta 'files' si no existe
+    files_folder = Path("files")
+    files_folder.mkdir(parents=True, exist_ok=True)
+
+    # Guardar el archivo en la carpeta 'files'
+    file_path = files_folder / file.filename
+    with open(file_path, "wb") as buffer:
+        buffer.write(await file.read())
+
+    return {"filename": file.filename, "file_data": file_data, "id_file": file_id}
+
+
+
+
+@archivedFiles_router.post("/upload-archived-file/{training_id}")
+async def upload_training_file(training_id: str, 
+                               file: UploadFile = File(...),
+                               custom_filename: str = Form(...)):
+    upload_dir = Path.cwd() / "files" / "archived_files" / training_id
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    _, extension = splitext(file.filename)
+    final_filename = custom_filename
+    file_path = upload_dir / f"{final_filename}{extension}"
+
+    # Verificar si el archivo ya existe y modificar el nombre si es necesario
+    counter = 1
+    while file_path.exists():
+        final_filename = f"{custom_filename}_{counter}"
+        file_path = upload_dir / f"{final_filename}{extension}"
+        counter += 1
+
+    with open(file_path, "wb") as buffer:
+        content = await file.read()
+        buffer.write(content)
+
+
+@archivedFiles_router.get("/get-archived-file/{training_id}/{filename}")
+async def get_archived_file(training_id: str, filename: str):
+    file_path = Path.cwd() / "files" / "archived_files" / training_id / filename
+    
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    return FileResponse(str(file_path))
+    
+
 
 @archivedFiles_router.put("/archived-file/{file_id}")
 def update_file(file_id: int, file: ArchivedFile):
@@ -129,99 +184,3 @@ def delete_type(type_id: int):
     result = types_instance.delete_type(type_id)
     types_instance.close_connection()
     return {"message": result}
-
-
-
-from fastapi import APIRouter
-from models.training_file import TrainingFileModel  # Asegúrate de importar tu modelo de archivo de capacitación
-from schema.training_file import TrainingFile  # Importa tu esquema Pydantic aquí
-from fastapi import FastAPI, UploadFile, File,Form 
-from fastapi import APIRouter
-from fastapi.responses import FileResponse
-from schema.training_file import TrainingFile  # Asegúrate de importar tu esquema Pydantic aquí
-
-from pathlib import Path
-from os.path import splitext
-
-archivedFiles_router = APIRouter()
-
-
-
-@archivedFiles_router.post("/training-file")
-def create_training_file(file: TrainingFile):
-    training_file_instance = TrainingFileModel()
-    file_id = training_file_instance.insert_file(file)
-    training_file_instance.close_connection()
-    return {"file_id": file_id}
-
-
-
-
-
-@archivedFiles_router.post("/upload-training-file/{training_id}")
-async def upload_training_file(training_id: str, 
-                               file: UploadFile = File(...),
-                               custom_filename: str = Form(...)):
-    upload_dir = Path.cwd() / "files" / "training" / training_id
-    upload_dir.mkdir(parents=True, exist_ok=True)
-
-    _, extension = splitext(file.filename)
-    final_filename = custom_filename
-    file_path = upload_dir / f"{final_filename}{extension}"
-
-    # Verificar si el archivo ya existe y modificar el nombre si es necesario
-    counter = 1
-    while file_path.exists():
-        final_filename = f"{custom_filename}_{counter}"
-        file_path = upload_dir / f"{final_filename}{extension}"
-        counter += 1
-
-    with open(file_path, "wb") as buffer:
-        content = await file.read()
-        buffer.write(content)
-
-    file_data = TrainingFile(
-        training_id=training_id,
-        file_name=final_filename + extension,
-        file_url=str(file_path),
-        file_type=extension.lstrip('.')
-    )
-
-    training_file_instance = TrainingFileModel()
-    try:
-        file_id = training_file_instance.insert_file(file_data)
-    except Exception as e:
-        return {"message": "Error al registrar el archivo en la base de datos", "error": str(e)}
-    finally:
-        training_file_instance.close_connection()
-
-    return {"message": "Archivo subido con éxito", "file_id": file_id, "file_path": str(file_path)}
-
-
-@archivedFiles_router.delete("/delete-training-file/{file_id}")
-def delete_training_file(file_id: int):
-    # Obtén la información del archivo de la base de datos
-    # Por ejemplo: file_info = get_file_info(file_id)
-
-    file_path = Path(file_info['file_path'])
-    if file_path.exists():
-        file_path.unlink()  # Elimina el archivo
-
-    # Ahora elimina el registro de la base de datos
-    # Por ejemplo: delete_file(file_id)
-
-    return {"message": "Archivo eliminado con éxito"}
-
-
-
-
-@archivedFiles_router.get("/get-training-file/{training_id}/{file_name}")
-def get_training_file(training_id: str, file_name: str):
-    # Construir la ruta del archivo basada en el training_id y el nombre del archivo
-    file_path = Path.cwd() / "files" / "training" / training_id / file_name
-
-    # Verificar si el archivo existe
-    if file_path.exists():
-        return FileResponse(file_path)
-    else:
-        return {"message": "Archivo no encontrado"}, 404

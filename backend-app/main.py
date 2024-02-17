@@ -28,7 +28,7 @@ from routes.supply.supply import supply_router
 from routes.supply.supply_delivery import supply_delivery_router
 from routes.supply.supply_delivery_item import supply_delivery_item_router
 from routes.archived_file import archivedFiles_router,areas_router,types_router
-
+from routes.site_schedule import site_schedule_router
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -77,3 +77,4 @@ app.include_router(supply_delivery_item_router)
 app.include_router(archivedFiles_router)
 app.include_router(areas_router)
 app.include_router(types_router)
+app.include_router(site_schedule_router)

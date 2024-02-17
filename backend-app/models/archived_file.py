@@ -95,7 +95,6 @@ class ArchivedFiles:
 
 
 
-
 class Areas:
     def __init__(self):
         self.conn_str = f"dbname={DB_NAME} user={DB_USER} password={DB_PASSWORD} host={DB_HOST} port={DB_PORT}"
@@ -218,3 +217,29 @@ class DocumentTypes:
 
     def close_connection(self):
         self.conn.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
