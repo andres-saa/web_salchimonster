@@ -194,7 +194,7 @@ const cerrar_sesion = () => {
 </script>
 
 <template>
-    <div class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 " style=" z-index: ">
+    <div class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 " style=" background-color: rgb(255, 255, 255); ">
 
 
         <router-link to="/" class="layout-topbar-logo" style="z-index: 99999;">
