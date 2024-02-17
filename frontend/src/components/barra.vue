@@ -186,6 +186,22 @@
            </i>
          </button></a>
 
+
+         <a href="https://www.youtube.com/@Salchimonster/videos">  <button class="whatsapp-btn" style="
+                             border: none; background-color:transparent; 
+                             transition: all ease .3s;
+                             /* border-radius: 50%;  */
+                             display: flex;align-items: center; justify-content: center;
+ 
+ 
+     
+ 
+     ">
+           <i class="" :class="PrimeIcons.YOUTUBE"
+             style=" ;position: relative;  font-weight:  bold; font-size: 2rem; color: rgb(255, 255, 255);width:auto">
+           </i>
+         </button></a>
+
         
 
 
