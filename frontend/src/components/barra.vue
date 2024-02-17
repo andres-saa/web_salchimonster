@@ -1,26 +1,27 @@
 <template >
 
-            
-<div v-if="ruta.fullPath != '/cart' && 
-  !ruta.fullPath.includes('admin-products') &&
-  !ruta.fullPath.includes('entregas')
-   " class="barra-carrito col-12 " style=" 
+<div class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bottom: 0; left: 0; ; justify-content: center">
+  <div :style="!showElement? 'transform: translateY(5rem);opacity:0': ''"  class="barra-carrito  px-5 " style=" 
                           /* width: auto; */
                             display: flex;
                             gap:2rem;
+                            border-radius: 10rem;
                             align-items: center;  
                             position: relative;
                             z-index: 1000;
+                            bottom: 1rem;
+                            max-width: min-content;
                             /* z-index: 999;  */
                             justify-content:center ;
+                            /* margin: auto; */
                             /* touch-action: none;  */
                             /* width: %;  */
                             height: 4rem;
                             /* padding: 1rem; */
                         /* padding: 1rem;  */
                             background-color: rgb(255, 255, 255); 
-                            position: fixed; bottom: 0; left: 0; 
-                            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.5);">
+                            
+                            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);">
  
      
 
@@ -35,7 +36,7 @@
                             background-color:;
                         
 
-                            border-bottom: 4px solid rgb(0, 0, 0);
+                            /* border-bottom: 4px solid rgb(0, 0, 0); */
                         
                             ">
  
@@ -116,14 +117,24 @@
 
 
     
-    <a class="whatsapp" :href="wsp" style="
+   
+
+
+
+
+
+  </div>
+  <div>
+    
+  </div>
+
+
+  <div class="whatsapp"  :style="!showElement? 'transform: translateX(2.5rem)': ''"  style="
                             
                         
                             ">
  
- 
- 
-         <button class="whatsapp-btn" style="
+ <a :href="wsp">  <button class="whatsapp-btn" style="
                              border: none; background-color:transparent; 
                              transition: all ease .3s;
                              /* border-radius: 50%;  */
@@ -136,14 +147,52 @@
            <i class="" :class="PrimeIcons.WHATSAPP"
              style=" ;position: relative;  font-weight:  bold; font-size: 2rem; color: rgb(255, 255, 255);width:auto">
            </i>
+         </button></a>
+ 
+        
+
+         <a href="https://www.facebook.com/salchimonsterr">
+
+          <button class="whatsapp-btn" style="
+                             border: none; background-color:transparent; 
+                             transition: all ease .3s;
+                             /* border-radius: 50%;  */
+                             display: flex;align-items: center; justify-content: center;
+ 
+ 
+     
+ 
+     ">
+           <i class="" :class="PrimeIcons.FACEBOOK"
+             style=" ;position: relative;  font-weight:  bold; font-size: 2rem; color: rgb(255, 255, 255);width:auto">
+           </i>
          </button>
-       </a>
+         </a>
+        
+         
+
+         <a href="https://www.instagram.com/salchimonsterr/">  <button class="whatsapp-btn" style="
+                             border: none; background-color:transparent; 
+                             transition: all ease .3s;
+                             /* border-radius: 50%;  */
+                             display: flex;align-items: center; justify-content: center;
+ 
+ 
+     
+ 
+     ">
+           <i class="" :class="PrimeIcons.INSTAGRAM"
+             style=" ;position: relative;  font-weight:  bold; font-size: 2rem; color: rgb(255, 255, 255);width:auto">
+           </i>
+         </button></a>
+
+        
 
 
+        </div>
+</div>
+            
 
-
-
-  </div>
 
 
 
@@ -154,7 +203,7 @@
 import { menuOptions } from '@/service/menuOptions';
 
 // import { getProductsByCategory, getCategory, getMenu } from '@/service/productServices.js'
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { PrimeIcons } from 'primevue/api';
 // import { changeProduct } from './service/productServices';
 import { carro_para_la_barra_de_abajo } from '@/service/cart';
@@ -166,6 +215,28 @@ import router from '@/router/index.js'
 import { formatoPesosColombianos } from '@/service/formatoPesos';
 
 const ruta = ref(router.currentRoute)
+let scrollTimer;
+
+const handleScroll = () => {
+      showElement.value = false;
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        showElement.value = true;
+      }, 500); // 2000ms (2 segundos) de inactividad antes de ocultar el elemento
+    };
+
+    onMounted(() => {
+      window.addEventListener('scroll', handleScroll);
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimer);
+    });
+
+
+const showElement = ref(true);
+
 </script>
 
 <style scoped>
@@ -196,6 +267,7 @@ const ruta = ref(router.currentRoute)
   transform-origin: center bottom;
 }
 
+
 .img-cart:hover {
   transform: scale(1.3);
 }
@@ -204,9 +276,13 @@ const ruta = ref(router.currentRoute)
   transition: all .3s ease;
 }
 
+.background {
 
+  background: linear-gradient(to top, rgba(255, 255, 255, 1) , rgba(255, 255, 255, 0));
 
+}
 
+*{transition:  all .2s ease;}
 
 
 
@@ -243,11 +319,7 @@ const ruta = ref(router.currentRoute)
 
 }
 
-.carro:hover {
-  /* transform: scalex(1.2); */
-  background-color: #ff62004a;
-  cursor: pointer
-}
+
 
 .menu-button-new {
   background-color: var(--primary-color);
@@ -463,16 +535,20 @@ const ruta = ref(router.currentRoute)
     /* background-color: red; */
     /* min-width: 1024px; */
     width: 3rem;
-    height: 3rem;
+    height: min-content;
+    gap: 1rem;
     display: flex;
+    flex-direction: column;
+    /* gap: 1rem; */
     transition: all ease .3s;
-    right: 5rem;
+    right: 0rem;
     bottom: 9rem;
+    padding:  1rem 0;
 
     /* align-items: center; */
-    justify-content: center;
-    background-color: #25D366;
-    border-radius: 50%;
+    justify-content: space-around;
+    background-color: var(--primary-color);
+    border-radius:  1.5rem 0 0 1.5rem; 
     position: absolute;
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.391);
  
@@ -481,10 +557,9 @@ const ruta = ref(router.currentRoute)
   .whatsapp {
     /* background-color: red; */
     /* min-width: 1024px; */
-    width: 4rem;
-    height: 4rem;
-    right: 5%;
-    bottom: 130%;
+   
+    /* right: 5%; */
+    bottom: 20vh;
 
   }
 }

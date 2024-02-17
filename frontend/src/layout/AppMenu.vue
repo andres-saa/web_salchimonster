@@ -200,7 +200,7 @@ const model = ref([
 <template>
     <ul class="layout-menu">
         <template v-for="(item, i) in model" :key="item">
-            <app-menu-item class="text-xl" v-if="!item.separator" :item="item" :index="i"></app-menu-item>
+            <app-menu-item class="text-l" style="text-transform: uppercase; font-weight: 200;" v-if="!item.separator" :item="item" :index="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator"></li>
         </template>
         <!-- <li>

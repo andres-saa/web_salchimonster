@@ -18,3 +18,5 @@ class ArchivedFile(BaseModel):
     id_area: int
     id_type: int
     file_extension:str
+
+    
