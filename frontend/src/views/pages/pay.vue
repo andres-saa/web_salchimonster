@@ -128,7 +128,7 @@ import {showThaks, send_order,order_notes,user_data,payMethod,payMethods,invalid
 import { subtotal } from '../../service/state';
 import router from '@/router/index.js'
 import resumen from './resumen.vue';
-// import Sesion_main from './sesion_main.vue';
+import Sesion_main from './sesion_main.vue';
 import TarjetaMenu from '../../components/TarjetaMenu.vue';
 const changeThanks = () =>{
     showThaks.value = false
