@@ -336,7 +336,7 @@ import { useRoute } from 'vue-router';
 import barra from '@/components/barra.vue';
 import siteDialog from '@/components/siteDialog.vue';
 // import ProductDial from '@/views/pages/productDial.vue';
-
+import { verCerrado } from '../service/state';
 const salsas = ref()
 const cambios = ref()
 const route = useRoute();
@@ -615,6 +615,12 @@ const possibleNeigborhoods = ref()
 const vueMenu = ref(false)
 
 const addcar = (product) => {
+
+  const estado = localStorage.getItem('estado')
+    if(estado && estado=='cerrado'){
+        verCerrado.value = true
+        return
+    }
 
   showProductDialog.value = !showProductDialog.value
 

@@ -119,7 +119,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { formatoPesosColombianos } from '../../service/formatoPesos';
 import { URI } from '../../service/conection';
 import { PrimeIcons } from 'primevue/api';
-
+import { verCerrado } from '../../service/state';
 import { useCart,domicilio, eliminarAdicionDelCarrito,agregarAdicionAlCarrito, products, updateCart, contarObjetosRepetidos, quitarElementos } from '../../service/cart';
 import { useRoute } from 'vue-router';
 import { calcularPrecioTotal, calcularTotalCarrito, showSiteDialog,antojoVisible } from '../../service/state';
@@ -141,7 +141,12 @@ const currentCity = ref(JSON.parse(localStorage.getItem('currentNeigborhood')));
 const malteadas = ref([])
 const currenNeigborhood = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood.name
 
+onMounted(() => {
 
+
+domicilio.value = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
+
+});
 
 const getProducts = async (category_name) => {
     try {
@@ -170,6 +175,15 @@ const getProducts = async (category_name) => {
 
 
 const mostrarAntojos = () => {
+
+
+
+const estado = localStorage.getItem('estado')
+if(estado && estado=='cerrado'){
+    verCerrado.value = true
+    return
+}
+
 const user = user_data.value
 
 if (!user.user_name || !user.user_name.trim()) {

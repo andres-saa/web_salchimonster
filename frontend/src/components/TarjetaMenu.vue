@@ -58,6 +58,7 @@ import { check_site, setProductDialog,showProductDialog } from '../service/state
 import { useToast } from 'primevue/usetoast';
 import { comprobar_sede } from '../service/state';
 import { computed } from 'vue';
+import { verCerrado } from '../service/state';
 
 const toast = useToast();
 
@@ -87,6 +88,11 @@ const truncatedDescription = computed(() => {
 
 const addcar =(product) => {
 
+    const estado = localStorage.getItem('estado')
+    if(estado && estado=='cerrado'){
+        verCerrado.value = true
+        return
+    }
     comprobar_sede()
     useCart.add(product)  
     toast.add({ severity: 'success', summary: 'Agregado al carrito', detail: props.product.name, life: 3000 });

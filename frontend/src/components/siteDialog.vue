@@ -31,7 +31,7 @@
 </div>
                 <Dropdown @click="() => currenNeigborhood = {
                     site: {
-                        name: 'default'
+                        site_name: 'default'
                     }   
                 }" v-model="currenCity" :options="cities" placeholder="" optionLabel="city_name" required="true" />
 
@@ -99,7 +99,7 @@
                             style="background-color: black; text-align: center; height: min-content;  width: 100%;  font-weight: bold; background-color: rgba(0, 0, 0, 0.7);">
                             <span  class="text-xl lg:text-2xl p-0" style=""> SALCHIMONSTER</span> <span
                                 style="text-transform: uppercase;" class="text-xl lg:text-2xl p-0">{{
-                                    site.site_name }}</span>
+                                    site?.site_name }}</span>
                         </p>
                     </div>
                 </div>
@@ -192,7 +192,7 @@ const setNeigborhood = async() => {
         localStorage.setItem('currentNeigborhood', JSON.stringify({
         currenCity: currenCity.value.city_name,
         currenNeigborhood: currenNeigborhood.value,
-        currenSite: data.site_name,
+        currenSite: data?.site_name,
         currenSiteId: data.site_id,
 
 
@@ -200,6 +200,8 @@ const setNeigborhood = async() => {
 
         
     }))
+
+    localStorage.setItem('siteId', data.site_id)
 
 
 
