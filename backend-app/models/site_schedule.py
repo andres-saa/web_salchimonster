@@ -67,7 +67,7 @@ class site_schedule:
         current_time = datetime.strptime(current_time, "%H:%M:%S").time()  # Convertir la cadena a datetime.time
         
         # Obtener el día de la semana en la zona horaria de Colombia
-        current_day_of_week = datetime.now(colombia_tz).strftime("%w")  # %w devuelve el día de la semana como número (0 para domingo, 1 para lunes, etc.)
+        current_day_of_week = (int(datetime.now(colombia_tz).strftime("%w")) + 1) % 7 or 7
         
         query = f"""
         SELECT opening_time, closing_time

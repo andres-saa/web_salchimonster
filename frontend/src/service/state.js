@@ -16,7 +16,7 @@ const currentCambios=ref([]);
 const currentToppings=ref([]);
 const currentSalsas=ref([]);
 const currentAcompanantes=ref([]);
-
+const verCerrado = ref(false)
 
 const ruta = ref(router.currentRoute)
 
@@ -87,7 +87,7 @@ const setShowDialog =()=>{
   currentAditions.value=[]
   currentSalsas.value=[]
   
-    showSiteDialog.value = !showSiteDialog.value
+    showSiteDialog.value = true
     console.log('hola')
     if (showProductDialog.value) {
 
@@ -115,7 +115,7 @@ const setShowDialog =()=>{
 const comprobar_sede = () => {
   const c_neigbor = ref(localStorage.getItem('currentNeigborhood'))
 
-  if (!c_neigbor.value && ruta.value.fullPath == '/menu' || !c_neigbor.value && ruta.value.fullPath == '/sedes'   ) {
+  if (ruta.value.fullPath == '/menu' || ruta.value.fullPath == '/sedes'   ) {
     showSiteDialog.value = false
   }
 
@@ -124,5 +124,12 @@ const comprobar_sede = () => {
   }
 }
 
+const comprobarEstado = () => {
+  const estado = localStorage.getItem('estado')
+    if(estado && estado=='cerrado'){
+        verCerrado.value = true
+        return null
+    }
+}
 
-export {antojoVisible,currentCambios, currentToppings, currentAcompanantes, subtotal, comprobar_sede, check_site,checkedAcomp,calcularTotalCarrito,calcularPrecioTotal,sumarAdiciones, showSiteDialog,setShowDialog,showProductDialog,setProductDialog,productDialog,checkedSalsas,checkedAdiciones,currentAditions,currentSalsas}
+export {antojoVisible,currentCambios, currentToppings, currentAcompanantes, subtotal,verCerrado,comprobarEstado, comprobar_sede, check_site,checkedAcomp,calcularTotalCarrito,calcularPrecioTotal,sumarAdiciones, showSiteDialog,setShowDialog,showProductDialog,setProductDialog,productDialog,checkedSalsas,checkedAdiciones,currentAditions,currentSalsas}

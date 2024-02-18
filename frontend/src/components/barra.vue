@@ -16,7 +16,7 @@
                             /* margin: auto; */
                             /* touch-action: none;  */
                             /* width: %;  */
-                            height: 4rem;
+                            height: 3.5rem;
                             /* padding: 1rem; */
                         /* padding: 1rem;  */
                             background-color: rgb(255, 255, 255); 
@@ -26,7 +26,7 @@
      
 
 
-      <RouterLink to="/cart" style="">
+      <div  @click="enviarAlCarro" style="">
         <button class="    carro  " style="  
                             display: flex; 
                             background-color: ; 
@@ -64,7 +64,7 @@
 
 
         </button>
-      </RouterLink>
+      </div>
 
       <p class="h2" style="position: absolute;top: 0;">
        
@@ -186,6 +186,22 @@
            </i>
          </button></a>
 
+
+         <a href="https://www.youtube.com/@Salchimonster/videos">  <button class="whatsapp-btn" style="
+                             border: none; background-color:transparent; 
+                             transition: all ease .3s;
+                             /* border-radius: 50%;  */
+                             display: flex;align-items: center; justify-content: center;
+ 
+ 
+     
+ 
+     ">
+           <i class="" :class="PrimeIcons.YOUTUBE"
+             style=" ;position: relative;  font-weight:  bold; font-size: 2rem; color: rgb(255, 255, 255);width:auto">
+           </i>
+         </button></a>
+
         
 
 
@@ -210,10 +226,10 @@ import { carro_para_la_barra_de_abajo } from '@/service/cart';
 const wsp = ref(localStorage.getItem('currenSiteWsp'))
 import {URI} from '@/service/conection'
 import router from '@/router/index.js'
-
+// import router from '../router';
 // import { PrimeIcons } from 'primevue/api';
 import { formatoPesosColombianos } from '@/service/formatoPesos';
-
+import { verCerrado } from '../service/state';
 const ruta = ref(router.currentRoute)
 let scrollTimer;
 
@@ -237,6 +253,18 @@ const handleScroll = () => {
 
 const showElement = ref(true);
 
+
+
+const enviarAlCarro = ()=> {
+
+  const estado = localStorage.getItem('estado')
+    if(estado && estado=='cerrado'){
+        verCerrado.value = true
+        return
+    }
+    
+  router.push('cart')
+}
 </script>
 
 <style scoped>

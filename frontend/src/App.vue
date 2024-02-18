@@ -4,6 +4,8 @@ import barra from './components/barra.vue';
 import siteDialog from './components/siteDialog.vue';
 // import siteDialog from './components/siteDialog.vue';
 import VistaProducto from './components/VistaProducto.vue'
+import restauranteCerrado from './components/restauranteCerrado.vue';
+
 
 
 
@@ -15,7 +17,9 @@ import VistaProducto from './components/VistaProducto.vue'
 
   
 
+<restauranteCerrado>
 
+</restauranteCerrado>
 <router-view  class="p-0 pb-8" style="content:; background-color: rgba(0, 0, 0, 0.046); width: 100vw;left:0px;position: absolute;"/>
 
 

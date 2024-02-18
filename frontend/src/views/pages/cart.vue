@@ -156,7 +156,7 @@ const showAditionsDialog = ref(false)
 import { URI } from '../../service/conection';
 import { comprobar_sede } from '../../service/state';
 import Resumen from './resumen.vue';
-import Sesion_main from './sesion_main.vue';
+// import Sesion_main from './sesion_main.vue';
 import BarraCategorias from '../../components/BarraCategorias.vue';
 const existeAdicionEnProducto = (adicion, producto) => {
     return producto.adiciones && producto.adiciones.some(a => a.id === adicion.id);

@@ -111,6 +111,7 @@ const menus = [
     { name: 'Historial de pedidos', to: '/historial' },
     { name: ' Cuadre de caja', to: '/cuadre' },
     { name: ' Menu', to: '/tienda-menu' },
+    { name: ' Horarios', to: '/horarios' },
 
 ]
 
@@ -193,7 +194,7 @@ const cerrar_sesion = () => {
 </script>
 
 <template>
-    <div class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 " style=" z-index: ">
+    <div class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 " style=" background-color: rgb(255, 255, 255); ">
 
 
         <router-link to="/" class="layout-topbar-logo" style="z-index: 99999;">
@@ -228,9 +229,9 @@ const cerrar_sesion = () => {
             font-size: 1rem;
             font-weight: normal;
             white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 200px;">
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;">
                     <span v-if="!isSmallScreen" class="sm:d-none"></span> <span v-else class="sm:d-none">sede
                         -</span>  {{ buscarSedePorId(parseInt(curentSite)).Nombre }} 
                 </span>
@@ -246,13 +247,13 @@ const cerrar_sesion = () => {
         </button> -->
 
 
-        <div class="" style="left: 0; position: absolute; display: flex; width: 100%;justify-content: center;"> 
+        <div class="" style="left: 0; position: ; display: flex;gap: 1rem; width: 100%;justify-content: center;"> 
             <div v-for=" menu in menus" class="p-0 " style="width: max-content;">
 
-                <RouterLink :to="menu.to" class="link-menu  " style="text-decoration: none;color: black;">
+                <RouterLink cla :to="menu.to" class="link-menu " style="text-decoration: none;color: black;">
 
-                    <p class="col-12 text-md text-center p-1 px-3" :class="ruta.fullPath == menu.to ? 'selected' : 'menu'"
-                        style="font-weight: "> {{ menu.name }}</p>
+                    <p class="col-12 text-md text-center p-1 p-" :class="ruta.fullPath == menu.to ? 'selected' : 'menu'"
+                        style="font-weight: ;background-color: rgb(255, 255, 255);border-radius: 1rem "> {{ menu.name }}</p>
 
 
                 </RouterLink>
@@ -260,7 +261,7 @@ const cerrar_sesion = () => {
             </div>
             
         </div>
-        <button @click="cerrar_sesion" class="ml-5 px-2" style="position: absolute;right: 5rem; background-color: white;border-radius: 10rem; color:var(--primary-color); font-weight: bold; border: none;z-index: 999; cursor: pointer;" > Cerrar sesión </button>
+        <button @click="cerrar_sesion" class="ml-5 px-2" style="position: ;right: 5rem; background-color: white;border-radius: 10rem; color:var(--primary-color); font-weight: bold; border: none;z-index: 999; cursor: pointer;" > Salir </button>
 
 
 

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, watch,onUnmounted } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
 import CarouselBanner from '../components/CarouselBanner.vue';
@@ -14,6 +14,66 @@ import { showSiteDialog, setShowDialog } from '../service/state';
 import { productDialog, setProductDialog } from '../service/state';
 import router from '../router';
 import { useRoute } from 'vue-router';
+import { domicilio } from '../service/cart';
+
+
+const estado = ref(''); 
+    const siteId = 1;
+
+
+    const obtenerEstado = async () => {
+
+
+    const siteId = localStorage.getItem("siteId")
+    // alert(siteId)
+    
+    if(!siteId){
+        return
+    }
+    
+      try {
+        const response = await fetch(`${URI}/site/${siteId}/status`);
+        const data = await response.json();
+        
+        if (data.status === 'closed') {
+          estado.value = 'cerrado';
+          localStorage.setItem('estado', 'cerrado');
+        } else {
+          estado.value = 'abierto';
+          localStorage.setItem('estado', 'abierto');
+        }
+      } catch (error) {
+        console.error('Error al obtener el estado:', error);
+        estado.value = 'cerrado';
+          localStorage.setItem('estado', 'cerrado');
+      }
+    };
+
+
+
+
+    const intervalId = setInterval(obtenerEstado, 30000);
+
+    // Llamar a obtenerEstado cuando el componente se monta
+    onMounted(obtenerEstado);
+
+    // Limpiar el intervalo cuando el componente se desmonta para evitar fugas de memoria
+    onUnmounted(() => clearInterval(intervalId));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const { layoutConfig, onMenuToggle } = useLayout();
 
 const outsideClickListener = ref(null);
@@ -188,8 +248,8 @@ const fondoVisible = ref(false)
 </script>
 
 <template>
-    <div v-if="!isInAdminProductsRoute && !isEntregasRoute" class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 "
-        style=" z-index:999 ">
+    <div v-if="!isInAdminProductsRoute && !isEntregasRoute" st class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 "
+        style=" z-index:999;background-color: white; ">
 
 
         <router-link to="/" class="layout-topbar-logo" style="z-index: 99999;">
@@ -214,7 +274,7 @@ const fondoVisible = ref(false)
                 color: var(--primary-color);">
 
 
-                    {{ currentCity ? currentCity.currenCity : 'Definir ubicacion' }}
+                    {{ currentCity ? currentCity.currenCity : 'Definir ubicacion' }}  <span class="px-3 py-0 " :class="estado == 'abierto'? 'abierto': 'cerrado'"  style="" >{{estado}}</span> 
                 </span>
 
                 <span style="
@@ -226,7 +286,7 @@ const fondoVisible = ref(false)
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 200px;">
-                      <span >sede -  </span>  <span class="site-name">{{ currentCity ?  currentCity.currenSite : 'Definir ubicacion' }}</span>
+                      <span >sede -  </span>  <span class="site-name">{{ currentCity ?  currentCity.currenSite : 'Definir ubicacion' }}   </span>
                 </span>
 
             </div>
@@ -315,6 +375,10 @@ const fondoVisible = ref(false)
 
         <p class="text-xl text-center" style="color: rgb(255, 255, 255); font-weight: bold; "> DOMICILIOS SALCHIMONSTER</p>
     </div>
+
+
+
+
 </template>
 
 <style lang="scss" scoped>
@@ -462,7 +526,7 @@ const fondoVisible = ref(false)
 .img-product-cont:hover>.img-product {
 
     transform: scale(1.1);
-    filter: brightness(1.2);
+   
 
 
 }
@@ -494,7 +558,29 @@ const fondoVisible = ref(false)
     text-transform: uppercase;
 }
 
+@keyframes parpadeo {
+  0% { opacity: 1; background-color: greenyellow; }
+  50% { opacity: 1;background-color: rgb(255, 245, 47); }
+  100% { opacity: 1; }
+}
 
+@keyframes parpadeo2 {
+  0% { opacity: 1; background-color: rgb(136, 0, 0); }
+  50% { opacity: 1;background-color: rgb(255, 5, 5);; }
+  100% { opacity: 1; }
+}
+
+.abierto {
+  animation: parpadeo 1s infinite; /* 1s es la duración de la animación */
+   border-radius: 1rem; color: rgb(0, 0, 0); font-weight: 500; 
+  
+}
+
+
+.cerrado {
+  animation: parpadeo2 1s infinite; /* 1s es la duración de la animación */
+ border-radius: 1rem; color: rgb(255, 255, 255); font-weight: 500; 
+}
 
 </style>
 

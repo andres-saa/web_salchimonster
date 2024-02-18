@@ -32,6 +32,12 @@ const router = createRouter({
               
             },
             {
+              path: '/horarios',
+              name: 'horarios',
+              component: () => import('@/views/pages/horarios.vue'),
+              
+            },
+            {
               path: '/historial',
               name: 'historial',
               component: () => import('@/views/pages/historial-pedidos.vue'),

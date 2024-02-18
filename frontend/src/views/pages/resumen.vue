@@ -363,12 +363,12 @@
                     style="padding: 2rem; background-color: white; position:sticky;bottom: 0rem; display: flex;width: 100%; display: flex;align-items: center; justify-content: center;">
 
 <!-- {{ruta}} -->
-                    <RouterLink style=" width: 60%;" to="/pay"><button
+                    <div style=" width: 60%;" @click="enviarAPago"><button
                             style=" width: 100%;; border:none; background-color: var(--primary-color); color: white; border-radius: 0.6rem; padding: 0.5rem;">
                             <span class="text-xl"
                                 style="font-weight: bold;margin-top: 5rem;;">REALIZAR
                                 PEDIDO</span></button>
-                    </RouterLink>
+                    </div>
 
 
                 </div>
@@ -396,6 +396,24 @@ import {order_notes} from '@/service/order';
 import { subtotal } from '@/service/state';
 import router from '@/router';
 import { sumarAdiciones } from '@/service/state';
+import { verCerrado } from '../../service/state';
+
+
+
+const enviarAPago = () => {
+
+    const estado = localStorage.getItem('estado')
+    if(estado && estado=='cerrado'){
+        verCerrado.value = true
+        return
+    }
+
+    router.push('pay')
+}
+
+
+
+
 
 const ruta = ref(router.currentRoute)
 const total = ref()
@@ -407,26 +425,27 @@ onMounted(() => {
 // Ejemplo de uso
 
 
-
-
-
-
-
 onMounted( async() => {
 
-    let barrio = {}
+let barrio = {}
 
-    if (localStorage.getItem('currentNeigborhood')){
-        barrio = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
-        console.log(barrio.neighborhood_id)
-        getNeighborhood(barrio.neighborhood_id).then(data => domicilio.value = data)
+if (localStorage.getItem('currentNeigborhood')){
+    barrio = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
+    getNeighborhood(barrio.neighborhood_id).then(data => domicilio.value = data)
 
-    }else{
-        barrio = 'definir domicilio'
-    } 
+}else{
+    barrio = 'definir domicilio'
+} 
 
-    
+
 })
+
+
+
+
+
+
+
 
 
 const getNeighborhood = async(neighborhood_id) => {
