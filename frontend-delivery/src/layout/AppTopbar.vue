@@ -2,7 +2,7 @@
 import { ref, computed,onUnmounted, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
-
+import { URI } from '../service/conection';
 import { PrimeIcons } from 'primevue/api';
 
 import { ableMenu } from '../service/menuOptions';
