@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { ref, computed,onUnmounted, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
 
@@ -23,6 +23,61 @@ const selectedMenu = ref({})
 const products = ref([])
 
 const categories = ref([{}])
+
+
+
+
+
+
+
+
+
+
+
+const estado = ref(''); 
+    const siteId = 1;
+
+
+    const obtenerEstado = async () => {
+
+
+    const siteId = localStorage.getItem("siteId")
+    // alert(siteId)
+    
+    if(!siteId){
+        return
+    }
+    
+      try {
+        const response = await fetch(`${URI}/site/${siteId}/status`);
+        const data = await response.json();
+        
+        if (data.status === 'closed') {
+          estado.value = 'cerrado';
+          localStorage.setItem('estado', 'cerrado');
+        } else {
+          estado.value = 'abierto';
+          localStorage.setItem('estado', 'abierto');
+        }
+      } catch (error) {
+        console.error('Error al obtener el estado:', error);
+        estado.value = 'cerrado';
+          localStorage.setItem('estado', 'cerrado');
+      }
+    };
+
+
+
+
+    const intervalId = setInterval(obtenerEstado, 30000);
+
+    // Llamar a obtenerEstado cuando el componente se monta
+    onMounted(obtenerEstado);
+
+    // Limpiar el intervalo cuando el componente se desmonta para evitar fugas de memoria
+    onUnmounted(() => clearInterval(intervalId));
+
+
 
 const isSmallScreen = computed(() => screenWidth.value < 992);
 
@@ -220,8 +275,10 @@ const cerrar_sesion = () => {
 
 
                     {{ buscarSedePorId(parseInt(curentSite)).Ciudad }}
+
                     
                 </span>
+                
 
                 <span style="
             margin-left: 0.5rem; 
@@ -232,8 +289,9 @@ const cerrar_sesion = () => {
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 200px;">
-                    <span v-if="!isSmallScreen" class="sm:d-none"></span> <span v-else class="sm:d-none">sede
-                        -</span>  {{ buscarSedePorId(parseInt(curentSite)).Nombre }} 
+                    <span v-if="!isSmallScreen" class="sm:d-none"></span> <span v-else class="sm:d-none">
+                        </span>  {{ buscarSedePorId(parseInt(curentSite)).Nombre }}                      <span class="px-2 py-0 text-sm" :class="estado == 'abierto'? 'abierto': 'cerrado'"  style="" >{{estado}}</span>
+
                 </span>
 
             </div>
@@ -241,19 +299,19 @@ const cerrar_sesion = () => {
 
         </button>
 
-        <!-- <button v-if="isSmallScreen" style="border: none" class="p-link layout-menu-button layout-topbar-button"
+        <button v-if="isSmallScreen" style="border: none" class="p-link layout-menu-button layout-topbar-button"
             @click="onMenuToggle()">
             <i style="border: ; color: var(--primary-color);" class="text-4xl pi pi-bars"></i>
-        </button> -->
+        </button>
 
 
-        <div class="" style="left: 0; position: ; display: flex;gap: 1rem; width: 100%;justify-content: center;"> 
+        <div v-else class="" style="left: 0; position: ; display: flex;gap: 1rem; width: 100%;justify-content: center;"> 
             <div v-for=" menu in menus" class="p-0 " style="width: max-content;">
 
                 <RouterLink cla :to="menu.to" class="link-menu " style="text-decoration: none;color: black;">
 
                     <p class="col-12 text-md text-center p-1 p-" :class="ruta.fullPath == menu.to ? 'selected' : 'menu'"
-                        style="font-weight: ;background-color: rgb(255, 255, 255);border-radius: 1rem "> {{ menu.name }}</p>
+                        style="font-weight: ;background-color: rgb(255, 255, 255);"> {{ menu.name }}</p>
 
 
                 </RouterLink>
@@ -261,7 +319,7 @@ const cerrar_sesion = () => {
             </div>
             
         </div>
-        <button @click="cerrar_sesion" class="ml-5 px-2" style="position: ;right: 5rem; background-color: white;border-radius: 10rem; color:var(--primary-color); font-weight: bold; border: none;z-index: 999; cursor: pointer;" > Salir </button>
+        <button @click="cerrar_sesion" class=" layout-menu-button" style="background-color: white;border-radius: 10rem; color:var(--primary-color); font-weight: bold; border: none;z-index: 999; cursor: pointer;" > Salir </button>
 
 
 
@@ -320,6 +378,30 @@ const cerrar_sesion = () => {
     // padding: 50px;
     // width: auto;
 
+}
+
+@keyframes parpadeo {
+  0% { opacity: 1; background-color: greenyellow; }
+  50% { opacity: 1;background-color: rgb(255, 245, 47); }
+  100% { opacity: 1; }
+}
+
+@keyframes parpadeo2 {
+  0% { opacity: 1; background-color: rgb(136, 0, 0); }
+  50% { opacity: 1;background-color: rgb(255, 5, 5);; }
+  100% { opacity: 1; }
+}
+
+.abierto {
+  animation: parpadeo 1s infinite; /* 1s es la duración de la animación */
+   border-radius: 1rem; color: rgb(0, 0, 0); font-weight: 500; 
+  
+}
+
+
+.cerrado {
+  animation: parpadeo2 1s infinite; /* 1s es la duración de la animación */
+ border-radius: 1rem; color: rgb(255, 255, 255); font-weight: 500; 
 }
 
 .menus {

@@ -63,7 +63,7 @@ const getUserID = async (userData) => {
 
 
 
-
+const sending_order = ref(false)
 
 
 
@@ -162,6 +162,8 @@ const send_order = async () => {
     };
 
     // Realizar la solicitud Fetch
+    sending_order.value = true
+
    await fetch(queryUrl, requestOptions)
         .then(response => {
             if (!response.ok) {
@@ -180,6 +182,8 @@ const send_order = async () => {
             thanks_data.value.order_id = data.order_id
             // localStorage.removeItem('cart')
             antojoVisible.value = false
+            sending_order.value = false
+
            
            
             
@@ -194,6 +198,8 @@ const send_order = async () => {
         })
         .catch(error => {
             console.error('Error en la solicitud:', error);
+            sending_order.value = false
+
             // toast.add({ severity: 'error', summary: 'llene todos los campos', detail: '', life: 3000 })
 
         });
@@ -225,4 +231,4 @@ function eliminarProductosDelCarrito() {
   }
 
 
-export{payMethods,payMethod,showThaks,send_order,order_notes,user_data,invalid,thanks_data}
+export{payMethods,payMethod,showThaks,sending_order, send_order,order_notes,user_data,invalid,thanks_data}

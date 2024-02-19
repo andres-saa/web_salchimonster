@@ -76,25 +76,30 @@ const model = ref([
             //     ]
             // },
             {
-                label: 'Menu',
+                label: 'Atender',
                 icon: 'pi pi-fw pi-pencil',
-                to: '/menu'
+                to: '/'
             },
 
             {
-                label: 'Sedes',
+                label: 'Historial',
                 icon: 'pi pi-fw pi-pencil',
-                to: '/pages/sites'
+                to: '/historial'
             },
             {
-                label: 'Carrito de compras',
+                label: 'Cuadre',
                 icon: 'pi pi-fw pi-pencil',
-                to: '/cart'
+                to: '/cuadre'
             },
             {
-                label: 'Finalizar compra',
+                label: 'Menu',
                 icon: 'pi pi-fw pi-pencil',
-                to: '/pay'
+                to: '/tienda-menu'
+            },
+            {
+                label: 'Horarios',
+                icon: 'pi pi-fw pi-pencil',
+                to: '/horarios'
             },
             // {
             //     label: 'Gestion de Sedes',

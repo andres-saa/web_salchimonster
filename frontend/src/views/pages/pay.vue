@@ -33,9 +33,23 @@
         </div>
 
             <div class="col-12 p-6 d-flex justify-content-center">
-                <button @click="mostrarAntojos()" class="col "
-                        style=" width: 100%;border:none; background-color: var(--primary-color); color: white; border-radius: 0.6rem; padding: 0.5rem;">
-                        <span class="text-xl" style="min-width:max-content; font-weight: bold;margin-top: 5rem;">FINALIZAR COMPRA</span></button>
+                <button @click="mostrarAntojos()" class="col text-center "
+                        style=" width: 100%;border:none; background-color: var(--primary-color);display: flex; justify-content: center; gap: 1rem; color: white; border-radius: 0.6rem; padding: 0.5rem;">
+                        <span  class="text-xl" style="min-width:max-content;display: flex; font-weight: bold;">FINALIZAR COMPRA  
+                        
+                        
+                            
+                        
+                        
+                        
+                        
+                        </span>
+                    
+                        <ProgressSpinner v-if="sending_order" class="p-0 m-0"  style="width: 30px;background-color: ; height: 30px" strokeWidth="10" fill="white"
+        animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                    
+                    
+                    </button>
 
             </div>
 
@@ -106,7 +120,24 @@
 
 
 
-    <p   style="border-radius: 10rem; color: black;  position: absolute; bottom: -2rem;background-color:var(--primary-color); font-weight: bold;" class="text-center text-2xl px-4 py-1" > <button  @click="send_order()" style="font-weight: bold; background-color: transparent;color: white; border: none;">  Finalizar compra</button></p>
+    <p   style="border-radius: 10rem; color: black;  position: absolute; bottom: -2rem;background-color:var(--primary-color); font-weight: bold;" class="text-center text-2xl px-4 py-1" ><button :disabled="sending_order" @click="send_order()" class="col text-center "
+                        style=" width: 100%;border:none; background-color: var(--primary-color);display: flex; justify-content: center; gap: 1rem; color: white; border-radius: 0.6rem; padding: 0.5rem;">
+                        <span  class="text-xl" style="min-width:max-content;display: flex; font-weight: bold;">FINALIZAR COMPRA  
+                        
+                        
+                            
+                        
+                        
+                        
+                        
+                        </span>
+                    
+                        <ProgressSpinner v-if="sending_order" class="p-0 m-0"  style="width: 30px;background-color: ; height: 30px" strokeWidth="10" fill="white"
+        animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                    
+                    
+                    </button> </p>
+    
 </Dialog>
 
 
@@ -124,9 +155,10 @@ import { useCart,domicilio, eliminarAdicionDelCarrito,agregarAdicionAlCarrito, p
 import { useRoute } from 'vue-router';
 import { calcularPrecioTotal, calcularTotalCarrito, showSiteDialog,antojoVisible } from '../../service/state';
 import { adiciones } from '../../service/menu/adiciones/adiciones';
-import {showThaks, send_order,order_notes,user_data,payMethod,payMethods,invalid } from '../../service/order';
+import {showThaks, send_order,order_notes,user_data,payMethod,payMethods,invalid, sending_order } from '../../service/order';
 import { subtotal } from '../../service/state';
 import router from '@/router/index.js'
+import Loading from '../../components/Loading.vue';
 import resumen from './resumen.vue';
 import Sesion_main from './sesion_main.vue';
 import TarjetaMenu from '../../components/TarjetaMenu.vue';
