@@ -32,18 +32,18 @@
 
 
             <Column class="p-2" field="opening_time" header="Apertura" 
-    headerStyle="width:5rem; min-width:5rem;">
+        headerStyle="width:5rem; min-width:5rem;">
     <template #body="scheldule">
         <span class="p-column-title">Code</span>
-        <Calendar :disabled="!isEditing" timeOnly v-model="scheldule.data.opening_time" ></Calendar>
+        <Calendar :disabled="!isEditing" hourFormat="12" timeOnly v-model="scheldule.data.opening_time"></Calendar>
     </template>
 </Column>
 
 <Column class="p-2" field="closing_time" header="Cierre" 
-    headerStyle="width:5rem; min-width:5rem;">
+        headerStyle="width:5rem; min-width:5rem;">
     <template #body="scheldule">
         <span class="p-column-title">Code</span>
-        <Calendar :disabled="!isEditing" timeOnly v-model="scheldule.data.closing_time" ></Calendar>
+        <Calendar :disabled="!isEditing" hourFormat="12" timeOnly v-model="scheldule.data.closing_time"></Calendar>
     </template>
 </Column>
 
