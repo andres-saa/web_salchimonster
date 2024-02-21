@@ -145,7 +145,7 @@ const saveChanges = async () => {
 };
 
 
-const dias = ref(["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"])
+const dias = ref([ "Domingo","Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"])
 
 </script>
 
