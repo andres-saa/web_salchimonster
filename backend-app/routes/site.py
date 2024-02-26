@@ -69,9 +69,16 @@ temporizadores_asistencia = {}
 
 async def verificar_inactividad(sede_id: int, delay: int):
     await asyncio.sleep(delay)
-    # Asume que esta función ahora también registra un evento de desconexión
-    await insert_connectivity_event(sede_id, "Desconexión")
-    print(f"Sede {sede_id} ha sido marcada como inactiva.")
+    # Verificar nuevamente si la sede sigue en línea antes de registrar desconexión
+    connectivity_instance = ConnectivityLog()
+    is_online = connectivity_instance.is_site_online(sede_id)
+    connectivity_instance.close_connection()
+    
+    if not is_online:
+        await insert_connectivity_event(sede_id, "Desconexión")
+        print(f"Sede {sede_id} ha sido marcada como inactiva.")
+    else:
+        print(f"Sede {sede_id} aún en línea, no se marca como inactiva.")
 
 from fastapi import FastAPI, BackgroundTasks
 
