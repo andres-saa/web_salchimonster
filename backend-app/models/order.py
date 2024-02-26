@@ -21,11 +21,6 @@ class Order:
         self.cursor = self.conn.cursor()
         self.order_id = order_id
 
-    def select_orders_by_site_id(self, site_id):
-        select_query = "SELECT * FROM orders WHERE site_id = %s ORDER BY order_id DESC LIMIT 50;"
-        self.cursor.execute(select_query, (site_id,))
-        columns = [desc[0] for desc in self.cursor.description]
-        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
 
     def select_order_by_id(self, order_id):
@@ -43,6 +38,14 @@ class Order:
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+
+    def select_orders_by_site_id(self, site_id):
+            select_query = "SELECT * FROM orders WHERE site_id = %s ORDER BY order_id DESC LIMIT 50;"
+            self.cursor.execute(select_query, (site_id,))
+            columns = [desc[0] for desc in self.cursor.description]
+            return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
 
     
     def get_sales_report_by_site_and_status(self, site_ids, status, start_date, end_date):
@@ -68,8 +71,7 @@ class Order:
             COALESCE(addition_prices.total_addition_price, 0) +
             COALESCE(topping_prices.total_topping_price, 0) +
             COALESCE(change_prices.total_change_price, 0) +
-            COALESCE(accompaniment_prices.total_accompaniment_price, 0) +
-            o.delivery_price -- Incluir en el cálculo del ticket promedio
+            COALESCE(accompaniment_prices.total_accompaniment_price, 0) 
         ) / NULLIF(COUNT(o.order_id), 0)
         AS NUMERIC
     ) AS average_ticket,
@@ -84,7 +86,10 @@ class Order:
             COALESCE(accompaniment_prices.total_accompaniment_price, 0), -- Agregar el precio de entrega a cada orden
             'site_name', s.site_name,
             'products', o.order_products,  -- Incluir los productos de la orden
-            'delivery_price', o.delivery_price -- Incluir el precio de entrega específico de la orden
+            'delivery_price', o.delivery_price,
+            'user_data', o.user_data 
+
+
         )
     ) AS orders_info
 FROM
