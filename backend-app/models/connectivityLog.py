@@ -29,7 +29,7 @@ class ConnectivityLog:
         insert_query = """
         INSERT INTO connectivity_logs (
             site_id,  event_type
-        ) VALUES (%s, %s, %s) RETURNING log_id;
+        ) VALUES (%s, %s) RETURNING log_id;
         """
         self.cursor.execute(insert_query, (
             log_data.site_id,  log_data.event_type
