@@ -1,8 +1,9 @@
 <script setup>
 
-import { curentSite } from './service/un_pedido';
+import { curentSite } from '@/service/un_pedido';
+import { URI } from '@/service/conection';
 // import { menuOptions } from './service/menuOptions';
-import {onBeforeUnmount} from 'vue'
+import {onBeforeUnmount, onMounted,onUnmounted} from 'vue'
 // // import {sumarAdiciones, showSiteDialog, setShowDialog,showProductDialog,setProductDialog,productDialog,checkedSalsas,checkedAdiciones,currentAditions,currentSalsas, calcularTotalCarrito } from './service/state';
 // import { carro } from './service/cart';
 
@@ -180,9 +181,46 @@ onBeforeUnmount(async() => {
 
 
 // const visible = ref(true)
+// import {curentSite} from '../service/un_pedido'
+let intervalId = null; // Variable para guardar el ID del intervalo
 
+function marcarAsistencia() {
+  const site_id = curentSite.value
+  fetch(`${URI}/asistencia/${site_id}`, {
+    method: 'POST', // Método HTTP
+    headers: {
+      'Content-Type': 'application/json', // Indicar el tipo de contenido
+    },
+    body: JSON.stringify({
+      site_id: site_id, // Datos que quieres enviar en el POST
+    }),
+  })
+  .then(response => response.json()) // Convertir la respuesta a JSON
+  .then(data => console.log(data)) // Hacer algo con la respuesta
+  .catch(error => console.error('Error:', error)); // Manejar errores
+}
 
+// Reemplaza '123' por el ID real que necesitas enviar
+const id = '123';
 
+// Ejecutar hacerPost cada 30 segundos
+
+// const site_id = localStorage.getItem('siteId')
+
+onMounted(() => {
+      // Establecer el intervalo y guardar su ID
+      intervalId = setInterval(() => {
+        marcarAsistencia();
+      }, 3000);
+    });
+
+    onUnmounted(() => {
+      // Limpiar el intervalo cuando el componente se desmonte
+      if (intervalId !== null) {
+        clearInterval(intervalId);
+      }
+    });
+  
 
 
 </script>
