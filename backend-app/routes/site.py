@@ -135,7 +135,6 @@ async def insert_connectivity_event(site_id: int, event_type: str):
     colombia_now = obtener_hora_colombia()  # Usar la función para obtener la hora
     log_data = ConnectivityLogSchema(
         site_id=site_id,
-        event_timestamp=colombia_now,
         event_type=event_type
     )
     log_id = connectivity_instance.insert_connectivity_log(log_data)
