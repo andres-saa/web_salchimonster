@@ -5,6 +5,7 @@ import AppTopbar from './AppTopbar.vue';
 import AppSidebar from './AppSidebar.vue';
 import AppConfig from './AppConfig.vue';
 import { useLayout } from '@/layout/composables/layout';
+import Loading from '../components/Loading.vue';
 
 const { layoutConfig, layoutState, isSidebarActive } = useLayout();
 
@@ -64,12 +65,19 @@ const isOutsideClicked = (event) => {
 
         </div>
         <app-topbar></app-topbar>
+        <loading style="top: 0px;"></loading>
         <div class="layout-sidebar">
             <app-sidebar></app-sidebar>
         </div>
         <div class="layout-main-container  pr-0 pl-0 pt-7 " style="contain:paint ;">
+
             <div class="layout-main  ">
-                <router-view></router-view>
+               
+
+                <transition name="fade">
+                    <router-view class="p-0"></router-view>
+
+                </transition>
             </div>
             <app-footer></app-footer>
         </div>
@@ -78,4 +86,29 @@ const isOutsideClicked = (event) => {
     </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Estado Final de Salida: desvanecido y desplazado hacia la derecha */
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(20rem);
+}
+
+/* Estado Inicial de Entrada: ligeramente desplazado hacia arriba y desenfocado */
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(-10vh);
+  filter: blur(10px);
+}
+
+/* Estado Final de Entrada: totalmente opaco, sin desplazamiento y enfocado */
+.fade-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+</style>

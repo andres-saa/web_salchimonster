@@ -308,7 +308,7 @@
                     <span style="font-weight: bold; text-transform: ;"> Domicilio a  <span @click="setShowDialog()"
                             style="margin-right: 1rem; cursor: pointer; color: var(--primary-color);">
                             <span class="domi-name">
-                                {{ domicilio.name
+                                {{ domicilio?.name
                             }}
                             
                         
@@ -316,11 +316,11 @@
                         </span> </span> </span>
                     <span class="bold" style="font-weight: bold;" >
                     
-                    <span v-if="domicilio.delivery_price">{{ formatoPesosColombianos(domicilio.delivery_price)}}</span>
+                    <span v-if="domicilio?.delivery_price">{{ formatoPesosColombianos(domicilio?.delivery_price)}}</span>
                     
 
 
-<ProgressSpinner v-if="!domicilio.delivery_price" style="width: 20px; height: 20px" strokeWidth="8" fill="var(--white)"
+<ProgressSpinner v-if="!domicilio?.delivery_price" style="width: 20px; height: 20px" strokeWidth="8" fill="var(--white)"
                 
     animationDuration=".5s" aria-label="Custom ProgressSpinner" /> 
                     </span>
@@ -333,14 +333,14 @@
                     <span style="font-weight: bold;"> TOTAL </span>
                     <span class="bold" style="font-weight: bold;">
                     
-                    <span v-if="domicilio.delivery_price">
+                    <span v-if="domicilio?.delivery_price">
                         {{ formatoPesosColombianos(calcularTotalCarrito() +
-                        domicilio.delivery_price) }} 
+                        domicilio?.delivery_price) }} 
                     </span>
                         
                     
                     
-                        <ProgressSpinner v-if="!domicilio.delivery_price" style="width: 20px; height: 20px" strokeWidth="8" fill="var(--white)"
+                        <ProgressSpinner v-if="!domicilio?.delivery_price" style="width: 20px; height: 20px" strokeWidth="8" fill="var(--white)"
                 
     animationDuration=".5s" aria-label="Custom ProgressSpinner" /> 
                     

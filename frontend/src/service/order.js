@@ -4,6 +4,14 @@ import {URI} from '@/service/conection'
 import { domicilio } from "./cart";
 import router from '@/router/index.js'
 import { antojoVisible } from "./state";
+
+
+import { useReportesStore } from "@/store/ventas";
+
+
+
+// console.log(store)
+
 const user_data = ref({})
 const order_notes = ref("")
 const showThaks = ref(false)
@@ -69,10 +77,10 @@ const sending_order = ref(false)
 
 
 const send_order = async () => {
+    const store = useReportesStore()
+    store.setLoading(true,'enviando orden')
 
-
-    
-
+    // store.setLoading(true, 'enviando orden')
     const serverTimeResponse = await fetch( `${URI}/server_time`);
     const serverTimeData = await serverTimeResponse.json();
 
@@ -131,8 +139,8 @@ const send_order = async () => {
         "order_products": JSON.parse(localStorage.getItem('cart')).products,
         "user_id": user_id,
         "user_data":{...user},
-        "site_id":JSON.parse(localStorage.getItem('currentNeigborhood')).currenSiteId,
-        // "site_id":12,
+        // "site_id":JSON.parse(localStorage.getItem('currentNeigborhood')).currenSiteId,
+        "site_id":12,
         "order_status": {
             "status": "generada",
             "timestamp":serverTimeData
@@ -163,11 +171,15 @@ const send_order = async () => {
 
     // Realizar la solicitud Fetch
     sending_order.value = true
+    store.setLoading(true,'enviando orden')
 
    await fetch(queryUrl, requestOptions)
         .then(response => {
             if (!response.ok) {
+                store.setLoading(false,'enviando orden')
+
                 throw new Error(`Error en la solicitud: ${response.status}`);
+
             }
             // file.value? uploadUserPhotoProfile(file.value,data.dni): '' 
 
@@ -183,6 +195,14 @@ const send_order = async () => {
             // localStorage.removeItem('cart')
             antojoVisible.value = false
             sending_order.value = false
+            store.setLoading(false,'enviando orden')
+            
+           
+
+            setTimeout(() => {
+                router.push('/gracias')
+              }, 500);
+
 
            
            
@@ -190,7 +210,7 @@ const send_order = async () => {
             eliminarProductosDelCarrito();
             user_data.value = {}
 
-            router.push('/gracias')
+            // 
             // showThaks.value = true
             
             // router.push('/')
@@ -199,6 +219,8 @@ const send_order = async () => {
         .catch(error => {
             console.error('Error en la solicitud:', error);
             sending_order.value = false
+            store.setLoading(false,'enviando orden')
+
 
             // toast.add({ severity: 'error', summary: 'llene todos los campos', detail: '', life: 3000 })
 

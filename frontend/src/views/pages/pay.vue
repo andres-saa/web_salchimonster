@@ -141,6 +141,7 @@
 </Dialog>
 
 
+
 </template>
 
 
@@ -162,6 +163,15 @@ import Loading from '../../components/Loading.vue';
 import resumen from './resumen.vue';
 import Sesion_main from './sesion_main.vue';
 import TarjetaMenu from '../../components/TarjetaMenu.vue';
+
+
+import { useReportesStore } from "@/store/ventas";
+
+const store = useReportesStore()
+
+console.log(store)
+
+
 const changeThanks = () =>{
     showThaks.value = false
     // router.push('/')

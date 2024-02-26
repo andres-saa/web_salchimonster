@@ -1,12 +1,18 @@
 <template>
+           
 <div class="grid xl:col-10 xl:m-auto p-2 m-auto" style="border-radius:2rem; margin-bottom: 5rem;max-width: 1024px;">
-    
+    <transition-group name="fade">
     <div v-for="(product, index) in products.filter(product => product.state === 'active')" :key="product.id" class="xl:col-3 lg:col-4 md:p-3 col-6 p-3 aparecer">
-        <TarjetaMenu  :id="`tarjeta-${index}`" style="width: 100%;" :product="product"></TarjetaMenu>
+        
+
+
+            <TarjetaMenu  :id="`tarjeta-${index}`" style="width: 100%;" :product="product"></TarjetaMenu>
+
+ 
     </div>
+    </transition-group>
 
 
-    
 </div>
 
 
@@ -21,46 +27,45 @@ import { useRoute } from 'vue-router';
 import { URI } from '../../service/conection';
 import router from '@/router/index.js';
 
+
+
+import { useReportesStore } from '../../store/ventas';
+const store = useReportesStore()
 const products = ref([]); // Definiendo la variable reactiva para almacenar los productos
 const ruta = useRoute(); // Usando useRoute para acceder a los parámetros de la ruta
 
-
-const applyAnimation = () => {
-    // Obtén todos los elementos que necesitan la animación
-    const cards = document.querySelectorAll('.aparecer');
-    // Remueve y añade la clase para resetear la animación
-    cards.forEach(card => {
-        card.classList.remove('aparecer');
-        void card.offsetWidth; // Provoca el reflow
-        card.classList.add('aparecer');
-    });
-};
 
 
 
 onMounted(async () => {
     getProducts(ruta.params.menu_name);
     await nextTick();
-    applyAnimation(); // Asegura que la animación se aplique al montar
 });
 
 watch(() => ruta.params.menu_name, async (newMenuName) => {
     getProducts(newMenuName);
     await nextTick(); // Espera a que el DOM se actualice
-    applyAnimation(); // Función para aplicar la animación
 });
 
 
 
 const getProducts = async (category_name) => {
+    store.setLoading(true, 'cargando productos')
     try {
         let response = await fetch(`${URI}/products/category/name/${category_name}/site/${currentCity.value.currenSiteId}`);
         if (!response.ok) {
+            store.setLoading(false, 'cargando productos')
+
             throw new Error(`HTTP error! status: ${response.status}`);
+
         }
+        store.setLoading(false, 'cargando productos')
+
         let data = await response.json();
         products.value = data;
     } catch (error) {
+        store.setLoading(false, 'cargando productos')
+
         console.error('Error fetching data: ', error);
     }
 }
@@ -97,20 +102,8 @@ const currentCity = ref(JSON.parse(localStorage.getItem('currentNeigborhood')));
     /* font-weight: bold; */
 }
 
-@keyframes aparecer {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-.aparecer {
-    animation: aparecer 0.5s ease-out forwards;
-}
+
 
 .menu-button:hover {
     /* box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5); */
@@ -139,10 +132,27 @@ const currentCity = ref(JSON.parse(localStorage.getItem('currentNeigborhood')));
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.fade-enter, .fade-leave-to {
+
+/* Estado Final de Salida: desvanecido y desplazado hacia la derecha */
+.fade-leave-to {
   opacity: 0;
+  transform: translateX(20rem);
+}
+
+/* Estado Inicial de Entrada: ligeramente desplazado hacia arriba y desenfocado */
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(-10vh);
+  filter: blur(10px);
+}
+
+/* Estado Final de Entrada: totalmente opaco, sin desplazamiento y enfocado */
+.fade-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
 }
 
 /* Estilo del pulgar de la barra de desplazamiento */

@@ -127,8 +127,8 @@ const comprobar_sede = () => {
 const comprobarEstado = () => {
   const estado = localStorage.getItem('estado')
     if(estado && estado=='cerrado'){
-        verCerrado.value = true
-        return null
+        // verCerrado.value = true
+        // return null
     }
 }
 

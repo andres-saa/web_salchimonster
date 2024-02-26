@@ -11,13 +11,11 @@
     
   <BarraCategorias></BarraCategorias>
 
+  <transition name="fade">
+        <RouterView style=""></RouterView>
+    </transition>
 
-
-
-    <RouterView class="pb-8" >
-
-    </RouterView>
-
+ 
 
 
 
@@ -152,12 +150,7 @@ onMounted(async () => {
    /* Ancho de la barra de desplazamiento */
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter, .fade-leave-to {
-  opacity: 0;
-}
+
 
 /* Estilo del pulgar de la barra de desplazamiento */
 /* WebKit (Chrome, Safari) */
@@ -184,4 +177,49 @@ onMounted(async () => {
     /* position: absolute; */
     left: 0;
     padding: 1.5rem;
-}</style>
+}
+
+
+
+
+/* Estado Final de Salida: desvanecido y desplazado hacia la derecha */
+
+/* Estado Inicial de Entrada: ligeramente desplazado hacia arriba y desenfocado */
+
+
+/* Estado Final de Entrada: totalmente opaco, sin desplazamiento y enfocado */
+
+
+
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Estado Final de Salida: desvanecido y desplazado hacia la derecha */
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(20rem);
+}
+
+/* Estado Inicial de Entrada: ligeramente desplazado hacia arriba y desenfocado */
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(-10vh);
+  filter: blur(10px);
+}
+
+/* Estado Final de Entrada: totalmente opaco, sin desplazamiento y enfocado */
+.fade-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+
+
+
+
+
+
+</style>
