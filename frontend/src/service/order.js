@@ -4,6 +4,14 @@ import {URI} from '@/service/conection'
 import { domicilio } from "./cart";
 import router from '@/router/index.js'
 import { antojoVisible } from "./state";
+
+
+import { useReportesStore } from "@/store/ventas";
+
+
+
+// console.log(store)
+
 const user_data = ref({})
 const order_notes = ref("")
 const showThaks = ref(false)
@@ -63,16 +71,16 @@ const getUserID = async (userData) => {
 
 
 
-
+const sending_order = ref(false)
 
 
 
 
 const send_order = async () => {
+    const store = useReportesStore()
+    store.setLoading(true,'enviando orden')
 
-
-    
-
+    // store.setLoading(true, 'enviando orden')
     const serverTimeResponse = await fetch( `${URI}/server_time`);
     const serverTimeData = await serverTimeResponse.json();
 
@@ -162,10 +170,16 @@ const send_order = async () => {
     };
 
     // Realizar la solicitud Fetch
+    sending_order.value = true
+    store.setLoading(true,'enviando orden')
+
    await fetch(queryUrl, requestOptions)
         .then(response => {
             if (!response.ok) {
+                store.setLoading(false,'enviando orden')
+
                 throw new Error(`Error en la solicitud: ${response.status}`);
+
             }
             // file.value? uploadUserPhotoProfile(file.value,data.dni): '' 
 
@@ -180,13 +194,23 @@ const send_order = async () => {
             thanks_data.value.order_id = data.order_id
             // localStorage.removeItem('cart')
             antojoVisible.value = false
+            sending_order.value = false
+            store.setLoading(false,'enviando orden')
+            
+           
+
+            setTimeout(() => {
+                router.push('/gracias')
+              }, 500);
+
+
            
            
             
             eliminarProductosDelCarrito();
             user_data.value = {}
 
-            router.push('/gracias')
+            // 
             // showThaks.value = true
             
             // router.push('/')
@@ -194,6 +218,10 @@ const send_order = async () => {
         })
         .catch(error => {
             console.error('Error en la solicitud:', error);
+            sending_order.value = false
+            store.setLoading(false,'enviando orden')
+
+
             // toast.add({ severity: 'error', summary: 'llene todos los campos', detail: '', life: 3000 })
 
         });
@@ -225,4 +253,4 @@ function eliminarProductosDelCarrito() {
   }
 
 
-export{payMethods,payMethod,showThaks,send_order,order_notes,user_data,invalid,thanks_data}
+export{payMethods,payMethod,showThaks,sending_order, send_order,order_notes,user_data,invalid,thanks_data}

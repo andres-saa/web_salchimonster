@@ -1,6 +1,6 @@
 <template>
     <Dialog class="dialogo" style=" border-radius: 1rem; overflow: ; background-color: rgb(255, 255, 255); color: black"
-        v-model:visible="visibleCancelar" modal header="name" :style="{ width: '40rem' }"
+        v-model:visible="visibleCancelar" modal  :style="{ width: '40rem' }"
         :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
 
         <div style="display:  flex; flex-direction: column; width: 100%; align-items: center; gap: 20px;">
@@ -29,8 +29,8 @@
 
 
     <Dialog class="dialogo"
-        style="padding-bottom: 7rem; border-radius: 1rem; overflow: ; background-color: rgb(255, 255, 255); color: black"
-        v-model:visible="dialog_pedido_visible" modal header="name" :style="{ width: '40rem' }"
+        style="padding-bottom: 7rem;  border-radius: 1rem; overflow: ; background-color: rgb(255, 255, 255); color: black"
+        v-model:visible="dialog_pedido_visible" modal closeButton="false"  :style="{ width: '40rem' }"
         :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
 
         <button class="btn_cerrar" @click="dialog_pedido_visible = !dialog_pedido_visible"

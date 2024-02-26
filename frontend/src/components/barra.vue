@@ -47,7 +47,7 @@
 
           <div v-for="product in carro_para_la_barra_de_abajo.products.slice(0, 5)">
             <img class="img-cart" @mouseover="() => vueMenu = true" style="height: 2rem; object-fit: contain;"
-              :src="`${URI}/read-product-image/300/${product.name}`" alt="">
+              :src="`${URI}/read-product-image/96/${product.name}`" alt="">
 
             <!-- <TarjetaMenu v-if="vueMenu" style="width: 200px;height: 200px;" :product="product"></TarjetaMenu> -->
 

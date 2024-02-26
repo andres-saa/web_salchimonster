@@ -83,25 +83,33 @@ const mensaje = ref()
 const serverDate = ref("2029-12-21 16:19")
 const queja = ref()
 
-
+import { useReportesStore } from '../../store/ventas';
+const store = useReportesStore()
 
 
 const getOrder = async() => {
+  store.setLoading(true, 'buscando orden')
     fetch(`${URI}/order/${order_id.value}`)
   .then(response => {
     if (!response.ok) {
+      store.setLoading(false, 'buscando orden')
+
       throw new Error('Network response was not ok');
     }
     
     return response.json();
   })
   .then(data => {
+    store.setLoading(false, 'buscando orden')
+
     console.log('Employer data:', data);
     order.value = data
     queja.value = ''
     determinarMensaje()
   })
   .catch(error => {
+    store.setLoading(false, 'buscando orden')
+
     console.error('There has been a problem with your fetch operation:', error);
     order.value = {}
     queja.value = '  No hay un usuario para el número de documento '+ order_id.value

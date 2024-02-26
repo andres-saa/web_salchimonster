@@ -5,7 +5,7 @@ import siteDialog from './components/siteDialog.vue';
 // import siteDialog from './components/siteDialog.vue';
 import VistaProducto from './components/VistaProducto.vue'
 import restauranteCerrado from './components/restauranteCerrado.vue';
-
+import Loading from './components/Loading.vue'
 
 
 
@@ -14,13 +14,13 @@ import restauranteCerrado from './components/restauranteCerrado.vue';
 
 <template>
 
-
-  
-
 <restauranteCerrado>
 
 </restauranteCerrado>
-<router-view  class="p-0 pb-8" style="content:; background-color: rgba(0, 0, 0, 0.046); width: 100vw;left:0px;position: absolute;"/>
+
+
+        <RouterView></RouterView>
+
 
 
 <siteDialog></siteDialog>
@@ -34,5 +34,51 @@ import restauranteCerrado from './components/restauranteCerrado.vue';
 
   <!-- <div v-if="showProductDialog" class="full-before col-12 p-0 m-0" style="top: 0;left: 0; position: fixed; background-color: black;height: 100vh;opacity: 0.1;"> </div> -->
 </template>
+
+<style scoped> 
+
+.fade-enter-active,.fade-leave-active {
+  transition: all ease  .5s;
+  
+}
+
+
+
+/* .fade-enter-to  {
+  opacity: 0;
+  transform: translateX(20rem);
+ 
+} */
+
+
+/* .fade-leave-from  {
+  opacity: 1;
+  transform: translateY(20rem);
+
+} */
+ /*
+*/
+
+ .fade-enter-from {
+  opacity: 1;
+  transform: translateY(-20rem);
+  filter: blur(10px);
+  /* filter: blur(0); */
+  
+}
+
+
+
+.fade-enter-to {
+  opacity: 1;
+  /* filter: blur(0); */
+  /* transform: translateY(0); */
+
+  
+} 
+
+
+
+</style>
 
 

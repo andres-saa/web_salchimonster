@@ -51,3 +51,48 @@ def update_site(site_id: int, updated_site: site_schema_post):
     else:
         site_instance.close_connection()
         return {"message": "Site not found"}
+    
+
+
+from fastapi import FastAPI, BackgroundTasks
+from datetime import datetime, timedelta
+import asyncio
+
+# app = FastAPI()
+
+# Este diccionario almacena los temporizadores de asistencia para cada sede
+temporizadores_asistencia = {}
+
+async def verificar_inactividad(sede_id: int, delay: int):
+    await asyncio.sleep(delay)
+    # Lógica para manejar la inactividad, por ejemplo, actualizar el estado en la base de datos
+    print(f"Sede {sede_id} inactiva")
+
+from fastapi import FastAPI, BackgroundTasks
+
+tareas_temporizador = {}
+
+async def verificar_inactividad(sede_id: int, delay: int):
+    await asyncio.sleep(delay)
+    # Tu lógica para manejar la inactividad aquí
+    print(f"Sede {sede_id} ha sido marcada como inactiva.")
+
+@site_router.post("/asistencia/{sede_id}")
+async def asistencia(sede_id: int, background_tasks: BackgroundTasks):
+    global tareas_temporizador
+    
+    # Cancelar la tarea anterior si existe
+    if sede_id in tareas_temporizador:
+        tarea_anterior = tareas_temporizador[sede_id]
+        tarea_anterior.cancel()
+        print(f"Tarea anterior para sede {sede_id} cancelada.")
+    
+    # Planificar una nueva tarea de verificación de inactividad
+    tarea = asyncio.create_task(verificar_inactividad(sede_id, 60))  # Suponiendo 60 segundos para inactividad
+    tareas_temporizador[sede_id] = tarea
+    
+    # Añadir la tarea al background tasks de FastAPI no es necesario aquí,
+    # ya que estamos usando asyncio.create_task directamente.
+    print(f"Nueva tarea para sede {sede_id} iniciada.")
+
+    return {"mensaje": "Asistencia registrada para sede " + str(sede_id)}

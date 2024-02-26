@@ -1,5 +1,5 @@
 <template>
-  <div style="min-width: 500px" class="grid col-6  m-auto m-0 p-0" >
+  <div style="max-width: 600px" class="grid col-12  m-auto m-0 p-0" >
     <div  class="col-12 p-0" style="" > 
  
       <div  class="col-12 mb-6 m-0 pb-0" 
