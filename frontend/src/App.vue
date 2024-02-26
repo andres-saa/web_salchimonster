@@ -7,6 +7,7 @@ import VistaProducto from './components/VistaProducto.vue'
 import restauranteCerrado from './components/restauranteCerrado.vue';
 import Loading from './components/Loading.vue'
 
+import { URI } from './service/conection';
 
 
 
