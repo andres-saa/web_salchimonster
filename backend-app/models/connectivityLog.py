@@ -92,7 +92,7 @@ class ConnectivityLog:
         for site in sites_data:
             site_id, site_name = site
             is_online = self.is_site_online(site_id)
-            sites_online_status.append({"site_name": site_name, "online_status": is_online})
+            sites_online_status.append({"id":site_id,"site_name": site_name, "online_status": is_online})
 
         return sites_online_status
     
