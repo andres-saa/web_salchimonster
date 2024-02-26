@@ -5,6 +5,19 @@ from models.connectivityLog import ConnectivityLog
 from schema.connectivityLog import ConnectivityLogSchema
 from datetime import datetime
 import pytz
+
+
+
+
+
+
+
+def obtener_hora_colombia():
+    zona_horaria_colombia = pytz.timezone('America/Bogota')
+    hora_actual_colombia = datetime.now(zona_horaria_colombia)
+    return hora_actual_colombia
+
+
 site_router = APIRouter()
 
 @site_router.get("/sites")
@@ -119,13 +132,12 @@ async def asistencia(sede_id: int, background_tasks: BackgroundTasks):
         mensaje = "La sede " + str(sede_id) + " ya está en línea. No se registra un nuevo evento de conexión."
 
     return {"mensaje": mensaje}
+
+
 async def insert_connectivity_event(site_id: int, event_type: str):
     """Función auxiliar para insertar un evento de conectividad."""
     connectivity_instance = ConnectivityLog()
-    # Establecer la zona horaria a Colombia
-    colombia_zone = pytz.timezone('America/Bogota')
-    # Obtener la fecha y hora actuales en la zona horaria de Colombia
-    colombia_now = datetime.now(colombia_zone)
+    colombia_now = obtener_hora_colombia()  # Usar la función para obtener la hora
     log_data = ConnectivityLogSchema(
         site_id=site_id,
         event_timestamp=colombia_now,
