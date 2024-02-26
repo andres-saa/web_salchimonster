@@ -72,10 +72,10 @@ class ConnectivityLog:
         if not last_event:
             return False
 
-        # Hacer que last_event[1] sea consciente de la zona horaria
-        last_event_timestamp_aware = last_event[1].replace(tzinfo=pytz.utc)
+        # # Hacer que last_event[1] sea consciente de la zona horaria
+        # last_event_timestamp_aware = last_event[1].replace(tzinfo=pytz.utc)
 
-        if last_event[0] == 'Desconexión' or last_event_timestamp_aware < threshold_time:
+        if last_event[0] == 'Desconexión':
             return False
 
         return True

@@ -7,11 +7,6 @@ from datetime import datetime
 import pytz
 
 
-
-
-
-
-
 def obtener_hora_colombia():
     zona_horaria_colombia = pytz.timezone('America/Bogota')
     hora_actual_colombia = datetime.now(zona_horaria_colombia)
