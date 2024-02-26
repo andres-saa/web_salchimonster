@@ -61,8 +61,8 @@ class Order:
         COALESCE(addition_prices.total_addition_price, 0) +
         COALESCE(topping_prices.total_topping_price, 0) +
         COALESCE(change_prices.total_change_price, 0) +
-        COALESCE(accompaniment_prices.total_accompaniment_price, 0) +
-        o.delivery_price -- Sumar el precio de entrega al total de ventas
+        COALESCE(accompaniment_prices.total_accompaniment_price, 0) 
+        
     ) AS total_sales,
     COUNT(o.order_id) AS total_orders,
     CAST(
