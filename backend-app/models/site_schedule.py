@@ -69,6 +69,7 @@ class site_schedule:
         # Obtener el día de la semana en la zona horaria de Colombia
         current_day_of_week = (int(datetime.now(colombia_tz).strftime("%w")) + 1) % 7 or 7
         
+        print(current_day_of_week)
         query = f"""
         SELECT opening_time, closing_time
         FROM site_schedule
