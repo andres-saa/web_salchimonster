@@ -1,6 +1,7 @@
 files/**
 .env
 web-env/
+my-env/
 web-envi/
 backend-app/
 __pycache__/**

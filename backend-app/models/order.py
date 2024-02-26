@@ -21,6 +21,11 @@ class Order:
         self.cursor = self.conn.cursor()
         self.order_id = order_id
 
+    def select_orders_by_site_id(self, site_id):
+        select_query = "SELECT * FROM orders WHERE site_id = %s ORDER BY order_id DESC LIMIT 50;"
+        self.cursor.execute(select_query, (site_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
 
     def select_order_by_id(self, order_id):

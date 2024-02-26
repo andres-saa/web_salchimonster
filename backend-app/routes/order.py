@@ -51,7 +51,7 @@ def update_order(order_id: int, updated_order: order_schema_post):
 @order_router.get("/orders_by_site/{site_id}")
 def get_orders_by_site(site_id: int):
     order_instance = Order()
-    orders = order_instance.select_orders_by_site(site_id)
+    orders = order_instance.select_orders_by_site_id(site_id)
     order_instance.close_connection()
     return orders
 
