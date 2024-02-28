@@ -87,6 +87,7 @@ class Order:
             'site_name', s.site_name,
             'products', o.order_products,  -- Incluir los productos de la orden
             'delivery_price', o.delivery_price,
+            'payment_method',o.payment_method,
             'user_data', o.user_data 
 
 
