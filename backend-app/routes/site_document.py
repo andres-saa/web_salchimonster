@@ -1,7 +1,8 @@
 from fastapi import APIRouter,Form,File
 from models.site_document import SiteDocument  # Asegúrate de que este módulo esté correctamente importado
 from schema.site_document import SiteDocumentSchemaPost  
-
+from datetime import datetime
+import uuid
 
 from fastapi import APIRouter, UploadFile, File,Form
 from fastapi.responses import FileResponse
@@ -9,6 +10,11 @@ from os import getcwd
 from os.path import splitext
 from pathlib import Path
 
+from fastapi import APIRouter, File, Form, UploadFile
+from pathlib import Path
+from os import getcwd
+from os.path import splitext
+import shutil
 
 # Asegúrate de que este esquema esté correctamente definido
 site_document_router = APIRouter()
@@ -33,7 +39,9 @@ def create_site_document(document: SiteDocumentSchemaPost):
     document_id = document_instance.insert_document(document)
     created_document = document_instance.select_document_by_id(document_id)
     document_instance.close_connection()
+    # Aquí puedes agregar lógica adicional si necesitas guardar un archivo usando el document_id como nombre
     return {"document_id": created_document['document_id']}
+
 
 @site_document_router.put("/site-document/{document_id}")
 def update_site_document(document_id: int, updated_document: SiteDocumentSchemaPost):
@@ -58,69 +66,46 @@ def delete_site_document(document_id: int):
     return {"message": message}
 
 
-@site_document_router.post('/upload-file-document/')
-async def upload_user_photo(site_id: str = Form(...), type_document: str = Form(...), file: UploadFile = File(...)):
-    # Obtener la extensión del archivo
-    file_extension = splitext(file.filename)[1]
+@site_document_router.post('/upload-file-document/{document_id}')
+async def upload_file_document(document_id: int, file: UploadFile = File(...), file_name: str = Form(...)):
+    # Extraer la extensión del archivo original
+    original_file_extension = splitext(file.filename)[1]
 
-    # Directorio donde se guardarán las imágenes
-    upload_dir = Path(getcwd()) / "files" / "documents" / "sites" / site_id
+    # Directorio donde se guardarán los archivos
+    upload_dir = Path(getcwd()) / "files" / "documents" / str(document_id)
 
-    # Crear la carpeta "users" si no existe
-    upload_dir.mkdir(parents=True, exist_ok=True)
-
-    # Combinar el nombre del archivo con el directorio
-    file_path = upload_dir / (site_id + " " + type_document + file_extension)
-
-    with open(file_path, "wb") as myflle:
-        content = await file.read()
-        myflle.write(content)
-
-    return "hecho"
-
-
-@site_document_router.post('/upload-file-document/')
-async def upload_user_photo(site_id: str = Form(...), type_document: str = Form(...), file: UploadFile = File(...)):
-    # Obtener la extensión del archivo
-    file_extension = splitext(file.filename)[1]
-
-    # Directorio donde se guardarán las imágenes
-    upload_dir = Path(getcwd()) / "files" / "documents" / "sites" / site_id
-
-    # Crear la carpeta "users" si no existe
-    upload_dir.mkdir(parents=True, exist_ok=True)
-
-    # Combinar el nombre del archivo con el directorio
-    file_path = upload_dir / (site_id + " " + type_document + file_extension)
-
-    with open(file_path, "wb") as myflle:
-        content = await file.read()
-        myflle.write(content)
-
-    return "hecho"
-
-@site_document_router.get("/get-site-document/{site_id}/{type_document}")
-def get_site_document(site_id: str, type_document: str):
-    base_dir = getcwd() + "/files" + "/documents" + "/sites" + "/" + site_id 
-
-    # Lista de extensiones de archivo a buscar en orden de preferencia
-    file_extensions = ['.pdf', '.jpg', '.jpeg', '.gif', '.bmp']
-
-    for extension in file_extensions:
-        file_path = base_dir + "/" + site_id + " " + type_document + extension
-        print (file_path)
-        file = Path(file_path)
-
-        if file.exists():
-
-
-            return FileResponse(file)
-                   
+    # Eliminar la carpeta si ya existe, para remover todo su contenido
+    if upload_dir.exists():
+        shutil.rmtree(upload_dir)
     
+    # Crear la carpeta nuevamente después de eliminarla
+    upload_dir.mkdir(parents=True, exist_ok=True)
 
-    print(base_dir)     
-    # Si no se encuentra ninguna de las extensiones, puedes devolver un error o un archivo predeterminado
-    return "Archivo no encontrado", 404
+    # Construir el nombre completo del archivo usando el nombre proporcionado y la extensión original
+    full_file_name = f"{file_name}{original_file_extension}"
+    file_path = upload_dir / full_file_name
+
+    # Guardar el nuevo archivo
+    with open(file_path, "wb") as myfile:
+        content = await file.read()
+        myfile.write(content)
+
+    return {"message": "Archivo subido con éxito", "file_name": file_name, "full_file_name": full_file_name}
+
+from fastapi.responses import FileResponse
+
+from glob import glob
+
+@site_document_router.get("/get-document-file/{document_id}/{file_name}")
+def get_document_file(document_id: int, file_name: str):
+    base_dir = Path(getcwd()) / "files" / "documents" / str(document_id)
+    search_pattern = str(base_dir / f"{file_name}.*")
+
+    matching_files = glob(search_pattern)
+    if matching_files:
+        return FileResponse(matching_files[0])
+    else:
+        return {"message": "Archivo no encontrado"}, 404
 
 
 @site_document_router.get("/get-site-documents-info/{site_id}")

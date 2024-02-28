@@ -80,7 +80,6 @@ class ConnectivityLog:
 
         return True
     
-    
     def get_sites_online_status(self):
         # Consulta para obtener todos los site_id y site_name
         self.cursor.execute("SELECT site_id, site_name FROM sites order by site_id;")

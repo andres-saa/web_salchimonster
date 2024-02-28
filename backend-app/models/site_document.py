@@ -43,18 +43,57 @@ class SiteDocument:
         else:
             return None
 
+    # def insert_document(self, document_data: SiteDocumentSchemaPost):
+    #     insert_query = """
+    #     INSERT INTO site_documents (
+    #         document_name, document_type, renovation_date, site_id
+    #     ) VALUES (%s, %s, %s, %s) RETURNING document_id;
+    #     """
+    
+    #     self.cursor.execute(insert_query, (
+    #         document_data.document_name, document_data.document_type, document_data.renovation_date, document_data.site_id
+    #     ))
+    #     document_id = self.cursor.fetchone()[0]
+    #     self.conn.commit()
+    #     return document_id
+
     def insert_document(self, document_data: SiteDocumentSchemaPost):
-        insert_query = """
-        INSERT INTO site_documents (
-            document_name, document_type, renovation_date, site_id
-        ) VALUES (%s, %s, %s, %s) RETURNING document_id;
+        # Primero, intenta encontrar un documento existente con el mismo site_id y document_type
+        search_query = """
+        SELECT document_id FROM site_documents 
+        WHERE site_id = %s AND document_type = %s;
         """
-        self.cursor.execute(insert_query, (
-            document_data.document_name, document_data.document_type, document_data.renovation_date, document_data.site_id
-        ))
-        document_id = self.cursor.fetchone()[0]
-        self.conn.commit()
+        self.cursor.execute(search_query, (document_data.site_id, document_data.document_type))
+        existing_document = self.cursor.fetchone()
+
+        if existing_document:
+            # Si existe, actualiza el registro existente
+            update_query = """
+            UPDATE site_documents
+            SET document_name = %s, renovation_date = %s
+            WHERE document_id = %s
+            RETURNING document_id;
+            """
+            self.cursor.execute(update_query, (
+                document_data.document_name, document_data.renovation_date, existing_document[0]
+            ))
+            document_id = existing_document[0]  # Usamos el ID existente
+        else:
+            # Si no existe, inserta un nuevo registro
+            insert_query = """
+            INSERT INTO site_documents (
+                document_name, document_type, renovation_date, site_id
+            ) VALUES (%s, %s, %s, %s) RETURNING document_id;
+            """
+            self.cursor.execute(insert_query, (
+                document_data.document_name, document_data.document_type, document_data.renovation_date, document_data.site_id
+            ))
+            document_id = self.cursor.fetchone()[0]
+
+        self.conn.commit()  # Asegúrate de hacer commit para guardar los cambios
         return document_id
+
+    
 
     def update_document(self, document_id, updated_data: SiteDocumentSchemaPost):
         update_query = """
