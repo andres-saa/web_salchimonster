@@ -77,7 +77,6 @@ temporizadores_asistencia = {}
 
 async def verificar_inactividad(sede_id: int, delay: int):
     await asyncio.sleep(delay)
-    # Verificar nuevamente si la sede sigue en línea antes de registrar desconexión
     connectivity_instance = ConnectivityLog()
     is_online = connectivity_instance.is_site_online(sede_id)
     connectivity_instance.close_connection()
@@ -85,8 +84,6 @@ async def verificar_inactividad(sede_id: int, delay: int):
     if not is_online:
         await insert_connectivity_event(sede_id, "Desconexión")
         print(f"Sede {sede_id} ha sido marcada como inactiva.")
-    else:
-        print(f"Sede {sede_id} aún en línea, no se marca como inactiva.")
 
 from fastapi import FastAPI, BackgroundTasks
 
@@ -102,44 +99,33 @@ tareas_temporizador = {}
 async def asistencia(sede_id: int, background_tasks: BackgroundTasks):
     global tareas_temporizador
 
-    # Comprobar el último estado de conexión de la sede
     connectivity_instance = ConnectivityLog()
     is_online = connectivity_instance.is_site_online(sede_id)
     connectivity_instance.close_connection()
 
-    # Si la sede no está en línea, registrar el evento de conexión
     if not is_online:
         await insert_connectivity_event(sede_id, "Conexión")
-
-        # Cancelar la tarea anterior si existe
-        if sede_id in tareas_temporizador:
-            tarea_anterior = tareas_temporizador[sede_id]
+    
+    if sede_id in tareas_temporizador:
+        tarea_anterior = tareas_temporizador[sede_id]
+        if not tarea_anterior.done():
             tarea_anterior.cancel()
-            print(f"Tarea anterior para sede {sede_id} cancelada.")
+        print(f"Tarea anterior para sede {sede_id} cancelada.")
+    
+    tarea = asyncio.create_task(verificar_inactividad(sede_id, 60))
+    tareas_temporizador[sede_id] = tarea
 
-        # Planificar una nueva tarea de verificación de inactividad
-        tarea = asyncio.create_task(verificar_inactividad(sede_id, 60))  # Suponiendo 60 segundos para inactividad
-        tareas_temporizador[sede_id] = tarea
-
-        mensaje = "Asistencia registrada y conectividad actualizada para sede " + str(sede_id)
-    else:
-        # Si la sede ya está en línea, no registrar un nuevo evento de conexión
-        mensaje = "La sede " + str(sede_id) + " ya está en línea. No se registra un nuevo evento de conexión."
-
+    mensaje = f"Asistencia registrada y conectividad actualizada para sede {sede_id}."
     return {"mensaje": mensaje}
 
-
 async def insert_connectivity_event(site_id: int, event_type: str):
-    """Función auxiliar para insertar un evento de conectividad."""
     connectivity_instance = ConnectivityLog()
     colombia_now = obtener_hora_colombia()  # Usar la función para obtener la hora
-    log_data = ConnectivityLogSchema(
-        site_id=site_id,
-        event_type=event_type
-    )
+    log_data = ConnectivityLogSchema(site_id=site_id, event_type=event_type, timestamp=colombia_now)
     log_id = connectivity_instance.insert_connectivity_log(log_data)
     connectivity_instance.close_connection()
     return log_id
+
 
 @site_router.get("/site/{site_id}/online-status", response_model=bool)
 def check_site_online_status(site_id: int) -> bool:
