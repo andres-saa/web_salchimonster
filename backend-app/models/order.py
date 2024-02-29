@@ -75,6 +75,7 @@ class Order:
         ) / NULLIF(COUNT(o.order_id), 0)
         AS NUMERIC
     ) AS average_ticket,
+    COALESCE(
     JSON_AGG(
         JSON_BUILD_OBJECT(
             'order_id', o.order_id,
@@ -92,7 +93,7 @@ class Order:
 
 
         )
-    ) AS orders_info
+    ), '[]') AS orders_info
 FROM
     public.orders o
 JOIN public.sites s ON o.site_id = s.site_id 
