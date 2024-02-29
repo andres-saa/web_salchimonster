@@ -53,8 +53,11 @@ class ConnectivityLog:
         colombia_timezone = pytz.timezone('America/Bogota')
         current_time_colombia = datetime.now(colombia_timezone)
 
-        # Para mantener la consistencia, usa la hora en la zona horaria de Colombia para la comparación
-        threshold_time = current_time_colombia - timedelta(minutes=1)  # Ajustado a 1 minuto para el umbral
+        # Asumiendo que quieres comparar usando UTC
+        current_time_utc = current_time_colombia.astimezone(pytz.utc)
+
+        # Restamos 5 minutos a la hora actual UTC para determinar el umbral de inactividad
+        threshold_time = current_time_utc - timedelta(minutes=5)
 
         # Consulta para obtener el último evento
         self.cursor.execute("""
@@ -69,14 +72,13 @@ class ConnectivityLog:
         if not last_event:
             return False
 
-        # Hacer que last_event[1] sea consciente de la zona horaria
-        last_event_timestamp_aware = last_event[1].astimezone(colombia_timezone)
+        # # Hacer que last_event[1] sea consciente de la zona horaria
+        # last_event_timestamp_aware = last_event[1].replace(tzinfo=pytz.utc)
 
-        if last_event[0] == 'Desconexión' or last_event_timestamp_aware < threshold_time:
+        if last_event[0] == 'Desconexión':
             return False
 
         return True
-    
     
     def get_sites_online_status(self):
         # Consulta para obtener todos los site_id y site_name
