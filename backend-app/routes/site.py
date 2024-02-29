@@ -75,16 +75,14 @@ import asyncio
 # Este diccionario almacena los temporizadores de asistencia para cada sede
 temporizadores_asistencia = {}
 
-async def verificar_inactividad(sede_id: int, delay: int):
-    await asyncio.sleep(delay)
+async def verificar_inactividad(sede_id: int, tiempo_espera: int):
+    await asyncio.sleep(tiempo_espera)  # Espera el tiempo definido antes de verificar nuevamente
     connectivity_instance = ConnectivityLog()
     is_online = connectivity_instance.is_site_online(sede_id)
     connectivity_instance.close_connection()
-    
-    if not is_online:
+    # Solo registra el evento de desconexión si el sitio sigue desconectado y el último evento no es una desconexión
+    if not is_online and not connectivity_instance.last_event_is_disconnection(sede_id):
         await insert_connectivity_event(sede_id, "Desconexión")
-        print(f"Sede {sede_id} ha sido marcada como inactiva.")
-
 from fastapi import FastAPI, BackgroundTasks
 
 tareas_temporizador = {}
@@ -103,19 +101,20 @@ async def asistencia(sede_id: int, background_tasks: BackgroundTasks):
     is_online = connectivity_instance.is_site_online(sede_id)
     connectivity_instance.close_connection()
 
+    # No registra inmediatamente un evento de desconexión para evitar duplicados
     if not is_online:
-        await insert_connectivity_event(sede_id, "Conexión")
+        print(f"Sede {sede_id} detectada como desconectada, esperando para verificar inactividad.")
     
     if sede_id in tareas_temporizador:
-        tarea_anterior = tareas_temporizador[sede_id]
-        if not tarea_anterior.done():
+        tarea_anterior = tareas_temporizador.get(sede_id)
+        if tarea_anterior and not tarea_anterior.done():
             tarea_anterior.cancel()
         print(f"Tarea anterior para sede {sede_id} cancelada.")
     
     tarea = asyncio.create_task(verificar_inactividad(sede_id, 60))
     tareas_temporizador[sede_id] = tarea
 
-    mensaje = f"Asistencia registrada y conectividad actualizada para sede {sede_id}."
+    mensaje = f"Asistencia registrada. Verificación de conectividad pendiente para sede {sede_id}."
     return {"mensaje": mensaje}
 
 async def insert_connectivity_event(site_id: int, event_type: str):
