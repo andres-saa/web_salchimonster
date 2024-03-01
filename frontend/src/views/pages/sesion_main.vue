@@ -1,7 +1,23 @@
 <template>
+    <p class="col-12 text-center text-2xl lg:text-5xl" style="font-weight: bold;" > ⚔️ BATALLA DE CIUDADES ⚔️</p>
+
     <div class="grid xl:col-10 xl:m-auto p-2 m-auto" style="border-radius:2rem; margin-bottom: 5rem;max-width: 1024px;">
-        <div v-for="product in products.filter(product => product.state === 'active')" :key="product.id" class="xl:col-3 lg:col-4 md:p-3 col-6 p-3">
+        
+        
+        <div v-for="(product,index) in products.filter(product => product.state === 'active')" :key="product.id" class="xl:col-4 lg:col-4 md:p-3 col-6 p-3">
+            <span class="text-2xl my-5  lg:text-4xl" style="color: var(--primary-color); font-weight: bold;">{{ ciudades[index] }} </span> 
             <TarjetaMenu style="width: 100%;" :product="product"></TarjetaMenu>
+            
+        </div>
+    </div>
+
+
+    <p class="col-12 text-center text-2xl lg:text-5xl" style="font-weight: bold;" >SALCHIPAPAS </p>
+
+    <div class="grid xl:col-10 xl:m-auto p-2 m-auto" style="border-radius:2rem; margin-bottom: 5rem;max-width: 1024px;">
+        <div v-for="product in products2.filter(product => product.state === 'active')" :key="product.id" class="xl:col-3 lg:col-4 md:p-3 col-6 p-3">
+            <TarjetaMenu style="width: 100%;" :product="product"></TarjetaMenu>
+            
         </div>
     </div>
     
@@ -17,12 +33,14 @@
     import { URI } from '../../service/conection';
     import router from '@/router/index.js';
     
-    const products = ref([]); // Definiendo la variable reactiva para almacenar los productos
+    const ciudades = ['Medellín','Cali','Bogotá']
+    const products = ref([]);
+    const products2 = ref([]); // Definiendo la variable reactiva para almacenar los productos
     const ruta = useRoute(); // Usando useRoute para acceder a los parámetros de la ruta
     
     const getProducts = async () => {
         try {
-            let response = await fetch(`${URI}/products/category/name/salchipapas/site/${currentCity.value.currenSiteId}`);
+            let response = await fetch(`${URI}/products/category/name/Batalla%20de%20ciudades/site/${currentCity.value.currenSiteId}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -32,9 +50,23 @@
             console.error('Error fetching data: ', error);
         }
     }
+
+    const getProducts2 = async () => {
+        try {
+            let response = await fetch(`${URI}/products/category/name/salchipapas/site/${currentCity.value.currenSiteId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            let data = await response.json();
+            products2.value = data;
+        } catch (error) {
+            console.error('Error fetching data: ', error);
+        }
+    }
     
     onMounted(async () => {
         getProducts(ruta.params.menu_name);
+        getProducts2()
     });
     
     // Opcional: Observar cambios en el parámetro de la ruta
