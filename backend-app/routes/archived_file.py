@@ -1,6 +1,12 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
 from fastapi.responses import FileResponse
+from datetime import datetime
 
+# from pathlib import Path
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from pydantic import BaseModel
+from pathlib import Path
+import shutil
 
 import os
 from fastapi import UploadFile, File,Form
@@ -29,58 +35,164 @@ def get_file_by_id(file_id: int):
         raise HTTPException(status_code=404, detail="File not found")
     return file
 
+
+
 @archivedFiles_router.post("/archived-file")
-async def create_file(file: UploadFile = File(...), file_data: ArchivedFile = dict):
+async def create_file(file_data: ArchivedFile):
     files_instance = ArchivedFiles()
-    file_id = files_instance.insert_file(file, file_data)
+    file_id = files_instance.insert_file(file_data)
     files_instance.close_connection()
 
-    # Crear la carpeta 'files' si no existe
-    files_folder = Path("files")
-    files_folder.mkdir(parents=True, exist_ok=True)
-
-    # Guardar el archivo en la carpeta 'files'
-    file_path = files_folder / file.filename
-    with open(file_path, "wb") as buffer:
-        buffer.write(await file.read())
-
-    return {"filename": file.filename, "file_data": file_data, "id_file": file_id}
+    return {"file_id": file_id}
 
 
 
 
-@archivedFiles_router.post("/upload-archived-file/{training_id}")
-async def upload_training_file(training_id: str, 
-                               file: UploadFile = File(...),
-                               custom_filename: str = Form(...)):
-    upload_dir = Path.cwd() / "files" / "archived_files" / training_id
-    upload_dir.mkdir(parents=True, exist_ok=True)
+# @archivedFiles_router.post("/upload-archived-file/{training_id}")
+# async def upload_training_file(training_id: str, 
+#                                file: UploadFile = File(...),
+#                                custom_filename: str = Form(...)):
+#     upload_dir = Path.cwd() / "files" / "archived_files" / training_id
+#     upload_dir.mkdir(parents=True, exist_ok=True)
 
+#     _, extension = splitext(file.filename)
+#     final_filename = custom_filename
+#     file_path = upload_dir / f"{final_filename}{extension}"
+
+#     # Verificar si el archivo ya existe y modificar el nombre si es necesario
+#     counter = 1
+#     while file_path.exists():
+#         final_filename = f"{custom_filename}_{counter}"
+#         file_path = upload_dir / f"{final_filename}{extension}"
+#         counter += 1
+
+#     with open(file_path, "wb") as buffer:
+#         content = await file.read()
+#         buffer.write(content)
+
+
+# @archivedFiles_router.get("/get-archived-file/{training_id}/{filename}")
+# async def get_archived_file(training_id: str, filename: str):
+#     file_path = Path.cwd() / "files" / "archived_files" / training_id / filename
+    
+#     if not file_path.exists():
+#         raise HTTPException(status_code=404, detail="File not found")
+    
+#     return FileResponse(str(file_path))
+    
+# @archivedFiles_router.post("/upload-archived-file/{archived_id}")
+
+# async def upload_training_file(file: UploadFile, archived_id:int, filedata:ArchivedFile ):
+#     archived_instance = ArchivedFiles()
+#     file_db = archived_instance.select_file_by_id(archived_id)
+#     # return file
+
+#     if (file_db):
+#         upload_dir = Path.cwd() / "files" / "archived_files" / str(file_db['area_name'])  / str(file_db['type_name']) 
+#         upload_dir.mkdir(parents=True, exist_ok=True)
+#     else:
+#         return 'paila'
+#     _, extension = splitext(file.filename)
+#     # return file
+#     final_filename = str(file_db['file_name'])
+#     file_path = upload_dir / f"{final_filename}{extension}"
+    
+#     with open(file_path, "wb") as buffer:
+#         content = await file.read()
+#         buffer.write(content)
+
+#     return "hecho"
+
+
+@archivedFiles_router.get("/archived-files/area/{area_id}")
+def get_files_by_area(area_id: int):
+    files_instance = ArchivedFiles()
+    files = files_instance.select_files_by_area(area_id)
+    files_instance.close_connection()
+    return files
+
+@archivedFiles_router.get("/archived-files/type/{type_id}")
+def get_files_by_type(type_id: int):
+    files_instance = ArchivedFiles()
+    files = files_instance.select_files_by_type(type_id)
+    files_instance.close_connection()
+    return files
+
+@archivedFiles_router.get("/archived-files/{area_id}/{type_id}")
+def get_files_by_area_and_type(area_id: int, type_id: int):
+    files_instance = ArchivedFiles()
+    files = files_instance.select_files_by_area_and_type(area_id, type_id)
+    files_instance.close_connection()
+    if not files:
+        raise HTTPException(status_code=404, detail="Files not found")
+    return files
+
+
+@archivedFiles_router.post("/upload-archived-file/")
+async def upload_archived_file(
+    file: UploadFile = File(...),
+    id_area: int = Form(...),
+    id_type: int = Form(...),
+    file_name: str = Form(...),  # El nombre deseado sin extensión
+):
+    # Instancia de la clase para manejar archivos archivados
+    files_instance = ArchivedFiles()
+    
+    # Determinar la extensión del archivo y el nombre final
     _, extension = splitext(file.filename)
-    final_filename = custom_filename
-    file_path = upload_dir / f"{final_filename}{extension}"
+    final_filename = f"{file_name}{extension}"
 
-    # Verificar si el archivo ya existe y modificar el nombre si es necesario
+    # Construir la ruta de destino relativa y absoluta
+    relative_path = Path("files") / "archived_files" / f"area_{id_area}" / f"tipo_{id_type}"
+    upload_dir = Path.cwd() / relative_path
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    file_path = upload_dir / final_filename
+
+    # Asegurar nombre único
     counter = 1
     while file_path.exists():
-        final_filename = f"{custom_filename}_{counter}"
-        file_path = upload_dir / f"{final_filename}{extension}"
+        final_filename = f"{file_name}_{counter}{extension}"
+        file_path = upload_dir / final_filename
         counter += 1
 
-    with open(file_path, "wb") as buffer:
-        content = await file.read()
-        buffer.write(content)
+    # Guardar el archivo
+    with file_path.open("wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
 
+    # Construir la URL del archivo relativa para la base de datos, asegurándose de no incluir doble slash
+    file_url = str(relative_path / final_filename).replace("\\", "/")
 
-@archivedFiles_router.get("/get-archived-file/{training_id}/{filename}")
-async def get_archived_file(training_id: str, filename: str):
-    file_path = Path.cwd() / "files" / "archived_files" / training_id / filename
-    
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail="File not found")
-    
-    return FileResponse(str(file_path))
-    
+    # Crear registro en la base de datos con el nombre final del archivo y la URL relativa
+    file_data = ArchivedFile(
+        file_name=final_filename,
+        file_url=file_url,  # Usando la ruta relativa desde "files"
+        upload_date=datetime.now(),
+        id_area=id_area,
+        id_type=id_type,
+        file_extension=extension.lstrip('.')  # Eliminar el punto inicial de la extensión si existe
+    )
+    file_id = files_instance.insert_file(file_data)
+
+    return {"file_id": file_id, "file_name": final_filename, "file_path": file_url}
+
+@archivedFiles_router.get("/get-archived-file/{area_id}/{file_type_id}/{file_name}")
+def get_training_file(area_id: str, file_type_id: str, file_name: str):
+    # Construir la ruta del directorio basada en el área y el tipo de archivo
+    directory_path = Path.cwd() / "files" / "archived_files" / f"area_{area_id}"  / f"tipo_{file_type_id}" 
+
+    # Construir el patrón de búsqueda para el archivo, sin incluir la extensión
+    file_pattern = file_name + ".*"
+
+    # Buscar todos los archivos que coincidan con el patrón en el directorio especificado
+    matching_files = list(directory_path.glob(file_pattern))
+
+    # Verificar si se encontró al menos un archivo
+    if matching_files:
+        # Devolver el primer archivo encontrado
+        return FileResponse(str(matching_files[0]))
+    else:
+        # Si no se encuentra ningún archivo, devolver un mensaje de error
+        raise HTTPException(status_code=404, detail="Archivo no encontrado")
 
 
 @archivedFiles_router.put("/archived-file/{file_id}")
@@ -92,14 +204,33 @@ def update_file(file_id: int, file: ArchivedFile):
         raise HTTPException(status_code=404, detail="File not found")
     return updated_file
 
+
 @archivedFiles_router.delete("/archived-file/{file_id}")
 def delete_file(file_id: int):
     files_instance = ArchivedFiles()
+    file = files_instance.select_file_by_id(file_id)  # Step 1: Get file details
+    
+    if file is None:
+        files_instance.close_connection()
+        raise HTTPException(status_code=404, detail="File not found")
+
+    # Construct the full path to the file. Adjust the path construction based on your actual file storage structure.
+    file_path = Path.cwd() / file['file_url']  # Adjust the path according to your structure
+
+    # Step 2: Delete the file from the filesystem if it exists
+    if file_path.exists():
+        file_path.unlink()
+        
+        
+    # Step 3: Delete the file record from the database
     result = files_instance.delete_file(file_id)
     files_instance.close_connection()
+
     if result is None:
-        raise HTTPException(status_code=404, detail="File not found")
-    return {"message": "File deleted successfully"}
+        raise HTTPException(status_code=500, detail="Error deleting file record from the database")
+
+    return {"message": "File deleted successfully from both database and storage", "noe":file_path}
+
 
 
 areas_router = APIRouter()

@@ -21,21 +21,35 @@ class ArchivedFiles:
         self.file_id = file_id
 
     def select_all_files(self):
-        select_query = "SELECT * FROM archived_files;"
+        select_query = """
+        SELECT af.*, a.area_name, dt.type_name 
+        FROM archived_files af
+        JOIN areas a ON af.id_area = a.id_area
+        JOIN DocumentTypes dt ON af.id_type = dt.id_type;
+        """
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
+        # Asegúrate de incluir 'area_name' y 'type_name' en el resultado
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
     def select_file_by_id(self, file_id):
-        select_query = "SELECT * FROM archived_files WHERE id_file = %s;"
+        select_query = """
+        SELECT af.*, a.area_name, dt.type_name 
+        FROM archived_files af
+        JOIN areas a ON af.id_area = a.id_area
+        JOIN DocumentTypes dt ON af.id_type = dt.id_type
+        WHERE af.id_file = %s;
+        """
         self.cursor.execute(select_query, (file_id,))
         columns = [desc[0] for desc in self.cursor.description]
         file_data = self.cursor.fetchone()
 
         if file_data:
+            # Asegúrate de incluir 'area_name' y 'type_name' en el resultado
             return dict(zip(columns, file_data))
         else:
             return None
+
 
     def insert_file(self, file_data: ArchivedFile):
         insert_query = """
@@ -50,6 +64,44 @@ class ArchivedFiles:
         file_id = self.cursor.fetchone()[0]
         self.conn.commit()
         return file_id
+
+
+    def select_files_by_area(self, area_id):
+        select_query = """
+        SELECT af.*, a.area_name, dt.type_name 
+        FROM archived_files af
+        JOIN areas a ON af.id_area = a.id_area
+        JOIN DocumentTypes dt ON af.id_type = dt.id_type
+        WHERE af.id_area = %s;
+        """
+        self.cursor.execute(select_query, (area_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+    def select_files_by_type(self, type_id):
+        select_query = """
+        SELECT af.*, a.area_name, dt.type_name 
+        FROM archived_files af
+        JOIN areas a ON af.id_area = a.id_area
+        JOIN DocumentTypes dt ON af.id_type = dt.id_type
+        WHERE af.id_type = %s;
+        """
+        self.cursor.execute(select_query, (type_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+    def select_files_by_area_and_type(self, area_id, type_id):
+        select_query = """
+        SELECT af.*, a.area_name, dt.type_name 
+        FROM archived_files af
+        JOIN areas a ON af.id_area = a.id_area
+        JOIN DocumentTypes dt ON af.id_type = dt.id_type
+        WHERE af.id_area = %s AND af.id_type = %s;
+        """
+        self.cursor.execute(select_query, (area_id, type_id))
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
 
 
     def update_file(self, file_id, updated_data: ArchivedFile):
@@ -74,9 +126,14 @@ class ArchivedFiles:
             return None
 
     def delete_file(self, file_id):
-        # Implementar lógica de desactivación o eliminación según tus requisitos.
-        return 'solo desactiva el archivo'
-    
+        # Primero, obtén la URL o la ruta del archivo para poder eliminarlo del sistema de archivos
+        
+        # Luego, elimina el archivo de la base de datos
+        delete_query = "DELETE FROM archived_files WHERE id_file = %s"
+        self.cursor.execute(delete_query, (file_id,))
+        self.conn.commit()
+        return "Archivo eliminado exitosamente"
+
     
 
     def close_connection(self):
