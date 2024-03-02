@@ -1,11 +1,12 @@
 <template>
     <p class="col-12 text-center text-2xl lg:text-5xl" style="font-weight: bold;" > ⚔️ BATALLA DE CIUDADES ⚔️</p>
 
-    <div class="grid xl:col-10 xl:m-auto p-2 m-auto" style="border-radius:2rem; margin-bottom: 5rem;max-width: 1024px;">
+    <div class="grid xl:col-10 xl:m-auto p-0 m-auto" style="border-radius:2rem; margin-bottom: 5rem;max-width: 1024px;">
         
         
-        <div v-for="(product,index) in products.filter(product => product.state === 'active')" :key="product.id" class="xl:col-4 lg:col-4 md:p-3 col-6 p-3">
-            <span class="text-2xl my-5  lg:text-4xl" style="color: var(--primary-color); font-weight: bold;">{{ ciudades[index] }} </span> 
+        <div v-for="(product,index) in products.filter(product => product.state === 'active')" :key="product.id" class="xl:col-4 lg:col-4 md:p-3 col-6 my-3 ">
+            <span class="text-2xl py-5  lg:text-4xl" style="color: var(--primary-color); font-weight: bold;">{{ ciudades[index] }} </span> 
+            <!-- <p> divisor</p> -->
             <TarjetaMenu style="width: 100%;" :product="product"></TarjetaMenu>
             
         </div>
@@ -14,7 +15,7 @@
 
     <p class="col-12 text-center text-2xl lg:text-5xl" style="font-weight: bold;" >SALCHIPAPAS </p>
 
-    <div class="grid xl:col-10 xl:m-auto p-2 m-auto" style="border-radius:2rem; margin-bottom: 5rem;max-width: 1024px;">
+    <div class="grid xl:col-10 xl:m-auto p-0 m-auto" style="border-radius:2rem; margin-bottom: 5rem;max-width: 1024px;">
         <div v-for="product in products2.filter(product => product.state === 'active')" :key="product.id" class="xl:col-3 lg:col-4 md:p-3 col-6 p-3">
             <TarjetaMenu style="width: 100%;" :product="product"></TarjetaMenu>
             
