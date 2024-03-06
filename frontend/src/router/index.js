@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory,createWebHistory } from 'vue-router'
 import AppLayout from '@/layout/AppLayout.vue';
 import axios from 'axios';
 import { setShowDialog } from '../service/state';
+import pixel from './pixel';
 
 import { URI } from '@/service/conection'
 import { menuOptions } from '@/service/menuOptions';
@@ -364,7 +365,13 @@ router.beforeEach((to, from, next) => {
 });
 
 
+pixel.init()
+router.afterEach((to, from) => {
+  // Esto rastreará una "PageView" cada vez que el usuario cambie de ruta
+  pixel.track('PageView');
+});
 
-export default router;
+
+export default router
 
 
