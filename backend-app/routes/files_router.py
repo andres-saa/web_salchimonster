@@ -6,6 +6,7 @@ from pathlib import Path
 # from model.files_connection import siteDocumentConnection
 # from schema.site_document_schema import SiteDocumentSchemaPost,SiteDocumentSchema
 from PIL import Image , ExifTags
+from glob import glob
 
 from os import remove
 from fastapi.responses import JSONResponse
@@ -103,23 +104,25 @@ async def upload_user_photo(product_id: str, file: UploadFile = File(...), backg
 
 
 @router.get('/read-product-image/{height}/{product_id}')
-def get_photo_profile(product_id: str,height:str):
+def get_photo_profile(product_id: str, height: str):
     timestamp = int(time.time())  # Obtener el timestamp actual
 
-    base_dir = getcwd() + "/files" + "/images" + "/products" + "/" + product_id
+    base_dir = Path(getcwd()) / "files" / "images" / "products" / product_id
+    pattern = f"{base_dir}/product image {product_id} {height}x{height}.*"
 
-    # Lista de extensiones de archivo a buscar en orden de preferencia
-    file_extensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp']
+    # Buscar archivos que coincidan con el patrón
+    files = glob(pattern)
 
-    for extension in file_extensions:
-        file_path = base_dir + "/" + "product image " + product_id + " " + height+"x"+height + extension
-        file = Path(file_path)
-        print(file)
+    if files:
+        # Si se encuentran archivos, devolver el primero
+        return FileResponse(files[0], headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Version": str(timestamp)
+        })
 
-        if file.exists():
-            return FileResponse(file_path, headers={"Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache", "Expires": "0", "Version": str(timestamp)})
-
-    # Si no se encuentra ninguna de las extensiones, puedes devolver un error o un archivo predeterminado
+    # Si no se encuentra ningún archivo, devolver un error
     return "Archivo no encontrado", 404
 
 
