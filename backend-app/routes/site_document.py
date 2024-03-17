@@ -60,37 +60,50 @@ def update_site_document(document_id: int, updated_document: SiteDocumentSchemaP
 
 @site_document_router.delete("/site_document/{document_id}")
 def delete_site_document(document_id: int):
+    # Localiza el directorio donde se almacenan los archivos del documento
+    document_dir = Path(getcwd()) / "files" / "documents" / str(document_id)
+
+    # Elimina el directorio y todos los archivos dentro de él si existe
+    if document_dir.exists():
+        shutil.rmtree(document_dir)
+
+    # Elimina el registro de la base de datos
     document_instance = SiteDocument()
     message = document_instance.delete_document(document_id)
     document_instance.close_connection()
+    
+    # Retorna el mensaje de confirmación
     return {"message": message}
 
 
 @site_document_router.post('/upload-file-document/{document_id}')
 async def upload_file_document(document_id: int, file: UploadFile = File(...), file_name: str = Form(...)):
-    # Extraer la extensión del archivo original
     original_file_extension = splitext(file.filename)[1]
-
-    # Directorio donde se guardarán los archivos
     upload_dir = Path(getcwd()) / "files" / "documents" / str(document_id)
 
-    # Eliminar la carpeta si ya existe, para remover todo su contenido
     if upload_dir.exists():
         shutil.rmtree(upload_dir)
-    
-    # Crear la carpeta nuevamente después de eliminarla
     upload_dir.mkdir(parents=True, exist_ok=True)
 
-    # Construir el nombre completo del archivo usando el nombre proporcionado y la extensión original
+    # Iniciar el sufijo de duplicado y el nombre completo del archivo
+    duplicate_suffix = 1
     full_file_name = f"{file_name}{original_file_extension}"
     file_path = upload_dir / full_file_name
 
-    # Guardar el nuevo archivo
+    # Verificar si el archivo ya existe y actualizar el nombre en consecuencia
+    while file_path.exists():
+        full_file_name = f"{file_name}-{duplicate_suffix}{original_file_extension}"
+        file_path = upload_dir / full_file_name
+        duplicate_suffix += 1
+
+    # Guardar el archivo
     with open(file_path, "wb") as myfile:
         content = await file.read()
         myfile.write(content)
 
     return {"message": "Archivo subido con éxito", "file_name": file_name, "full_file_name": full_file_name}
+
+
 
 from fastapi.responses import FileResponse
 
@@ -99,15 +112,17 @@ from glob import glob
 @site_document_router.get("/get-document-file/{document_id}/{file_name}")
 def get_document_file(document_id: int, file_name: str):
     base_dir = Path(getcwd()) / "files" / "documents" / str(document_id)
-    search_pattern = str(base_dir / f"{file_name}.*")
+    # Buscar archivos que coincidan con el nombre proporcionado y cualquier sufijo numérico
+    search_pattern = str(base_dir / f"{file_name}*.*")
 
     matching_files = glob(search_pattern)
     if matching_files:
+        # Si hay múltiples coincidencias, esto podría ajustarse para seleccionar el archivo deseado
         return FileResponse(matching_files[0])
     else:
         return {"message": "Archivo no encontrado"}, 404
-
-
+     
+     
 @site_document_router.get("/get-site-documents-info/{site_id}")
 def get_site_documents_info(site_id: str):
     document_instance = SiteDocument()
@@ -121,6 +136,15 @@ def get_site_documents_info(site_id: str):
 def insert(site_data: SiteDocumentSchemaPost):
     document_instance = SiteDocument()
     data = site_data
+
+    # Comprobar si el documento ya existe y ajustar el nombre de ser necesario
+    base_name = data.name
+    if document_instance.document_exists(base_name):
+        max_suffix = document_instance.get_max_suffix(base_name)
+        new_suffix = max_suffix + 1
+        new_name = f"{base_name}-{new_suffix}"
+        data.document_name = new_name  # Asumiendo que 'name' es un atributo de 'SiteDocumentSchemaPost'
+
     document_id = document_instance.insert_document(data)
     document_instance.close_connection()
     return {"document_id": document_id}
