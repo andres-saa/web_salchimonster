@@ -58,42 +58,36 @@ class SiteDocument:
     #     return document_id
 
     def insert_document(self, document_data: SiteDocumentSchemaPost):
-        # Primero, intenta encontrar un documento existente con el mismo site_id y document_type
-        search_query = """
-        SELECT document_id FROM site_documents 
-        WHERE site_id = %s AND document_type = %s;
-        """
-        self.cursor.execute(search_query, (document_data.site_id, document_data.document_type))
+        # Verifica si el documento con el mismo nombre ya existe
+        check_query = "SELECT * FROM site_documents WHERE document_name = %s;"
+        self.cursor.execute(check_query, (document_data.document_name,))
         existing_document = self.cursor.fetchone()
 
+        # Genera un nuevo nombre si el documento ya existe
         if existing_document:
-            # Si existe, actualiza el registro existente
-            update_query = """
-            UPDATE site_documents
-            SET document_name = %s, renovation_date = %s
-            WHERE document_id = %s
-            RETURNING document_id;
-            """
-            self.cursor.execute(update_query, (
-                document_data.document_name, document_data.renovation_date, existing_document[0]
-            ))
-            document_id = existing_document[0]  # Usamos el ID existente
-        else:
-            # Si no existe, inserta un nuevo registro
-            insert_query = """
-            INSERT INTO site_documents (
-                document_name, document_type, renovation_date, site_id
-            ) VALUES (%s, %s, %s, %s) RETURNING document_id;
-            """
-            self.cursor.execute(insert_query, (
-                document_data.document_name, document_data.document_type, document_data.renovation_date, document_data.site_id
-            ))
-            document_id = self.cursor.fetchone()[0]
+            i = 1
+            new_name = f"{document_data.document_name} [{i}]"
+            while True:
+                self.cursor.execute(check_query, (new_name,))
+                if not self.cursor.fetchone():
+                    break
+                i += 1
+                new_name = f"{document_data.document_name} [{i}]"
+            document_data.document_name = new_name
 
-        self.conn.commit()  # Asegúrate de hacer commit para guardar los cambios
+        # Inserta el nuevo documento
+        insert_query = """
+        INSERT INTO site_documents (
+            document_name, document_type, renovation_date, site_id
+        ) VALUES (%s, %s, %s, %s) RETURNING document_id;
+        """
+        self.cursor.execute(insert_query, (
+            document_data.document_name, document_data.document_type, document_data.renovation_date, document_data.site_id
+        ))
+        document_id = self.cursor.fetchone()[0]
+
+        self.conn.commit()
         return document_id
-
-    
 
     def update_document(self, document_id, updated_data: SiteDocumentSchemaPost):
         update_query = """
@@ -117,8 +111,20 @@ class SiteDocument:
             return None
 
     def delete_document(self, document_id):
-        # Implementa la lógica de eliminación según tus necesidades
-        return 'Implementar lógica de eliminación'
+    # Primero, verifica si el documento existe
+        select_query = "SELECT * FROM site_documents WHERE document_id = %s;"
+        self.cursor.execute(select_query, (document_id,))
+        document = self.cursor.fetchone()
+
+        if document:
+            # Si el documento existe, procede a eliminarlo
+            delete_query = "DELETE FROM site_documents WHERE document_id = %s;"
+            self.cursor.execute(delete_query, (document_id,))
+            self.conn.commit()  # Asegúrate de confirmar los cambios
+            return {"message": "Document deleted successfully", "document_id": document_id}
+        else:
+            # Si el documento no existe, retorna un mensaje indicándolo
+            return {"message": "Document not found", "document_id": document_id}
 
     def close_connection(self):
         self.conn.close()
