@@ -5,7 +5,7 @@ from models.connectivityLog import ConnectivityLog
 from schema.connectivityLog import ConnectivityLogSchema
 from datetime import datetime
 import pytz
-
+from schema.directory import *
 
 def obtener_hora_colombia():
     zona_horaria_colombia = pytz.timezone('America/Bogota')
@@ -50,7 +50,6 @@ def create_site(site: site_schema_post):
     site_id = site_instance.insert_site(site)
     site_instance.close_connection()
     return {"site_id": site_id}
-
 @site_router.put("/site/{site_id}")
 def update_site(site_id: int, updated_site: site_schema_post):
     site_instance = Site()
@@ -140,3 +139,191 @@ def get_all_sites_online_status():
     sites_status = connectivity_instance.get_sites_online_status()
     connectivity_instance.close_connection()
     return sites_status
+
+
+
+
+@site_router.get("/site/{site_id}/safe-boxes")
+def get_safe_boxes(site_id: int):
+    site_instance = Site(site_id=site_id)
+    safe_boxes = site_instance.get_all_safe_boxes()
+    site_instance.close_connection()
+    return safe_boxes
+
+@site_router.get("/site/{site_id}/cameras")
+def get_cameras(site_id: int):
+    site_instance = Site(site_id=site_id)
+    cameras = site_instance.get_all_cameras()
+    site_instance.close_connection()
+    return cameras
+
+@site_router.get("/site/{site_id}/wifi-networks")
+def get_wifi_networks(site_id: int):
+    site_instance = Site(site_id=site_id)
+    wifi_networks = site_instance.get_all_wifi_networks()
+    site_instance.close_connection()
+    return wifi_networks
+
+@site_router.get("/site/{site_id}/dataphones")
+def get_dataphones(site_id: int):
+    site_instance = Site(site_id=site_id)
+    dataphones = site_instance.get_all_dataphones()
+    site_instance.close_connection()
+    return dataphones
+
+@site_router.get("/site/{site_id}/web-pages")
+def get_web_pages(site_id: int):
+    site_instance = Site(site_id=site_id)
+    web_pages = site_instance.get_all_web_pages()
+    site_instance.close_connection()
+    return web_pages
+
+@site_router.get("/site/{site_id}/applications")
+def get_applications(site_id: int):
+    site_instance = Site(site_id=site_id)
+    applications = site_instance.get_all_applications()
+    site_instance.close_connection()
+    return applications
+
+# Consider adding an endpoint for general emails if needed and if they are associated with sites.
+
+# You can also consider adding an endpoint that aggregates all these details for a site
+@site_router.get("/site/{site_id}/all-details")
+def get_all_site_details(site_id: int):
+    site_instance = Site(site_id=site_id)
+    site_details = site_instance.get_all_site_data()
+    site_instance.close_connection()
+    return site_details
+
+
+
+
+
+@site_router.post("/site/safe-box")
+def create_safe_box( safe_box: DirSafeBoxes):
+    site_instance = Site()
+    safe_box_id = site_instance.create_safe_box(safe_box)
+    site_instance.close_connection()
+    return {"safe_box_id": safe_box_id}
+
+@site_router.put("/site/{site_id}/safe-box/{safe_box_id}")
+def update_safe_box(site_id: int, safe_box_id: int, safe_box: DirSafeBoxes):
+    site_instance = Site(site_id=site_id)
+    site_instance.update_safe_box(safe_box_id, safe_box)
+    site_instance.close_connection()
+    return {"message": "Safe box updated"}
+
+@site_router.post("/site/camera")
+def create_camera( camera: DirCameras):
+    site_instance = Site()
+    camera_id = site_instance.create_camera(camera)
+    site_instance.close_connection()
+    return {"camera_id": camera_id}
+
+@site_router.put("/site/{site_id}/camera/{camera_id}")
+def update_camera(site_id: int, camera_id: int, camera: DirCameras):
+    site_instance = Site(site_id=site_id)
+    site_instance.update_camera(camera_id, camera)
+    site_instance.close_connection()
+    return {"message": "Camera updated"}
+
+@site_router.post("/site/wifi-network")
+def create_wifi_network( wifi_network: DirWifi):
+    site_instance = Site()
+    wifi_id = site_instance.create_wifi_network(wifi_network)
+    site_instance.close_connection()
+    return {"wifi_id": wifi_id}
+
+@site_router.put("/site/{site_id}/wifi-network/{wifi_id}")
+def update_wifi_network(site_id: int, wifi_id: int, wifi_network: DirWifi):
+    site_instance = Site(site_id=site_id)
+    site_instance.update_wifi_network(wifi_id, wifi_network)
+    site_instance.close_connection()
+    return {"message": "WiFi network updated"}
+
+@site_router.post("/site/dataphone")
+def create_dataphone(dataphone: DirDataphones):
+    site_instance = Site()
+    dataphone_id = site_instance.create_dataphone(dataphone)
+    site_instance.close_connection()
+    return {"dataphone_id": dataphone_id}
+
+@site_router.put("/site/{site_id}/dataphone/{dataphone_id}")
+def update_dataphone(site_id: int, dataphone_id: int, dataphone: DirDataphones):
+    site_instance = Site(site_id=site_id)
+    site_instance.update_dataphone(dataphone_id, dataphone)
+    site_instance.close_connection()
+    return {"message": "Dataphone updated"}
+
+@site_router.post("/siteweb-page")
+def create_web_page( web_page: DirWebPages):
+    site_instance = Site()
+    web_page_id = site_instance.create_web_page(web_page)
+    site_instance.close_connection()
+    return {"web_page_id": web_page_id}
+
+@site_router.put("/site/{site_id}/web-page/{web_page_id}")
+def update_web_page(site_id: int, web_page_id: int, web_page: DirWebPages):
+    site_instance = Site(site_id=site_id)
+    site_instance.update_web_page(web_page_id, web_page)
+    site_instance.close_connection()
+    return {"message": "Web page updated"}
+
+@site_router.post("/site/application")
+def create_application( application: DirApplications):
+    site_instance = Site()
+    application_id = site_instance.create_application(application)
+    site_instance.close_connection()
+    return {"application_id": application_id}
+
+@site_router.put("/site/{site_id}/application/{application_id}")
+def update_application(site_id: int, application_id: int, application: DirApplications):
+    site_instance = Site(site_id=site_id)
+    site_instance.update_application(application_id, application)
+    site_instance.close_connection()
+    return {"message": "Application updated"}
+
+
+
+
+@site_router.delete("/site/{site_id}/safe-box/{safe_box_id}")
+def delete_safe_box(site_id: int, safe_box_id: int):
+    site_instance = Site(site_id=site_id)
+    site_instance.delete_safe_box(safe_box_id)
+    site_instance.close_connection()
+    return {"message": "Safe box deleted"}
+
+@site_router.delete("/site/{site_id}/camera/{camera_id}")
+def delete_camera(site_id: int, camera_id: int):
+    site_instance = Site(site_id=site_id)
+    site_instance.delete_camera(camera_id)
+    site_instance.close_connection()
+    return {"message": "Camera deleted"}
+
+@site_router.delete("/site/{site_id}/wifi-network/{wifi_id}")
+def delete_wifi_network(site_id: int, wifi_id: int):
+    site_instance = Site(site_id=site_id)
+    site_instance.delete_wifi_network(wifi_id)
+    site_instance.close_connection()
+    return {"message": "WiFi network deleted"}
+
+@site_router.delete("/site/{site_id}/dataphone/{dataphone_id}")
+def delete_dataphone(site_id: int, dataphone_id: int):
+    site_instance = Site(site_id=site_id)
+    site_instance.delete_dataphone(dataphone_id)
+    site_instance.close_connection()
+    return {"message": "Dataphone deleted"}
+
+@site_router.delete("/site/{site_id}/web-page/{web_page_id}")
+def delete_web_page(site_id: int, web_page_id: int):
+    site_instance = Site(site_id=site_id)
+    site_instance.delete_web_page(web_page_id)
+    site_instance.close_connection()
+    return {"message": "Web page deleted"}
+
+@site_router.delete("/site/{site_id}/application/{application_id}")
+def delete_application(site_id: int, application_id: int):
+    site_instance = Site(site_id=site_id)
+    site_instance.delete_application(application_id)
+    site_instance.close_connection()
+    return {"message": "Application deleted"}

@@ -7,3 +7,7 @@ class SiteDocumentSchemaPost(BaseModel):
     document_type:str
     renovation_date:str
     site_id: int
+    
+    
+class SiteFileType(BaseModel):
+    type_name: str

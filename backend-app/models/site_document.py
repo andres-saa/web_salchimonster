@@ -1,7 +1,7 @@
 # site_document.py
 
 import psycopg2
-from schema.site_document import SiteDocumentSchemaPost  # Asegúrate de crear este esquema
+from schema.site_document import SiteDocumentSchemaPost, SiteFileType # Asegúrate de crear este esquema
 from dotenv import load_dotenv
 import os
 
@@ -125,6 +125,58 @@ class SiteDocument:
         else:
             # Si el documento no existe, retorna un mensaje indicándolo
             return {"message": "Document not found", "document_id": document_id}
+
+    def create_site_file_type(self, file_type_data: SiteFileType):
+        insert_query = """
+        INSERT INTO site_file_types (type_name) VALUES (%s) RETURNING id;
+        """
+        self.cursor.execute(insert_query, (file_type_data.type_name,))
+        type_id = self.cursor.fetchone()[0]
+        self.conn.commit()
+        return type_id
+
+    def get_all_site_file_types(self):
+        select_query = "SELECT * FROM site_file_types;"
+        self.cursor.execute(select_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+    def get_site_file_type(self, type_id):
+        select_query = "SELECT * FROM site_file_types WHERE id = %s;"
+        self.cursor.execute(select_query, (type_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        type_data = self.cursor.fetchone()
+
+        if type_data:
+            return dict(zip(columns, type_data))
+        else:
+            return None
+
+    def update_site_file_type(self, type_id, updated_data: SiteFileType):
+        update_query = """
+        UPDATE site_file_types
+        SET type_name = %s
+        WHERE id = %s RETURNING *;
+        """
+        self.cursor.execute(update_query, (updated_data.type_name, type_id))
+        updated_type_data = self.cursor.fetchone()
+
+        if updated_type_data:
+            columns = [desc[0] for desc in self.cursor.description]
+            self.conn.commit()
+            return dict(zip(columns, updated_type_data))
+        else:
+            return None
+
+    def delete_site_file_type(self, type_id):
+        delete_query = "DELETE FROM site_file_types WHERE id = %s;"
+        self.cursor.execute(delete_query, (type_id,))
+        self.conn.commit()
+        return {"message": "File type deleted successfully", "id": type_id}
+
+
+
+
 
     def close_connection(self):
         self.conn.close()

@@ -1,6 +1,6 @@
-from fastapi import APIRouter,Form,File
+from fastapi import APIRouter,Form,File,HTTPException
 from models.site_document import SiteDocument  # Asegúrate de que este módulo esté correctamente importado
-from schema.site_document import SiteDocumentSchemaPost  
+from schema.site_document import SiteDocumentSchemaPost,SiteFileType  
 from datetime import datetime
 import uuid
 
@@ -149,6 +149,46 @@ def insert(site_data: SiteDocumentSchemaPost):
     document_instance.close_connection()
     return {"document_id": document_id}
 
+
+
+@site_document_router.get("/site-file-types")
+def get_all_site_file_types():
+    document_instance = SiteDocument()
+    types = document_instance.get_all_site_file_types()
+    document_instance.close_connection()
+    return types
+
+@site_document_router.get("/site-file-type/{type_id}")
+def get_site_file_type(type_id: int):
+    document_instance = SiteDocument()
+    file_type = document_instance.get_site_file_type(type_id)
+    document_instance.close_connection()
+    if not file_type:
+        raise HTTPException(status_code=404, detail="Site file type not found")
+    return file_type
+
+@site_document_router.post("/site-file-type")
+def create_site_file_type(file_type: SiteFileType):
+    document_instance = SiteDocument()
+    type_id = document_instance.create_site_file_type(file_type)
+    new_file_type = document_instance.get_site_file_type(type_id)
+    document_instance.close_connection()
+    return new_file_type
+
+@site_document_router.put("/site-file-type/{type_id}")
+def update_site_file_type(type_id: int, file_type: SiteFileType):
+    document_instance = SiteDocument()
+    updated_type_id = document_instance.update_site_file_type(type_id, file_type.type_name)
+    updated_file_type = document_instance.get_site_file_type(updated_type_id)
+    document_instance.close_connection()
+    return updated_file_type
+
+@site_document_router.delete("/site-file-type/{type_id}")
+def delete_site_file_type(type_id: int):
+    document_instance = SiteDocument()
+    document_instance.delete_site_file_type(type_id)
+    document_instance.close_connection()
+    return {"message": "Site file type deleted successfully"}
 
 # @site_document_router.put("/update/site-document/{document_id}")
 # def update(site_data: SiteDocumentSchemaPost, document_id: str):
