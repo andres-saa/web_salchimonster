@@ -153,6 +153,7 @@ class SiteDocument:
             return None
 
     def update_site_file_type(self, type_id, updated_data: SiteFileType):
+        print(updated_data)
         update_query = """
         UPDATE site_file_types
         SET type_name = %s
