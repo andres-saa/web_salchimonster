@@ -175,13 +175,16 @@ def create_site_file_type(file_type: SiteFileType):
     document_instance.close_connection()
     return new_file_type
 
+
 @site_document_router.put("/site-file-type/{type_id}")
 def update_site_file_type(type_id: int, file_type: SiteFileType):
     document_instance = SiteDocument()
-    updated_type_id = document_instance.update_site_file_type(type_id, file_type.type_name)
-    updated_file_type = document_instance.get_site_file_type(updated_type_id)
+
+    document_instance.update_site_file_type(type_id, file_type)
+    
+    # updated_file_type = document_instance.get_site_file_type(updated_type_id)
     document_instance.close_connection()
-    return updated_file_type
+    # return updated_file_type
 
 @site_document_router.delete("/site-file-type/{type_id}")
 def delete_site_file_type(type_id: int):
