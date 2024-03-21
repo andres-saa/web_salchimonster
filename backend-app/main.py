@@ -19,6 +19,7 @@ from routes.training import training_router, attendee_router, assigned_attendee_
 from routes.training_document import training_document_router
 from routes.training_file import training_file_router
 from routes.mail import mail_router
+from routes.audit import audit_router
 app = FastAPI()
 # from routes.area import area_router
 from routes.role import role_router, rolegroup_router
@@ -78,3 +79,4 @@ app.include_router(archivedFiles_router)
 app.include_router(areas_router)
 app.include_router(types_router)
 app.include_router(site_schedule_router)
+app.include_router(audit_router)
