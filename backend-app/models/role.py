@@ -143,14 +143,15 @@ class RoleGroup:
         self.cursor.execute(query)
         groups_with_roles = self.cursor.fetchall()
 
-        # Formatear el resultado en un diccionario
+        # Formatear el resultado en un diccionario, asegurándose de que todos los elementos son strings
         formatted_roles_by_group = {}
         for group_name, roles in groups_with_roles:
-            # Convertir la lista de roles a una lista de strings si no es None
-            roles_list = roles if roles is not None else []
+            # Filtrar cualquier valor que no sea una cadena de texto
+            roles_list = [role for role in roles if isinstance(role, str)]
             formatted_roles_by_group[group_name] = roles_list
 
         return formatted_roles_by_group
+
 
 
 

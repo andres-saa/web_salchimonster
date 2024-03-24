@@ -30,6 +30,9 @@ from routes.supply.supply_delivery import supply_delivery_router
 from routes.supply.supply_delivery_item import supply_delivery_item_router
 from routes.archived_file import archivedFiles_router,areas_router,types_router
 from routes.site_schedule import site_schedule_router
+from routes.work_scheduler import work_record_router
+from routes.work_scheduler import work_shift_router
+from routes.work_scheduler import work_day_router
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -58,6 +61,7 @@ app.include_router(grupo_cambios_router)
 app.include_router(grupo_acompanantes_router) 
 app.include_router(employer_router) 
 app.include_router(site_document_router)
+app.include_router(work_day_router)
 # app.include_router(area_router)
 app.include_router(login)
 app.include_router(permission_router)
@@ -80,3 +84,5 @@ app.include_router(areas_router)
 app.include_router(types_router)
 app.include_router(site_schedule_router)
 app.include_router(audit_router)
+app.include_router(work_record_router)
+app.include_router(work_shift_router)
