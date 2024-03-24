@@ -31,7 +31,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     
     access_token_expires = timedelta(minutes=15)
     access_token = create_access_token(
-        data={"sub": user['dni'], "rol":user['position'], "dni":user['dni'] ,"id":user['id'] }, expires_delta=access_token_expires
+        data={"sub": user['dni'], "rol":user['position'], "dni":user['dni'] ,"id":user['id'],"site_id":user["site_id"] }, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
