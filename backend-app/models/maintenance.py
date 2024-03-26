@@ -77,7 +77,44 @@ class EquipmentModel:
             return dict(zip(columns, updated_equipment_data))
         else:
             return None
-        
+    
+    def select_sites_with_all_equipment_by_names(self, equipment_names: List[str]):
+        equipment_count = len(equipment_names)
+        if equipment_count == 0:
+            return []
+
+        # Creando placeholders para la consulta
+        placeholders = ', '.join(['%s'] * equipment_count)
+
+        # Consulta para obtener los site_id que contienen todos los equipos especificados por nombre
+        select_query = f"""
+        SELECT site_id
+        FROM equipment
+        WHERE name IN ({placeholders})
+        GROUP BY site_id
+        HAVING COUNT(DISTINCT name) = %s;
+        """
+
+        # Ejecutando la consulta para obtener site_id
+        self.cursor.execute(select_query, tuple(equipment_names + [equipment_count]))
+        site_ids = [row[0] for row in self.cursor.fetchall()]
+
+        # Si no hay site_ids que coincidan, retorna una lista vacía
+        if not site_ids:
+            return []
+
+        # Recopilación de información detallada de cada sitio
+        sites = []
+        for site_id in site_ids:
+            # Ajusta esta consulta a tu esquema de base de datos si es necesario
+            self.cursor.execute("SELECT * FROM sites WHERE site_id = %s", (site_id,))
+            columns = [desc[0] for desc in self.cursor.description]
+            site_data = self.cursor.fetchone()
+            if site_data:
+                sites.append(dict(zip(columns, site_data)))
+
+        return sites
+
     
     def select_sites_with_all_equipment(self, equipment_ids: List[int]):
         equipment_count = len(equipment_ids)

@@ -126,3 +126,17 @@ def complete_maintenance_record(maintenance_id: int, remarks: str):
         return updated_maintenance
     else:
         raise HTTPException(status_code=404, detail="Maintenance record not found or could not be updated")
+    
+    
+    
+
+@equipment_router.post("/equipment/sites-with-all-by-names")
+def get_sites_with_all_equipment_by_names(equipment_names: List[str]):
+    equipment_instance = EquipmentModel()
+    sites = equipment_instance.select_sites_with_all_equipment_by_names(equipment_names)
+    equipment_instance.close_connection()
+    if not sites:
+       return [
+           
+       ]
+    return sites
