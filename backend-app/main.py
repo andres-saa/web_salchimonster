@@ -20,6 +20,7 @@ from routes.training_document import training_document_router
 from routes.training_file import training_file_router
 from routes.mail import mail_router
 from routes.audit import audit_router
+from routes.shift_work_scheduler import shift_work_day_router, shift_work_record_router, shift_work_shift_router
 from routes.maintenance import maintenance_router, equipment_router
 app = FastAPI()
 # from routes.area import area_router
@@ -44,6 +45,7 @@ app.add_middleware(
 
 app.include_router(product_router)
 app.include_router(user_router)
+
 app.include_router(site_router)
 app.include_router(delivery_person_router)
 app.include_router(order_router)
@@ -89,3 +91,6 @@ app.include_router(site_schedule_router)
 app.include_router(audit_router)
 app.include_router(work_record_router)
 app.include_router(work_shift_router)
+app.include_router(shift_work_day_router)
+app.include_router(shift_work_record_router)
+app.include_router(shift_work_shift_router)
