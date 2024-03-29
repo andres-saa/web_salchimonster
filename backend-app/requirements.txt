@@ -1,4 +1,5 @@
 fastapi
+APScheduler
 Pillow
 psycopg2-binary
 python-dotenv
