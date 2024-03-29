@@ -146,6 +146,16 @@ WHERE
             'average_ticket': average_ticket,
             'orders_info': orders_info
         }
+        
+        
+    def update_all_orders_status(self):
+        update_query = """
+        UPDATE orders
+        SET order_status = (order_status::jsonb || '{"status": "enviada"}')::json
+        WHERE (order_status->>'status') = 'en preparacion';
+        """
+        self.cursor.execute(update_query)
+        self.conn.commit()
 
 
     def get_order_total_price(self, order_id):

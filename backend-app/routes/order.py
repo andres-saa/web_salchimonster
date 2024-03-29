@@ -177,3 +177,18 @@ async def get_daily_average_ticket(site_ids: str, status: str, start_date: str, 
         return daily_average_ticket
     finally:
         order_instance.close_connection()
+        
+        
+        
+from apscheduler.schedulers.background import BackgroundScheduler
+
+scheduler = BackgroundScheduler()
+scheduler.start()
+
+def update_orders_status():
+    order_instance = Order()
+    order_instance.update_all_orders_status()
+    order_instance.close_connection()
+
+# Programa la tarea para que se ejecute todos los días a la 1 AM
+scheduler.add_job(update_orders_status, 'cron', hour=1, minute=0)
