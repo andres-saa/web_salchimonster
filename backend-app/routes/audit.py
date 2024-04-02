@@ -12,6 +12,16 @@ def create_audit(audit: Audit):
     audit_dao.close_connection()
     return audit_id
 
+
+@audit_router.delete("/checklist/{checklist_id}")
+def delete_checklist(checklist_id: int):
+    dao = AuditDAO()
+    try:
+        result = dao.delete_checklist(checklist_id)
+        return {"message": f"Checklist {checklist_id} deleted successfully"}
+    finally:
+        dao.close_connection()
+
 @audit_router.get("/audits")
 def get_audits():
     audit_dao = AuditDAO()

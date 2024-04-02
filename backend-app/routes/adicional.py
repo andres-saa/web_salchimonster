@@ -27,7 +27,7 @@ from schema.adicionales.cambios import CambioSchemaPost
 
 adicional_router = APIRouter()
 
-@adicional_router.get("/adicionales")
+@adicional_router.get("/adicionales" , tags=['products'])
 def get_adicionales():
     adicional_instance = Adicional()
     adicionales = adicional_instance.select_all_adicionales()
@@ -36,7 +36,7 @@ def get_adicionales():
 
 
 
-@adicional_router.post("/adicionales")
+@adicional_router.post("/adicionales" , tags=['products'])
 def create_adicional(adicional: adicionalSchemaPost):
     adicional_instance = Adicional()
     adicional_id = adicional_instance.insert_adicional(adicional)
@@ -44,7 +44,7 @@ def create_adicional(adicional: adicionalSchemaPost):
     adicional_instance.close_connection()
     return {"adicional_id": created_adicional[0]}
 
-@adicional_router.put("/adicionales/{adicional_id}")
+@adicional_router.put("/adicionales/{adicional_id}" , tags=['products'])
 def update_adicional(adicional_id: int, adicional: adicionalSchemaPost):
     adicional_instance = Adicional()
     existing_adicional = adicional_instance.select_adicional_by_id(adicional_id)
@@ -56,7 +56,7 @@ def update_adicional(adicional_id: int, adicional: adicionalSchemaPost):
     adicional_instance.close_connection()
     return {"message": "Adicional updated successfully", "adicional_id": adicional_id}
 
-@adicional_router.delete("/adicionales/{adicional_id}")
+@adicional_router.delete("/adicionales/{adicional_id}" , tags=['products'])
 def delete_adicional(adicional_id: int):
     adicional_instance = Adicional()
     existing_adicional = adicional_instance.select_adicional_by_id(adicional_id)
@@ -72,21 +72,21 @@ def delete_adicional(adicional_id: int):
 
 salsa_router = APIRouter()
 
-@salsa_router.post("/salsas")
+@salsa_router.post("/salsas" , tags=['products'])
 def create_salsa(salsa: SalsaSchemaPost):
     salsa_instance = Salsas()
     salsa_id = salsa_instance.insert_salsa(salsa)
     salsa_instance.close_connection()
     return {"salsa_id": salsa_id}
 
-@salsa_router.get("/salsas")
+@salsa_router.get("/salsas" , tags=['products'])
 def get_all_salsas():
     salsa_instance = Salsas()
     salsas = salsa_instance.select_all_salsas()
     salsa_instance.close_connection()
     return salsas
 
-@salsa_router.get("/salsas/{salsa_id}")
+@salsa_router.get("/salsas/{salsa_id}" , tags=['products'])
 def get_salsa(salsa_id: int):
     salsa_instance = Salsas()
     salsa = salsa_instance.select_salsa_by_id(salsa_id)
@@ -95,7 +95,7 @@ def get_salsa(salsa_id: int):
         raise HTTPException(status_code=404, detail="Salsa not found")
     return salsa
 
-@salsa_router.put("/salsas/{salsa_id}")
+@salsa_router.put("/salsas/{salsa_id}" , tags=['products'])
 def update_salsa(salsa_id: int, salsa: SalsaSchemaPost):
     salsa_instance = Salsas()
     salsa_instance.update_salsa(salsa_id, salsa)
@@ -105,7 +105,7 @@ def update_salsa(salsa_id: int, salsa: SalsaSchemaPost):
         raise HTTPException(status_code=404, detail="Salsa not found")
     return updated_salsa
 
-@salsa_router.delete("/salsas/{salsa_id}")
+@salsa_router.delete("/salsas/{salsa_id}" , tags=['products'])
 def delete_salsa(salsa_id: int):
     salsa_instance = Salsas()
     salsa_instance.delete_salsa(salsa_id)
@@ -116,21 +116,21 @@ def delete_salsa(salsa_id: int):
 
 topping_router = APIRouter()
 
-@topping_router.get("/toppings")
+@topping_router.get("/toppings" , tags=['products'])
 def get_all_toppings():
     topping_instance = Toppings()
     toppings = topping_instance.select_all_toppings()
     topping_instance.close_connection()
     return toppings
 
-@topping_router.post("/toppings")
+@topping_router.post("/toppings" , tags=['products'])
 def create_topping(topping: ToppingSchemaPost):
     topping_instance = Toppings()
     topping_id = topping_instance.insert_topping(topping)
     topping_instance.close_connection()
     return {"topping_id": topping_id}
 
-@topping_router.get("/toppings/{topping_id}")
+@topping_router.get("/toppings/{topping_id}" , tags=['products'])
 def get_topping(topping_id: int):
     topping_instance = Toppings()
     topping = topping_instance.select_topping_by_id(topping_id)
@@ -139,7 +139,7 @@ def get_topping(topping_id: int):
         raise HTTPException(status_code=404, detail="Topping not found")
     return topping
 
-@topping_router.put("/toppings/{topping_id}")
+@topping_router.put("/toppings/{topping_id}" , tags=['products'])
 def update_topping(topping_id: int, topping_data: ToppingSchemaPost):
     topping_instance = Toppings()
     topping_instance.update_topping(topping_id, topping_data)
@@ -149,7 +149,7 @@ def update_topping(topping_id: int, topping_data: ToppingSchemaPost):
         raise HTTPException(status_code=404, detail="Topping not found")
     return updated_topping
 
-@topping_router.delete("/toppings/{topping_id}")
+@topping_router.delete("/toppings/{topping_id}" , tags=['products'])
 def delete_toppings(topping_id: int):
     topping_instance = Topping()
     topping_instance.delete_topping(topping_id)
@@ -158,21 +158,21 @@ def delete_toppings(topping_id: int):
 
 acompanante_router = APIRouter()
 
-@acompanante_router.post("/acompanantes")
+@acompanante_router.post("/acompanantes" , tags=['products'])
 def create_acompanante(acompanante: AcompananteSchemaPost):
     acompanante_instance = Acompanantes()
     acompanante_id = acompanante_instance.insert_acompanante(acompanante)
     acompanante_instance.close_connection()
     return {"acompanante_id": acompanante_id}
 
-@acompanante_router.get("/acompanantes")
+@acompanante_router.get("/acompanantes" , tags=['products'])
 def get_all_acompanantes():
     acompanante_instance = Acompanantes()
     acompanantes = acompanante_instance.select_all_acompanantes()
     acompanante_instance.close_connection()
     return acompanantes
 
-@acompanante_router.get("/acompanantes/{acompanante_id}")
+@acompanante_router.get("/acompanantes/{acompanante_id}" , tags=['products'])
 def get_acompanante(acompanante_id: int):
     acompanante_instance = Acompanantes()
     acompanante = acompanante_instance.select_acompanante_by_id(acompanante_id)
@@ -181,7 +181,7 @@ def get_acompanante(acompanante_id: int):
         raise HTTPException(status_code=404, detail="Acompanante not found")
     return acompanante
 
-@acompanante_router.put("/acompanantes/{acompanante_id}")
+@acompanante_router.put("/acompanantes/{acompanante_id}" , tags=['products'])
 def update_acompanante(acompanante_id: int, acompanante_data: AcompananteSchemaPost):
     acompanante_instance = Acompanantes()
     acompanante_instance.update_acompanante(acompanante_id, acompanante_data)
@@ -191,7 +191,7 @@ def update_acompanante(acompanante_id: int, acompanante_data: AcompananteSchemaP
         raise HTTPException(status_code=404, detail="Acompanante not found")
     return updated_acompanante
 
-@acompanante_router.delete("/acompanantes/{acompanante_id}")
+@acompanante_router.delete("/acompanantes/{acompanante_id}" , tags=['products'])
 def delete_acompanante(acompanante_id: int):
     acompanante_instance = Acompanantes()
     acompanante_instance.delete_acompanante(acompanante_id)
@@ -201,14 +201,14 @@ def delete_acompanante(acompanante_id: int):
 
 cambio_router = APIRouter()
 
-@cambio_router.post("/cambios")
+@cambio_router.post("/cambios" , tags=['products'])
 def create_cambio(cambio: CambioSchemaPost):
     cambio_instance = Cambios()
     cambio_id = cambio_instance.insert_cambio(cambio)
     cambio_instance.close_connection()
     return {"cambio_id": cambio_id}
 
-@cambio_router.get("/cambios/{cambio_id}")
+@cambio_router.get("/cambios/{cambio_id}" , tags=['products'])
 def get_cambio(cambio_id: int):
     cambio_instance = Cambios()
     cambio = cambio_instance.select_cambio_by_id(cambio_id)
@@ -217,7 +217,7 @@ def get_cambio(cambio_id: int):
         raise HTTPException(status_code=404, detail="Cambio not found")
     return cambio
 
-@cambio_router.put("/cambios/{cambio_id}")
+@cambio_router.put("/cambios/{cambio_id}" , tags=['products'])
 def update_cambio(cambio_id: int, cambio_data: CambioSchemaPost):
     cambio_instance = Cambios()
     cambio_instance.update_cambio(cambio_id, cambio_data)
@@ -227,7 +227,7 @@ def update_cambio(cambio_id: int, cambio_data: CambioSchemaPost):
         raise HTTPException(status_code=404, detail="Cambio not found")
     return updated_cambio
 
-@cambio_router.delete("/cambios/{cambio_id}")
+@cambio_router.delete("/cambios/{cambio_id}" , tags=['products'])
 def delete_cambio(cambio_id: int):
     cambio_instance = Cambios()
     cambio_instance.delete_cambio(cambio_id)
@@ -235,7 +235,7 @@ def delete_cambio(cambio_id: int):
     return {"message": "Cambio deleted successfully"}
 
 
-@cambio_router.get("/cambios")
+@cambio_router.get("/cambios" , tags=['products'])
 def get_all_cambios():
     cambio_instance = Cambios()
     cambios = cambio_instance.select_all_cambios()

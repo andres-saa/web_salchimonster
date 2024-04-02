@@ -19,12 +19,13 @@ from schema.archived_file import ArchivedFile,Area,DocumentType  # Asume que est
 
 archivedFiles_router = APIRouter()
 
-@archivedFiles_router.get("/archived-files")
+@archivedFiles_router.get("/archived-files" )
 def get_files():
     files_instance = ArchivedFiles()
     files = files_instance.select_all_files()
     files_instance.close_connection()
     return files
+
 
 @archivedFiles_router.get("/archived-file/{file_id}")
 def get_file_by_id(file_id: int):

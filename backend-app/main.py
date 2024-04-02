@@ -22,8 +22,9 @@ from routes.mail import mail_router
 from routes.audit import audit_router
 from routes.shift_work_scheduler import shift_work_day_router, shift_work_record_router, shift_work_shift_router
 from routes.maintenance import maintenance_router, equipment_router
-app = FastAPI()
-# from routes.area import area_router
+from routes.recipe.ingredient import ingredient_router
+from routes.recipe.data_sheet import recipe_data_sheet_router
+
 from routes.role import role_router, rolegroup_router
 from routes.city import city_router
 from routes.neighborhood import neighborhood_router
@@ -35,6 +36,9 @@ from routes.site_schedule import site_schedule_router
 from routes.work_scheduler import work_record_router
 from routes.work_scheduler import work_shift_router
 from routes.work_scheduler import work_day_router
+from routes.recipe.recipe import recipe_router
+app = FastAPI()
+# from routes.area import area_router
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -43,9 +47,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
+
+app.include_router(recipe_data_sheet_router)
 app.include_router(product_router)
 app.include_router(user_router)
-
+app.include_router(ingredient_router)
 app.include_router(site_router)
 app.include_router(delivery_person_router)
 app.include_router(order_router)
@@ -67,6 +75,7 @@ app.include_router(site_document_router)
 app.include_router(work_day_router)
 app.include_router(maintenance_router)
 app.include_router(equipment_router)
+app.include_router(recipe_router)
 # app.include_router(area_router)
 app.include_router(login)
 app.include_router(permission_router)
