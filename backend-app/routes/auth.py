@@ -104,6 +104,7 @@ def verify_user(username: str, password: str):
             return site
 
 # Ruta para obtener un token de acceso
+
 @auth.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     site = verify_user(form_data.username, form_data.password)
@@ -114,6 +115,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         return {"access_token": token, "token_type": "bearer", "username": form_data.username, "site_id": site.site_id}
     else:
         raise HTTPException(status_code=401, detail="Credenciales no válidas")
+
 
 # Ruta protegida con token
 @auth.get("/private-data")

@@ -3,7 +3,7 @@ from schema.order import order_schema_post
 from models.order import Order
 from fastapi import APIRouter, HTTPException
 from datetime import datetime
-
+from pytz import timezone
 import pytz 
 order_router = APIRouter()
 
@@ -182,7 +182,7 @@ async def get_daily_average_ticket(site_ids: str, status: str, start_date: str, 
         
 from apscheduler.schedulers.background import BackgroundScheduler
 
-scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler(timezone=timezone('America/Bogota'))
 scheduler.start()
 
 def update_orders_status():

@@ -238,10 +238,27 @@ class AuditDAO:
             return None
     
     def delete_audit(self, audit_id):
-        delete_query = "DELETE FROM audits WHERE id = %s;"
-        self.cursor.execute(delete_query, (audit_id,))
+        # Retrieve all audit item IDs associated with the audit
+        self.cursor.execute("SELECT id FROM audit_items WHERE audit_id = %s;", (audit_id,))
+        audit_item_ids = self.cursor.fetchall()
+
+        # Delete warnings associated with each audit item
+        for item_id in audit_item_ids:
+            self.cursor.execute("DELETE FROM warnings WHERE audit_item_id = %s;", (item_id[0],))
+
+        # Delete audit items associated with the audit
+        delete_items_query = "DELETE FROM audit_items WHERE audit_id = %s;"
+        self.cursor.execute(delete_items_query, (audit_id,))
+
+        # Delete the audit itself
+        delete_audit_query = "DELETE FROM audits WHERE id = %s;"
+        self.cursor.execute(delete_audit_query, (audit_id,))
+
         self.conn.commit()
-        return f"Audit with id {audit_id} was deleted."
+
+        return f"Audit with id {audit_id} was deleted along with its related audit items and warnings."
+
+
 
 
     def create_audit_with_items_and_warnings(self, audit_data: Audit, items_with_warnings: List[AuditItemWithWarning]):
@@ -433,6 +450,30 @@ class AuditDAO:
         updated_group_data = self.cursor.fetchone()
         self.conn.commit()  # Aquí se agrega el commit
         return dict(zip(columns, updated_group_data)) if updated_group_data else None
+
+
+    def delete_checklist(self, checklist_id):
+        # First, delete check items associated with the checklist
+        delete_items_query = """
+        DELETE FROM check_item
+        WHERE group_id IN (
+            SELECT id FROM checkgroup WHERE checklist_id = %s
+        );
+        """
+        self.cursor.execute(delete_items_query, (checklist_id,))
+        
+        # Then, delete the check groups associated with the checklist
+        delete_groups_query = "DELETE FROM checkgroup WHERE checklist_id = %s;"
+        self.cursor.execute(delete_groups_query, (checklist_id,))
+
+        # Finally, delete the checklist itself
+        delete_checklist_query = "DELETE FROM checklists WHERE id = %s;"
+        self.cursor.execute(delete_checklist_query, (checklist_id,))
+        
+        self.conn.commit()
+        return f"Checklist with id {checklist_id} was deleted along with its related groups and items."
+
+
 
     def delete_check_group(self, group_id):
         delete_query = "DELETE FROM checkgroup WHERE id = %s;"
