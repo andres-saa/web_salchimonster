@@ -35,7 +35,7 @@ try {
 
 
 const payMethod = ref('')
-const payMethods = ref(["Recoger en local", "Efectivo", "Pago con tarjeta (datafono),"])
+const payMethods = ref(["Recoger en local", "Efectivo", "Pago con tarjeta (datafono),","Transferencia"])
 const invalid = ref({})
 const thanks_data = ref()
 
@@ -253,4 +253,4 @@ function eliminarProductosDelCarrito() {
   }
 
 
-export{payMethods,payMethod,showThaks,sending_order, send_order,order_notes,user_data,invalid,thanks_data}
+export{payMethods,payMethod,showThaks,sending_order,eliminarProductosDelCarrito, send_order,order_notes,user_data,invalid,thanks_data}

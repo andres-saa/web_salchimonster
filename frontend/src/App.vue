@@ -6,10 +6,15 @@ import siteDialog from './components/siteDialog.vue';
 import VistaProducto from './components/VistaProducto.vue'
 import restauranteCerrado from './components/restauranteCerrado.vue';
 import Loading from './components/Loading.vue'
-
+// import { eliminarAdicionDelCarrito } from './service/cart';
+import { eliminarProductosDelCarrito } from './service/order';
 import { URI } from './service/conection';
+import { onMounted } from 'vue';
 
 
+onMounted(()=>{
+eliminarProductosDelCarrito()
+})
 
 </script>
 
