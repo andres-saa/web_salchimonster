@@ -64,9 +64,18 @@ import { useRoute } from 'vue-router';
 
 const route = useRoute()
 
+const siteStore = useSitesStore()
+
+
+if(!siteStore.location.site.site_id){
+    // alert(route.fullPath)
+    siteStore.setVisible("currentSite", true)
+  }
+
 import {ref} from 'vue'
 import { comprobar_sede } from '../../service/state';
 import router from '@/router/index.js'
+import { useSitesStore } from '../../store/site';
 const ruta = ref(router.currentRoute)
 const hola = ref( localStorage.getItem('currentNeigborhood') )
 

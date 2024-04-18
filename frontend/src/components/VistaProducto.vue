@@ -48,7 +48,7 @@
         style="display: flex;align-items: center; max-height: 45rem; background-color:white;border-radius: 0.5rem; ">
 
 
-        <img class="col-12 p-2 m-0" :src="`https://backend.salchimonster.com/read-product-image/600/LA%20%C3%91ERA`"
+        <img class="col-12 p-2 m-0" :src="`https://backend.salchimonster.com/read-product-image/600/${store.currentProduct.product_name}`"
           alt="" style="width: 100%;object-fit: contain; aspect-ratio: 1/1;">
 
       </div>
