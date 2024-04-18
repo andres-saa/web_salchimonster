@@ -191,4 +191,4 @@ def update_orders_status():
     order_instance.close_connection()
 
 # Programa la tarea para que se ejecute todos los días a la 1 AM
-scheduler.add_job(update_orders_status, 'cron', hour=1, minute=0)
+scheduler.add_job(update_orders_status, 'cron', hour=23, minute=30)

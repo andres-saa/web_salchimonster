@@ -1,7 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException,Body
 from models.product import Product
 from schema.product import ProductSchemaPost
-
+from schema.product import Product as Product_schema
+from typing import List
+from pydantic import BaseModel
 product_router = APIRouter()
 
 @product_router.get("/products")
@@ -12,24 +14,75 @@ def get_products():
     return products
 
 @product_router.post("/products")
-def create_product(product: ProductSchemaPost):
+def create_product(product: Product_schema):
     product_instance = Product()
     product_id = product_instance.insert_product(product)
     created_product = product_instance.select_product_by_id(product_id)
     product_instance.close_connection()
-    return {"product_id": created_product[0]}
+    return {"product_id": product_id}
 
 
-@product_router.get("/products/category/name/{category_name}/site/{site_id}")
-def get_products_by_category_name_and_site(category_name: str, site_id: int):
+@product_router.get("/products-active/category-id/{category_id}/site/{site_id}")
+def get_products_by_category_name_and_site(category_id: str, site_id: int):
     product_instance = Product()
     try:
-        products = product_instance.select_products_by_category_name_and_site(category_name, site_id)
+        products = product_instance.select_products_by_site_and_category_active(site_id,category_id)
         if not products:
             raise HTTPException(status_code=404, detail="No products found for the given category name and site")
         return products
     finally:
         product_instance.close_connection()
+
+
+
+class aditionals(BaseModel):
+    ids:list[int]
+
+
+@product_router.put("/products/update/{product_instance_id}")
+def update_product_and_instances(product_instance_id: int, product: ProductSchemaPost, additional_item_ids:list[int]):
+    product_instance = Product()
+    try:
+        existing_product = product_instance.select_product_by_id(product_instance_id)
+        if existing_product is None:
+            raise HTTPException(status_code=404, detail="Product not found")
+        
+        # print(existing_product)
+
+        # Convertir el esquema de entrada en un diccionario o manejarlo directamente si el método acepta un objeto del esquema
+        product_info = {
+            
+            "product_instance_id": product.product_id,
+            "product_id":existing_product[0]['product_id'],
+            "name": product.name,
+            "price": product.price,
+            "description": product.description,
+            "category_id": product.category_id,
+            "status": True
+        }
+        
+        
+        print(product_info)
+
+        # Llama al método de actualización que maneja tanto el producto como sus instancias y adicionales
+        update_result = product_instance.update_product_and_its_instances(product_info, additional_item_ids)
+        return {"message": update_result}
+
+    finally:
+        product_instance.close_connection()
+
+
+@product_router.get("/products-all/category-id/{category_id}/site/{site_id}")
+def get_products_by_category_name_and_site(category_id: str, site_id: int):
+    product_instance = Product()
+    try:
+        products = product_instance.select_products_by_site_and_category_all(site_id,category_id)
+        if not products:
+            raise HTTPException(status_code=404, detail="No products found for the given category name and site")
+        return products
+    finally:
+        product_instance.close_connection()
+
 
 @product_router.get("/products/category/{category_id}")
 def get_products_by_category(category_id: int):

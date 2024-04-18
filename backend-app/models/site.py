@@ -94,37 +94,37 @@ class Site:
         
         
     def get_all_safe_boxes(self):
-        select_query = "SELECT * FROM dir_safe_boxes WHERE site_id = %s;"
+        select_query = "SELECT * FROM directory.dir_safe_boxes WHERE site_id = %s;"
         self.cursor.execute(select_query, (self.site_id,))
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
     def get_all_cameras(self):
-        select_query = "SELECT * FROM dir_cameras WHERE site_id = %s;"
+        select_query = "SELECT * FROM directory.dir_cameras WHERE site_id = %s;"
         self.cursor.execute(select_query, (self.site_id,))
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
     def get_all_wifi_networks(self):
-        select_query = "SELECT * FROM dir_wifi WHERE site_id = %s;"
+        select_query = "SELECT * FROM directory.dir_wifi WHERE site_id = %s;"
         self.cursor.execute(select_query, (self.site_id,))
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
     def get_all_dataphones(self):
-        select_query = "SELECT * FROM dir_dataphones WHERE site_id = %s;"
+        select_query = "SELECT * FROM directory.dir_dataphones WHERE site_id = %s;"
         self.cursor.execute(select_query, (self.site_id,))
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
     def get_all_web_pages(self):
-        select_query = "SELECT * FROM dir_web_pages WHERE site_id = %s;"
+        select_query = "SELECT * FROM directory.dir_web_pages WHERE site_id = %s;"
         self.cursor.execute(select_query, (self.site_id,))
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
     def get_all_applications(self):
-        select_query = "SELECT * FROM dir_applications WHERE site_id = %s;"
+        select_query = "SELECT * FROM directory.dir_applications WHERE site_id = %s;"
         self.cursor.execute(select_query, (self.site_id,))
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
@@ -132,7 +132,7 @@ class Site:
     def get_all_general_emails(self):
         # Suponiendo que necesitas obtener los correos relacionados con una sede, pero esta relación no está directamente definida en tu esquema
         # Deberías ajustar esta función según tu diseño de base de datos y necesidades.
-        select_query = "SELECT * FROM dir_general_emails;"
+        select_query = "SELECT * FROM directory.dir_general_emails;"
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
@@ -157,117 +157,117 @@ class Site:
 
 
     def create_safe_box(self, safe_box: DirSafeBoxes):
-        insert_query = "INSERT INTO dir_safe_boxes (site_id,box_name,password) VALUES (%s,%s,%s);"
+        insert_query = "INSERT INTO directory.dir_safe_boxes (site_id,box_name,password) VALUES (%s,%s,%s);"
         self.cursor.execute(insert_query, (safe_box.site_id,safe_box.box_name,safe_box.password))
         self.conn.commit()
         return self.cursor.lastrowid
 
     def update_safe_box(self, safe_box: DirSafeBoxes):
-        update_query = "UPDATE dir_safe_boxes SET site_id = %s WHERE safe_box_id = %s;"
+        update_query = "UPDATE directory.dir_safe_boxes SET site_id = %s WHERE safe_box_id = %s;"
         self.cursor.execute(update_query, (safe_box.site_id, safe_box.safe_box_id))
         self.conn.commit()
 
     def create_camera(self, camera: DirCameras):
-        insert_query = "INSERT INTO dir_cameras (site_id, username, password) VALUES (%s, %s, %s);"
+        insert_query = "INSERT INTO directory.dir_cameras (site_id, username, password) VALUES (%s, %s, %s);"
         self.cursor.execute(insert_query, (camera.site_id, camera.username, camera.password))
         self.conn.commit()
         return self.cursor.lastrowid
 
     def update_camera(self, camera: DirCameras):
-        update_query = "UPDATE dir_cameras SET site_id = %s, username = %s, password = %s WHERE camera_id = %s;"
+        update_query = "UPDATE directory.dir_cameras SET site_id = %s, username = %s, password = %s WHERE camera_id = %s;"
         self.cursor.execute(update_query, (camera.site_id, camera.username, camera.password, camera.camera_id))
         self.conn.commit()
 
     # Repite un patrón similar para los métodos create y update de las demás entidades...
 
     def create_wifi_network(self, wifi: DirWifi):
-        insert_query = "INSERT INTO dir_wifi (site_id, username, password) VALUES (%s, %s, %s);"
+        insert_query = "INSERT INTO directory.dir_wifi (site_id, username, password) VALUES (%s, %s, %s);"
         self.cursor.execute(insert_query, (wifi.site_id, wifi.username, wifi.password))
         self.conn.commit()
         return self.cursor.lastrowid
 
     def update_wifi_network(self, wifi: DirWifi):
-        update_query = "UPDATE dir_wifi SET site_id = %s, username = %s, password = %s WHERE wifi_id = %s;"
+        update_query = "UPDATE directory.dir_wifi SET site_id = %s, username = %s, password = %s WHERE wifi_id = %s;"
         self.cursor.execute(update_query, (wifi.site_id, wifi.username, wifi.password, wifi.wifi_id))
         self.conn.commit()
         
         
     def create_dataphone(self, dataphone: DirDataphones):
-        insert_query = "INSERT INTO dir_dataphones (site_id, unique_code, external_code) VALUES (%s, %s, %s);"
+        insert_query = "INSERT INTO directory.dir_dataphones (site_id, unique_code, external_code) VALUES (%s, %s, %s);"
         self.cursor.execute(insert_query, (dataphone.site_id, dataphone.unique_code, dataphone.external_code))
         self.conn.commit()
         return self.cursor.lastrowid
 
     def update_dataphone(self, dataphone: DirDataphones):
-        update_query = "UPDATE dir_dataphones SET site_id = %s, unique_code = %s, external_code = %s WHERE dataphone_id = %s;"
+        update_query = "UPDATE directory.dir_dataphones SET site_id = %s, unique_code = %s, external_code = %s WHERE dataphone_id = %s;"
         self.cursor.execute(update_query, (dataphone.site_id, dataphone.unique_code, dataphone.external_code, dataphone.dataphone_id))
         self.conn.commit()
 
     def create_web_page(self, web_page: DirWebPages):
-        insert_query = "INSERT INTO dir_web_pages (site_id, page, username, password) VALUES (%s, %s, %s, %s);"
+        insert_query = "INSERT INTO directory.dir_web_pages (site_id, page, username, password) VALUES (%s, %s, %s, %s);"
         self.cursor.execute(insert_query, (web_page.site_id, web_page.page, web_page.username, web_page.password))
         self.conn.commit()
         return self.cursor.lastrowid
 
     def update_web_page(self, web_page: DirWebPages):
-        update_query = "UPDATE dir_web_pages SET site_id = %s, page = %s, username = %s, password = %s WHERE web_page_id = %s;"
+        update_query = "UPDATE directory.dir_web_pages SET site_id = %s, page = %s, username = %s, password = %s WHERE web_page_id = %s;"
         self.cursor.execute(update_query, (web_page.site_id, web_page.page, web_page.username, web_page.password, web_page.web_page_id))
         self.conn.commit()
 
     def create_application(self, application: DirApplications):
-        insert_query = "INSERT INTO dir_applications (site_id, name, username, password) VALUES (%s, %s, %s, %s);"
+        insert_query = "INSERT INTO directory.dir_applications (site_id, name, username, password) VALUES (%s, %s, %s, %s);"
         self.cursor.execute(insert_query, (application.site_id, application.name, application.username, application.password))
         self.conn.commit()
         return self.cursor.lastrowid
 
     def update_application(self, application: DirApplications):
-        update_query = "UPDATE dir_applications SET site_id = %s, name = %s, username = %s, password = %s WHERE application_id = %s;"
+        update_query = "UPDATE directory.dir_applications SET site_id = %s, name = %s, username = %s, password = %s WHERE application_id = %s;"
         self.cursor.execute(update_query, (application.site_id, application.name, application.username, application.password, application.application_id))
         self.conn.commit()
 
     def create_general_email(self, email: DirGeneralEmails):
-        insert_query = "INSERT INTO dir_general_emails (description, email) VALUES (%s, %s);"
+        insert_query = "INSERT INTO directory.dir_general_emails (description, email) VALUES (%s, %s);"
         self.cursor.execute(insert_query, (email.description, email.email))
         self.conn.commit()
         return self.cursor.lastrowid
 
     def update_general_email(self, email: DirGeneralEmails):
-        update_query = "UPDATE dir_general_emails SET description = %s, email = %s WHERE email_id = %s;"
+        update_query = "UPDATE directory.dir_general_emails SET description = %s, email = %s WHERE email_id = %s;"
         self.cursor.execute(update_query, (email.description, email.email, email.email_id))
         self.conn.commit()
 
     def delete_safe_box(self, safe_box_id: int):
-        delete_query = "DELETE FROM dir_safe_boxes WHERE safe_box_id = %s;"
+        delete_query = "DELETE FROM directory.dir_safe_boxes WHERE safe_box_id = %s;"
         self.cursor.execute(delete_query, (safe_box_id,))
         self.conn.commit()
 
     def delete_camera(self, camera_id: int):
-        delete_query = "DELETE FROM dir_cameras WHERE camera_id = %s;"
+        delete_query = "DELETE FROM directory.dir_cameras WHERE camera_id = %s;"
         self.cursor.execute(delete_query, (camera_id,))
         self.conn.commit()
 
     def delete_wifi_network(self, wifi_id: int):
-        delete_query = "DELETE FROM dir_wifi WHERE wifi_id = %s;"
+        delete_query = "DELETE FROM directory.dir_wifi WHERE wifi_id = %s;"
         self.cursor.execute(delete_query, (wifi_id,))
         self.conn.commit()
 
     def delete_dataphone(self, dataphone_id: int):
-        delete_query = "DELETE FROM dir_dataphones WHERE dataphone_id = %s;"
+        delete_query = "DELETE FROM directory.dir_dataphones WHERE dataphone_id = %s;"
         self.cursor.execute(delete_query, (dataphone_id,))
         self.conn.commit()
 
     def delete_web_page(self, web_page_id: int):
-        delete_query = "DELETE FROM dir_web_pages WHERE web_page_id = %s;"
+        delete_query = "DELETE FROM directory.dir_web_pages WHERE web_page_id = %s;"
         self.cursor.execute(delete_query, (web_page_id,))
         self.conn.commit()
 
     def delete_application(self, application_id: int):
-        delete_query = "DELETE FROM dir_applications WHERE application_id = %s;"
+        delete_query = "DELETE FROM directory.dir_applications WHERE application_id = %s;"
         self.cursor.execute(delete_query, (application_id,))
         self.conn.commit()
 
     def delete_general_email(self, email_id: int):
-        delete_query = "DELETE FROM dir_general_emails WHERE email_id = %s;"
+        delete_query = "DELETE FROM directory.dir_general_emails WHERE email_id = %s;"
         self.cursor.execute(delete_query, (email_id,))
         self.conn.commit()
 

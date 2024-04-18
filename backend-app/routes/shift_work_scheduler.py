@@ -131,15 +131,15 @@ def get_shift_filtered_work_days(
         day_instance.close_connection()
     return filtered_days
 
-@shift_work_day_router.post("/shift_work_days")
-def create_work_week(work_day: ShiftWorkDay):
-    day_instance = ShiftWorkDayCRUD()
-    try:
-        # Assuming create_work_week returns a list of WorkDay objects
-        created_days = day_instance.create_work_week(work_day.date, work_day.site_id)
-    finally:
-        day_instance.close_connection()
-    return created_days
+# @shift_work_day_router.post("/shift_work_days")
+# def create_work_week(work_day: ShiftWorkDay):
+#     day_instance = ShiftWorkDayCRUD()
+#     try:
+#         # Assuming create_work_week returns a list of WorkDay objects
+#         created_days = day_instance.create_work_week(work_day.date, work_day.site_id)
+#     finally:
+#         day_instance.close_connection()
+#     return created_days
 
 @shift_work_day_router.put("/shift_work_days/{day_id}")
 def update_work_day(day_id: int, work_day: ShiftWorkDay):

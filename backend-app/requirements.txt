@@ -10,4 +10,5 @@ pytz
 bcrypt                         
 email-validator                                         
 passlib                          
-pip                                           
+pip
+websockets                                           

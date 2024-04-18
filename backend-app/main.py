@@ -4,7 +4,8 @@ from routes.product import product_router
 from routes.user import user_router
 from routes.site import site_router
 from routes.delivery_person import delivery_person_router  # Importa el nuevo router de delivery persons
-from routes.order import order_router
+# from routes.order import order_router
+from routes.orders.order import order_router
 from routes import files_router
 from routes.auth import auth
 from routes.category import category_router
@@ -24,6 +25,7 @@ from routes.shift_work_scheduler import shift_work_day_router, shift_work_record
 from routes.maintenance import maintenance_router, equipment_router
 from routes.recipe.ingredient import ingredient_router
 from routes.recipe.data_sheet import recipe_data_sheet_router
+from routes.aditional_new import adicional_new_router
 
 from routes.role import role_router, rolegroup_router
 from routes.city import city_router
@@ -51,6 +53,7 @@ app.add_middleware(
 
 
 app.include_router(recipe_data_sheet_router)
+
 app.include_router(product_router)
 app.include_router(user_router)
 app.include_router(ingredient_router)
@@ -103,3 +106,4 @@ app.include_router(work_shift_router)
 app.include_router(shift_work_day_router)
 app.include_router(shift_work_record_router)
 app.include_router(shift_work_shift_router)
+app.include_router(adicional_new_router)
