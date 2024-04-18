@@ -3,7 +3,12 @@ import { useSitesStore } from "../../store/site";
 import { useUserStore } from '../../store/user';
 import axios from "axios";
 import { URI } from "../conection";
+import { useReportesStore } from "../../store/ventas";
+import { useRoute } from "vue-router";
 
+import router from '../../router/index'
+
+const report = useReportesStore()
 const cart = usecartStore();
 const site = useSitesStore();
 const user = useUserStore();
@@ -34,6 +39,7 @@ const preparar_orden = () => {
   const order = {
     "order_products": order_products,
     "site_id": site_id,
+    // "site_id": 12,
     "delivery_person_id": 4,
     "payment_method_id": user.user.payment_method_option?.id,
     "delivery_price": delivery_price,
@@ -59,20 +65,46 @@ export const orderService = {
     }
 
     try {
+      report.setLoading(true,`enviando tu pedido ${user.user.name}`)
       const response = await axios.post(`${URI}/order`, order);
       if (response.status === 200) {
+
+        report.setLoading(false,"enviando tu pedido")
+
+        user.user = {
+          name:'',
+          neigborhood:'',
+          address:'',
+          phone_number:'',
+          payment_method_option:''
+      },
+
+      cart.cart = {
+        products: [],
+        total_cost: 0,
+        additions: []  // Nueva propiedad para manejar las adiciones a nivel del carrito
+    }
+
+    router.push('/gracias')
+
+
 
       } else {
         console.error('An error occurred while sending the order:', response.status);
         alert('An error occurred while sending the order. Please try again.');
+        report.setLoading(false,"enviando tu pedido" )
+
     
         return null;
         
       }
     } catch (error) {
       console.error('An error occurred while sending the order:', error);
+      report.setLoading(false,"enviando tu pedido")
+
       alert('An error occurred while sending the order. Please check your internet connection and try again.');
       return null;
+
     }
   },
 };

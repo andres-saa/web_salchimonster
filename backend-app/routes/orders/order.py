@@ -12,6 +12,18 @@ from pydantic import BaseModel
 connected_clients: Dict[int, List[WebSocket]] = {}
 
 
+
+async def notify_all_clients(site_id: int, message: str, sender: WebSocket):
+    for client in connected_clients[site_id]:
+        if client != sender:  # Evita enviar el mensaje de vuelta al emisor original
+            try:
+                await client.send_text(message)
+            except WebSocketDisconnect:
+                connected_clients[site_id].remove(client)
+                if not connected_clients[site_id]:
+                    del connected_clients[site_id]
+                    
+
 @order_router.websocket("/ws/{site_id}")
 async def websocket_endpoint(websocket: WebSocket, site_id: int):
     site_id = int(site_id)  # Ensure site_id is converted to integer, if not already
@@ -24,6 +36,7 @@ async def websocket_endpoint(websocket: WebSocket, site_id: int):
         while True:
             # This can be a place to handle incoming messages or just keep the connection alive
             await websocket.receive_text()
+            await notify_sites(site_id, 'hola')
     except WebSocketDisconnect:
         # Properly handle disconnections
         connected_clients[site_id].remove(websocket)

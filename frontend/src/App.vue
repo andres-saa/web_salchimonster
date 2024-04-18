@@ -10,11 +10,19 @@ import Loading from './components/Loading.vue'
 import { eliminarProductosDelCarrito } from './service/order';
 import { URI } from './service/conection';
 import { onMounted } from 'vue';
+import { useSitesStore } from './store/site';
+import { useRoute } from 'vue-router';
 
+const siteStore = useSitesStore()
+const route = useRoute()
 
-onMounted(()=>{
-eliminarProductosDelCarrito()
-})
+// onMounted(()=>{
+//   // if(!siteStore.location.site.site_id && route.path == '/'){
+//   //   alert(route.fullPath)
+//   //   siteStore.setVisible("currentSite", true)
+//   // }
+// eliminarProductosDelCarrito()
+// })
 
 </script>
 
