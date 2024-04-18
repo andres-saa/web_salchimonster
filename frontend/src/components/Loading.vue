@@ -1,7 +1,7 @@
 <template>
 
 <Transition name="loading">
-    <div v-if="store.loading.visible" class="col-12" v style="display: flex;flex-direction: column; pointer-events: none; align-items: center; justify-content: center; position: fixed;z-index: 100;left: 0;top: 0;backdrop-filter:blur(5px); height: 100vh;background-color: rgba(255, 255, 255, 0.537);">
+    <div v-if="store.loading.visible" class="col-12" v style="display: flex;flex-direction: column; pointer-events: none; align-items: center; justify-content: center; position: fixed;z-index: 100;left: 0;top: 0;backdrop-filter:blur(5px); height: 100vh;background-color: rgba(255, 255, 255, 0.808);">
 
 <div class="p-5" style="background-color: ;height: min-content;display: flex;flex-direction: column;align-items: center;justify-content: center;
 
@@ -86,7 +86,7 @@ onUnmounted(() => {
 
  .loading-enter-from {
   opacity: 0;
-  transform: translateY(20rem);
+  /* transform: translateY(20rem); */
   filter: blur(10px);
   /* filter: blur(0); */
   
@@ -95,7 +95,7 @@ onUnmounted(() => {
 
 .noti-enter-from {
   opacity: 0;
-  transform: translateY(20rem);
+  /* transform: translateY(20rem); */
   filter: blur(10px);
   /* filter: blur(0); */
   

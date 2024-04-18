@@ -1,21 +1,16 @@
 <script setup>
-import { useLayout } from '@/layout/composables/layout';
-import { ref, computed } from 'vue';
-import AppConfig from '@/layout/AppConfig.vue';
-import router from '@/router/index.js'
+import { ref, onUnmounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import {URI} from '@/service/conection'
-import {curentSite} from '@/service/un_pedido'
-const toast = useToast();
-const { layoutConfig } = useLayout();
+import { useRouter } from 'vue-router';
+import { URI ,URI_SOCKET} from '../../../service/conection';
+import { useSitesStore } from '../../../store/site';
+
+const store = useSitesStore()
 const email = ref('');
 const password = ref('');
-const checked = ref(false);
-
-
-const send = () =>{
-    console.log(email.value)
-}
+const toast = useToast();
+const router = useRouter();
+let webSocket = null;
 
 const getToken = async () => {
     try {
@@ -35,13 +30,10 @@ const getToken = async () => {
 
         if (response.ok) {
             const data = await response.json();
-            const accessToken = data.access_token;
-            const siteId = data.site_id; // Agrega esta línea para obtener el site_id
-
-            // Guardar tanto el token como el site_id en localStorage
-            localStorage.setItem('accessToken', accessToken);
-            localStorage.setItem('siteId', siteId);
-
+            localStorage.setItem('accessToken', data.access_token);
+            localStorage.setItem('siteId', data.site_id);
+            connectWebSocket(data.site_id);
+            store.setSite(data)
             router.push('/');
             toast.add({ severity: 'success', summary: 'Bienvenido', detail: '', life: 3000 });
         } else {
@@ -55,17 +47,15 @@ const getToken = async () => {
 };
 
 
+function connectWebSocket(siteId) {
+    webSocket = new WebSocket(`wss://${URI_SOCKET}/ws/${siteId}`);
+    webSocket.onopen = () => console.log("WebSocket connected");
+    webSocket.onmessage = (message) => console.log("Message received:", message.data);
+    webSocket.onclose = () => console.log("WebSocket disconnected");
+    webSocket.onerror = (error) => console.error("WebSocket error:", error);
+}
 
-// const logout = () => {
-//     // Eliminar el token de acceso almacenado en localStorage
-//     localStorage.removeItem('accessToken');
 
-//     // Redirigir al usuario a la página de inicio de sesión
-//     router.push('/login');
-
-//     // Otra opción es redirigir al usuario a la página de inicio
-//     // router.push('/');
-// };
 
 
 

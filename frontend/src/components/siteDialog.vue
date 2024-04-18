@@ -1,15 +1,22 @@
 <template>
-    <Dialog :closeOnEscape="!c_neigbor ? false : true" v-if="!c_neigbor || showSiteDialog" v-model:visible="showSiteDialog"
-        :style="{ width: '500px' }" header="Seleccion de sede" :modal="true" class="p-fluid "
-        style="    box-shadow: 0px 0px 50px rgb(255, 0, 0);; background-color: white;border: .5rem solid ;position: relative; border-radius: 30px;padding-top: 2rem;">
+    <Dialog v-model:visible="store.visibles.currentSite"
+        :style="{ width: '380px' }" header="Seleccion de sede" :modal="true" class="p-fluid m-3"
+        style=" background-color: white;position: relative; border-radius: 1rem;padding-top: 2rem;">
 
-        <div class="notch"
+
+
+
+       <b style="color:black">
+        <!-- {{ store.location }} -->
+       </b>
+
+        <!-- <div class="notch"
             style="display: flex; align-items: center; width: 30%; background-color: black; border-radius: 0 0 1rem 1rem; height: 2rem; position: absolute; top: 0rem; left: 35%;">
             <div class="led"
                 style="position:absolute ;right: 1rem; width: 0.7rem; height: 0.7rem; background-color: var(--primary-color); border-radius: 50%;: 1rem">
             </div>
 
-        </div>
+        </div> -->
 
 
         <div
@@ -22,23 +29,19 @@
                 <div style="display: flex; ;width: min-content; justify-content:start;gap: 1rem;align-items: center;"> 
                 <label for="site_id" style="color: black;">Ciudad   </label> 
                 
-                
-                
                 <ProgressSpinner v-if="spinnersView.ciudad" style="width: 20px; height: 20px" strokeWidth="8" fill="var(--white)"
                 
     animationDuration=".5s" aria-label="Custom ProgressSpinner" /> 
 
 </div>
-                <Dropdown @click="() => currenNeigborhood = {
+                <Dropdown class="" @click="() => currenNeigborhood = {
                     site: {
                         site_name: 'default'
                     }   
                 }" v-model="currenCity" :options="cities" placeholder="" optionLabel="city_name" required="true" />
 
             </div>
-            <p style="color: black;">
-                <!-- {{ currenCity }} -->
-            </p>
+     
 
             <div class="field col-12 mt-0 pt-0 p-0" style="width: 100%;gap: ; display: block;">
                 <div style="display: flex;width: min-content; justify-content:start;gap: 1rem;align-items: center;"> 
@@ -51,7 +54,7 @@
                 animationDuration=".5s" aria-label="Custom ProgressSpinner" /> 
                 
                 <p class="pl-2" style="color: black;">buscando barrios...</p>
-                </div>
+                </div>  
                 
                 
 
@@ -59,7 +62,7 @@
  
                 <Dropdown style="" filter v-model="currenNeigborhood" :disabled="!possibleNeigborhoods"
           :options="possibleNeigborhoods" optionLabel="name" required="true"
-          placeholder="Selecciona una vecindad" />
+          placeholder="Selecciona un barrio" />
 
           
 
@@ -72,34 +75,25 @@
 
                 <div class="img-cont col-12 p-0" style="overflow: hidden;position: relative;">
 
-                    <div class="img-before" style="display: flex; flex-direction: column;" v-if="currenNeigborhood.site?.name == 'default'">
-                        <p class="text-xl lg:text-xl text-center " style="font-weight: bold;color: black;">Vamos a buscar
-                            tu sede mas cercana</p>
-
-                            
-                
-
-
-                            
-                    </div>
+                    
 
                     
 
 
 
-                    <img :src="`${URI}/read-product-image/600/site-${currenNeigborhood?.site_id}`"
+                    <img v-if="currenNeigborhood?.site_id" :src="`${URI}/read-product-image/600/site-${currenNeigborhood?.site_id}`"
                         :class="currenNeigborhood.site?.name == 'default' ? 'default-image' : ''"
-                        style="border: 1px solid rgb(255, 255, 255); width: 100%;background-color: rgb(255, 255, 255); height: 100%; object-fit: cover; border-radius: 5px;"
+                        style="border: 1px solid rgb(255, 255, 255); width: 100%;background-color: rgb(255, 255, 255); height: 100%; object-fit: cover; border-radius: 0.2rem;"
                         alt="">
 
 
                     <div
-                        style=" position: absolute; top: 0; left: 0; width: 100%; height: 100%; display:flex; padding: ; align-items: end;border-radius: 1rem; ">
-                        <p v-if="currenNeigborhood?.site_id" class="col-12 py-3"
-                            style="background-color: black; text-align: center; height: min-content;  width: 100%;  font-weight: bold; background-color: rgba(0, 0, 0, 0.7);">
-                            <span  class="text-xl lg:text-2xl p-0" style=""> SALCHIMONSTER</span> <span
-                                style="text-transform: uppercase;" class="text-xl lg:text-2xl p-0">{{
-                                    site?.site_name }}</span>
+                        style=" position: absolute; top: 0; left: 0; width: 100%; height: 100%; display:flex; padding: ; align-items: end;border-radius: 0.5rem; ">
+                        <p v-if="currenNeigborhood?.site_id" class="col-12 py-1"
+                            style="background-color: black; text-align: center; height: min-content;  width: 100%;  font-weight: 500; background-color: rgba(0, 0, 0, 0.7);">
+                            <span  class="text-xl lg:text-lg p-0" style=""> SALCHIMONSTER</span> <span
+                                style="text-transform: uppercase;" class="text-xl lg:text-lg p-0">{{
+                                    currentSite?.site_name }}</span>
                         </p>
                     </div>
                 </div>
@@ -111,24 +105,21 @@
 
             </div>
 
-            <div class="field col-12" style="width: 100%;  ;">
-                <Button @click="setNeigborhood" :disabled="!currenNeigborhood?.name"
-                    style="width: max-content; padding: 10px 20px;width: 100%; text-align: center;" class="menu-button-new">
-                    <p style="width: 100%; padding: 0; margin: 0">
-                        <i :class="PrimeIcons.SAVE"></i> GUARDAR
-                    </p>
+            <div class="field col-12 p-0" style="width: 100%;  ;">
+                <Button label="Guardar" @click="setNeigborhood" :disabled="!currenNeigborhood?.name"
+                    style="width: max-content;border: none; padding: 10px 20px;width: 100%; text-align: center;background-color: black;" b>
+                    
                 </Button>
 
             </div>
 
 
         </div>
+ 
+        <Button @click="store.setVisible('currentSite',false)" icon="pi pi-times" severity="danger" rounded
+            style="width: 2.5rem;height: 2.5rem; border: none; position: absolute; right: -1rem; top:-1rem;"/>
+            
 
-        <button @click="showSiteDialog = false"
-            style="width: 3rem;height: 3rem; border: none; position: absolute; right: 2rem; top:1rem;background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center;justify-content: center;">
-            <i :class="PrimeIcons.TIMES" style="color: white; font-weight: bold; " class="text-2xl"></i>
-
-        </button>
 
 
     </Dialog>
@@ -148,11 +139,29 @@ import { PrimeIcons } from 'primevue/api';
 import { showSiteDialog, setShowDialog } from '@/service/state';
 import { URI } from '@/service/conection'
 // import { cities } from '@/service/citiesService';
+import {sitesService } from '../service/site/sitesService'
+import {useSitesStore} from '../store/site'
+import { usecartStore } from '../store/shoping_cart';
 
+const store = useSitesStore()
+const cart = usecartStore()
+
+watch(() =>  store.location.site.site_id ,() => {
+    
+    cart.cart =  {
+          products: [],
+          total_cost: 0,
+          additions: [],
+    
+}
+
+location.reload()
+
+} )
 
 const spinnersView = ref({ciudad:false, barrio:false})
 const cities = ref([]) 
-const site = ref({})
+const currentSite = ref({})
 const currenCity = ref({})
 const c_neigbor = ref(localStorage.getItem('currentNeigborhood'))
 const currenNeigborhood = ref({
@@ -173,39 +182,14 @@ watch(currenCity, () => { changePossiblesNeigborhoods() })
 
 
 
-watch(currenNeigborhood, () => { 
+watch(currenNeigborhood, async() => { 
     
-    getSiteById(currenNeigborhood.value.site_id).then((data) => site.value = data)
+   currentSite.value =  await sitesService.getSiteById(currenNeigborhood.value.site_id).then((data) => currentSite.value = data)
  })
 
 
 
 
-const obtenerEstado = async () => {
-const siteId = localStorage.getItem("siteId")
-// alert(siteId)
-
-if(!siteId){
-    return
-}
-
-  try {
-    const response = await fetch(`${URI}/site/${siteId}/status`);
-    const data = await response.json();
-    
-    if (data.status === 'closed') {
-    //   estado.value = 'cerrado';
-      localStorage.setItem('estado', 'cerrado');
-    } else {
-    //   estado.value = 'abierto';
-      localStorage.setItem('estado', 'abierto');
-    }
-  } catch (error) {
-    console.error('Error al obtener el estado:', error);
-    // estado.value = 'cerrado';
-      localStorage.setItem('estado', 'cerrado');
-  }
-};
 
 
 
@@ -216,40 +200,15 @@ if(!siteId){
 
 const setNeigborhood = async() => {
 
-    getSiteById(currenNeigborhood.value.site_id).then( (data) => {
-
-
-        console.log(data)
-        
-
-
-        localStorage.setItem('currentNeigborhood', JSON.stringify({
-        currenCity: currenCity.value.city_name,
-        currenNeigborhood: currenNeigborhood.value,
-        currenSite: data?.site_name,
-        currenSiteId: data.site_id,
-
-
-       
-
-        
-    }))
-
-    localStorage.setItem('siteId', data.site_id)
-
-
-
-    localStorage.setItem('currenSiteWsp', data.wsp_link)
-        // showSiteDialog.value = false
-
+    const newLocation = {
+        site:currentSite.value,
+        neigborhood:currenNeigborhood.value,
+        city:currenCity.value
+    }
     
-
-    location.reload()
-
-
-
-
-    }).then(obtenerEstado())
+    store.setLocation(newLocation)
+    store.setVisible('currentSite',false)
+    showSiteDialog.value = false
 
 }
 
@@ -273,40 +232,10 @@ const getCities = async() => {
 }
 
 
-        const getNeighborhoods = async() => {
-            try {
-            const response = await fetch(`${URI}/neighborhoods`)
-            if(response.ok){
-                const data = await response.json()
-                // cities.value = data
-                return data
-            }
-            
-        } catch (error) {
-            
-        }
-        }
 
 
 
-const getSiteById = async(site_id) => {
-    try {
-        // spinnersView.value.barrio = true
-     const response = await fetch(`${URI}/site/${site_id}`)
-     if(response.ok){
-        const data = await response.json()
-        // cities.value = data
-        spinnersView.value.barrio = false
 
-        return data
-     }
-     
-   } catch (error) {
-    spinnersView.value.barrio = false
-
-    
-   }
-}
 
 
 
@@ -509,7 +438,7 @@ onMounted(async() => {
 
 .cart {
 
-    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.4);
+    /* box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.4); */
 
 
 
@@ -705,7 +634,9 @@ onMounted(async() => {
 a {
     text-decoration: none;
 }
-
+ *{
+    text-transform: uppercase;
+ }
 .texto {
     /* width: 40%; */
     /* min-width: 200px; */

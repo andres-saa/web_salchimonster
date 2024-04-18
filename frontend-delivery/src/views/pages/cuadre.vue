@@ -1,176 +1,126 @@
 <template>
-<div style="height: 80vh;overflow-y: auto; display:flex; align-items: center;">
-  <div class="  col-12 m-auto" style="width: 30rem; box-shadow: 0 0 10px rgba(0, 0, 0, 0.196); border-radius: 2rem; ">
+  <div class="grid m-auto" style="max-width: 400px;">
 
-<p class="text-center text-xl " style="font-weight: bold;"> VENTAS {{ formatearFechaHora(fecha_del_server).toUpperCase() }} </p>
+    <DialogoPedido>
 
-<p class=" text-center mb-1" style="font-weight: bold; background-color: rgb(191, 255, 96); border-radius: 1rem;"> PEDIDOS ENVIADOS  {{  filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),'enviada').length }}</p>
-
-<div >
-  <div class=" pedido" v-for="order in filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),'enviada')" style="display: flex;">
-
-   <div class="col p-0 text-left"  >
-    Pedido #{{ order.order_id }}  
-   </div>
-   <div class="col p-0 text-right" style="font-weight: bold;">
-    {{ formatoPesosColombianos(sumarProductos(contarObjetosRepetidos(order.order_products))) }}
-
-   </div>
-  </div>
-
-</div>
-
-<div class="p-1 mb-2 " style="border-bottom: 1px solid;"></div>
-
-<div class=" grid p-3 pb-0  text-xl mb-2 p-0" style="">
-  <p class="  col p-0 text-left m-0" style="font-weight: bold; ">  TOTAL CAJA</p>
-  <p class="  col p-0 text-right m-0 pr-3" style="font-weight: bold;border-radius: 1rem;  background: linear-gradient(to right,transparent, rgb(191, 255, 96) );
-">  {{formatoPesosColombianos( calcularTotalConjuntoOrdenes(filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),'enviada')) )}}</p>
-</div>
+    </DialogoPedido>
 
 
 
-
-<p class=" text-center mb-1 pt-0" style="font-weight: bold; background-color: rgb(255, 165, 180);border-radius: 1rem;"> PEDIDOS CANCELADOS {{  filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),'cancelada').length }}</p>
-
-<div >
-  <div class="grid" v-for="order in filtrarPorEstado(filtrarPedidosPorFecha(pedidos,fecha_del_server),'cancelada')">
-
-   <div class="col pb-0 text-left">
-    Pedido #{{ order.order_id }}  
-
-   </div>
+    <div class=" my-2 p-2  m-0 " style="height: 80vh;overflow-y: auto;width: 100%; display: flex;align-items: center;">
+     
+        <div class="shadow-2 p-0 m-0" style="width: 100%;border-radius: 0.5rem;">
 
 
-   <div class="col pb-2 text-left">
-    <Button  @click="open_order(order)" class="py-0 m-0" size=""  severity="success" style="font-weight:;border:none">Detalles</Button>
+          <p class="col-12 text-center shadow-2" style="background-color: #ffffff61;">
+                        <span class="text-center text-2xl" style="color: black;font-weight: bold;"><i class="pi pi-history
+            text-2xl
+            "></i> <b>
+              CUADRE DE CAJA
+            </b></span>
+          </p>
+
+          <p class="col-12 text-center p-0 my-0" style="background-color:#22c55e">
+            <span class="text-center text-xl" style="color: black;font-weight: bold;"> Enviadas</span>
+          </p>
+
+          <div style="height: 100%; overflow-y: auto;">
+
+            <div class="px-3 py-1" v-for="orden in store.TodayOrders.filter(order => order.current_status == 'enviada') ">
+              <cuadreItem :order="orden" />
+            </div>
+          </div>
 
 
-   </div>
-   <div class="col pb-2 text-right" ref="hola" style="font-weight: bold;">
-    {{ formatoPesosColombianos(sumarProductos(contarObjetosRepetidos(order.order_products))) }}
+          <p class="col-12 text-center p-0 my-0" style="background-color:#ef4444">
+            <span class="text-center text-xl" style="color: black;font-weight: bold;"> Canceladas</span>
+          </p>
 
-   </div>
+          <div style="height: 100%; overflow-y: auto;">
 
-  
+            <div class="px-3 py-1" v-for="orden in store.TodayOrders.filter(order => order.current_status == 'cancelada')">
+              <cuadreItem :order="orden" />
+            </div>
+          </div>
+
+
+          <p class="col-12 text-center text-white p-0 my-0" style="background-color:#000000;color: white;">
+            <span class="text-center text-xl" style="color: rgb(255, 255, 255);font-weight: bold;"> Resumen</span>
+          </p>
+
+
+
+
+   <div class="px-3 py-2 text-2xl" style="display: flex;font-weight: bold; align-items: center;justify-content: space-between;">
+            <div style=" display: flex;align-items: center;">
+                <b style="min-width: max-content;color: black;">
+        CUADRE
+            </b>
+
+
+            </div>
+
+            
+            
+          
+            
+            
+                <b style="color:black">
+                    {{formatoPesosColombianos(totalEnviadas)  }}
+
+                </b>
+                
+       
+           
+
+          
+
     
+            
+            
+        </div>
+        
+
+
+
+
+        </div>
+    
+    </div>
+
+
+
+
+
+
 
   </div>
 
-</div>
-</div>
 
-
-</div>
-
-<DialogoPedido></DialogoPedido>
-
+  <!-- <div :class="dialog_pedido_visible ? 'before' : ''"></div> -->
 </template>
- 
-
-
-
-
-
-
-
 
 <script setup>
 
-import { fecha_del_server,open_order, filtrarPedidosPorFecha, fechaHoyFormateada,set_dialog_order, pedidos, ordenes_de_hoy,filtrarPorEstado,dialog_pedido_visible } from '../../service/un_pedido';
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+
+import DialogoPedido from './DialogoPedido.vue';
+
+import { onMounted} from 'vue';
+import { useOrderStore } from '../../store/order';
+import cuadreItem from './cuadreItem.vue';
 import { formatoPesosColombianos } from '../../service/formatoPesos';
-import { calcularPrecioTotal, calcularTotalCarrito, contarObjetosRepetidos, sumarProductos } from '../../service/state';
-import { URI } from "@/service/conection";
-import dialogoPedido from './dialogo-pedido.vue';
-import DialogoPedido from './dialogo-pedido.vue';
+const store = useOrderStore()
 
 
- 
-const clickarPedido = (pedido_id) => {
-  const pedido = ref("hola")
-  console.log(hola)
-  // pedido.click()
-}
-function calcularTotalConjuntoOrdenes(orders) {
-  // Inicializar la variable para almacenar la suma total
-  let totalGlobal = 0;
+import { computed } from 'vue';
 
-  // Iterar sobre cada orden en el conjunto de órdenes
-  for (let i = 0; i < orders.length; i++) {
-    // Calcular el total de la orden actual utilizando la función calcularTotalCarrito
-    const totalOrden = sumarProductos(contarObjetosRepetidos(orders[i].order_products))
+const totalEnviadas = computed(() => {
+  return store.TodayOrders.filter(order => order.current_status === 'enviada')
+                          .reduce((total, order) => total + order.total_order_price, 0);
+});
 
-    
-    // Sumar el total de la orden actual al total global
-    totalGlobal += totalOrden;
-  }
-
-  // Devolver el total global
-  return totalGlobal;
-}
-
-const formatearFechaHora = (fechaHoraString) => {
-  const fechaHora = new Date(fechaHoraString);
-  const diaSemanaNumero = fechaHora.getDay();
-  const diasSemana = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
-  const diaSemana = diasSemana[diaSemanaNumero];
-  const diaMes = fechaHora.getDate();
-  const mes = fechaHora.toLocaleString("es-ES", { month: "long" });
-  const anio = fechaHora.getFullYear();
-  const horas = fechaHora.getHours();
-  const minutos = fechaHora.getMinutes();
-  const periodo = horas >= 12 ? "PM" : "AM";
-  const horasFormato12 = horas % 12 || 12;
-
-  return `${diaSemana} ${diaMes} de ${mes} de ${anio} hasta las ${horasFormato12}:${minutos} ${periodo}`;
-};
-
-
-const fechaActualServidor = ref()
-const fechapedido = ref()
-
-const nombresMeses = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
-];
-
-// const filtrarOrdenesPorFecha = async (ordenes) => {
-//   // Obtener la fecha actual del servidor
-//   const serverTimeResponse = await fetch(`${URI}/server_time`);
-//   const serverTimeData = await serverTimeResponse.json();
-//   fechaActualServidor.value = serverTimeData.fecha;
-
-//   // Filtrar las órdenes por la fecha actual
-//   const ordenesFiltradas = ordenes.filter(orden => {
-//     const fechaOrden = orden.order_status.timestamp.fecha;
-//     fechapedido.value = fechaOrden
-//     return (
-//       fechaOrden.d === fechaActualServidor.value.d &&
-//       fechaOrden.m === fechaActualServidor.value.m &&
-//       fechaOrden.a === fechaActualServidor.value.a
-//     );
-//   });
-
-//   fechapedido.value = ordenesFiltradas
-//   return ordenesFiltradas
-// }
-
-
-
-
-
+onMounted(() => {
+  store.getTodayOrders()
+})
 
 </script>
-
-
-<style>
-
-/* .pedido:hover{
-
-
-  background-color: rgb(204, 204, 204);
-  cursor: pointer;
-} */
-
-</style>

@@ -1,29 +1,40 @@
+import axios from "axios";
+import { URI } from "../service/conection";
 
-export default class ProductService {
+export const productService = {
     
-    getProductsSmall() {
-        return fetch('demo/data/products-small.json')
-            .then((res) => res.json())
-            .then((d) => d.data);
+    async getProductsByCategorySite(category_id,site_id) {
+        try {
+            const response = await axios.get(`${URI}/products-all/category-id/${category_id}/site/${site_id}`);
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                console.error('An error occurred while fetching the ingredients:', response.status);
+                return null;
+            }
+        } catch (error) {
+            console.error('An error occurred while fetching the ingredients:', error);
+            return null;
+        }
+    },
+    async updateProductInstanceStatus(product_instance_id, new_status) {
+        try {
+            const response = await axios.put(`${URI}/product-instance/${product_instance_id}/status`, {
+                new_status: new_status // Asegurando que el valor enviado es booleano
+            });
+            if (response.status === 200) {
+                console.log('Product instance status updated successfully:', response.data);
+                return response.data;
+            } else {
+                console.error('Failed to update product instance status:', response.status);
+                return null;
+            }
+        } catch (error) {
+            console.error('Error updating product instance status:', error);
+            return null;
+        }
     }
 
-    getProducts() {
-        return fetch('demo/data/products.json')
-            .then((res) => res.json())
-            .then((d) => d.data);
-    }
-
-
-    getUsers() {
-        return fetch('http://127.0.0.1:8000/read/users')
-            .then((res) => res.json()).then((d) => d.data)
-           
-    }
-    
-
-    getProductsWithOrdersSmall() {
-        return fetch('demo/data/products-orders-small.json')
-            .then((res) => res.json())
-            .then((d) => d.data);
-    }
 }
+
+

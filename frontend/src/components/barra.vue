@@ -1,27 +1,28 @@
 <template >
 
-<div class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bottom: 0; left: 0; ; justify-content: center">
+<div v-if="!route.path.includes('cart') && !route.path.includes('pay')" class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bottom: 0; left: 0; ; justify-content: center">
   <div :style="!showElement? 'transform: translateY(5rem);opacity:0': ''"  class="barra-carrito  px-5 " style=" 
-                          /* width: auto; */
-                            display: flex;
-                            gap:2rem;
-                            border-radius: 10rem;
-                            align-items: center;  
-                            position: relative;
-                            z-index: 1000;
-                            bottom: 1rem;
-                            max-width: min-content;
-                            /* z-index: 999;  */
-                            justify-content:center ;
-                            /* margin: auto; */
-                            /* touch-action: none;  */
-                            /* width: %;  */
-                            height: 3.5rem;
-                            /* padding: 1rem; */
-                        /* padding: 1rem;  */
-                            background-color: rgb(255, 255, 255); 
-                            
-                            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);">
+                          
+  /* width: auto; */
+  display: flex;
+  gap:2rem;
+  border-radius: 10rem;
+  align-items: center;  
+  position: relative;
+  z-index: 1000;
+  bottom: 1rem;
+  max-width: min-content;
+  /* z-index: 999;  */
+  justify-content:center ;
+  /* margin: auto; */
+  /* touch-action: none;  */
+  /* width: %;  */
+  height: 3.5rem;
+  /* padding: 1rem; */
+/* padding: 1rem;  */
+  background-color: rgb(255, 255, 255); 
+  
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);">
  
      
 
@@ -45,19 +46,18 @@
           <i style="font-size: 2rem; " class="icono" :class="PrimeIcons.SHOPPING_CART"> </i>
 
 
-          <div v-for="product in carro_para_la_barra_de_abajo.products.slice(0, 5)">
+          <div style="position: relative;" :key="product.id" v-for="product in store.cart.products.slice(0, 4)">
+            <Button class="p-0" :label="product.quantity" severity="danger" rounded style="width: 1.2rem;font-size: 0.8rem; height: 1.2rem;top: -.3rem; right: -.5rem; position: absolute;"/>
             <img class="img-cart" @mouseover="() => vueMenu = true" style="height: 2rem; object-fit: contain;"
-              :src="`${URI}/read-product-image/96/${product.name}`" alt="">
-
-            <!-- <TarjetaMenu v-if="vueMenu" style="width: 200px;height: 200px;" :product="product"></TarjetaMenu> -->
-
+              src="https://backend.salchimonster.com/read-product-image/600/CHICHAMONSTER" alt="">
+            
           </div>
 
-          <div v-if="carro_para_la_barra_de_abajo.products.length > 5 "
+          <div v-if="store.cart.products.length > 4 "
             style="width: auto; border-radius: 50%; ; height: 100%; object-fit: contain;" alt="">
 
-            <p style="font-weight: bold; font-size: 2rem; ">
-              +{{ carro_para_la_barra_de_abajo.products.length - 5 }}
+            <p style="font-weight: bold; " class="text-xl">
+              +{{ store.cart.products.length - 4 }}
             </p>
           </div>
 
@@ -92,7 +92,7 @@
       </RouterLink> -->
 
 
-      <a v-if="carro_para_la_barra_de_abajo.products.length > 0 && screenWidth>720" >
+      <a v-if="store.cart.products.length > 0 && screenWidth>720" >
 
 
 
@@ -129,12 +129,12 @@
   </div>
 
 
-  <div class="whatsapp"  :style="!showElement? 'transform: translateX(2.5rem)': ''"  style="
+  <div v-if="!route.path.includes('cart') && !route.path.includes('pay')" class="whatsapp"  :style="!showElement? 'transform: translateX(-2.2rem)': ''"  style="
                             
                         
                             ">
  
- <a :href="wsp">  <button class="whatsapp-btn" style="
+ <a :href="wsp">  <button class="whatsapp-btn p-1" style="
                              border: none; background-color:transparent; 
                              transition: all ease .3s;
                              /* border-radius: 50%;  */
@@ -145,7 +145,7 @@
  
      ">
            <i class="" :class="PrimeIcons.WHATSAPP"
-             style=" ;position: relative;  font-weight:  bold; font-size: 2rem; color: rgb(255, 255, 255);width:auto">
+             style=" ;position: relative;  font-weight:  bold; font-size: 1.8rem; color: rgb(255, 255, 255);width:auto">
            </i>
          </button></a>
  
@@ -153,7 +153,7 @@
 
          <a href="https://www.facebook.com/salchimonsterr">
 
-          <button class="whatsapp-btn" style="
+          <button class="whatsapp-btn p-1" style="
                              border: none; background-color:transparent; 
                              transition: all ease .3s;
                              /* border-radius: 50%;  */
@@ -164,14 +164,14 @@
  
      ">
            <i class="" :class="PrimeIcons.FACEBOOK"
-             style=" ;position: relative;  font-weight:  bold; font-size: 2rem; color: rgb(255, 255, 255);width:auto">
+             style=" ;position: relative;  font-weight:  bold; font-size: 1.8rem; color: rgb(255, 255, 255);width:auto">
            </i>
          </button>
          </a>
         
          
 
-         <a href="https://www.instagram.com/salchimonsterr/">  <button class="whatsapp-btn" style="
+         <a href="https://www.instagram.com/salchimonsterr/">  <button class="whatsapp-btn p-1" style="
                              border: none; background-color:transparent; 
                              transition: all ease .3s;
                              /* border-radius: 50%;  */
@@ -182,12 +182,12 @@
  
      ">
            <i class="" :class="PrimeIcons.INSTAGRAM"
-             style=" ;position: relative;  font-weight:  bold; font-size: 2rem; color: rgb(255, 255, 255);width:auto">
+             style=" ;position: relative;  font-weight:  bold; font-size: 1.8rem; color: rgb(255, 255, 255);width:auto">
            </i>
          </button></a>
 
 
-         <a href="https://www.youtube.com/@Salchimonster/videos">  <button class="whatsapp-btn" style="
+         <a href="https://www.youtube.com/@Salchimonster/videos">  <button class="whatsapp-btn p-1" style="
                              border: none; background-color:transparent; 
                              transition: all ease .3s;
                              /* border-radius: 50%;  */
@@ -198,7 +198,7 @@
  
      ">
            <i class="" :class="PrimeIcons.YOUTUBE"
-             style=" ;position: relative;  font-weight:  bold; font-size: 2rem; color: rgb(255, 255, 255);width:auto">
+             style=" ;position: relative;  font-weight:  bold; font-size: 1.8rem; color: rgb(255, 255, 255);width:auto">
            </i>
          </button></a>
 
@@ -221,17 +221,24 @@ import { menuOptions } from '@/service/menuOptions';
 // import { getProductsByCategory, getCategory, getMenu } from '@/service/productServices.js'
 import { ref, onMounted, onUnmounted } from 'vue';
 import { PrimeIcons } from 'primevue/api';
+import { useRoute } from 'vue-router';
 // import { changeProduct } from './service/productServices';
 import { carro_para_la_barra_de_abajo } from '@/service/cart';
 const wsp = ref(localStorage.getItem('currenSiteWsp'))
 import {URI} from '@/service/conection'
 import router from '@/router/index.js'
+import { usecartStore } from '../store/shoping_cart';
+const store = usecartStore()
 // import router from '../router';
 // import { PrimeIcons } from 'primevue/api';
 import { formatoPesosColombianos } from '@/service/formatoPesos';
 import { verCerrado } from '../service/state';
 const ruta = ref(router.currentRoute)
 let scrollTimer;
+
+
+
+const route = useRoute()
 
 const handleScroll = () => {
       showElement.value = false;
@@ -263,7 +270,7 @@ const enviarAlCarro = ()=> {
         return
     }
     
-  router.push('cart')
+  router.push('/cart')
 }
 </script>
 
@@ -282,11 +289,6 @@ const enviarAlCarro = ()=> {
   }
 }
 
-* *:focus{
-  outline: none;
-  border: none;
-}
-
 .imagen {
   margin: 200px;
   width: 100px;
@@ -296,9 +298,6 @@ const enviarAlCarro = ()=> {
 }
 
 
-.img-cart:hover {
-  transform: scale(1.3);
-}
 
 .img-cart {
   transition: all .3s ease;
@@ -562,21 +561,21 @@ const enviarAlCarro = ()=> {
 .whatsapp {
     /* background-color: red; */
     /* min-width: 1024px; */
-    width: 3rem;
+    width: 2.5rem;
     height: min-content;
-    gap: 1rem;
+    gap: 0rem;
     display: flex;
     flex-direction: column;
     /* gap: 1rem; */
     transition: all ease .3s;
-    right: 0rem;
+    left: 0rem;
     bottom: 9rem;
-    padding:  1rem 0;
+    padding:  0.5rem 0;
 
     /* align-items: center; */
     justify-content: space-around;
     background-color: var(--primary-color);
-    border-radius:  1.5rem 0 0 1.5rem; 
+    border-radius: 0  1rem   1rem 0; 
     position: absolute;
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.391);
  

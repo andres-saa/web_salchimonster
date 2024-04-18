@@ -1,256 +1,125 @@
 <template>
-  <Dialog v-model:visible="showProductDialog" :style="{ width: '1024px', height: 'max-content' }" header="Seleccion de sede"
+  <Dialog v-model:visible="store.visibles.currentProduct" :style="{ width: '500px', }" header="Seleccion de sede"
     :modal="true" class="p-fluid pt-8 m-3"
-    style="justify-content: center;    box-shadow: 0px 0px 30px rgb(0, 0, 0);; background-color: white; ; border-radius: 30px;padding-top: 2rem;">
+    style="justify-content: center; background-color: white;position: relative ; border-radius: 1rem;padding-top: 2rem;">
 
 
 
 
-    <div class="header col-12 grid m-0 text-justify pb-5"
-      style="border-radius: 30px 30px 0 0; background-color: rgb(255, 255, 255);z-index:99; position:absolute;top:1rem;left: 0;height: max-content;">
-      <p class="pl-4 nombre col-9 text-xl lg:text-3xl p-0 text-left" style="color:black;font-weight: bold"> {{
-        productDialog.name }}</p>
-      <p class="pr-4 precio col-3 text-xl lg:text-3xl p-0 text-right " style="color:black;font-weight: bold">
-        {{ formatoPesosColombianos(productDialog.price + sumarPrecios(currentAditions) + sumarPrecios(currentToppings) +
-          sumarPrecios(currentCambios) + sumarPrecios(currentAcompanantes)) }}</p> 
+    <div class="header col-12    "
+      style=" display: flex;justify-content: space-between; ; background-color: rgb(255, 255, 255);z-index:99; position:absolute;top:0rem;left: 0;height: min-content;">
+      <p class=" mayuscula md:pl-4 nombre col-9 text-l lg:text-xl p-0 text-left" style="color:black;font-weight: bold"> {{
+        store.currentProduct.product_name }}</p>
+      <p class="md:pr-4 precio col-3 text-l lg:text-xl p-0 text-right " style="color:black;font-weight: bold">
+        {{ formatoPesosColombianos(store.currentProduct.price) }}</p>
     </div>
 
 
-
-
-    <button @click="showProductDialog = !showProductDialog"
-      style=" width: 3rem;height: 3rem; border: none; position: absolute; right: -1rem; top: -1rem;background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center;justify-content: center; z-index: 99;">
-      <i :class="PrimeIcons.TIMES" style="color: white; font-weight: bold; " class="text-2xl"></i>
-
-    </button>
-
-    <div class="col-12"
-      style="pointer-events: none; height: 5rem;top: 4rem; z-index: 90; position: absolute; background: linear-gradient(to top, rgba(255, 255, 255, 0) 0%, rgb(255, 255, 255) 80%);;">
-
-    </div>
-
-    <div class="grid col-12 p-0  md:p-4">
-
-
-
-      <!-- <div class="bajador col-12 p-0 grid m-0" style="background-color: rgb(255, 255, 255); color: transparent; z-index:9;height: max-content;">
-      <p class="nombre col-9 text-justify text-xl lg:text-2xl p-0 text-left" style="color:rgba(0, 0, 0, 0);font-weight: bold"> {{ productDialog.name }}</p>
-      <p class="precio col-3 text-xl lg:text-2xl p-0 text-right " style="color:rgba(0, 0, 0, 0)09, 28, 28);font-weight: bold"> {{formatoPesosColombianos( productDialog.price )}}</p>
-    </div> -->
-
-
-
-      <div class="col-12 md:col-6 p-4 mt-5"
-        style="display: flex;align-items: center; max-height: 45rem; background-color:white;box-shadow: 0 0 20px rgba(0, 0, 0, 0.239); border-radius: 2rem;; overflow: hidden; ">
-
-        <!-- <div class="before"
-                style="top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; position: ;  position: absolute;">
-                <img :src="`${URI}/read_product_image/600/${productDialog.id}`" alt=""
-                    style="width: 110%; height: 110%; opacity: 0.3; object-fit:  cover; filter: blur(5px);">
-        </div> -->
-        <img class="col-12 p-0" :src="`${URI}/read-product-image/600/${productDialog.name}`" alt=""
-          style="width: 100%;object-fit: cover;">
-
+    <template #footer>
+      <div class="col-12 pb-6 " style="display: flex; justify-content: center;">
+        <Button class="" @click="addToCart(store.currentProduct)" label="Agregar al carrito" icon="pi pi-shopping-cart"
+          style=" position: absolute;  pointer-events: all; background-color: black; color:white;width:auto;border:none;padding: 0.5rem 3rem; font-weight: bold;">
+        </Button>
       </div>
 
-      <div class="   col-12 md:col-6 m-0 md:pl-3 pr-0 mr-0" style="  height: 45rem; " :class="!isSmallScreen?'scroll':'static'">
-        <p class="col-12 text-xl md:pb-0 p-0 md:pl-3 " style="font-weight: bold;color: black; ">
+    </template>
+
+
+
+    <Button @click="store.setVisible('currentProduct', false)" severity="danger" icon="pi pi-times"
+      style=" width: 2.5rem;height: 2.5rem; border: none; position: absolute; right: -1rem; top: -1rem; border-radius: 50%; display: flex; align-items: center;justify-content: center; z-index: 99;">
+
+    </Button>
+
+
+
+
+
+
+
+
+    <div class="grid col-12 p-0  md:p-2">
+
+
+
+
+
+      <div class="col-12  p-0 mt-0 shadow-5"
+        style="display: flex;align-items: center; max-height: 45rem; background-color:white;border-radius: 0.5rem; ">
+
+
+        <img class="col-12 p-2 m-0" :src="`https://backend.salchimonster.com/read-product-image/600/LA%20%C3%91ERA`"
+          alt="" style="width: 100%;object-fit: contain; aspect-ratio: 1/1;">
+
+      </div>
+      <!-- <p style="color: black;">{{ store.cart.additions }} {{ selectedAdditions }}</p> -->
+
+
+      <div class="   col-12 p-0 my-5" style="  " :class="!isSmallScreen ? 'scroll' : 'static'">
+        <p class="col-12 p-0 " style="font-weight: bold;color: black; ">
           DESCRIPCION
 
-          <!-- {{ productDialog }}
-           -->
         </p>
 
 
-        <p class="col-12 text-l p-0 md:pl-5" style="color: black;">
-          {{ productDialog.description }}
-          <!-- {{ productDialog }} -->
-          <!-- {{ salsas }} -->
+        <p class="col-12 text-l p-0" style="color: black;text-transform:capitalize">
+          {{ store.currentProduct.product_description.toLowerCase() }}
+
         </p>
 
-        <div>
-          <p v-if="salsas.length > 0" class="col-12 text-xl p-0 md:pl-3"
-            style="font-weight: bold;color: black;display: flex;align-items: center;">
-            <span class="col-4 p-0 m-0">SALSAS</span>
-          <div class="col p-0 m-0" style="height: auto; height: 0.2rem;background-color: var(--primary-color)"> </div>
-          </p>
 
-          <div v-for="salsa in salsas" class="col-12 pt-0 pb-0 mb-0 p-0 md:pl-5"
-            :class="checkedSalsas[salsa.name] || checkedSalsas['TODAS LAS SALSAS'] ? 'selected' : ''"
-            style="justify-content: start; padding-bottom: 0.5rem; padding-left: 1rem; border-radius: 1rem;">
+        <div style="color: black;">
+          <!-- {{ adicionales }}
+          
+          -->
 
-            <div class="salsa col-12 p-0 "
-              style="color: black; margin: 0; padding: 0; display: flex; justify-content: space-between; align-items: center;">
-              <p class="texto p-0 m-0" style="margin: 0; padding: 0; min-width: max-content">{{ salsa.name }}</p>
+          <div v-for="grupo in adicionales" :key="grupo.category">
+            <div class="mb-2">
+              <span class="mb-2 text-center">
+                <b>{{ grupo.category }}</b>
+              </span>
+              <div class="mt-2">
+                <div v-for="item in grupo.items" :key="item.aditional_item_instance_id" style="display: flex; gap: 1rem;">
 
-              <Checkbox
-                v-if="!(checkedSalsas['SIN SALSAS'] && !checkedSalsas[salsa.name] || (checkedSalsas['TODAS LAS SALSAS'] && !checkedSalsas[salsa.name]))"
-                @change="cargarSalsas(salsa.name)" v-model="checkedSalsas[salsa.name]" :binary="true"
-                style="margin-right: 1rem;" />
-            </div>
-          </div>
-
-        </div>
-
-        <div v-if="productDialog.category_id != 3">
-
-
-
-<div class="pb-6">
-
-          <p v-if="cambios.length > 0" class="col-12 text-xl p-0 md:pl-3 mt-3 mb-5 pl"
-            style="font-weight: bold;color: black;display: flex;align-items: center;">
-            <span class="col-4 p-0 m-0">Cambios</span>
-          <div class="col p-0 m-0" style="height: auto; height: 0.2rem;background-color: var(--primary-color)"> </div>
-          </p>
+                  <Checkbox class="my-1" :binary="true" v-model="item.checked"
+                    @change="() => handleAdditionChange(item, grupo.category)" />
+                  <div style="display: flex; width: 100%; gap: 1rem; justify-content: space-between;">
+                    <span class="text-sm adicion" style="text-transform: lowercase;">{{ item.aditional_item_name }}</span>
+                    <span v-if="item.checked" style="display: flex; align-items: center;">
 
 
 
 
-          <div class="md:p-0 p-0" v-for="adicion in cambios" style=" ;  ; color:black;border-radius:2rem"
-            :class="checkedAdiciones[adicion.name] ? 'selected' : ''">
 
 
 
-            <div class=" col-12 grid p-0  md:pl-5 mb-3" style=" align-items: center; justify-content: space-between;  ">
+                      <span v-if="item.aditional_item_price > 0" class="pl-2 py-1 text-sm">
+                        <b>{{ formatoPesosColombianos(item.aditional_item_price *
+                          selectedAdditions[item.aditional_item_instance_id]?.quantity) }}</b>
+                      </span>
+
+                      <Button @click="decrement(item)" class="ml-2" severity="danger"
+                        style="width: 2rem; height: 1.5rem;border: none;" icon="pi pi-minus"></Button>
+                      <InputText :modelValue="selectedAdditions[item.aditional_item_instance_id]?.quantity" readonly
+                        style="width: 2rem;border: none; height: 1.5rem;" class="p-0 text-center" />
+                      <Button @click="increment(item)" severity="danger" style="width: 2rem;height: 1.5rem; border: none;"
+                        icon="pi pi-plus"></Button>
+                    </span>
 
 
-              <div class="col-9 pl-3 p-0  " style="display: flex;">
-                <Checkbox @change="cargarAdiciones(adicion)" class="p-0" v-model="checkedAdiciones[adicion.name]"
-                  :binary="true" style="margin-right: 1rem;  " />
 
-                <p class="   p-0" style=";"> {{ adicion.name }}
-                </p>
+                    <span v-else-if="item.aditional_item_price > 0" class="pl-2 py-1 text-sm">
+                        <b>{{ formatoPesosColombianos(item.aditional_item_price)}}
+                          </b>
+                      </span>
 
+                  </div>
 
+                </div>
+                <hr>
               </div>
-
-
-              <p class=" text col-3 text-right p-0 " style="font-weight: bold; margin-left: ;">+
-                {{ formatoPesosColombianos(adicion.price) }}
-              </p>
-
             </div>
-
-
           </div>
-
-
-
-          <p v-if="adicionales.length > 0" class="col-12 text-xl p-0 md:pl-3 mt-3 mb-5"
-            style="font-weight: bold;color: black;display: flex;align-items: center;">
-            <span class="col-4 p-0 m-0">Adiciones</span>
-          <div class="col p-0 m-0" style="height: auto; height: 0.2rem;background-color: var(--primary-color)"> </div>
-          </p>
-
-
-
-
-          <div class="md:p-0 p-0" v-for="adicion in adicionales" style=" ;  ; color:black;border-radius:2rem"
-            :class="checkedAdiciones[adicion.name] ? 'selected' : ''">
-
-
-
-            <div class=" col-12 grid p-0  md:pl-5 mb-3" style=" align-items: center; justify-content: space-between;  ">
-
-
-              <div class="col-9 p-0 pl-3 " style="display: flex;">
-                <Checkbox @change="cargarAdiciones(adicion)" class="p-0" v-model="checkedAdiciones[adicion.name]"
-                  :binary="true" style="margin-right: 1rem;  " />
-
-                <p class="   p-0" style=";"> {{ adicion.name }}
-                </p>
-
-
-              </div>
-
-
-              <p class=" text col-3 text-right p-0 " style="font-weight: bold; margin-left: ;">{{
-                formatoPesosColombianos(adicion.price) }}
-              </p>
-
-            </div>
-
-
-          </div>
-
-
-
-
-          <p v-if="toppings.length > 0" class="col-12 text-xl p-0 md:pl-3 mt-3 mb-5"
-            style="font-weight: bold;color: black;display: flex;align-items: center;">
-            <span class="col-4 p-0 m-0">toppings</span>
-          <div class="col p-0 m-0" style="height: auto; height: 0.2rem;background-color: var(--primary-color)"> </div>
-          </p>
-
-
-          <div class="md:p-0 p-0" v-for="adicion in toppings" style=" ;  ; color:black;border-radius:2rem"
-            :class="checkedAdiciones[adicion.name] ? 'selected' : ''">
-
-
-
-            <div class=" col-12 grid p-0  md:pl-5 mb-3" style=" align-items: center; justify-content: space-between;  ">
-
-
-              <div class="col-9 p-0 pl-3  " style="display: flex;">
-                <Checkbox @change="cargarAdiciones(adicion)" class="p-0" v-model="checkedAdiciones[adicion.name]"
-                  :binary="true" style="margin-right: 1rem;  " />
-
-                <p class="   p-0" style=";"> {{ adicion.name }}
-                </p>
-
-
-              </div>
-
-
-              <p class=" text col-3 text-right p-0 " style="font-weight: bold; margin-left: ;">{{
-                formatoPesosColombianos(adicion.price) }}
-              </p>
-
-            </div>
-
-
-          </div>
-
-
-
-          <p v-if="acompanantes.length > 0" class="col-12 text-xl p-0 md:pl-3 mt-3 mb-5"
-            style="font-weight: bold;color: black;display: flex;align-items: center;">
-            <span class="col-4 p-0 m-0">Acompanantes</span>
-          <div class="col p-0 m-0" style="height: auto; height: 0.2rem;background-color: var(--primary-color)"> </div>
-          </p>
-
-
-          <div class="md:p-0 p-0" v-for="adicion in acompanantes" style=" ;  ; color:black;border-radius:2rem"
-            :class="checkedAdiciones[adicion.name] ? 'selected' : ''">
-
-
-
-            <div class=" col-12 grid p-0  md:pl-5 mb-3" style=" align-items: center; justify-content: space-between;  ">
-
-
-              <div class="col-9 p-0 pl-3  " style="display: flex;">
-                <Checkbox @change="cargarAdiciones(adicion,productDialog.number_of_acompanantes)" class="p-0" v-model="checkedAdiciones[adicion.name]"
-                  :binary="true" style="margin-right: 1rem;  " />
-
-                  <!-- {{ productDialog }} -->
-                <p class="   p-0" style=";"> {{ adicion.name }}
-                </p>
-
-
-              </div>
-
-
-              <p class=" text col-3 text-right p-0 " style="font-weight: bold; margin-left: ;">{{
-                formatoPesosColombianos(adicion.price) }}
-              </p>
-
-            </div>
-
-
-          </div>
-
-
         </div>
 
 
@@ -258,48 +127,25 @@
 
 
 
-      </div>
+
       </div>
 
-      <div v-if="!isSmallScreen" class="col-12 md:col-6 add-car pt-5 " style="pointer-events: none; position: absolute;display: flex; align-items: end; justify-content: center;     background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgb(255, 255, 255) 80%);
+      <div v-if="!isSmallScreen" class="col-12 md:col-6 add-car pt-5 " style="pointer-events: none;display: flex; align-items: end; justify-content: center;     background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgb(255, 255, 255) 80%);
   height: 5rem; bottom: 0rem;right: 0;">
 
-        <button @click="addcar(productDialog) "
-          style=" pointer-events: all; background-color: var(--primary-color); color:white; border:none;padding: 0.5rem 3rem; font-weight: bold; border-radius: 2rem;">
-          <span class="text-xl">AGREGAR AL CARRITO</span></button>
+
 
       </div>
 
-      
+
     </div>
 
 
 
-    <div v-if="isSmallScreen" class="col-12 md:col-6 add-car pt-5 " style="pointer-events: none; bottom: 0; position:absolute ;display: flex; align-items: end; justify-content: center;     background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgb(255, 255, 255) 80%);
-  height: 5rem; bottom: 0rem;right: 0; border-radius: 2rem;">
-
-        <button @click="addcar(productDialog) "
-          style=" pointer-events: all; background-color: var(--primary-color); color:white; border:none;padding: 0.5rem 3rem; font-weight: bold; border-radius: 2rem;">
-          <span class="text-xl">AGREGAR AL CARRITO</span></button>
-
-      </div>
-
-
-    <!-- <button  @click="setProductDialog" style="width: 3rem;height: 2rem; border: none; position: absolute; right: 1rem; top:1rem;background-color: var(--primary-color); border-radius: 5px; display: flex; align-items: center;justify-content: center;">
-      <i :class="PrimeIcons.TIMES" style="color: white; font-weight: bold; " class="text-2xl"></i>
- 
-    </button> -->
-
-    <!-- <div
-      style="width: 40%;max-width: 20rem; position: absolute; display: flex;align-items: center; justify-content: end;padding-right: 1rem; height: 1.5rem; background-color: black; top: 0; border-radius:  15px 15px ; top:0.5rem">
-      <div class="led" style="width: 0.7rem;height: 0.7rem;border-radius: 50%; display: ;"></div>
-      
-    </div> -->
-
     <img style="     pointer-events: none;
-   ; position: absolute;right: 95%; top: 20%;" :src="'images/garra-sm-hor.png'" alt="">
+   ; position: absolute;right: 95%; top: 20%;" :src="'/images/garra-sm-hor.png'" alt="">
     <img style="     pointer-events: none;
-   ; position: absolute;left: 95%; top: 20%;" :src="'images/garra-sm-izq.png'" alt="">
+   ; position: absolute;left: 95%; top: 20%;" :src="'/images/garra-sm-izq.png'" alt="">
 
   </Dialog>
 </template>
@@ -337,12 +183,126 @@ import barra from '@/components/barra.vue';
 import siteDialog from '@/components/siteDialog.vue';
 // import ProductDial from '@/views/pages/productDial.vue';
 import { verCerrado } from '../service/state';
+import { usecartStore } from '../store/shoping_cart';
+import { curentProduct } from '../service/productServices';
+import { carService } from '../service/car/carService'
+import { adicionalesService } from '../service/restaurant/aditionalService';
+import { useSitesStore } from '../store/site';
+
+
+const selectedAdditions = ref({});
+
+
+const handleAdditionChange = (item, group) => {
+  if (item.checked) {
+
+    const new_item = {
+      id: item.aditional_item_instance_id,
+      name: item.aditional_item_name,
+      price: item.aditional_item_price,
+      group: group
+    }
+
+    selectedAdditions.value[new_item.id] = {
+      ...new_item,
+      quantity: item.quantity || 1
+    };
+  } else {
+    delete selectedAdditions.value[item.aditional_item_instance_id];
+  }
+};
+
+const increment = (item) => {
+  if (item.checked) {
+
+    const new_item = {
+      id: item.aditional_item_instance_id,
+      name: item.aditional_item_name,
+      price: item.aditional_item_price,
+      // quantity:item.quantity
+    }
+
+
+    selectedAdditions.value[new_item.id].quantity++;
+  }
+};
+
+const decrement = (item) => {
+
+  if (selectedAdditions.value[item.aditional_item_instance_id].quantity > 1 && selectedAdditions.value[item.aditional_item_instance_id]) {
+    selectedAdditions.value[item.aditional_item_instance_id].quantity--
+  }
+
+};
+
+
+const addToCart = (product) => {
+  // Convertir las adiciones seleccionadas de un objeto a un array
+
+
+  const additionsArray = Object.values(selectedAdditions.value);
+  store.addProductToCart(product);
+
+  additionsArray.forEach(adition => {
+    store.addAdditionToCart(adition)
+    console.log(adition)
+  })
+
+  selectedAdditions.value = {}; // Resetear las adiciones seleccionadas
+
+
+  store.setVisible('currentProduct', false)
+};
+
+const adicionales = ref([])
+const store = usecartStore()
+
+const checkedAdition = ref({})
+
+
+
 const salsas = ref()
 const cambios = ref()
 const route = useRoute();
-const adicionales = ref()
+// const adicionales = ref()
 const toppings = ref()
 const acompanantes = ref()
+
+
+onMounted(async () => {
+  const product_id = await store.currentProduct.id
+
+
+  if (product_id) {
+    adicionales.value = await adicionalesService.getAditional(product_id)
+  }
+})
+
+
+watch(() => store.currentProduct, async () => {
+  const product_id = await store.currentProduct.id
+
+
+  if (product_id) {
+    adicionales.value = await adicionalesService.getAditional(product_id)
+  }
+})
+
+
+watch(() => store.visibles.addAdditionToCart, async (new_val) => {
+  if (!new_val) {
+    selectedAdditions.value = {}
+    adicionales.value = []
+  } else {
+    const product_id = await store.currentProduct.id
+    if (product_id) {
+      adicionales.value = await adicionalesService.getAditional(product_id)
+    }
+  }
+}, { deep: true })
+
+
+
 
 // Verificar si la ruta actual o alguna de sus rutas secundarias es /admin-products
 const isInAdminProductsRoute =
@@ -366,9 +326,6 @@ const isSmallScreen = computed(() => screenWidth.value < 768);
 
 
 
-onMounted(() => {
-    window.addEventListener('resize', updateScreenWidth);
-});
 
 
 const toast = useToast();
@@ -617,10 +574,10 @@ const vueMenu = ref(false)
 const addcar = (product) => {
 
   const estado = localStorage.getItem('estado')
-    if(estado && estado=='cerrado'){
-        verCerrado.value = true
-        return
-    }
+  if (estado && estado == 'cerrado') {
+    verCerrado.value = true
+    return
+  }
 
   showProductDialog.value = !showProductDialog.value
 
@@ -904,17 +861,21 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 </script>
 
-<style scoped>* {
-  text-transform: lowercase;
-}
+<style scoped>
 *::-webkit-scrollbar {
   overflow-y: auto;
-  display: none; /* oculta la barra de desplazamiento en navegadores basados en WebKit/Blink */
+  display: none;
+  /* oculta la barra de desplazamiento en navegadores basados en WebKit/Blink */
 }
 
-.scroll{
+/* .scroll{
   overflow-y: auto;
+} */
+
+.adicion::first-letter {
+  text-transform: uppercase;
 }
-*::first-letter {
+
+.mayuscula {
   text-transform: uppercase;
 }</style>

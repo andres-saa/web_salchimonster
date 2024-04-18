@@ -1,249 +1,251 @@
 <template>
-    <!-- <p class="col-12 md:col-7 p-1 text-center text-4xl m-auto mb-5 lg:col-7 md:col-12 sm:col-12 m-auto mb-8" style="border-radius: 2rem; font-weight: bold; color: white; background-color: black;" > <i class="text-4xl pr-3 p-0" :class="PrimeIcons.SHOPPING_CART" style="color: white;"></i>CARRITO DE COMPRAS </p>
-     -->
-    <div class="col-12 p-4 p-0 m-0">
-        <div sty class=" contenedor-principal p- md:p-3 grid md:col-10 md:m-auto xl:col-8 xl:ml-auto xl:mr-auto clase"
-            v-if="products.length > 0" style="margin-bottom: 5rem;overflow: hidden;height: 100%;">
+    <!-- {{ store.cart }} -->
 
-            <div class=" col-12 xl:col-7 xl:p-5 " style="">
-                <div class="cont-products grid p-2" style=";position: inherit; ">
+
+    <div class="col-12  my-4 md:my-8 p-0">
+        <div class="grid mx-auto " style="max-width:800px;">
 
 
 
+            <div class="col-12 text-sm md:col-6 p-2 md:px-4" style="display: flex; flex-direction: column; gap:1rem;justify-content: center;">
 
-                    <div v-for="product in products" class=" m-0 grid mb-5 md:pr-5 pb-6 col-12"
-                        style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); height: min-content;border-radius: 1rem; overflow: hidden; position: relative; background-color: white;">
+                <div class=" col-12 py-3 p-shadow"
+                    style=" display: flex;align-items:end;position: relative; gap:1rem;border-radius: 0.3rem;"
+                    v-for="product in store.cart.products">
+
+                    <img style="width:5rem;object-fit:cover; height:5rem"
+                        src="https://backend.salchimonster.com/read-product-image/600/CHICHAMONSTER" alt="">
+
+                    <Button class="ml-2" @click="store.removeProductFromCart(product.product.id)" icon="pi pi-trash"
+                        severity="danger" rounded
+                        style="border:none;right: -.5rem;top: -.5rem; position: absolute; outline:none;width:2rem; height:2rem" />
+
+                    <div style="display: flex; flex-direction:column;gap:0.4rem; width:100%">
+
+                        <div style="display: flex; flex-direction:column;gap:0.3rem; width:100%">
+                            <div style="display:flex;justify-content:space-between;align-items: center; width:100%;gap:1rem">
+                                <span class="p-0 m-0"> {{ product.product.product_name }} </span>
+                            </div>
+                           <span style="text-transform: uppercase;font-weight: bold;">{{ product.product.category_name }}</span> 
+
+                           
+                            <div style="display:flex">
+                                <div>
+
+                                </div>
+
+                                <div class="p-0 "
+                                    style="box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.2); background-color:#ff620000; border-radius: 5rem;display: flex;">
+                                    <Button @click="store.removeProductInstance(product.product.id)" icon="pi pi-minus"
+                                        severity="danger"
+                                        style="border:none;outline:none;width:2rem; height:1.5rem;border-radius: 0.4rem 0 0 0.4rem;">
+                                    </Button>
 
 
-                        <img @click="setProductDialog(product.product)" class="col-2 p-1 " style=" object-fit: contain;"
-                            :src="`${URI}/read-product-image/96/${product.product.name}`" alt="">
 
-                        <div class="col-10 grid m-0 pl-5   " style="">
-                            <div class="col text-left text-md p-0" style="font-weight: bold;display: flex; gap:0.5rem">
-                                <p>
-                            {{ `${product.quantity}  ` }}  
-                                </p> <p class="name-product" style="width: auto;">{{product.product.name}}</p>
+                                    <InputText class="text-center"
+                                        style="background-color:transparent;font-weight:bold; width:3rem;height:1.5rem;color:black ; border:none"
+                                        :modelValue="product.quantity" readonly></InputText>
+
+
+
+
+
+                                    <Button @click="store.addProductToCart(product.product)" icon="pi pi-plus "
+                                        severity="danger"
+                                        style="font-weight: bold; border:none;outline:none;width:2rem; height:1.5rem;border-radius:0 0.4rem   0.4rem 0;;">
+                                    </Button>
+                                </div>
+
+
 
                             </div>
-                            <div class="col-4 text-right text-md p-0" style="font-weight: bold;">
-                                {{ formatoPesosColombianos(
-                                    product.quantity * product.product.price +
-                                    product.quantity * sumarAdiciones(product.product.adiciones ) +
-                                    product.quantity * sumarAdiciones(product.product.toppings) +
-                                    product.quantity * sumarAdiciones(product.product.cambios) +  
-                                    product.quantity * sumarAdiciones(product.product.acompanantes)    ) 
-                                      }}
-                            </div>
-                            <div class="col-12 text-left  descripcion p-0 "
-                                style="font-weight:; text-transform: lowercase;">{{ product.product.description }} </div>
-
-
-                            <p class="col-12 pl-0  mb-0 pb-0" style="font-weight: bold;"
-                                v-if="product.product.adiciones?.length > 0">ADICIONES</p>
-                            <div style="max-width: max-content;">
-                                <span class="col text-left text-md descripcion p-0"
-                                    style="min-width:max-content; text-transform: lowercase; "
-                                    v-for="i in product.product.adiciones"> {{ i.name }} + <span style="font-weight: bold;">
-                                        {{ formatoPesosColombianos(i.price) }}</span> , </span>
-                            </div>
-
-                            <p class="col-12 pl-0  mb-0 pb-0" style="font-weight: bold;"
-                                v-if="product.product.adiciones?.length > 0">CAMBIOS</p>
-                            <div style="max-width: max-content;">
-                                <span class="col text-left text-md descripcion p-0"
-                                    style="min-width:max-content; text-transform: lowercase; "
-                                    v-for="i in product.product.cambios"> {{ i.name }} + <span style="font-weight: bold;">
-                                        {{ formatoPesosColombianos(i.price) }}</span> , </span>
-                            </div>
-
-
-                            
-
-                            <p class="col-12 pl-0  mb-0 pb-0" style="font-weight: bold;"
-                                v-if="product.product.toppings?.length > 0">TOPPINGS</p>
-                            <div style="max-width: max-content;">
-                                <span class="col text-left text-md descripcion p-0"
-                                    style="min-width:max-content; text-transform: lowercase; "
-                                    v-for="i in product.product.toppings"> {{ i.name }} + <span style="font-weight: bold;">
-                                        {{ formatoPesosColombianos(i.price) }}</span> , </span>
-                            </div>
-
-
-
-
-
-                            <p class="col-12 pl-0  mb-0 pb-0" style="font-weight: bold;"
-                                v-if="product.product.acompanantes?.length > 0">ACOMPANANTES</p>
-                            <div style="max-width: max-content;">
-                                <span class="col text-left text-md descripcion p-0"
-                                    style="min-width:max-content; text-transform: lowercase; "
-                                    v-for="i in product.product.acompanantes"> {{ i.name }} + <span style="font-weight: bold;">
-                                        {{ formatoPesosColombianos(i.price) }}</span> , </span>
-                            </div>
-
-
-
-
-                            
-                            <p v-if="product.product.salsas?.length > 0" class="col-12 pl-0  mb-0 pb-0" style="font-weight: bold;">SALSAS</p>
-                            <div style="max-width: max-content;">
-                                <span class="col md:col text-left text-md descripcion p-0"
-                                    style="font-weight:; text-transform: lowercase; " v-for="i in product.product.salsas">
-                                    {{ i }}, </span>
-
-                            </div>
-
-
-
-
-                        </div>
-                        <div class="contador col text-reignt ">
-
-                            <button
-                                style="  display: flex; align-items: center;justify-content: center;  border: none;background-color: transparent;"
-                                @click="remove(product.product)"> <i :class="PrimeIcons.MINUS"> </i>
-
-                            </button>
-
-                            <input class="cantidad"
-                                style="font-size: 1.5rem; text-align: center; width: 30px; border: 1px none;  " readonly
-                                type="text" :value="product.quantity">
-
-                            <button
-                                style="  display: flex; align-items: center;justify-content: center; border: none;font-weight: bold; font-size: 3vh;background-color: transparent;"
-                                @click="add(product.product)"> <i :class="PrimeIcons.PLUS"> </i> </button>
-
-
                         </div>
 
                     </div>
+
+                    <h5 class="p-0 m-0"> <b>{{ formatoPesosColombianos(product.total_cost) }}</b> </h5>
+
+
+
+
+
+
                 </div>
+
+                <div class="col-12 p-0 mt-1">
+                    <div class="p-shadow p-3 mb-4 " v-for="(items, grupo) in agrupados" :key="grupo" style="position: relative;border-radius: 0.3rem;">
+                        
+                        <Button class="ml-2" @click="deleteGroup(items)" icon="pi pi-trash"
+                            severity="danger" rounded
+                            style="border:none;right: -.5rem;top: -.5rem; position: absolute; outline:none;width:2rem; height:2rem" />
+
+                        <div class="mb-2">
+                            <span class="mb-2 text-center">
+                                <b>{{ grupo }}</b>
+
+                            </span>
+                            
+                            <div class="mt-2">
+                                <div v-for="item in items" :key="item.aditional_item_instance_id"
+                                    style="display: flex; gap: 1rem; align-items: center;">
+                                    <Button text rounded @click="deleteAd(item)" class="p-0 m-0" severity="danger"
+                                        style="width: 2rem;  height: 2rem;border: none;" icon="pi pi-trash m-0"></Button>
+                                        
+
+                                    <div style="display: flex; width: 100%; gap: 1rem; justify-content: space-between;">
+                                        <span class="text adicion" style="text-transform: capitalize;">{{ item.name
+                                        }}</span>
+                                        <span style="display: flex; align-items: center;">
+
+
+
+
+
+
+
+                                            <span v-if="item.price > 0" class="pl-2 py-1 text-sm">
+                                                <b>{{ formatoPesosColombianos(item.price * item.quantity) }}</b>
+                                            </span>
+
+                                            <div v-if="grupo != 'SALSAS'" style="box-shadow: 0 0 5px rgba(0, 0, 0, 0.411);display: flex; border-radius: 0.3rem; " class="ml-2">
+
+                                           
+                                            <Button @click="decrement(item)"  severity="danger"
+                                                style="width: 2rem; height: 1.5rem;border: none; border-radius: 0.3rem 0 0 0.3rem;"
+                                                icon="pi pi-minus"></Button>
+                                            <InputText :modelValue="item.quantity" readonly
+                                                style="width: 2rem;border: none; height: 1.5rem;" class="p-0 text-center" />
+                                            <Button @click="increment(item)" severity="danger"
+                                                style="width: 2rem;height: 1.5rem; border: none;border-radius:0 0.3rem 0.3rem 0;"
+                                                icon="pi pi-plus"></Button>
+                                            </div>
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                               
+
+                            </div>
+                            
+                        </div>
+                        
+                    </div>
+                    <div @click="store.setVisible('addAdditionToCart',true)" class="col-12 p-0 m-0" style="display: flex;justify-content: end;">
+                        <Button rounded severity="danger" icon="pi pi-plus"></Button>
+
+                    </div>
+
+                </div>
+
+
             </div>
 
 
-           <Resumen></Resumen>
+            <resumen class="md:col-6"></resumen>
 
-
-        </div>
-
-
-
-        <div class="col-12 m-auto d-flex w-100 my-8 p-0 m-0" v-else
-            style="display: flex; flex-direction: column; justify-content: center; text-align: center; min-height: 80vh; align-items: center; ">
-            <img style="width: 100%; max-width: 640px; margin-bottom:  5rem;" src="/images/empty-cart.png" alt="">
-
-            <p class="text-2xl">Metele unas Salchis</p>
-            <i class="text-5xl" :class=" PrimeIcons.ARROW_DOWN" style="margin:  5rem;"></i>
-        
-            <Sesion_main></Sesion_main>
 
         </div>
     </div>
+
+
+    <dialogAddAditions></dialogAddAditions>
 </template>
 
 
 <script setup>
 import { useToast } from 'primevue/usetoast';
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue';
+import resumen from './resumen.vue';
+import { usecartStore } from '../../store/shoping_cart';
 import { formatoPesosColombianos } from '../../service/formatoPesos';
-import { PrimeIcons } from 'primevue/api';
-import { order_notes } from '@/service/order.js'
-import { quitarSalsas, eliminarSalsaDelCarrito, agregarSalsasAlCarrito, domicilio, useCart, eliminarAdicionDelCarrito, agregarAdicionAlCarrito, products, updateCart, contarObjetosRepetidos, quitarElementos } from '../../service/cart';
-import { useRoute } from 'vue-router';
-import {subtotal, calcularPrecioTotal, calcularTotalCarrito, setProductDialog, setShowDialog, sumarAdiciones } from '../../service/state';
-import { adiciones } from '../../service/menu/adiciones/adiciones';
-const showAditionsDialog = ref(false)
-import { URI } from '../../service/conection';
-import { comprobar_sede } from '../../service/state';
-import Resumen from './resumen.vue';
-// import Sesion_main from './sesion_main.vue';
-import BarraCategorias from '../../components/BarraCategorias.vue';
-const existeAdicionEnProducto = (adicion, producto) => {
-    return producto.adiciones && producto.adiciones.some(a => a.id === adicion.id);
+import { useSitesStore } from '../../store/site';
+import { orderService } from '../../service/order/orderService'
+import { adicionalesService } from '../../service/restaurant/aditionalService';
+import dialogAddAditions from './dialogAddAditions.vue'
+const store = usecartStore()
+const siteStore = useSitesStore()
+const selectedAdditions = ref({})
+const agrupados = ref({})
+
+
+
+const update = () => {
+    agrupados.value = store.cart.additions.reduce((acumulador, elemento) => {
+        let grupo = elemento.group;
+
+        if (!acumulador[grupo]) {
+            acumulador[grupo] = [];
+        }
+        acumulador[grupo].push(elemento);
+
+        return acumulador;
+    }, {})
 }
 
 
-function autoResize(textarea) {
-    // Ajusta la altura del textarea en base a su contenido
-    textarea.style.height = 'auto';
-    textarea.style.height = (textarea.scrollHeight) + 'px';
+
+watch(() => store.cart.additions, () => {
+    update()
+},{deep:true})
+
+
+const increment = (adition) => {
+    const new_adition = { ...adition }
+    new_adition.quantity = 1
+    store.addAdditionToCart(new_adition)
 }
 
-const op = ref();
-const showAditions = ref([]);
-const showSalsas = ref([])
-const toggle = (event) => {
-    op.value.toggle(event);
+const decrement = (adition) => {
+
+    if(adition.quantity > 1) {
+        store.removeAdditionFromCart(adition.id)
+    }
 }
 
-
-// localStorage.removeItem('cart')
-
-
-const screenWidth = ref(window.innerWidth);
-
-const isSmallScreen = computed(() => screenWidth.value < 580);
-
-const updateScreenWidth = () => {
-    screenWidth.value = window.innerWidth;
-};
-
-onMounted(() => {
-
-    window.addEventListener('resize', updateScreenWidth);
-    domicilio.value = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
-
-});
-
-onBeforeUnmount(() => {
-    window.removeEventListener('resize', updateScreenWidth);
-    comprobar_sede()
-});
-
-
-
-
-
-const add = (product) => {
-    useCart.add(product)
-    
-    calcularTotalCarrito()
-    // total.value = JSON.parse(localStorage.getItem('cart')).total
-
+const deleteAd = (adicion) => {
+    store.removeAdditionCompletelyFromCart(adicion.id)
+    update()
 }
 
-
-const remove = (product) => {
-    useCart.remove(product)
-
-    // total.value = JSON.parse(localStorage.getItem('cart')).total
-    calcularTotalCarrito()
-
-
+const deleteGroup = (items) => {
+    items.forEach(item => {
+        deleteAd(item)
+    })
 }
-// localStorage.removeItem('cart')
 
-const total = ref()
-onMounted(() => {
-    products.value = contarObjetosRepetidos(JSON.parse(localStorage.getItem('cart')).products);
-    total.value = JSON.parse(localStorage.getItem('cart')).total
+watch(() => store.visibles.addAdditionToCart, (newval)=> {
+    if(newval){
+        selectedAdditions.value = {}
+    }
+},{deep:true})
+
+const adicionales = ref([])
+onMounted(async () => {
+    const product_id = 53
+
+
+    if (product_id) {
+        adicionales.value = await adicionalesService.getAditional(product_id)
+    }
+
+
+    agrupados.value = store.cart.additions.reduce((acumulador, elemento) => {
+        let grupo = elemento.group;
+
+        if (!acumulador[grupo]) {
+            acumulador[grupo] = [];
+        }
+        acumulador[grupo].push(elemento);
+
+        return acumulador;
+    }, {})
+
 
 })
-// Ejemplo de uso
-const miArray = [
-    { name: 'producto1', price: 2000 },
-    { name: 'producto2', price: 3000 },
-    { name: 'producto1', price: 2000 },
-    { name: 'producto3', price: 2500 },
-    { name: 'producto2', price: 3000 },
-];
-
-const resultado = contarObjetosRepetidos(JSON.parse(localStorage.getItem('cart')).products);
-console.log(resultado);
-
-
-// const productos = ref
-
+// orderService.sendOrder()
 
 </script>
 
@@ -258,13 +260,15 @@ console.log(resultado);
     /* 3s de duración, animación infinita */
 }
 
-.name-product::first-letter{
+.name-product::first-letter {
     text-transform: uppercase;
 }
 
+img {
+    border-radius: 50%;
+}
 
-
-.domi-name{
+.domi-name {
     text-transform: capitalize;
 }
 
@@ -442,12 +446,12 @@ button:hover {
     outline: none;
 }
 
-*{
-    text-transform:lowercase;
+* {
+    text-transform: capitalize;
 }
 
-*::first-letter{
-    text-transform:uppercase;
+*::first-letter {
+    text-transform: uppercase;
 }
 
 
@@ -462,4 +466,8 @@ button:hover {
     height: 10rem;
     width: 10rem;
     /* display: none;  */
+}
+
+.p-shadow {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
 }</style>

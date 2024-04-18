@@ -109,9 +109,12 @@ import '@/assets/styles.scss';
 
 
 
+import { createPinia } from 'pinia';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 const app = createApp(App);
-// app.use(VueCarousel);
-
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+app.use(pinia)
 app.use(router);
 app.use(PrimeVue, { ripple: true });
 app.use(ToastService);

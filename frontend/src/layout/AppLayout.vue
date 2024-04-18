@@ -61,9 +61,15 @@ const isOutsideClicked = (event) => {
 <template>
     <div class="layout-wrapper col-12 " :class="containerClass">
         <div class="col-12"
-            style=" height: 100vh; position: fixed; background-color: red; z-index:9999; left: 100%;box-shadow: 0 0 20px black;">
+            style=" height: 150vh;top: -1rem; position: fixed; background-color: red; z-index:9999; left: 100%;box-shadow: 0 0 30px rgba(0, 0, 0, 0.585);">
 
         </div>
+
+        <div class="col-12"
+            style=" height: 150vh;top: -1rem; position: fixed; background-color: red; z-index:9999; right: 100%;box-shadow: 0 0 30px  rgba(0, 0, 0, 0.585)">
+
+        </div>
+
         <app-topbar></app-topbar>
         <loading style="top: 0px;"></loading>
         <div class="layout-sidebar">

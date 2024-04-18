@@ -1,13 +1,14 @@
 <template>
-    <div class="grid xl:col-10 xl:m-auto p-2 m-auto" style="border-radius:2rem; margin-bottom: 5rem;max-width: 1024px;">
+    <!-- <div class="grid xl:col-10 xl:m-auto p-2 m-auto" style="border-radius:2rem; margin-bottom: 5rem;max-width: 1024px;">
         <div  v-for="product in products" :key="product.id" class="xl:col-3 lg:col-4 md:p-3 col-6 p-2 ">
             <TarjetaMenu v-if="product.state=='active'"  style="width: 100%;" :product="product"></TarjetaMenu>
-            <!-- {{ currentCity }}jj -->
         </div>
       
-    </div>
+    </div> -->
 
-
+<div>
+    
+</div>
 
 
 </template>

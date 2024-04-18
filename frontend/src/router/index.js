@@ -23,7 +23,7 @@ const router = createRouter({
           component: () => import('@/views/pages/MenuView.vue'),
           children:[
             {
-              path: '/:menu_name',
+              path: '/:menu_name/:category_id',
               name: 'sesion',
               component: () => import('@/views/pages/sesion.vue'),
               // meta: { requireMenu: true },
@@ -108,7 +108,7 @@ const router = createRouter({
           path: '/cart',
           name: 'cart',
           component: () => import('@/views/pages/cart.vue'),
-          meta: { requirelocation: true },
+          // meta: { requirelocation: true },
           // meta: { requireMenu: true },
         },
         {
@@ -311,58 +311,58 @@ const router = createRouter({
   ]
 });
 
-router.beforeEach(async (to, from, next) => {
-  // Verificar si la ruta requiere autenticación
-  if (to.meta.requirelocation) {
-    // Obtener el token de acceso desde localStorage
-    const location = localStorage.getItem('currentNeigborhood');
-    const estado = localStorage.getItem('estado');
-    if (!location || !estado ) {
-      // Si no hay un token de acceso, redirigir a la página de inicio de sesión
-      setShowDialog()
-      next('/');
-    } else {
-      // Si hay un token de acceso, continuar con la navegación
-      next();
-    }
-  } else {
-    // Si la ruta no requiere autenticación, continuar con la navegación
-    next();
-  }
-});
+// router.beforeEach(async (to, from, next) => {
+//   // Verificar si la ruta requiere autenticación
+//   if (to.meta.requirelocation) {
+//     // Obtener el token de acceso desde localStorage
+//     const location = localStorage.getItem('currentNeigborhood');
+//     const estado = localStorage.getItem('estado');
+//     if (!location || !estado ) {
+//       // Si no hay un token de acceso, redirigir a la página de inicio de sesión
+//       setShowDialog()
+//       next('/');
+//     } else {
+//       // Si hay un token de acceso, continuar con la navegación
+//       next();
+//     }
+//   } else {
+//     // Si la ruta no requiere autenticación, continuar con la navegación
+//     next();
+//   }
+// });
 
-router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    const token = localStorage.getItem('token-admin-fotos');
-    if (!token) {
-      // Si no hay token, redirige a la página de inicio de sesión
-      next('/login');
-    } else {
-      // Si hay token, permite el acceso
-      next();
-    }
-  } else {
-    // Si la ruta no requiere autenticación, permite el acceso
-    next();
-  }
-});
+// router.beforeEach((to, from, next) => {
+//   if (to.matched.some(record => record.meta.requiresAuth)) {
+//     const token = localStorage.getItem('token-admin-fotos');
+//     if (!token) {
+//       // Si no hay token, redirige a la página de inicio de sesión
+//       next('/login');
+//     } else {
+//       // Si hay token, permite el acceso
+//       next();
+//     }
+//   } else {
+//     // Si la ruta no requiere autenticación, permite el acceso
+//     next();
+//   }
+// });
 
 
-router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requirePay)) {
-    const token = thanks_data.value?.user_data;
-    if (!token) {
-      // Si no hay token, redirige a la página de inicio de sesión
-      next('/');
-    } else {
-      // Si hay token, permite el acceso
-      next();
-    }
-  } else {
-    // Si la ruta no requiere autenticación, permite el acceso
-    next();
-  }
-});
+// router.beforeEach((to, from, next) => {
+//   if (to.matched.some(record => record.meta.requirePay)) {
+//     const token = thanks_data.value?.user_data;
+//     if (!token) {
+//       // Si no hay token, redirige a la página de inicio de sesión
+//       next('/');
+//     } else {
+//       // Si hay token, permite el acceso
+//       next();
+//     }
+//   } else {
+//     // Si la ruta no requiere autenticación, permite el acceso
+//     next();
+//   }
+// });
 
 
 pixel.init()
