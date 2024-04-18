@@ -49,7 +49,7 @@
 <script setup>
 import { defineProps, ref, onMounted, onUnmounted } from "vue";
 import { URI } from "../service/conection";
-import { convertirA12h,obtenerHoraFormateadaAMPM } from "../service/un_pedido";
+// import { convertirA12h,obtenerHoraFormateadaAMPM } from "../service/un_pedido";
 
 const porcentajeCompletado = ref(0);
 const props = defineProps({

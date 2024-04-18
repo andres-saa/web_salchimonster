@@ -1,5 +1,4 @@
 <template>
-
     <Loading v-if="guardando" tittle="guardando"></Loading>
     <Loading v-if="cargando" tittle="cargando horario"></Loading>
 
@@ -7,19 +6,83 @@
     <!-- {{ horario }} -->
 
     <!-- {{ horario }} -->
-    <div class="m-auto p-2" style="max-width: 600px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.31);border-radius: 1rem;">
-        <Button @click="enableEditing" size="small" class="m-3" outlined style="font-weight: bold;border-radius: 0.5rem;">Modificar</Button>
-        <DataTable ref="dt" class="p-5" :value="horario" dataKey="id" style="border: 1rem;overflow: hidden;" :rows="7"
+    <Dialog v-model:visible="isEditing" style="width: 30rem;" modal>
+        <div class="m-auto p-0" style="max-width: 600px; ">
+            <DataTable ref="dt" class="p-0" :value="horario" dataKey="id" style="border: 1rem;overflow: hidden;" :rows="7"
+                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                :rowsPerPageOptions="[5, 10, 25, 100]"
+                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} scheldules"
+                responsiveLayout="scroll" scrollable scroll-height="62vh">
+
+
+                <!-- <Column class="p-2" selectionMode="multiple" headerStyle="width: 3rem; " frozen></Column> -->
+
+                <Column class="p-2" field="day_of_week" header="Dia" headerStyle="width:5rem; min-width:5rem; ">
+                    <template #body="scheldule">
+                        <span class="p-column-title">Code</span>
+                        {{ dias[scheldule.data.day_of_week - 1] }}
+
+                    </template>
+                </Column>
+
+
+
+
+
+                <Column class="p-2" field="opening_time" header="Apertura" headerStyle="width:5rem; min-width:5rem;">
+                    <template #body="scheldule">
+                        <span class="p-column-title">Code</span>
+                        <Calendar :disabled="!isEditing" hourFormat="12" timeOnly v-model="scheldule.data.opening_time">
+                        </Calendar>
+                    </template>
+                </Column>
+
+                <Column class="p-2" field="closing_time" header="Cierre" headerStyle="width:5rem; min-width:3rem;">
+                    <template #body="scheldule">
+                        <span class="p-column-title">Code</span>
+                        <Calendar :disabled="!isEditing" hourFormat="12" timeOnly v-model="scheldule.data.closing_time">
+                        </Calendar>
+                    </template>
+                </Column>
+
+
+
+
+
+
+            </DataTable>
+
+
+
+
+
+
+
+        </div>
+
+        <template #footer>
+
+            <div class="col-12 p-2 m-0" style="display: flex;gap: 1rem; justify-content: end;">
+                <Button outlined severity="danger" @click="isEditing = false" style="font-weight: bold;border-radius: 0.3rem; " class="m-0"
+                    label="Cancelar" ></Button>
+                    <Button severity="success" @click="saveChanges" style="font-weight: bold;border-radius: 0.3rem; " class="m-0"
+                    label="Guardar"></Button>
+            </div>
+
+        </template>
+    </Dialog>
+
+    <div class="m-auto p-0" style="max-width: 600px; ">
+
+        <DataTable showGridlines ref="dt" class="p-0" :value="horario" dataKey="id" style="border: 1rem;overflow: hidden;" :rows="7"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             :rowsPerPageOptions="[5, 10, 25, 100]"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} scheldules" responsiveLayout="scroll"
             scrollable scroll-height="62vh">
 
 
-            <!-- <Column class="p-2" selectionMode="multiple" headerStyle="width: 3rem; " frozen></Column> -->
 
-            <Column  class="p-2" field="day_of_week" header="Dia" 
-                headerStyle="width:5rem; min-width:5rem; ">
+            <Column class="p-2" field="day_of_week" header="Dia" headerStyle="width:2rem;">
                 <template #body="scheldule">
                     <span class="p-column-title">Code</span>
                     {{ dias[scheldule.data.day_of_week - 1] }}
@@ -27,35 +90,31 @@
                 </template>
             </Column>
 
-            
+            <Column class="p-2" field="opening_time" header="Apertura" headerStyle="width:2rem">
+                <template #body="scheldule">
+                    <span class="p-column-title">Code</span>
+                    <span :disabled="!isEditing" hourFormat="12" timeOnly> {{ formatearHora(scheldule.data.opening_time)
+                    }}</span>
+                </template>
+            </Column>
 
-
-
-            <Column class="p-2" field="opening_time" header="Apertura" 
-        headerStyle="width:5rem; min-width:5rem;">
-    <template #body="scheldule">
-        <span class="p-column-title">Code</span>
-        <Calendar :disabled="!isEditing" hourFormat="12" timeOnly v-model="scheldule.data.opening_time"></Calendar>
-    </template>
-</Column>
-
-<Column class="p-2" field="closing_time" header="Cierre" 
-        headerStyle="width:5rem; min-width:5rem;">
-    <template #body="scheldule">
-        <span class="p-column-title">Code</span>
-        <Calendar :disabled="!isEditing" hourFormat="12" timeOnly v-model="scheldule.data.closing_time"></Calendar>
-    </template>
-</Column>
-
-
-
-
+            <Column class="p-2" field="closing_time" header="Cierre" headerStyle="width:2rem;">
+                <template #body="scheldule">
+                    <span class="p-column-title">Code</span>
+                    <span :disabled="!isEditing" hourFormat="12" timeOnly> {{ formatearHora(scheldule.data.closing_time)
+                    }}</span>
+                </template>
+            </Column>
 
         </DataTable>
-        <div class="col-12" style="display: flex; justify-content: end;">
-            <Button @click="saveChanges" style="font-weight: bold;border-radius: 0.5rem;d " class="">Guardar</Button>
+
+
+        <div class="col-12 p-0 mt-5" style="display: flex; justify-content: end;">
+            <Button severity="danger" @click="enableEditing" size="small" label="Modificar El horario" class="m-0 mb-3"
+            style="font-weight: bold;border-radius: 0.3rem;"></Button>
 
         </div>
+        
 
 
     </div>
@@ -67,6 +126,23 @@ import { onMounted, ref } from 'vue'
 import Loading from '@/components/Loading.vue'
 const isEditing = ref(false);
 
+function formatearHora(fecha) {
+    // Extraer la hora y los minutos
+    var hora = fecha.getHours();
+    var minutos = fecha.getMinutes();
+
+    // Convertir a formato de 12 horas y determinar AM o PM
+    var ampm = hora >= 12 ? 'PM' : 'AM';
+    hora = hora % 12;
+    hora = hora ? hora : 12; // El '0' se convierte a '12'
+
+    // Formatear la hora para mostrarla en formato hh:mm AM/PM
+    var horaFormateada = hora + ':' + minutos.toString().padStart(2, '0') + ' ' + ampm;
+
+    return horaFormateada;
+}
+
+
 const enableEditing = () => {
     isEditing.value = true;
 };
@@ -76,7 +152,9 @@ const horario = ref([])
 const cargando = ref(false)
 
 onMounted(() => {
-    getHorarios(1).then(data => horario.value = data)
+    const site_id = localStorage.getItem('siteId')
+
+    getHorarios(site_id).then(data => horario.value = data)
 })
 
 
@@ -112,7 +190,7 @@ const saveChanges = async () => {
     try {
         // Formatear los datos para enviar solo la hora
         const horarioToSend = horario.value.map(item => {
-            const openingTime  = item.opening_time instanceof Date ? item.opening_time.toLocaleTimeString() : item.opening_time;
+            const openingTime = item.opening_time instanceof Date ? item.opening_time.toLocaleTimeString() : item.opening_time;
             const closing_time = item.closing_time instanceof Date ? item.closing_time.toLocaleTimeString() : item.closing_time;
 
             return {
@@ -145,7 +223,7 @@ const saveChanges = async () => {
 };
 
 
-const dias = ref([ "Domingo","Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"])
+const dias = ref(["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"])
 
 </script>
 

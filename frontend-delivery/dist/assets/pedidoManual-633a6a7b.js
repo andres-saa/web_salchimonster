@@ -1,0 +1,1 @@
+import{_ as e,o as t,c as o}from"./index-0cc8019f.js";const c={},r={width:"100%",style:{height:"99vh"},src:"http://localhost:5174/",frameborder:"0"};function s(a,n){return t(),o("iframe",r)}const d=e(c,[["render",s]]);export{d as default};

@@ -1,11 +1,8 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch,onUnmounted } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
-import { useRouter } from 'vue-router';
-import CarouselBanner from '../components/CarouselBanner.vue';
+
 import { PrimeIcons } from 'primevue/api';
-import CarouselSites from '../components/CarouselSites.vue';
-import { getProductsByCategory, getCategory, getMenu, changeProduct, curentProduct } from '../service/productServices.js'
 import { quantity } from '@/service/cart'
 import { menuOptions } from '@/service/menuOptions';
 import { ableMenu } from '../service/menuOptions';
@@ -15,8 +12,12 @@ import { productDialog, setProductDialog } from '../service/state';
 import router from '../router';
 import { useRoute } from 'vue-router';
 import { domicilio } from '../service/cart';
+import { useSitesStore } from '../store/site';
+import { usecartStore } from '../store/shoping_cart';
 
+const car = usecartStore()
 
+const siteStore = useSitesStore()
 const estado = ref(''); 
     const siteId = 1;
 
@@ -24,30 +25,33 @@ const estado = ref('');
     const obtenerEstado = async () => {
 
 
-    const siteId = localStorage.getItem("siteId")
-    // alert(siteId)
+const siteId = localStorage.getItem("siteId")
+// alert(siteId)
+
+if(!siteId){
+    return
+}
+
+  try {
+    const response = await fetch(`${URI}/site/${siteId}/status`);
+    const data = await response.json();
     
-    if(!siteId){
-        return
+    if (data.status === 'closed') {
+      estado.value = 'cerrado';
+      localStorage.setItem('estado', 'cerrado');
+    } else {
+      estado.value = 'abierto';
+      localStorage.setItem('estado', 'abierto');
     }
-    
-      try {
-        const response = await fetch(`${URI}/site/${siteId}/status`);
-        const data = await response.json();
-        
-        if (data.status === 'closed') {
-          estado.value = 'cerrado';
-          localStorage.setItem('estado', 'cerrado');
-        } else {
-          estado.value = 'abierto';
-          localStorage.setItem('estado', 'abierto');
-        }
-      } catch (error) {
-        console.error('Error al obtener el estado:', error);
-        estado.value = 'cerrado';
-          localStorage.setItem('estado', 'cerrado');
-      }
-    };
+  } catch (error) {
+    console.error('Error al obtener el estado:', error);
+    estado.value = 'cerrado';
+      localStorage.setItem('estado', 'cerrado');
+  }
+};
+
+
+
 
 
 
@@ -238,7 +242,7 @@ const areaHandler = (value) => {
 
 
 const imagenNoCargada = (event) => {
-    event.target.src = 'https://novatocode.online/assets/logo-f2daca0e.png'
+    event.target.src = '/images/logo.png'
 }
 
 const fondoVisible = ref(false)
@@ -248,18 +252,18 @@ const fondoVisible = ref(false)
 </script>
 
 <template>
-    <div v-if="!isInAdminProductsRoute && !isEntregasRoute" st class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 "
+    <div v-if="!isInAdminProductsRoute && !isEntregasRoute" st class="layout-topbar px-3 md:pl-4 md:pr-4 lg:pl-8 lg:pr-8 "
         style=" z-index:999;background-color: white; ">
 
 
         <router-link to="/" class="layout-topbar-logo" style="z-index: 99999;">
-            <img :src="'images/logo.png'" alt="logo" />
+            <img :src="'/images/logo.png'" alt="logo" />
 
 
         </router-link>
 
 
-        <button @click="(setShowDialog)" class="p-link boton-menu layout-topbar-logo"
+        <button @click="(siteStore.setVisible('currentSite',true))" class="p-link boton-menu layout-topbar-logo"
             style=" font-size: 24px; font-weight: bold;  color: black; z-index: 99999;display:flex; justify-content: center; align-items: center;">
 
             <i sty :class="PrimeIcons.MAP_MARKER" style="font-size: 100%; color: var(--primary-color)"> </i>
@@ -274,7 +278,7 @@ const fondoVisible = ref(false)
                 color: var(--primary-color);">
 
 
-                    {{ currentCity ? currentCity.currenCity : 'Definir ubicacion' }}  <span class="px-3 py-0 " :class="estado == 'abierto'? 'abierto': 'cerrado'"  style="" >{{estado}}</span> 
+                    {{ siteStore.location.city?.city_name || 'Definir ubicacion' }}  <span ST class="px-3 py-0 text-sm " :class="estado == 'abierto'? 'abierto': 'cerrado'"  style="text-transform: uppercase;" > {{estado}}</span> 
                 </span>
 
                 <span style="
@@ -286,7 +290,7 @@ const fondoVisible = ref(false)
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 200px;">
-                      <span >sede -  </span>  <span class="site-name">{{ currentCity ?  currentCity.currenSite : 'Definir ubicacion' }}   </span>
+                      <span style="" >sede </span>  <span class="site-name">{{ siteStore.location.site.site_name?.toLowerCase() || 'Definir ubicacion' }}   </span>
                 </span>
 
             </div>
@@ -345,10 +349,11 @@ const fondoVisible = ref(false)
                 <button class="p-link layout-topbar-button p-0" style="position: relative;">
                     <i badge="5+" :class="PrimeIcons.SHOPPING_CART"></i>
                     <div class="p-0"
-                        style="display: flex;align-items: center;justify-content: center; position: absolute;bottom: 50%;left: 100%; background-color:var(--primary-color); width: 2rem;height: 2rem;border-radius: 50%">
-                        <div class="text-xl" style="color: white;font-weight: bold;font-size">
-                            {{ quantity }}
+                        style="display: flex;align-items: center;justify-content: center; position: absolute;bottom: 50%;right:0; background-color:var(--primary-color); width: 1.5rem;height: 1.5rem;border-radius: 50%">
+                        <div class="text-xl" style="color: white;font-size">
+                            {{ car.cart.products.length }}
                         </div>
+
                     </div>
 
 
@@ -360,23 +365,11 @@ const fondoVisible = ref(false)
 
         </div>
 
-<!--  -->
 
     </div>
 
 
-    <div v-if="isInAdminProductsRoute" class="col-12 p-4" style="background-color: red; position: fixed; z-index: 99;">
-
-        <p class="text-2xl text-center" style="color: white; font-weight: bold;"> ADMINISTRADOR DE IMAGENES</p>
-    </div>
-
-
-    <div v-if="isEntregasRoute" class="col-12 p-4 " style="background-color:var(--primary-color);box-shadow: 0 0 20px rgba(0, 0, 0, 0.53); position: fixed; z-index: 99; ;">
-
-        <p class="text-xl text-center" style="color: rgb(255, 255, 255); font-weight: bold; "> DOMICILIOS SALCHIMONSTER</p>
-    </div>
-
-
+ 
 
 
 </template>

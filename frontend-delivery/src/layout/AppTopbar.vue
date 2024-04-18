@@ -8,8 +8,9 @@ import { PrimeIcons } from 'primevue/api';
 import { ableMenu } from '../service/menuOptions';
 import router from '@/router/index.js'
 import { buscarSedePorId } from '../service/sedes'
-import {curentSite} from '../service/un_pedido'
-
+// import {curentSite} from '../service/un_pedido'
+import { useSitesStore } from '../store/site';
+const siteStore = useSitesStore()
 const ruta = ref(router.currentRoute)
 
 const { layoutConfig, onMenuToggle } = useLayout();
@@ -118,11 +119,11 @@ window.addEventListener('storage', (e) => {
     }
 });
 
-// También puedes usar watch para realizar un seguimiento del cambio de currentCity
-watch(currentCity, () => {
-    // Realizar acciones adicionales cuando currentCity cambie
-    currentCity.value = localStorage.getItem('currentNeigborhood');
-});
+// // También puedes usar watch para realizar un seguimiento del cambio de currentCity
+// watch(currentCity, () => {
+//     // Realizar acciones adicionales cuando currentCity cambie
+//     currentCity.value = localStorage.getItem('currentNeigborhood');
+// });
 
 
 
@@ -163,9 +164,10 @@ const changeCurrentGroupMenu = (grupoMenu) => {
 }
 const menus = [
     { name: 'Atender', to: '/' },
+    { name: ' Pedido manual', to: '/pedido-manual' },
     { name: 'Historial de pedidos', to: '/historial' },
     { name: ' Cuadre de caja', to: '/cuadre' },
-    { name: ' Menu', to: '/tienda-menu' },
+    { name: ' Menu', to: '/tienda-menu/productos/SALCHIPAPAS/3' },
     { name: ' Horarios', to: '/horarios' },
 
 ]
@@ -249,11 +251,13 @@ const cerrar_sesion = () => {
 </script>
 
 <template>
-    <div class="layout-topbar lg:pl-8 lg:pr-8 md:pr-8 " style=" background-color: rgb(255, 255, 255); ">
+
+
+    <div class="layout-topbar shadow-2 lg:pl-8 lg:pr-8 md:pr-8 " style=" background-color: rgb(255, 255, 255); ">
 
 
         <router-link to="/" class="layout-topbar-logo" style="z-index: 99999;">
-            <img :src="'images/logo.png'" alt="logo" />
+            <img :src="'/images/logo.png'" alt="logo" />
         </router-link>
 
         
@@ -269,12 +273,12 @@ const cerrar_sesion = () => {
 
                 <span style="
                 margin-left: 0.5rem; 
-                text-transform:; 
+                text-transform:uppercase; 
                 font-size: 1rem;
                 color: var(--primary-color);">
 
 
-                    {{ buscarSedePorId(parseInt(curentSite)).Ciudad }}
+                    {{ siteStore.site.site_name }}
 
                     
                 </span>
@@ -290,7 +294,7 @@ const cerrar_sesion = () => {
             text-overflow: ellipsis;
             max-width: 200px;">
                     <span v-if="!isSmallScreen" class="sm:d-none"></span> <span v-else class="sm:d-none">
-                        </span>  {{ buscarSedePorId(parseInt(curentSite)).Nombre }}                      <span class="px-2 py-0 text-sm" :class="estado == 'abierto'? 'abierto': 'cerrado'"  style="" >{{estado}}</span>
+                        </span>  {{  }}                      <span class="px-2 py-0 text-sm" :class="estado == 'abierto'? 'abierto': 'cerrado'"  style="" >{{estado}}</span>
 
                 </span>
 
@@ -306,6 +310,7 @@ const cerrar_sesion = () => {
 
 
         <div v-else class="" style="left: 0; position: ; display: flex;gap: 1rem; width: 100%;justify-content: center;"> 
+            
             <div v-for=" menu in menus" class="p-0 " style="width: max-content;">
 
                 <RouterLink cla :to="menu.to" class="link-menu " style="text-decoration: none;color: black;">

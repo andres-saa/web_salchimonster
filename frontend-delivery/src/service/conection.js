@@ -5,5 +5,5 @@
 // const URI = 'http://167.71.178.54:8200'
 // const URI = 'http://back.novatocode.online'
 const URI = 'https://backend.salchimonster.com'
-
-export {URI}
+const URI_SOCKET = 'backend.salchimonster.com'
+export {URI,URI_SOCKET}

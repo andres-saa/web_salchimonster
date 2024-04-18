@@ -6,13 +6,19 @@
     
 
 
-  <CarouselBanner></CarouselBanner>
+  <CarouselBanner v-if="route.path == '/'" ></CarouselBanner>
   <!-- <img src="/images/banners/banner-1.jpeg" class="pb-6" alt="" style="width: 100%; "> -->
-    
-  <BarraCategorias></BarraCategorias>
+  <!-- <Button  style="position: sticky;top:rem;z-index: 1000; left:-0.5rem;" severity="help" text icon="pi pi-angle-left text-4xl"></Button> -->
+
+  <BarraCategorias style=""></BarraCategorias>
+
+
+<!-- <Button  style="position: absolute; right: 0rem;" severity="help" text icon="pi pi-angle-right text-4xl"></Button> -->
 
   <transition name="fade">
-        <RouterView style=""></RouterView>
+        <RouterView style="">
+        
+        </RouterView>
     </transition>
 
  
@@ -53,7 +59,10 @@ import { formatoPesosColombianos } from '../../service/formatoPesos';
 import CarouselBanner from '../../components/CarouselBanner.vue'
 import sesion from './sesion.vue';
 import BarraCategorias from '../../components/BarraCategorias.vue';
+import Loading from '../../components/Loading.vue';
+import { useRoute } from 'vue-router';
 
+const route = useRoute()
 
 import {ref} from 'vue'
 import { comprobar_sede } from '../../service/state';

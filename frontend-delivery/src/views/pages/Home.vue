@@ -26,7 +26,7 @@
 
 
 import { ref, computed } from 'vue';
-import { curentSite,getOrders } from '../../service/un_pedido';
+// import { curentSite,getOrders } from '../../service/un_pedido';
 import { onMounted, onBeforeUnmount, watch } from 'vue'
 // import { ref, computed } from 'vue';
 
@@ -37,9 +37,6 @@ import { onMounted, onBeforeUnmount, watch } from 'vue'
 
 
 
-onMounted(() => {
-  getOrders()
-})
 
 </script>
 

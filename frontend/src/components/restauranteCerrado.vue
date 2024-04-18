@@ -33,30 +33,12 @@ const visible = ref(true)
 
 
 const obtenerEstado = async () => {
-    const siteId = localStorage.getItem("siteId")
     
-    if(!siteId){
-        return
-    }
-      try {
-        const response = await fetch(`${URI}/site/${siteId}/status`);
-        const data = await response.json();
-        
-      
-          estado.value = data;
-        //   localStorage.setItem('estado', 'abierto');
-        
-      } catch (error) {
-        console.error('Error al obtener el estado:', error);
-        estado.value = 'cerrado';
-          localStorage.setItem('estado', 'cerrado');
-      }
     };
 
 
 
 
-    const intervalId = setInterval(obtenerEstado, 30000);
 
     // Llamar a obtenerEstado cuando el componente se monta
     onMounted(obtenerEstado);

@@ -1,695 +1,213 @@
 <template>
-    <div class="col-12 xl:col-5 p-2 py-0">
-        <div class="   mt-4 p-4   "
-                style="position: relative; border-radius: 1rem; box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);padding:0 1rem ;background-color: white; ">
-                <!-- <div class="notch"
-                    style="display: flex; align-items: center; width: 30%; background-color: black; border-radius: 0 0 1rem 1rem; height: 2rem; position: sticky; top: 0; left: 35%;">
-                    <div class="led"
-                        style="position:absolute ;right: 1rem; width: 0.7rem; height: 0.7rem; background-color: var(--primary-color); border-radius: 50%;: 1rem">
-                    </div>
+    <div class="p-1 my-5 md:my-0 col-12">
+        <div style="position: sticky; top: 5rem;border-radius: 0.5rem; z-index: 1000;" class="col-12 p-3 p-shadow m-0  ">
 
-                </div> -->
-                <p class="text-2xl text-center pt-4" style="font-weight: bold;">RESUMEN </p>
+            <h5> <b>Resumen</b> </h5>
 
-                <!-- <input style="border-radius: 20px; " class="col-12 " type="text" name="" id=""> -->
+            <h5> <b>productos</b> </h5>
 
-                <div class="productos">
-                    <div class="producto" v-for="(product,index) in products"
-                        style="display: flex; justify-content: space-between; align-items:center ; flex-direction: column;">
+            <div class="grid mb-0 pb-0" v-for="product in store.cart.products">
 
+                <div class="col-6  py-2 mb-1">
+                    <span>
+                        <span style="min-width: 3rem;"><b>{{ product.quantity }} </b> </span>
+                        {{ product.product.product_name }}
+                    </span>
+                </div>
+                <div class="col-6 my-0  text-right py-2">
+                    <span>
+                        {{ formatoPesosColombianos(product.total_cost) }}
+                    </span>
+                </div>
 
+            </div>
 
-                        <div class="col-12 p-0 grid "
-                            style=" justify-content: space-between; align-items:center ;dis">
-                            <p class="col p-0"
-                                style="font-weight: bold;display: flex;; min-width: 80%;margin: 0; padding: 0.5rem ;gap:0.5rem">
-                                <span>{{ product.quantity }}</span> <p class="name-product" style="width: auto;">{{ product.product.name
-                                }}</p>
-                            </p>
-                            
-                            <div style="display: flex;gap: 0rem; justify-content: end;width: min-content; " class="col p-0 text-right">
-
-                 
-
-                                <p :class="
-                                    (product.product.adiciones?.length > 0 ||
-                                    product.product.cambios?.length  > 0 ||
-                                    product.product.acompanantes?.length > 0 ||
-                                    product.product.toppings?.length > 0) ? 'bo': 'bold text-md' " style="">{{ formatoPesosColombianos(product.quantity * product.product.price) }}
-                                </p>
-                                <!-- {{ product.product }} -->
-                            </div>
-                        </div>
+            <!-- <h5> <b>ADICIONALES</b> </h5> -->
 
 
+            <div class="col-12 p-0 mt-1">
+                    <div class="p-0 mb-2 " v-for="(items, grupo) in agrupados" :key="grupo" style="position: relative;border-radius: 0.3rem;">
+                        
                        
-
-
-
-                        <!-- {{ product.product.salsas }} -->
-
-                        <p v-if="product.product.adiciones?.length > 0" class="col-12 p-0 pl-4 mb-1" style="font-weight: bold;">
-                            ADICIONES</p>
-                        <div class="col-12 p-0 pl-4 "
-                            style="display: flex; justify-content: space-between; align-items:center ;"
-                            v-for="adicion in product.product.adiciones">
-
-                            <!-- <button @click="eliminarAdicionDelCarrito(adicion, product.product)"
-                            style="background-color: var(--primary-color); border: none;border-radius: 0.5rem; color: white;">
-                            <i style="color: white; border-radius: 1rem;" :class="PrimeIcons.TIMES"></i></button> -->
-                            <p class=""
-                                style="text-transform: uppercase; ;margin: 0; padding: 0.1rem 0;width: auto">
-                                <span> {{ product.quantity }} de {{ adicion.name
-                                }}</span>
-                            </p>
-
-
-
-
-                            <p style="font-weight: ;height: ;">{{ formatoPesosColombianos(product.quantity * adicion.price) }}
-                            </p>
-
-
-
-                        </div>
-
-                        <p v-if="product.product.acompanantes?.length > 0" class="col-12 p-0 pl-4 mb-1" style="font-weight: bold;">
-                            ACOMPANANTES</p>
-                        <div class="col-12 p-0 pl-4 "
-                            style="display: flex; justify-content: space-between; align-items:center ;"
-                            v-for="adicion in product.product.acompanantes">
-
-                            <!-- <button @click="eliminarAdicionDelCarrito(adicion, product.product)"
-                            style="background-color: var(--primary-color); border: none;border-radius: 0.5rem; color: white;">
-                            <i style="color: white; border-radius: 1rem;" :class="PrimeIcons.TIMES"></i></button> -->
-                            <p class=""
-                                style="text-transform: uppercase; ;margin: 0; padding: 0.1rem 0;width: auto">
-                                <span> {{ product.quantity }} de {{ adicion.name
-                                }}</span>
-                            </p>
-
-
-
-
-                            <p style="font-weight: ;height: ;">{{ formatoPesosColombianos(product.quantity * adicion.price) }}
-                            </p>
-
-
-
-                        </div>
-
-
-
-
-
-
-                        <p v-if="product.product.cambios?.length > 0" class="col-12 p-0 pl-4 mb-1" style="font-weight: bold;">
-                            CAMBIOS</p>
-                        <div class="col-12 p-0 pl-4 "
-                            style="display: flex; justify-content: space-between; align-items:center ;"
-                            v-for="adicion in product.product.cambios">
-
-                            <!-- <button @click="eliminarAdicionDelCarrito(adicion, product.product)"
-                            style="background-color: var(--primary-color); border: none;border-radius: 0.5rem; color: white;">
-                            <i style="color: white; border-radius: 1rem;" :class="PrimeIcons.TIMES"></i></button> -->
-                            <p class=""
-                                style="text-transform: uppercase; ;margin: 0; padding: 0.1rem 0;width: 100%">
-                                <span> {{ product.quantity }} POR {{ adicion.name
-                                }}</span>
-                            </p>
-
-
-
-
-                            <p style="font-weight: ;height: ;">{{ formatoPesosColombianos(product.quantity * adicion.price) }}
-                            </p>
-
-
-
-                        </div>
-
-                        <p v-if="product.product.toppings?.length > 0" class="col-12 p-0 pl-4 mb-1" style="font-weight: bold;">
-                            TOPPINGS</p>
-                        <div class="col-12 p-0 pl-4 "
-                            style="display: flex; justify-content: space-between; align-items:center ;"
-                            v-for="adicion in product.product.toppings">
-
-                            <!-- <button @click="eliminarAdicionDelCarrito(adicion, product.product)"
-                            style="background-color: var(--primary-color); border: none;border-radius: 0.5rem; color: white;">
-                            <i style="color: white; border-radius: 1rem;" :class="PrimeIcons.TIMES"></i></button> -->
-                            <p class=""
-                                style="text-transform: uppercase; ;margin: 0; padding: 0.1rem 0;width: 100%">
-                                <span> {{ product.quantity }} de {{ adicion.name
-                                }}</span>
-                            </p>
-
-
-
-
-                            <p style="font-weight: ;height: ;">{{ formatoPesosColombianos(product.quantity * adicion.price) }}
-                            </p>
-
-
-
-                        </div>
-
-
-
-
-
-
-
-
-
-
-
-                      
-
-                   
-                        
-
-
-                        <p v-if="product.product.salsas?.length > 0" class="col-12 p-0 pl-4 mt-1 mb-1" style="font-weight: bold;">
-                            SALSAS</p>
-                        <div class="col-12 p-0 pl-4 "
-                            style="display: flex; justify-content: space-between; align-items:center ;"
-                            v-for="salsa in product.product.salsas">
-
-                            <!-- <button @click="eliminarSalsaDelCarrito(salsa, product.product)"
-                            style="background-color: var(--primary-color); border: none;border-radius: 0.5rem; color: white;">
-                            <i style="color: white; border-radius: 1rem;" :class="PrimeIcons.TIMES"></i></button> -->
-                            <p class=""
-                                style="text-transform: uppercase; ;margin: 0; padding: 0.1rem 0;width: 100%">
-                                <span>{{ salsa
-                                }}</span>
-                            </p>
-
-
-
-
-                            <!-- <p style="font-weight: ;height: ;">{{ formatoPesosColombianos(adicion.price) }}
-                        </p> -->
-
-
-
-
-                        </div>
-
-
-                       
-
-
-
-
-
-
-
-                        <div v-if="product.product.adiciones?.length > 0 || product.product.toppings?.length > 0 || product.product.acompanantes?.length > 0 || product.product.cambios?.length > 0 " class=" p-0 col-12 " style="display: flex; justify-content: space-between;border-radius: ; ">
-                            <p class="text-left   m-0 " style="font-weight: bold;height: ;text-transform: ;"><b style=" font-weight: bold;">TOTAL</b> {{ product.quantity }} {{ product.product.name }}  {{product.product.adiciones?.length > 1 ? ' + adiciones': '' }} 
-                                {{product.product.toppings?.length > 0? ' + toppings': '' }} {{product.product.cambios?.length > 0? ' + cambios': '' }}
-                                {{product.product.acompanantes?.length > 0? ' + acompanantes': '' }} 
-                                </p>
-                                <p class="text-right text-md  m-0 text-l  bold" style=" font-weight: bold;height: ;">{{ formatoPesosColombianos(
-                                    product.quantity * product.product.price +
-                                    product.quantity * sumarAdiciones(product.product.adiciones) +
-                                    product.quantity * sumarAdiciones(product.product.toppings) +
-                                    product.quantity * sumarAdiciones(product.product.cambios) +  
-                                    product.quantity * sumarAdiciones(product.product.acompanantes)    ) 
-                                      }}
-                                </p>
-
-                        </div>
-
-
-
-                        <!-- <div class="col-12 p-0 pl-4 pt-1 "
-                        style="display: flex; justify-content: space-between; align-items:center ;">
-
-
-                        <button @click="showSalsas[product.product.name] = !showSalsas[product.product.name]"
-                            style="background-color: rgb(41, 255, 123); border: none;border-radius: 0.5rem; color: white;">
-                            <i v-if="product.product.salsas[0] != 'TODAS LAS SALSAS'"
-                                style="color: white; border-radius: 1rem;" :class="PrimeIcons.PLUS"></i>
-
-                            <i v-else style="color: white; border-radius: 1rem;" :class="PrimeIcons.MINUS"></i>
-
-
-                        </button>
-                        <p class="pl-2"
-                            style="text-transform: uppercase; ;margin: 0; padding: 0.1rem 0;width: 100%">
-
-
-                            <span> {{
-                                product.product.salsas.length < 1 ? 'METELE SALSAS' :
-                                product.product.salsas[0] == 'TODAS LAS SALSAS' ? 'QUITALE SALSAS' : 'METELE MAS SALSAS'
-                            }}</span>
-                        </p>
-
-
-
-                    </div> -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    <div v-if="index != products.length-1"
-                    class="col-12 mb-4 mt-1 p-0  " style="height: 2px; background-color: rgba(0, 0, 0, 0.2);">
-                    </div>
-                    </div>
-
-                    
-
-                </div>
-
-
-
-
-                <div style="width: 100%; border-bottom: 2px solid; margin-top:0rem;"></div>
-
-
-
-                <div class="text-xl p-0 mb-0" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
-
-                    <span style="font-weight: bold;"> SUBTOTAL </span>
-                    <span class="bold" style="font-weight: bold;">
-                        
-                        <span v-if="subtotal">
-                            {{ formatoPesosColombianos(subtotal)  }}
-                        </span>
-                        
-                    
-
-                        <ProgressSpinner v-else style="width: 20px; height: 20px" strokeWidth="8" fill="var(--white)"
-                
-    animationDuration=".5s" aria-label="Custom ProgressSpinner" /> 
-
-                    
-                    
-                    
-                    </span>
-
-                </div>
-
-                <div class="text-xl p-0 col-12 my-0 " style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
-
-                    <span style="font-weight: bold; text-transform: ;"> Domicilio a  <span @click="setShowDialog()"
-                            style="margin-right: 1rem; cursor: pointer; color: var(--primary-color);">
-                            <span class="domi-name">
-                                {{ domicilio?.name
-                            }}
+                        <div class="mb-0">
+                            <span class="mb-1 text-center">
+                                <b>{{ grupo }}</b>
+
+                            </span>
                             
+                           
+                                <div v-for="item in items" :key="item.aditional_item_instance_id"
+                                    style="display: flex; gap: 1rem; align-items: center;">
+
+                                    <div style="display: flex; width: 100%; gap: 1rem; justify-content: space-between;">
+
+                                       
+                                        <span class="text adicion" style="text-transform: ;"><span> <b> {{ item.quantity }}</b> </span>  {{ item.name
+                                        }}</span>
+
+
+                                        
+                                            <span v-if="item.price > 0" class="pl-2  text-sm">
+                                                <b>{{ formatoPesosColombianos(item.price * item.quantity) }}</b>
+                                            </span>
+
+                                            
+
+                                
+                                
+
+                                    </div>
+
+                                </div>
+
+                               
+
+                         
+                        </div>
                         
-                        
-                        </span> </span> </span>
-                    <span class="bold" style="font-weight: bold;" >
-                    
-                    <span v-if="domicilio?.delivery_price">{{ formatoPesosColombianos(domicilio?.delivery_price)}}</span>
-                    
-
-
-<ProgressSpinner v-if="!domicilio?.delivery_price" style="width: 20px; height: 20px" strokeWidth="8" fill="var(--white)"
-                
-    animationDuration=".5s" aria-label="Custom ProgressSpinner" /> 
-                    </span>
-
-                </div>
-
-
-                <div class="text-xl mt-0" style="; width: 100%; display: flex; justify-content: space-between; margin: 1rem 0;">
-
-                    <span style="font-weight: bold;"> TOTAL </span>
-                    <span class="bold" style="font-weight: bold;">
-                    
-                    <span v-if="domicilio?.delivery_price">
-                        {{ formatoPesosColombianos(calcularTotalCarrito() +
-                        domicilio?.delivery_price) }} 
-                    </span>
-                        
-                    
-                    
-                        <ProgressSpinner v-if="!domicilio?.delivery_price" style="width: 20px; height: 20px" strokeWidth="8" fill="var(--white)"
-                
-    animationDuration=".5s" aria-label="Custom ProgressSpinner" /> 
-                    
-                    
-                    
-                    </span>
-
-                </div>
-
-                <p class="text-xl mt-4" style="font-weight: ;">NOTAS DE TU PEDIDO</p>
-
-                <!-- <input style=" border-radius: ; height:20rem;margin-bottom: 2rem; border;" class="col-12 " type="text" name=""
-                id=""> -->
-                <textarea v-model="order_notes" style=" min-height:5rem ;margin-bottom: 2rem; border;" class="col-12 "
-                    type="text" name="" id="dynamicTextarea"></textarea>
-
-
-
-                <div v-if="ruta.name != 'pay'"
-                    style="padding: 2rem; background-color: white; position:sticky;bottom: 0rem; display: flex;width: 100%; display: flex;align-items: center; justify-content: center;">
-
-<!-- {{ruta}} -->
-                    <div style=" width: 60%;" @click="enviarAPago"><button
-                            style=" width: 100%;; border:none; background-color: var(--primary-color); color: white; border-radius: 0.6rem; padding: 0.5rem;">
-                            <span class="text-xl"
-                                style="font-weight: bold;margin-top: 5rem;;">REALIZAR
-                                PEDIDO</span></button>
                     </div>
-
+                    
 
                 </div>
-                <!-- <textarea cla style=" font-size: 1.5rem; resize: none; height: max-content;" class="col-12 text-xl" name="" id="" cols="30" rows="10"></textarea> -->
+
+
+
+
+
+
+
+
+            <hr class="p-0 mt-2">
+            <div class="grid">
+
+                <div class="col-6 my-0 py-0">
+                    <span><b>Subtotal</b></span>
+                </div>
+                <div class="col-6 my-0  text-right py-0">
+                    <span><b>{{ formatoPesosColombianos(store.cart.total_cost) }}</b></span>
+                </div>
+
+                <div class="col-6 my-0 py-0">
+                    <span><b>Domicilio</b></span>
+                </div>
+                <div class="col-6 my-0  text-right py-0">
+                    <!-- {{ siteStore.location }} -->
+                    <span><b>{{ formatoPesosColombianos(siteStore.location.neigborhood.delivery_price) }}</b></span>
+                </div>
+                <div class="col-6 my-0 py-0">
+                    <span><b>Total</b></span>
+                </div>
+                <div class="col-6 my-0  text-right py-0">
+                    <!-- {{ siteStore.location }} -->
+                    <span><b>{{ formatoPesosColombianos(store.cart.total_cost +
+                        siteStore.location.neigborhood.delivery_price) }}</b></span>
+                </div>
+
+
+
+            </div>
+
+
+
+            <router-link to="/SALCHIPAPAS/3" v-if="route.path.includes('cart')">
+                <Button outlined icon="pi pi-shopping-cart" label="Seguir comprando" class="mt-4" severity="danger"
+                    style="outline: none;width: 100%;font-weight: bold; background-color: rgba(0, 0, 0, 0);"></Button>
+
+            </router-link>
+
+            <router-link to="/cart" v-else>
+                <Button outlined icon="pi pi-arrow-left" label="Volver al carrito" class="mt-4" severity="danger"
+                    style="outline: none;width: 100%;font-weight: bold; background-color: rgba(0, 0, 0, 0);"></Button>
+
+            </router-link>
+
+
+            <router-link to="/pay" v-if="route.path.includes('cart')">
+                <Button iconPos="right" icon="pi pi-arrow-right" label="Pedir" class="mt-2" severity="help"
+                    style="outline: none;width: 100%; border: none;font-weight: bold; background-color: black;"></Button>
+            </router-link>
+
+            <router-link to="/pay" v-else>
+                <Button @click="orderService.sendOrder()" iconPos="right" icon="pi pi-arrow-right" label="Finalizar pedido"
+                    class="mt-2" severity="help"
+                    style="outline: none;width: 100%; border: none;font-weight: bold; background-color: black;"></Button>
+            </router-link>
+
+        </div>
+
+
+
+
+
+
+
 
 
     </div>
-    </div>
-    
 </template>
 
 <script setup>
-
-import { ref, onMounted,} from 'vue';
-import { formatoPesosColombianos } from '@/service/formatoPesos';
-import { setShowDialog } from '@/service/state';
-import { products,contarObjetosRepetidos} from '@/service/cart';
-
-import { calcularPrecioTotal, calcularTotalCarrito} from '@/service/state';
-import {URI} from '@/service/conection.js'
-
-import { domicilio} from '@/service/cart';
-
-import {order_notes} from '@/service/order';
-import { subtotal } from '@/service/state';
-import router from '@/router';
-import { sumarAdiciones } from '@/service/state';
-import { verCerrado } from '../../service/state';
+import { formatoPesosColombianos } from '../../service/formatoPesos';
+import { usecartStore } from '../../store/shoping_cart';
+import { useSitesStore } from '../../store/site';
+import { useRoute } from 'vue-router';
+import { orderService } from '../../service/order/orderService';
+import {onMounted, ref, watch} from 'vue'
+const route = useRoute()
+const store = usecartStore()
+const siteStore = useSitesStore()
 
 
 
-const enviarAPago = () => {
 
-    const estado = localStorage.getItem('estado')
-    if(estado && estado=='cerrado'){
-        verCerrado.value = true
-        return
-    }
 
-    router.push('pay')
+const agrupados = ref({})
+
+
+
+const update = () => {
+    agrupados.value = store.cart.additions.reduce((acumulador, elemento) => {
+        let grupo = elemento.group;
+
+        if (!acumulador[grupo]) {
+            acumulador[grupo] = [];
+        }
+        acumulador[grupo].push(elemento);
+
+        return acumulador;
+    }, {})
 }
 
 
 
 
-
-const ruta = ref(router.currentRoute)
-const total = ref()
 onMounted(() => {
-    products.value = contarObjetosRepetidos(JSON.parse(localStorage.getItem('cart')).products);
-    total.value = JSON.parse(localStorage.getItem('cart')).total
-
-})
-// Ejemplo de uso
-
-
-onMounted( async() => {
-
-let barrio = {}
-
-if (localStorage.getItem('currentNeigborhood')){
-    barrio = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
-    getNeighborhood(barrio.neighborhood_id).then(data => domicilio.value = data)
-
-}else{
-    barrio = 'definir domicilio'
-} 
-
-
+    update()
 })
 
 
-
-
-
-
-
-
-
-const getNeighborhood = async(neighborhood_id) => {
-    try {
-     const response = await fetch(`${URI}/neighborhood/${neighborhood_id}`)
-     if(response.ok){
-        const data = await response.json()
-        // cities.value = data
-        return data
-     }
-     
-   } catch (error) {
-    
-   }
-}
+watch(() => store.cart.additions, () => {
+    update()
+},{deep:true})
 
 
 
 </script>
-
-
 <style scoped>
-*:focus {
-    border: none;
+.p-shadow {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
 }
 
-.bold{
-    font-weight: bold;
-    background-color: rgba(106, 255, 205, 0.605);
-    /* padding:0 0.5rem 0 0.5rem ; */
-    /* border-radius: 1rem; */
-    padding-left: 1rem;
-    border-radius:  1rem 0 0 1rem;
-    background: linear-gradient(to left, rgb(244, 255, 126), rgba(255, 255, 255, 0));
-
-}
-.led {
-    animation: cambiaColor 1s infinite;
-    /* 3s de duración, animación infinita */
-}
-
-.name-product::first-letter{
+button {
     text-transform: uppercase;
 }
 
-
-
-.domi-name{
-    text-transform: capitalize;
+* {
+    text-transform: uppercase;
+    font-size: 0.9rem;
 }
 
-.descripcion::first-letter {
+*::first-letter {
     text-transform: uppercase;
 }
-
-@keyframes cambiaColor {
-    0% {
-        background-color: rgb(0, 0, 0);
-    }
-
-    50% {
-        background-color: rgb(30, 255, 0);
-    }
-
-    100% {
-        background-color: var(--primary-color);
-    }
-}
-
-.triangulo {
-    width: 0;
-    height: 0;
-    border-left: 1rem solid transparent;
-    border-right: 1rem solid transparent;
-    border-bottom: 2rem solid #ffede1;
-    /* Altura del triángulo dependiendo del ancho */
-    transform: rotate(-65deg);
-    position: absolute;
-    top: -1rem;
-    left: -1.2rem;
-}
-
-
-.container {
-    background-color: rgb(0, 0, 0);
-}
-
-.fixed {
-    position: fixed;
-    width: 25%;
-}
-
-.scrollit {
-    float: left;
-    width: 71%
-}
-
-.sumary {
-    /* background-color: green; */
-}
-
-.izq {
-    /* width: 100%; */
-
-}
-
-*:focus {
-    /* outline: none; */
-}
-
-
-.contenedor-producto {
-    align-items: center;
-    border-radius: .5rem;
-    overflow: hidden;
-    height: 7rem;
-    position: relative;
-}
-
-@media (max-width: 991px) {
-    .contenedor-producto {
-        /* background-color: #ffffffea;align-items: center;border-radius: rem;overflow: hidden;height: 7rem;position: relative; */
-    }
-}
-
-.nombre-sesion {
-    font-weight: bold;
-    /* width: auto; */
-    border-radius: 5rem;
-}
-
-.contenedor-principal {
-    /* border-radius: 2rem; */
-    /* position: sticky */
-    /* top: 100px; */
-    /* margin-bottom: 10rem; */
-    /* background-color: var(--primary-color); */
-    /* height: auto; */
-}
-
-
-.producto {
-
-    
-}
-
-
-
-.cantidad:focus-visible {
-    outline: none;
-
-}
-
-.imagen {
-    height: 100px;
-    object-fit: contain;
-}
-
-.contador {
-    background-color: white;
-    /* height: 3rem;  */
-
-    display: flex;
-    border-radius: 0.1rem;
-    padding: 0.1rem 1rem;
-    /* border: 1px solid var(--primary-color); */
-    border-radius: 0.5rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.274);
-    /* bottom: 0.5rem; */
-    position: absolute;
-    right: 1rem;
-    bottom: 1rem;
-    width: 8rem;
-    height: 2.5rem;
-
-}
-
-i {
-    font-weight: bold;
-}
-
-i:hover {
-    color: var(--primary-color);
-}
-
-button:hover {
-    cursor: pointer;
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-    .clase {
-        /* background-color: red; */
-        min-width: 720px;
-    }
-}
-
-@media (min-width: 1200px) and (max-width: 1920px) {
-    .clase {
-        /* background-color: red; */
-        min-width: 1024px;
-
-    }
-
-    .productos-scroll {
-        overflow-y: auto;
-        border-radius: 2rem;
-        /* height: 80vh; */
-        overflow-y: auto;
-        /* max-height: 720px */
-    }
-}
-
-::-webkit-scrollbar {
-    width: 1rem;
-    /* Ancho de la barra de desplazamiento */
-    padding-top: 1rem;
-    position: absolute;
-    display: none;
-}
-
-.clase {}
-
-*:focus {
-    outline: none;
-}
-
-*{
-    text-transform:lowercase;
-}
-
-*::first-letter{
-    text-transform:uppercase;
-}
-
-
-
-/* Estilo del pulgar de la barra de desplazamiento */
-/* WebKit (Chrome, Safari) */
-::-webkit-scrollbar-thumb {
-    background-color: rgb(255, 0, 0);
-    /* Color del pulgar de la barra de desplazamiento */
-    border-radius: 9px;
-    border: 5px solid var(--primary-color);
-    height: 10rem;
-    width: 10rem;
-    /* display: none;  */
-}</style>
+</style>
