@@ -245,16 +245,16 @@ def get_audit_check_groups_with_items(audit_id: int):
         
         
         
-@audit_router.get("/checklists")
-def get_checklists():
-    dao = AuditDAO()
-    try:
-        checklists = dao.get_all_checklists()
-        if not checklists:
-            raise HTTPException(status_code=404, detail="No checklists found")
-        return checklists
-    finally:
-        dao.close_connection()
+# @audit_router.get("/checklists")
+# def get_checklists():
+#     dao = AuditDAO()
+#     try:
+#         checklists = dao.get_all_checklists()
+#         if not checklists:
+#             raise HTTPException(status_code=404, detail="No checklists found")
+#         return checklists
+#     finally:
+#         dao.close_connection()
         
         
 
@@ -272,7 +272,7 @@ def get_checklists():
         
         
 @audit_router.get("/checklists/{checklist_id}")
-def get_checklist(checklist_id: int):
+def get_checklist_id(checklist_id: int):
     dao = AuditDAO()
     try:
         checklist = dao.get_checklist_by_id_with_groups_and_items(checklist_id)

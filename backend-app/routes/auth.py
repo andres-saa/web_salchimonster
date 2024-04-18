@@ -1,7 +1,7 @@
-from fastapi import FastAPI, Depends, HTTPException, APIRouter
+from fastapi import FastAPI, Depends, HTTPException, WebSocket, APIRouter,WebSocketDisconnect
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
-from typing import Optional
+from jose import jwt, JWTError
+from typing import List, Dict
 
 auth = APIRouter()
 
@@ -109,28 +109,42 @@ def verify_user(username: str, password: str):
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     site = verify_user(form_data.username, form_data.password)
     if site:
-        # Crear el token JWT con la información del usuario
         token_data = {"sub": form_data.username}
         token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
-        return {"access_token": token, "token_type": "bearer", "username": form_data.username, "site_id": site.site_id}
+        return {"access_token": token,"site_name":site.site_name, "token_type": "bearer", "username": form_data.username, "site_id": site.site_id}
     else:
-        raise HTTPException(status_code=401, detail="Credenciales no válidas")
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
 
-# Ruta protegida con token
 @auth.get("/private-data")
 async def get_private_data(token: str = Depends(oauth2_scheme)):
-    # Verificar el token y obtener la información del usuario
-    credentials_exception = HTTPException(
-        status_code=401, detail="Token inválido", headers={"WWW-Authenticate": "Bearer"}
-    )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         site = next((s for s in sites if s.username == payload["sub"]), None)
     except JWTError:
-        raise credentials_exception
-
+        raise HTTPException(status_code=401, detail="Invalid token", headers={"WWW-Authenticate": "Bearer"})
     if site:
-        return {"message": "Datos privados", "token": token, "username": payload["sub"], "site_id": site.site_id}
+        return {"message": "Private Data", "username": payload["sub"], "site_id": site.site_id}
     else:
-        raise credentials_exception
+        raise HTTPException(status_code=401, detail="Invalid token", headers={"WWW-Authenticate": "Bearer"})
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: Dict[int, List[WebSocket]] = {}
+
+    async def connect(self, websocket: WebSocket, site_id: int):
+        await websocket.accept()
+        if site_id not in self.active_connections:
+            self.active_connections[site_id] = []
+        self.active_connections[site_id].append(websocket)
+
+    def disconnect(self, websocket: WebSocket, site_id: int):
+        if site_id in self.active_connections:
+            self.active_connections[site_id].remove(websocket)
+            if not self.active_connections[site_id]:
+                del self.active_connections[site_id]
+
+manager = ConnectionManager()
+
+
+    

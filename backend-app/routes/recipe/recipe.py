@@ -38,3 +38,11 @@ def list_recipes():
     recipes = manager.list_recipes()
     manager.close_connection()
     return recipes
+
+
+@recipe_router.get("/unit-of-measures" , tags=['recipe'])
+def list_measures():
+    manager = RecipeManager()
+    measures = manager.list_unit_measures()
+    manager.close_connection()
+    return measures

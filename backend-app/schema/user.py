@@ -6,7 +6,7 @@ class user_schema_post(BaseModel):
     user_name:str
     user_phone:str
     user_address:str
-    site_id:int
+    site_id:Optional[int] = None
     
 
 

@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 import os
 from schema.recipe import RecipeDataSheet, RecipeDataIngredient
 from typing import List
+from fastapi import status
+
 load_dotenv()
 
 DB_USER = os.getenv('DB_USER')
@@ -38,7 +40,7 @@ class RecipeDataSheetManager:
 
             # Ahora, insertamos cada uno de los detalles de los ingredientes
             details_insert_query = """
-            INSERT INTO recipe.recipe_data_ingredient (
+            INSERT INTO recipe.recipe_data_ingredients (
                 recipe_data_sheet_id, ingredient_id, unit_of_measure, quantity
             ) VALUES (%s, %s, %s, %s);
             """
@@ -60,16 +62,20 @@ class RecipeDataSheetManager:
             return "An unexpected error occurred"
 
             
-        
-        
     def get_recipe_data_sheet_by_id(self, sheet_id: int):
         try:
-            # Fetch the recipe data sheet
-            select_query = "SELECT * FROM recipe.recipe_data_sheet WHERE id = %s;"
+            # Fetch the recipe data sheet with the recipe name and the associated product name
+            select_query = """
+            SELECT rds.*, r.product_id, p.name AS product_name
+            FROM recipe.recipe_cost_details rds
+            JOIN recipe.recipes r ON rds.recipe_id = r.id
+            JOIN inventory.products p ON r.product_id = p.id
+            WHERE rds.recipe_id = %s;
+            """
             self.cursor.execute(select_query, (sheet_id,))
             columns = [desc[0] for desc in self.cursor.description]
             data_sheet = self.cursor.fetchone()
-            
+
             if data_sheet:
                 data_sheet_dict = dict(zip(columns, data_sheet))
                 
@@ -78,17 +84,15 @@ class RecipeDataSheetManager:
                 self.cursor.execute(details_query, (data_sheet_dict["recipe_id"],))
                 details_columns = [desc[0] for desc in self.cursor.description]
                 details = [dict(zip(details_columns, detail_row)) for detail_row in self.cursor.fetchall()]
+                
                 # Include the details in the data sheet response
                 data_sheet_dict['ingredient_details'] = details
                 return data_sheet_dict
             return None
 
-
         except psycopg2.DatabaseError as e:
             print(f"Database error: {e}")
         return "Database error occurred"
-
-
     def update_recipe_data_sheet(self, sheet_id: int, updated_data: RecipeDataSheet):
         try:
             update_query = """
@@ -122,7 +126,6 @@ class RecipeDataSheetManager:
             self.conn.rollback()
             return "Database error occurred"
         
-
     def list_recipe_data_sheets(self):
         try:
             select_query = "SELECT * FROM recipe.recipe_data_sheet;"
@@ -144,7 +147,37 @@ class RecipeDataSheetManager:
         except psycopg2.DatabaseError as e:
             print(f"Database error: {e}")
             return "Database error occurred"
-        
-        
+    
+    def create_recipe_data_ingredient(self, data_sheet_id: int, ingredient: RecipeDataIngredient):
+        try:
+            insert_query = """
+            INSERT INTO recipe.recipe_data_ingredients (recipe_data_sheet_id, ingredient_id, unit_of_measure_id, quantity)
+            VALUES (%s, %s, %s, %s);
+            """
+            self.cursor.execute(insert_query, (data_sheet_id, ingredient.ingredient_id, ingredient.unit_measure_id, ingredient.quantity))
+            self.conn.commit()
+            return {"message": "Ingredient detail deleted successfully"}, status.HTTP_200_OK
+ 
+        except psycopg2.DatabaseError as e:
+            print(f"Database error: {e}")
+            self.conn.rollback()
+            return "Database error occurred"
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            return "An unexpected error occurred"
+
+    def delete_recipe_data_ingredient(self, ingredient_detail_id: int):
+        try:
+            delete_query = "DELETE FROM recipe.recipe_data_ingredients WHERE id = %s;"
+            self.cursor.execute(delete_query, (ingredient_detail_id,))
+            self.conn.commit()
+            return f"Ingredient detail with ID {ingredient_detail_id} deleted successfully."
+        except psycopg2.DatabaseError as e:
+            print(f"Database error: {e}")
+            self.conn.rollback()
+            return "Database error occurred"
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            return "An unexpected error occurred"    
     def close_connection(self):
         self.conn.close()

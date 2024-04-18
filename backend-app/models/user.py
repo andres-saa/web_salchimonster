@@ -36,7 +36,17 @@ class User:
         else:
             return None
 
+    def user_exists(self, user_phone):
+        select_query = "SELECT user_id FROM users WHERE user_phone = %s;"
+        self.cursor.execute(select_query, (user_phone,))
+        return self.cursor.fetchone()
+
     def insert_user(self, user_data: user_schema_post):
+        # Verifica si el usuario ya existe por número de teléfono
+        existing_user = self.user_exists(user_data.user_phone)
+        if existing_user:
+            return existing_user[0]  # Retorna el user_id si el teléfono ya está registrado
+
         insert_query = """
         INSERT INTO users (
             user_name, user_phone, user_address, site_id
