@@ -14,7 +14,7 @@ function connectWebSocket(siteId) {
     webSocket.close(); // Make sure to close any existing connections
   }
   
-  webSocket = new WebSocket(`ws://${URI_SOCKET}/ws/${siteId}`);
+  webSocket = new WebSocket(`wss://${URI_SOCKET}/ws/${siteId}`);
   
   webSocket.onopen = () => console.log("WebSocket connected");
   webSocket.onmessage = (message) => {
