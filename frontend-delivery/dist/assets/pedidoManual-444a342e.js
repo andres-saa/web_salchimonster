@@ -1,0 +1,1 @@
+import{_ as e,o as t,c}from"./index-ad3d3e91.js";const o={},r={width:"100%",style:{height:"99vh"},src:"https://salchimonster.com/",frameborder:"0"};function s(a,n){return t(),c("iframe",r)}const i=e(o,[["render",s]]);export{i as default};
