@@ -380,7 +380,7 @@ const IMPRIMIR = () => {
     ventanaImpresion.document.write(estilosPagina[i].outerHTML);
   }
 
-  ventanaImpresion.document.write('<style>  @media print {  html{height: min-content;}  *{text-transform:uppercase;align-items:center; font-family: sans-serif;padding:0;margin:0; font-size:0.7rem !IMPORTANT} body { padding:0.5rem; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
+  ventanaImpresion.document.write('<style>  @media print {  html{height: min-content;}  *{text-transform:uppercase;align-items:center; font-family: sans-serif;padding:0;margin:0; font-size:0.9rem !IMPORTANT} body { padding:0.5rem; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
   ventanaImpresion.document.write('</head><body>');
   ventanaImpresion.document.write(contenidoFactura);
 
