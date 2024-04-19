@@ -139,9 +139,15 @@ class Adicional:
         
         # Ejecutar la consulta para obtener los detalles adicionales de los productos
         select_query = f"""
-        SELECT DISTINCT  aditional_item_name,aditional_item_instance_id, product_category_name, aditional_item_price, aditional_item_type_name
+        SELECT DISTINCT ON (aditional_item_name, aditional_item_price)
+        aditional_item_name,
+        aditional_item_instance_id,
+        product_category_name,
+        aditional_item_price,
+        aditional_item_type_name
         FROM inventory.product_aditional_details
-        WHERE product_instance_id IN ({ids_string});
+        WHERE product_instance_id IN ({ids_string})
+        ORDER BY aditional_item_name, aditional_item_price, aditional_item_instance_id;
         """
         self.cursor.execute(select_query)
         
