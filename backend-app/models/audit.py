@@ -174,12 +174,7 @@ class AuditDAO:
 
 
     def insert_checklist_with_groups_and_items(self, checklist_data: Checklist):
-            """
-            Inserta un nuevo checklist con sus grupos y elementos asociados en la base de datos.
-
-            :param checklist_data: Objeto Checklist que contiene la información del checklist, sus grupos y elementos.
-            :return: El ID del nuevo checklist insertado.
-            """
+            
             # Insertar el checklist y obtener su ID
             checklist_id = self.insert_checklist(checklist_data)
 
@@ -598,7 +593,7 @@ class AuditDAO:
             ci.id as item_id,
             ci.description as item_description
         FROM 
-            checklist cl
+            checklists cl
             LEFT JOIN checkgroup cg ON cl.id = cg.checklist_id
             LEFT JOIN check_item ci ON cg.id = ci.group_id
         ORDER BY 
