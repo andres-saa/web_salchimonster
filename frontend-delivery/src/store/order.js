@@ -63,7 +63,7 @@ export const useOrderStore = defineStore('cart', {
                 this.webSocket.close// Make sure to close any existing connections
             }
 
-            this.webSocket = new WebSocket(`ws://${URI_SOCKET}/ws/${siteId}`);
+            this.webSocket = new WebSocket(`wss://${URI_SOCKET}/ws/${siteId}`);
             this.webSocket.onopen = () =>
                 this.webSocket.onmessage = (message) => {
                     this.Notification.play()
