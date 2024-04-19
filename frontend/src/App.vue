@@ -14,6 +14,7 @@ import { onMounted } from 'vue';
 
 onMounted(()=>{
 eliminarProductosDelCarrito()
+localStorage.removeItem('cart')
 })
 
 </script>
