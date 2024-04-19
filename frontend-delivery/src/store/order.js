@@ -68,10 +68,11 @@ export const useOrderStore = defineStore('cart', {
                 this.webSocket.onmessage = (message) => {
                     this.Notification.play()
                     this.getTodayOrders()
-                    this.Notification.addEventListener('ended', function () {
-                        this.currentTime = 0;
-                        this.play();
-                    }, false);
+                    alert('Nueva orden')
+                    // this.Notification.addEventListener('ended', function () {
+                    //     this.currentTime = 0;
+                    //     this.play();
+                    // }, false);
 
 
                 };
