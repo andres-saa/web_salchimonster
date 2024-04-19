@@ -8,8 +8,18 @@ const sitestore = useSitesStore()
 const store = useOrderStore();
 
 
+
+const requestNotificationPermission = async () => {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+        alert('Las notificaciones están deshabilitadas. Por favor, habilite las notificaciones para obtener alertas en tiempo real.');
+    }
+}
+
 onMounted(async() => {
 
+
+  requestNotificationPermission()
   const site_id = await sitestore.site.site_id
   
   if(sitestore.site.site_id){

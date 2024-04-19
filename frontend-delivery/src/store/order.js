@@ -58,45 +58,59 @@ export const useOrderStore = defineStore('cart', {
 
 
         async connectWebSocket(siteId) {
-            const siteStore = useSitesStore()
+            const siteStore = useSitesStore();
             if (this.webSocket !== null) {
-                this.webSocket.close// Make sure to close any existing connections
+                this.webSocket.close(); // Make sure to close any existing connections
             }
 
             this.webSocket = new WebSocket(`wss://${URI_SOCKET}/ws/${siteId}`);
-            this.webSocket.onopen = () =>
+            this.webSocket.onopen = () => {
                 this.webSocket.onmessage = (message) => {
-                    this.Notification.play()
-                    this.getTodayOrders()
-                    // alert('Nueva orden')
+                    this.Notification.play();
+                    this.getTodayOrders();
+                    
+                    if (Notification.permission === 'granted') {
+                        const notification = new Notification('Nueva Orden en la pagina de WhatsApp', {
+                            body: 'Nueva Orden en la pagina de WhatsApp',
+                            icon: '/images/logo.png',
+                            image: `${URI}/read-product-image/300/site-${siteId}`
+                        });
+                        notification.onclick = () => {
+                            window.focus();
+                        };
+                    }
+
                     this.Notification.addEventListener('ended', function () {
                         this.currentTime = 0;
                         this.play();
                     }, false);
-
-
                 };
+            };
             this.webSocket.onclose = async () => {
                 console.log("WebSocket disconnected");
-
-                const siteStore = useSitesStore()
-                const site_id = await siteStore.site.site_id
-
-                if (site_id) {
-
-                    this.connectWebSocket(site_id);
-                } else {
-                    // router.push('/login')
-                }
-                this.webSocket = null;
-                // location.reload() // Clean up the reference to the WebSocket
+                this.connectWebSocketIfDisconnected();
             };
-            this.webSocket.onerror = (error) => console.error("WebSocket error:", error);
+            this.webSocket.onerror = (error) => {
+                console.error("WebSocket error:", error);
+            };
+        },
+
+        connectWebSocketIfDisconnected() {
+            if (!this.webSocket || this.webSocket.readyState !== WebSocket.OPEN) {
+                this.connectWebSocket(useSitesStore().site.site_id);
+            }
+        },
+
+        startConnectionMonitor() {
+            setInterval(() => {
+                this.connectWebSocketIfDisconnected();
+            }, 300000); // 300000 ms = 5 minutes
         }
+    }
 
     }
 
 
 
 
-});
+);

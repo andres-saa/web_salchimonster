@@ -49,6 +49,7 @@ export const useSitesStore = defineStore('site', {
         },
 
         setLocation(location){
+            this.connectWebSocket(location.site.site_id)
             this.location = location
         },
         setVisible(item,status){
