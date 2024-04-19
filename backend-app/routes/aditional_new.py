@@ -67,7 +67,7 @@ def get_adicionales_new(request_body: InstanceProductIDs):
     adicional_instance = Adicional()
     try:
         # Access the list of IDs with request_body.instance_product_ids
-        adicionales = adicional_instance.select_adicionales_for_product(request_body.instance_product_ids)
+        adicionales = adicional_instance.select_adicionales_for_products(request_body.instance_product_ids)
     finally:
         adicional_instance.close_connection()
     return adicionales

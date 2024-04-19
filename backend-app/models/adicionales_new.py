@@ -133,7 +133,7 @@ class Adicional:
 
         return f"Updated {updated_rows} items named '{aditional_item_name}' with price {price} at site {site_id} to {'active' if status else 'inactive'}."
     
-    def select_adicionales_for_product(self, product_instance_ids):
+    def select_adicionales_for_products(self, product_instance_ids):
     # Convertir la lista de IDs en una cadena para la consulta SQL
         ids_string = ', '.join(map(str, product_instance_ids))
         
@@ -206,7 +206,35 @@ class Adicional:
         
         return grouped_items
 
+
+    def select_adicionales_for_product(self, product_instance_id):
+    # Ejecutar la consulta para obtener los detalles adicionales del producto
+        select_query = f"SELECT  aditional_item_instance_id,product_category_name, aditional_item_name,aditional_item_price,aditional_item_type_name FROM inventory.product_aditional_details WHERE product_instance_id = {product_instance_id}"
+        self.cursor.execute(select_query)
         
+        # Obtener los nombres de las columnas del resultado
+        columns = [desc[0] for desc in self.cursor.description]
+        
+        additional_details = [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+        grouped_details = {}
+        for detail in additional_details:
+            type_name = detail["aditional_item_type_name"]
+            if type_name not in grouped_details:
+                grouped_details[type_name] = [detail]
+            else:
+                grouped_details[type_name].append(detail)
+        
+        grouped_output = []
+        for type_name, items in grouped_details.items():
+            category_items = {
+                "category": type_name,
+                "items": items
+            }
+            grouped_output.append(category_items)
+
+        return grouped_output
+ 
         
         
      
