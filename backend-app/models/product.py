@@ -193,6 +193,7 @@ class Product:
 
             # Inserta nuevas instancias de adicionales y crea relaciones con el producto
             for additional_id in additional_item_ids:
+                print("este es ek aducuibak",additional_id)
                 for site in all_sites:
                     site_id = site[0]
                     insert_additional_query = """

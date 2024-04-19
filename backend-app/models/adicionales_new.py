@@ -207,7 +207,8 @@ class Adicional:
             grouped_items[type_name].append({
                 'item_id': item['item_id'],
                 'item_name': item['item_name'],
-                'item_price': item['item_price']
+                'item_price': item['item_price'],
+                'type_name':item['type_name']
             })
         
         return grouped_items
