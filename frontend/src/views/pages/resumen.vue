@@ -128,7 +128,10 @@
             </router-link>
 
             <router-link to="/pay" v-else>
-                <Button @click="orderService.sendOrder()" iconPos="right" icon="pi pi-arrow-right" label="Finalizar pedido"
+                <Button :disabled="sending" @click=" ()  => {
+                    orderService.sendOrder()
+                    sending = true
+                }" iconPos="right" icon="pi pi-arrow-right" label="Finalizar pedido"
                     class="mt-2" severity="help"
                     style="outline: none;width: 100%; border: none;font-weight: bold; background-color: black;"></Button>
             </router-link>
@@ -153,6 +156,7 @@ import { useSitesStore } from '../../store/site';
 import { useRoute } from 'vue-router';
 import { orderService } from '../../service/order/orderService';
 import {onMounted, ref, watch} from 'vue'
+const sending = ref(false)
 const route = useRoute()
 const store = usecartStore()
 const siteStore = useSitesStore()
