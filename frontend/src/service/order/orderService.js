@@ -7,7 +7,6 @@ import { useReportesStore } from "../../store/ventas";
 import { useRoute } from "vue-router";
 
 import router from '../../router/index'
-
 const report = useReportesStore()
 const cart = usecartStore();
 const site = useSitesStore();
@@ -60,6 +59,8 @@ export const orderService = {
 
     const order = preparar_orden()
 
+
+
     if (!validateOrder(order)) {
       return null;
     }
@@ -68,22 +69,23 @@ export const orderService = {
       report.setLoading(true,`enviando tu pedido ${user.user.name}`)
       const response = await axios.post(`${URI}/order`, order);
       if (response.status === 200) {
+        site.webSocket.send('pedido melo')
 
         report.setLoading(false,"enviando tu pedido")
 
-        user.user = {
-          name:'',
-          neigborhood:'',
-          address:'',
-          phone_number:'',
-          payment_method_option:''
-      },
+    //     user.user = {
+    //       name:'',
+    //       neigborhood:'',
+    //       address:'',
+    //       phone_number:'',
+    //       payment_method_option:''
+    //   },
 
-      cart.cart = {
-        products: [],
-        total_cost: 0,
-        additions: []  // Nueva propiedad para manejar las adiciones a nivel del carrito
-    }
+    //   cart.cart = {
+    //     products: [],
+    //     total_cost: 0,
+    //     additions: []  // Nueva propiedad para manejar las adiciones a nivel del carrito
+    // }
 
     router.push('/gracias')
 

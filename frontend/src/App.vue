@@ -9,20 +9,35 @@ import Loading from './components/Loading.vue'
 // import { eliminarAdicionDelCarrito } from './service/cart';
 import { eliminarProductosDelCarrito } from './service/order';
 import { URI } from './service/conection';
-import { onMounted } from 'vue';
+import { onMounted, onBeforeUnmount } from 'vue';
 import { useSitesStore } from './store/site';
 import { useRoute } from 'vue-router';
 
 const siteStore = useSitesStore()
 const route = useRoute()
 
-// onMounted(()=>{
-//   // if(!siteStore.location.site.site_id && route.path == '/'){
-//   //   alert(route.fullPath)
-//   //   siteStore.setVisible("currentSite", true)
-//   // }
-// eliminarProductosDelCarrito()
-// })
+
+
+
+onMounted(async() => {
+
+const site_id = await siteStore.location.site.site_id
+
+if(siteStore.location.site.site_id){
+
+  siteStore.connectWebSocket(site_id );
+} else{
+  // router.push('/login')
+}
+
+});
+
+onBeforeUnmount(() => {
+if (siteStore.webSocket) {
+  siteStore.webSocket.close();
+}
+});
+
 
 </script>
 
