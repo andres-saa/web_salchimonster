@@ -196,13 +196,17 @@ class Product:
                 print("este es ek aducuibak",additional_id)
                 for site in all_sites:
                     site_id = site[0]
+                    
+                    self.cursor.execute(f"SELECT price from orders.aditional_items where id = {additional_id}")
+                    aditiona_price = self.cursor.fetchone()[0]
+                    
                     insert_additional_query = """
                     INSERT INTO orders.aditional_item_instances (price, status, aditional_item_id, site_id, category_id)
                     VALUES (%s, %s, %s, %s, %s) RETURNING id;
                     """
                     print("site",site_id)
                     self.cursor.execute(insert_additional_query, (
-                        product_info['price'],
+                        aditiona_price,
                         True,# Aquí puedes ajustar si cada sitio podría tener un precio diferente
                         additional_id,
                         site_id,
