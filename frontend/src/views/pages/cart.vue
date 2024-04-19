@@ -191,7 +191,7 @@ const updateScreenWidth = () => {
 onMounted(() => {
 
     window.addEventListener('resize', updateScreenWidth);
-    domicilio.value = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
+    domicilio.value = JSON.parse(localStorage.getItem('currentNeigborhood'))?.currenNeigborhood
 
 });
 
@@ -225,8 +225,8 @@ const remove = (product) => {
 
 const total = ref()
 onMounted(() => {
-    products.value = contarObjetosRepetidos(JSON.parse(localStorage.getItem('cart')).products);
-    total.value = JSON.parse(localStorage.getItem('cart')).total
+    products.value = contarObjetosRepetidos(JSON.parse(localStorage.getItem('cart'))?.products);
+    total.value = JSON.parse(localStorage.getItem('cart'))?.total
 
 })
 // Ejemplo de uso
@@ -238,7 +238,7 @@ const miArray = [
     { name: 'producto2', price: 3000 },
 ];
 
-const resultado = contarObjetosRepetidos(JSON.parse(localStorage.getItem('cart')).products);
+const resultado = contarObjetosRepetidos(JSON.parse(localStorage.getItem('cart'))?.products);
 console.log(resultado);
 
 
