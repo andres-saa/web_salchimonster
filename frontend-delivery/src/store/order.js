@@ -58,42 +58,36 @@ export const useOrderStore = defineStore('cart', {
 
 
         async connectWebSocket(siteId) {
-            const siteStore = useSitesStore()
+            const siteStore = useSitesStore();
             if (this.webSocket !== null) {
-                this.webSocket.close// Make sure to close any existing connections
+              this.webSocket.close(); // Make sure to close any existing connections properly
             }
-
+          
             this.webSocket = new WebSocket(`wss://${URI_SOCKET}/ws/${siteId}`);
-            this.webSocket.onopen = () =>
-                this.webSocket.onmessage = (message) => {
-                    this.Notification.play()
-                    this.getTodayOrders()
-                    alert('Nueva orden')
-                    // this.Notification.addEventListener('ended', function () {
-                    //     this.currentTime = 0;
-                    //     this.play();
-                    // }, false);
-
-
-                };
-            this.webSocket.onclose = async () => {
-                console.log("WebSocket disconnected");
-
-                const siteStore = useSitesStore()
-                const site_id = await siteStore.site.site_id
-
-                if (site_id) {
-
-                    this.connectWebSocket(site_id);
-                } else {
-                    // router.push('/login')
-                }
-                this.webSocket = null;
-                // location.reload() // Clean up the reference to the WebSocket
+            this.webSocket.onopen = () => {
+              console.log("WebSocket connected");
+            };
+            this.webSocket.onmessage = (message) => {
+              this.Notification.play();
+              this.getTodayOrders();
+              alert('Nueva orden');
+            };
+            this.webSocket.onclose = () => {
+              console.log("WebSocket disconnected");
+              if (siteStore.site.site_id) {
+                this.connectWebSocket(siteStore.site.site_id);
+              }
             };
             this.webSocket.onerror = (error) => console.error("WebSocket error:", error);
-        }
+          },
+          
 
+        initNotification() {
+            this.Notification.play().then(() => {
+              this.Notification.pause();
+              this.Notification.currentTime = 0;
+            }).catch(err => console.error("Error iniciando el audio:", err));
+          }
     }
 
 
