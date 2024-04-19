@@ -5,50 +5,8 @@ import router from './router';
 import { useOrderStore } from './store/order';
 import { useSitesStore } from './store/site';
 const sitestore = useSitesStore()
-let webSocket = null;
 const store = useOrderStore();
 
-const boton = ref(null)
-
-
-
-function connectWebSocket(siteId) {
-  if (webSocket !== null) {
-    webSocket.close(); // Make sure to close any existing connections
-  }
-  
-  webSocket = new WebSocket(`wss://${URI_SOCKET}/ws/${siteId}`);
-  
-  webSocket.onopen = () => console.log("WebSocket connected");
-  webSocket.onmessage = (message) => {
-    console.log("Message received:", message.data); // Log the received message data
-    store.getTodayOrders();
-    store.Notification.play()
-    // alert('hola')
-    store.Notification.addEventListener('ended', function() {
-    this.currentTime = 0;
-    this.play();
-}, false);  
-    
-
-  };
-  webSocket.onclose = async() => {
-    console.log("WebSocket disconnected");
-
-
-    const site_id = await sitestore.site.site_id
-    
-    if(sitestore.site.site_id){
-
-      connectWebSocket(site_id);
-    } else{
-      router.push('/login')
-    }
-    webSocket = null;
-    // location.reload() // Clean up the reference to the WebSocket
-  };
-  webSocket.onerror = (error) => console.error("WebSocket error:", error);
-}
 
 onMounted(async() => {
 
@@ -56,7 +14,7 @@ onMounted(async() => {
   
   if(sitestore.site.site_id){
 
-    connectWebSocket(site_id );
+    store.connectWebSocket(site_id );
   } else{
     router.push('/login')
   }
@@ -64,14 +22,31 @@ onMounted(async() => {
 });
 
 onBeforeUnmount(() => {
-  if (webSocket) {
-    webSocket.close();
+  if (store.webSocket) {
+    store.webSocket.close();
   }
 });
+
+
+const visibleNotifications = ref(true)
+
+
 </script>
 
 <template>
   <!-- {{ sitestore }} -->
+
+  <Dialog  class="" style="overflow: hidden;display: flex;" modal :closable="false" v-model:visible = "visibleNotifications">
+    <div style="background-color: transparent; display: flex ; flex-direction: column; gap: 1rem;">
+      <i  class="pi pi-bell col-12 text-center p-0 m-0" style="font-size: 5rem;color: #a855f7;"></i>
+      <Button @click="() => {
+        visibleNotifications = false
+        store.getTodayOrders()
+
+      }" severity="help"  label="Aceptar las notificaciones"> </Button>
+    </div>
+
+  </Dialog>
   <router-view  class="col-12 p-0 " />
 
 </template>
