@@ -66,7 +66,15 @@ export const useOrderStore = defineStore('cart', {
             this.webSocket = new WebSocket(`wss://${URI_SOCKET}/ws/${siteId}`);
             this.webSocket.onopen = () => {
                 this.webSocket.onmessage = (message) => {
-                    this.Notification.play();
+                    try {
+                        this.Notification.play().catch(() => {
+                            console.error('Error playing notification sound');
+                            location.reload(); // Reload the page if audio fails to play
+                        });
+                    } catch (error) {
+                        console.error('Unexpected error when trying to play sound', error);
+                        location.reload(); // Reload the page if there's an error
+                    }
                     this.getTodayOrders();
                     
                     if (Notification.permission === 'granted') {
