@@ -34,6 +34,7 @@ export const orderService = {
             const response = await axios.post(`${URI}/order/${order_id}/prepare`);
             if (response.status === 200) {
                 store.Notification.pause()
+                store.Notification.currentTime = 0
                 store.getTodayOrders()
                 return response.data;
             } else {
@@ -49,6 +50,8 @@ export const orderService = {
     async cancelOrder(order_id, reason, responsible) {
         const store = useOrderStore()
         store.Notification.pause()
+        store.Notification.currentTime = 0
+
         store.setVisible('currentOrder',false)
         const data = {
                 "reason":reason,
