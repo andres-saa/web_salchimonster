@@ -56,7 +56,7 @@ export const useSitesStore = defineStore('site', {
             this.visibles[item]=status
         },
         async connectWebSocket(siteId) {
-            const siteStore = useSitesStore()
+
             if (this.webSocket !== null) {
                 this.webSocket.close// Make sure to close any existing connections
             }
