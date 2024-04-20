@@ -84,7 +84,7 @@
             <div style="display: grid; grid-template-columns: 60%  20% 20%;">
               <div >
               <span>
-                {{ product.quantity }}  --
+                {{ product.quantity }}
                 {{ product.name }}
               </span>
             </div>
@@ -130,7 +130,7 @@
 
                 <div >
                   <p >
-                    {{ aditional.aditional_quantity }} --  {{ aditional.aditional_name }}
+                    {{ aditional.aditional_quantity }}  {{ aditional.aditional_name }}
                   </p>
                 </div>
 
@@ -376,7 +376,7 @@ const IMPRIMIR = () => {
     ventanaImpresion.document.write(estilosPagina[i].outerHTML);
   }
 
-  ventanaImpresion.document.write('<style>  @media print {  html{height: min-content;}  *{text-transform:uppercase;align-items:center; width:100%; font-family: sans-serif;padding:0;margin:0; font-size:10pt !IMPORTANT} body { padding:0; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
+  ventanaImpresion.document.write('<style>  @media print {  html{height: min-content;}  *{text-transform:uppercase;align-items:center; width:100%; font-family: sans-serif;padding:0;margin:0; font-size:o.9rem !IMPORTANT} body { padding:0; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
   ventanaImpresion.document.write('</head><body>');
   ventanaImpresion.document.write(contenidoFactura);
 
