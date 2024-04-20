@@ -9,7 +9,7 @@
 
             <div v-for="product in props.order.products.slice(0,3)" style="width: 3rem;height:100%;">
                 <div style="position: relative;">
-                    <img style="width: 100%;" src="https://backend.salchimonster.com/read-product-image/96/MADURIMONSTER" alt="">
+                    <img style="width: 100%;" :src="`https://backend.salchimonster.com/read-product-image/96/${product.name}`" alt="">
                     
                     <Button severity="danger" class="p-0" rounded :label="product.quantity" style="width: 1.5rem;position: absolute;top: -.5rem;right: -.5rem; height: 1.5rem;border-radius: 1rem;">
 
