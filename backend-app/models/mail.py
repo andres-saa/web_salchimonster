@@ -4,7 +4,7 @@ from email.mime.text import MIMEText
 from pydantic import BaseModel, EmailStr
 
 
-
+ 
 def enviar_correo(destinatario, asunto, cuerpo):
     servidor_smtp = "smtp.zoho.com"
     puerto_smtp = 465  # Puerto para SSL
