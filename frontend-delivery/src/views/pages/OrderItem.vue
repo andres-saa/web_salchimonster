@@ -28,7 +28,7 @@
             
             <span style="display: flex; gap: 1rem;align-items: center;">
                 <b style="min-width: max-content;color: black;">
-            {{format_date(props.order?.latest_status_timestamp) }}
+            {{props.order?.latest_status_timestamp?.split('T')[1]?.split('.')[0]?.split(':').slice(0,2)?.join(':') }}
             </b>
             
             <Tag v-if="props.order.current_status != 'en preparacion'" :severity="icons[props.order.current_status]">

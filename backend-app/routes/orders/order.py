@@ -71,12 +71,24 @@ async def create_order(order_data: OrderSchemaPost):
 
 
 
+
 @order_router.get('/order-by-site/{site_id}')
 def get_orders_gy_site(site_id:int):
     order_instance = Order2()
     result = order_instance.get_orders_by_site_id_for_today(site_id)
     order_instance.close_connection()
     return result
+
+
+
+@order_router.get('/get_order_count_by_site_id/{site_id}')
+def get_order_count_by_site_id(site_id:int):
+    order_instance = Order2()
+    result = order_instance.get_order_count_by_site_id(site_id)
+    order_instance.close_connection()
+    return result
+
+
 
 
 

@@ -13,6 +13,7 @@ const site = useSitesStore();
 const user = useUserStore();
 
 const preparar_orden = () => {
+  cart.sending_order = true
   const order_products = cart.cart.products.map(p => {
     return { product_instance_id: p.product.id, quantity: p.quantity };
   });
@@ -58,17 +59,21 @@ export const orderService = {
   async sendOrder() {
 
     const order = preparar_orden()
+    const cart = usecartStore()
 
 
 
     if (!validateOrder(order)) {
+      cart.sending_order = false
       return null;
+      
     }
 
     try {
       report.setLoading(true,`enviando tu pedido ${user.user.name}`)
       const response = await axios.post(`${URI}/order`, order);
       if (response.status === 200) {
+        cart.sending_order = false
         site.webSocket.send('pedido melo')
 
         report.setLoading(false,"enviando tu pedido")
@@ -95,6 +100,7 @@ export const orderService = {
         console.error('An error occurred while sending the order:', response.status);
         alert('An error occurred while sending the order. Please try again.');
         report.setLoading(false,"enviando tu pedido" )
+        cart.sending_order = false
 
     
         return null;
@@ -103,17 +109,23 @@ export const orderService = {
     } catch (error) {
       console.error('An error occurred while sending the order:', error);
       report.setLoading(false,"enviando tu pedido")
+      cart.sending_order = false
 
       alert('An error occurred while sending the order. Please check your internet connection and try again.');
+      cart.sending_order = false
       return null;
 
     }
   },
 };
 
+
 function validateOrder(order) {
+  const cart = usecartStore()
   if (!order.order_products.every(p => p.product_instance_id && p.quantity)) {
     alert('Some products in your cart are missing details.');
+    cart.sending_order = false
+
     return false;
   }
 
@@ -122,11 +134,15 @@ function validateOrder(order) {
     !order.user_data.user_address || order.user_data.user_address.trim() == ''
   ) {
     alert('Sus datos estan incompletos por favor reviselos');
+    cart.sending_order = false
+
     return false;
   }
 
   if (!order.site_id || !order.delivery_price) {
     alert('Site information is missing. Please select a valid site.');
+    cart.sending_order = false
+
     return false;
   }
 

@@ -128,7 +128,7 @@
             </router-link>
 
             <router-link to="/pay" v-else>
-                <Button :disabled="sending" @click=" ()  => {
+                <Button :disabled="store.sending_order" @click=" ()  => {
                     orderService.sendOrder()
                     sending = true
                 }" iconPos="right" icon="pi pi-arrow-right" label="Finalizar pedido"

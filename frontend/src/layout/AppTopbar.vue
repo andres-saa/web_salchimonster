@@ -19,13 +19,12 @@ const car = usecartStore()
 
 const siteStore = useSitesStore()
 const estado = ref(''); 
-    const siteId = 1;
 
 
-    const obtenerEstado = async () => {
+const obtenerEstado = async () => {
 
 
-const siteId = localStorage.getItem("siteId")
+const siteId = siteStore.location.site.site_id  
 // alert(siteId)
 
 if(!siteId){
@@ -56,7 +55,7 @@ if(!siteId){
 
 
 
-    const intervalId = setInterval(obtenerEstado, 30000);
+    const intervalId = setInterval(obtenerEstado, 3000);
 
     // Llamar a obtenerEstado cuando el componente se monta
     onMounted(obtenerEstado);

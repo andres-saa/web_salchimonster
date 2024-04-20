@@ -7,13 +7,12 @@ from pydantic import BaseModel
 
 class InstanceProductIDs(BaseModel):
     instance_product_ids: List[int]
+    site_id : int
 
 class ToggleStatus(BaseModel):
     status: bool
 
 adicional_new_router = APIRouter()
-class InstanceProductIDs(BaseModel):
-    instance_product_ids: List[int]
     
 @adicional_new_router.get("/adicionales-new-active/{instance_product_id}" , tags=['products'])
 def get_adicionales_new_active(instance_product_id:int):
@@ -67,7 +66,7 @@ def get_adicionales_new(request_body: InstanceProductIDs):
     adicional_instance = Adicional()
     try:
         # Access the list of IDs with request_body.instance_product_ids
-        adicionales = adicional_instance.select_adicionales_for_products(request_body.instance_product_ids)
+        adicionales = adicional_instance.select_adicionales_for_products(request_body.instance_product_ids,request_body.site_id)
     finally:
         adicional_instance.close_connection()
     return adicionales

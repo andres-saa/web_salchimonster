@@ -36,13 +36,13 @@ const categories = ref([{}])
 
 
 const estado = ref(''); 
-    const siteId = 1;
+ 
 
 
     const obtenerEstado = async () => {
 
 
-    const siteId = localStorage.getItem("siteId")
+    const siteId = siteStore.site.site_id
     // alert(siteId)
     
     if(!siteId){
@@ -70,9 +70,8 @@ const estado = ref('');
 
 
 
-    const intervalId = setInterval(obtenerEstado, 30000);
+    const intervalId = setInterval(obtenerEstado, 3000);
 
-    // Llamar a obtenerEstado cuando el componente se monta
     onMounted(obtenerEstado);
 
     // Limpiar el intervalo cuando el componente se desmonta para evitar fugas de memoria

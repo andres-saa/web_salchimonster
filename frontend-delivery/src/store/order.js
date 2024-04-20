@@ -23,7 +23,7 @@ export const useOrderStore = defineStore('cart', {
         key: 'order',
         storage: localStorage,
         paths: [
-
+            'currentCountOrders'
         ]
 
     },
@@ -34,7 +34,8 @@ export const useOrderStore = defineStore('cart', {
         },
         TodayOrders: [],
         Notification: new Audio('/sound/pip.mp3'),
-        webSocket: null
+        webSocket: null,
+        currentCountOrders:0
 
     }),
 
@@ -57,63 +58,7 @@ export const useOrderStore = defineStore('cart', {
         },
 
 
-        async connectWebSocket(siteId) {
-            const siteStore = useSitesStore();
-            if (this.webSocket !== null) {
-                this.webSocket.close(); // Make sure to close any existing connections
-            }
 
-            this.webSocket = new WebSocket(`wss://${URI_SOCKET}/ws/${siteId}`);
-            this.webSocket.onopen = () => {
-                this.webSocket.onmessage = (message) => {
-                    try {
-                        this.Notification.play().catch(() => {
-                            console.error('Error playing notification sound');
-                            location.reload(); // Reload the page if audio fails to play
-                        });
-                    } catch (error) {
-                        console.error('Unexpected error when trying to play sound', error);
-                        location.reload(); // Reload the page if there's an error
-                    }
-                    this.getTodayOrders();
-                    
-                    if (Notification.permission === 'granted') {
-                        const notification = new Notification('Nueva Orden en la pagina de WhatsApp', {
-                            body: 'Nueva Orden en la pagina de WhatsApp',
-                            icon: '/images/logo.png',
-                            image: `${URI}/read-product-image/300/site-${siteId}`
-                        });
-                        notification.onclick = () => {
-                            window.focus();
-                        };
-                    }
-
-                    this.Notification.addEventListener('ended', function () {
-                        this.currentTime = 0;
-                        this.play();
-                    }, false);
-                };
-            };
-            this.webSocket.onclose = async () => {
-                console.log("WebSocket disconnected");
-                this.connectWebSocketIfDisconnected();
-            };
-            this.webSocket.onerror = (error) => {
-                console.error("WebSocket error:", error);
-            };
-        },
-
-        connectWebSocketIfDisconnected() {
-            if (!this.webSocket || this.webSocket.readyState !== WebSocket.OPEN) {
-                this.connectWebSocket(useSitesStore().site.site_id);
-            }
-        },
-
-        startConnectionMonitor() {
-            setInterval(() => {
-                this.connectWebSocketIfDisconnected();
-            }, 300000); // 300000 ms = 5 minutes
-        }
     }
 
     }

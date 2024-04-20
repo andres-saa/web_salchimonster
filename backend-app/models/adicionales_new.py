@@ -19,22 +19,6 @@ class Adicional:
         self.conn = psycopg2.connect(self.conn_str)
         self.cursor = self.conn.cursor()
 
-    # def insert_adicional(self, adicional_data: adicionalSchemaPost):
-    #     insert_query = """
-    #     INSERT INTO adicionales (name, price)
-    #     VALUES (%s, %s) RETURNING adicional_id;
-    #     """
-    #     self.cursor.execute(insert_query, (
-    #         adicional_data.name, 
-    #         adicional_data.price
-    #     ))
-    #     adicional_id = self.cursor.fetchone()[0]
-    #     self.conn.commit()
-    #     return adicional_id
-
-    # # ... [resto de tus métodos] ...
-
-
     def select_adicionales_for_product_active(self, product_instance_id):
     # Ejecutar la consulta para obtener los detalles adicionales del producto
         select_query = f"SELECT  aditional_item_instance_id,product_category_name, aditional_item_name,aditional_item_price,aditional_item_type_name FROM inventory.product_aditional_details WHERE product_instance_id = {product_instance_id} and status = true;"
@@ -133,7 +117,9 @@ class Adicional:
 
         return f"Updated {updated_rows} items named '{aditional_item_name}' with price {price} at site {site_id} to {'active' if status else 'inactive'}."
     
-    def select_adicionales_for_products(self, product_instance_ids):
+    
+    
+    def select_adicionales_for_products(self, product_instance_ids,site_id):
     # Convertir la lista de IDs en una cadena para la consulta SQL
         ids_string = ', '.join(map(str, product_instance_ids))
         
@@ -146,7 +132,7 @@ class Adicional:
         aditional_item_price,
         aditional_item_type_name
         FROM inventory.product_aditional_details
-        WHERE product_instance_id IN ({ids_string})
+        WHERE product_instance_id IN ({ids_string}) and status = true and site_id = {site_id}
         ORDER BY aditional_item_name, aditional_item_price, aditional_item_instance_id;
         """
         self.cursor.execute(select_query)

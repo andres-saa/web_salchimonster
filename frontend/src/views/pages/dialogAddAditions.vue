@@ -78,7 +78,8 @@ import { adicionalesService } from "../../service/restaurant/aditionalService";
 const selectedAdditions = ref({});
 import { usecartStore } from "../../store/shoping_cart";
 import { formatoPesosColombianos } from "../../service/formatoPesos";
-
+import { useSitesStore } from "../../store/site";
+const sitestore = useSitesStore()
 const store = usecartStore()
 const handleAdditionChange = (item, group) => {
     if (item.checked) {
@@ -130,7 +131,7 @@ watch(() => store.visibles.addAdditionToCart, async (new_val) => {
     } else {
         const ids = store.cart.products.map(product => product.product.id)
         if (ids.length > 0) {
-            adicionales.value = await adicionalesService.getAditionalGroup(ids)
+            adicionales.value = await adicionalesService.getAditionalGroup(ids,sitestore.location?.site?.site_id)
         }
     }
 }, { deep: true })
@@ -162,7 +163,7 @@ onMounted(async () => {
 
     const ids = store.cart.products.map(product => product.product.id)
     if (ids.length > 0) {
-        adicionales.value = await adicionalesService.getAditionalGroup(ids)
+        adicionales.value = await adicionalesService.getAditionalGroup(ids,sitestore.location?.site?.site_id)
     }
 })
 

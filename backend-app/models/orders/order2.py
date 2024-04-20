@@ -106,17 +106,31 @@ class Order2:
         
         # Consulta para insertar el estado de la orden
         order_status_insert_query = """
-        INSERT INTO orders.order_status (order_id, status, timestamp)
-        VALUES (%s, %s, %s);
+        INSERT INTO orders.order_status (order_id, status)
+        VALUES (%s, %s);
         """
-        self.cursor.execute(order_status_insert_query, (order_id, 'generada', now_colombia))
+        self.cursor.execute(order_status_insert_query, (order_id, 'generada',))
         
         # Consulta para insertar el historial del estado de la orden
         order_status_history_insert_query = """
-        INSERT INTO orders.order_status_history (order_id, status, timestamp)
-        VALUES (%s, %s, %s);
+        INSERT INTO orders.order_status_history (order_id, status)
+        VALUES (%s, %s);
         """
-        self.cursor.execute(order_status_history_insert_query, (order_id, 'generada', now_colombia))
+        self.cursor.execute(order_status_history_insert_query, (order_id, 'generada',))
+        
+        
+    def get_order_count_by_site_id(self,site_id):
+        order_query = f"""
+        SELECT COUNT(*) FROM orders.orders WHERE site_id = {site_id};
+        """
+        
+        self.cursor.execute(order_query)
+        result  = self.cursor.fetchone()[0]
+
+        return result
+        
+        
+        
 
     
     def get_orders_by_site_id_for_today(self, site_id):

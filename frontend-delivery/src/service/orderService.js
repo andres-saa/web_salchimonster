@@ -25,6 +25,23 @@ export const orderService = {
 
     },
 
+
+    async getOrderCount(site_id) {
+        
+        try {
+            const response = await axios.get(`${URI}/get_order_count_by_site_id/${site_id}`);
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                console.error('An error occurred while fetching the ingredients:', response.status);
+                return null;
+            }
+        } catch (error) {
+            console.error('An error occurred while fetching the ingredients:', error);
+            return null;
+        }
+    },
+
     async prepareOrder(order_id) {
         const store = useOrderStore()
         store.setVisible('currentOrder',false)

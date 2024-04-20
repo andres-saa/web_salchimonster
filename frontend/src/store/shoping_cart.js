@@ -18,7 +18,8 @@
                 products: [],
                 total_cost: 0,
                 additions: []  // Nueva propiedad para manejar las adiciones a nivel del carrito
-            }
+            },
+            sending_order:false
         }),
        
             getters: {

@@ -18,10 +18,11 @@ export const adicionalesService = {
         }
     },
     
-    async getAditionalGroup(product_instance_ids) {
+    async getAditionalGroup(product_instance_ids, site_id) {
         // Prepare the request body to match the expected structure: { instance_product_ids: [...] }
         const requestBody = {
-            instance_product_ids: product_instance_ids
+            instance_product_ids: product_instance_ids,
+            site_id:site_id
         };
     
         try {
