@@ -25,8 +25,11 @@
     style="width: 30rem;max-height: 80vh;position: relative;">
     <div id="factura">
 
-      <div class="" style="width: 100%;padding: ;">
 
+     
+    
+      <div class="" style="width: 100%;padding: ;">
+       
           <p class="" style="font-weight: bold;width: max-content; color: black;font-size: 1.7rem; margin:0rem auto;"> #{{ store.currentOrder.order_id }} </p>
 
 
@@ -40,9 +43,9 @@
               </p>
            
 
-
+ <!-- <img src="https://cocina.salchimonster.com/images/logo.png" alt="" style="width: 2cm;"> -->
           <div class=""
-            style="font-weight: bold;color:white;margin: 0; background-color: black;align-items: center;display: grid; grid-template-columns: 50% 8.33%  16.6% 25%; ">
+            style="font-weight: bold;color:white;margin: 0; background-color: black;align-items: center;display: grid; grid-template-columns: 60%  20% 20%; ">
 
             <div style="width: 100%;" >
 
@@ -50,18 +53,21 @@
 
 
             </div>
-            <div >
+            <!-- <div >
               <b>
 
                 x
               </b>
-            </div>
+            </div> -->
             <div>
-              <p style="text-align: end;">
-                <!-- {{ formatoPesosColombianos(product.price) }} -->
-                val
+              <p style="text-align: end;font-weight: bold;">
+            
+                <b style="text-align: end;">
+                  valor
+                </b>
               </p>
             </div>
+            
             <div >
               <p style="text-align: end;font-weight: bold;">
                 <b>
@@ -75,19 +81,14 @@
 
           <div  v-for="product in store.currentOrder.products">
 
-            <div style="display: grid; grid-template-columns: 50% 8.33%  16.6% 25%;">
+            <div style="display: grid; grid-template-columns: 60%  20% 20%;">
               <div >
               <span>
-
+                {{ product.quantity }}  --
                 {{ product.name }}
               </span>
             </div>
-            <div >
-              <span>
-                <!-- {{ formatoPesosColombianos(product.price) }} -->
-                {{ product.quantity }}
-              </span>
-            </div>
+          
             <div >
               <p style="text-align: end;color: black;">
                 <!-- {{ formatoPesosColombianos(product.price) }} -->
@@ -125,19 +126,14 @@
 
 
             <div   v-for="aditional in items">
-              <div style="display: grid; grid-template-columns: 50% 8.33%  16.6% 25%;">
+              <div style="display: grid; grid-template-columns: 60%  20% 20%;">
 
                 <div >
                   <p >
-                    {{ aditional.aditional_name }}
+                    {{ aditional.aditional_quantity }} --  {{ aditional.aditional_name }}
                   </p>
                 </div>
-                <div >
-                  <span>
-                    <!-- {{ formatoPesosColombianos(product.price) }} -->
-                    {{ aditional.aditional_quantity }}
-                  </span>
-                </div>
+
                 <div >
                   <p style="text-align: end;color: black;">
                     <!-- {{ formatoPesosColombianos(product.price) }} -->
@@ -380,7 +376,7 @@ const IMPRIMIR = () => {
     ventanaImpresion.document.write(estilosPagina[i].outerHTML);
   }
 
-  ventanaImpresion.document.write('<style>  @media print {  html{height: min-content;}  *{text-transform:uppercase;align-items:center; font-family: sans-serif;padding:0;margin:0; font-size:0.9rem !IMPORTANT} body { padding:0.5rem; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
+  ventanaImpresion.document.write('<style>  @media print {  html{height: min-content;}  *{text-transform:uppercase;align-items:center; font-family: sans-serif;padding:0;margin:0; font-size:10pt !IMPORTANT} body { padding:0.5cm; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
   ventanaImpresion.document.write('</head><body>');
   ventanaImpresion.document.write(contenidoFactura);
 
