@@ -210,14 +210,14 @@ class Order2:
         INSERT INTO orders.order_status (order_id, status)
         VALUES (%s, 'en preparacion');
         """
-        self.cursor.execute(prepare_query, (order_id))
+        self.cursor.execute(prepare_query, (order_id,))
         
         # Inserta el historial del estado
         history_query = """
         INSERT INTO orders.order_status_history (order_id, status)
         VALUES (%s, 'en preparacion');
         """
-        self.cursor.execute(history_query, (order_id))
+        self.cursor.execute(history_query, (order_id,))
         self.conn.commit()
 
     def cancel_order(self, order_id, responsible, reason):
