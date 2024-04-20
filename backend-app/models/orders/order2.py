@@ -229,19 +229,19 @@ class Order2:
 
         # Cancela la orden
         cancel_query = """
-        INSERT INTO orders.order_status (order_id, status, reason, responsible)
-        VALUES (%s, 'cancelada', %s, %s);
+        INSERT INTO orders.order_status (order_id, status, reason, responsible, timestamp)
+        VALUES (%s, 'cancelada', %s, %s, %s);
         """
-        self.cursor.execute(cancel_query, (order_id, reason, responsible))
+        self.cursor.execute(cancel_query, (order_id, reason, responsible, now_colombia))
         
         # Inserta el historial del estado
         history_query = """
-        INSERT INTO orders.order_status_history (order_id, status, reason, responsible)
-        VALUES (%s, 'cancelada', %s, %s);
+        INSERT INTO orders.order_status_history (order_id, status, reason, responsible, timestamp)
+        VALUES (%s, 'cancelada', %s, %s, %s);
         """
-        self.cursor.execute(history_query, (order_id, reason, responsible))
+        self.cursor.execute(history_query, (order_id, reason, responsible, now_colombia))
         self.conn.commit()
-    
+        
     def send_order(self, order_id):
         # Define la zona horaria de Colombia
         colombia_tz = pytz.timezone('America/Bogota')
@@ -249,19 +249,18 @@ class Order2:
 
         # Actualiza el estado de la orden a 'enviada'
         send_order_query = """
-        INSERT INTO orders.order_status (order_id, status)
-        VALUES (%s, 'enviada');
-        """
-        self.cursor.execute(send_order_query, (order_id))
-        
-        # Inserta el historial del estado
-        order_status_history_insert_query = """
-        INSERT INTO orders.order_status_history (order_id, status)
+        INSERT INTO orders.order_status (order_id, status, timestamp)
         VALUES (%s, 'enviada', %s);
         """
-        self.cursor.execute(order_status_history_insert_query, (order_id))
+        self.cursor.execute(send_order_query, (order_id, now_colombia))
+
+        # Inserta el historial del estado
+        order_status_history_insert_query = """
+        INSERT INTO orders.order_status_history (order_id, status, timestamp)
+        VALUES (%s, 'enviada', %s);
+        """
+        self.cursor.execute(order_status_history_insert_query, (order_id, now_colombia))
         self.conn.commit()
-  
   
     def update_product_instance_status(self, product_instance_id, new_status):
         """
