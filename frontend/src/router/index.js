@@ -8,7 +8,8 @@ import { URI } from '@/service/conection'
 import { menuOptions } from '@/service/menuOptions';
 import { ableMenu } from '../service/menuOptions';
 import { thanks_data } from '../service/order';
-
+import { verCerrado } from '../service/state';
+import { useSitesStore } from '../store/site';
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -108,7 +109,7 @@ const router = createRouter({
           path: '/cart',
           name: 'cart',
           component: () => import('@/views/pages/cart.vue'),
-          // meta: { requirelocation: true },
+          meta: { requireOpen: true },
           // meta: { requireMenu: true },
         },
         {
@@ -348,21 +349,37 @@ const router = createRouter({
 // });
 
 
-// router.beforeEach((to, from, next) => {
-//   if (to.matched.some(record => record.meta.requirePay)) {
-//     const token = thanks_data.value?.user_data;
-//     if (!token) {
-//       // Si no hay token, redirige a la página de inicio de sesión
-//       next('/');
-//     } else {
-//       // Si hay token, permite el acceso
-//       next();
-//     }
-//   } else {
-//     // Si la ruta no requiere autenticación, permite el acceso
-//     next();
-//   }
-// });
+  const estado = async(site_id) => {
+  const response = await fetch(`${URI}/site/${site_id}/status`);
+  const data = await response.json();
+return data
+// console.log(data)
+}
+
+router.beforeEach(async(to, from, next) => {
+  const store  = useSitesStore()
+  const site_id = store.location.site.site_id
+  // alert(site_id)
+  // console.log(site_id)
+  const open = await estado(site_id)
+  console.log(open)
+
+  if (to.matched.some(record => record.meta.requireOpen)) {
+    // const token = thanks_data.value?.user_data;
+
+    if (open.status == 'closed') {
+      verCerrado.value = true
+      next(false)
+
+    } else {
+      // Si hay token, permite el acceso
+      next();
+    }
+  } else {
+    // Si la ruta no requiere autenticación, permite el acceso
+    next();
+  }
+});
 
 
 pixel.init()

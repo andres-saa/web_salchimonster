@@ -264,12 +264,6 @@ const showElement = ref(true);
 
 const enviarAlCarro = ()=> {
 
-  const estado = localStorage.getItem('estado')
-    if(estado && estado=='cerrado'){
-        verCerrado.value = true
-        return
-    }
-    
   router.push('/cart')
 }
 </script>
