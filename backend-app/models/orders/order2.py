@@ -147,10 +147,10 @@ class Order2:
         combined_order_query = f"""
             SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone
             FROM orders.combined_order_view
-            WHERE site_id = %s 
+            WHERE site_id = %s AND latest_status_timestamp >= %s AND latest_status_timestamp < %s
             ORDER BY order_id, latest_status_timestamp DESC;
             """
-        self.cursor.execute(combined_order_query, (site_id,))
+        self.cursor.execute(combined_order_query, (site_id,today_start,tomorrow_start))
         orders_info = self.cursor.fetchall()
         columns_info = [desc[0] for desc in self.cursor.description]
         orders_dict = [dict(zip(columns_info, row)) for row in orders_info]
