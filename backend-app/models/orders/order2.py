@@ -26,13 +26,19 @@ class Order2:
         
     def create_order(self, order_data: OrderSchemaPost):
         user_id = self.create_user(order_data.user_data)
-        order_id = self.create_order_entry(user_id, order_data)
-        self.insert_order_details(order_id, order_data)
-        self.insert_order_products(order_id, order_data)
-        self.insert_order_aditionals(order_id, order_data)
-        self.update_order_status(order_id, order_data.order_status)
-        self.insert_order_notes(order_id,order_data.order_notes)
-        self.conn.commit()
+        # Verificar si el usuario puede realizar una nueva orden
+        if self.can_place_order(user_id):
+            order_id = self.create_order_entry(user_id, order_data)
+            self.insert_order_details(order_id, order_data)
+            self.insert_order_products(order_id, order_data)
+            self.insert_order_aditionals(order_id, order_data)
+            self.update_order_status(order_id, order_data.order_status)
+            self.insert_order_notes(order_id,order_data.order_notes)
+            # Actualizar la última hora de compra
+            self.update_last_order_time(user_id)
+            self.conn.commit()
+        else:
+            None
 
     def create_user(self, user_data):
         user_id = User().insert_user(user_data)
@@ -277,6 +283,62 @@ class Order2:
         """
         self.cursor.execute(update_query, (new_status, product_instance_id))
         self.conn.commit()
+        
+        
+        
+        
+        
+        
+        
+        
+    def can_place_order(self, user_id):
+        query = """
+        SELECT last_order_time
+        FROM orders.user_last_order_time
+        WHERE user_id = %s;
+        """
+        self.cursor.execute(query, (user_id,))
+        result = self.cursor.fetchone()
+        if result:
+            last_order_time = result[0]
+            # Define la zona horaria de Colombia
+            colombia_tz = pytz.timezone('America/Bogota')
+            now_colombia = datetime.now(colombia_tz)
+            elapsed_time = now_colombia - last_order_time
+            # Verificar si han pasado al menos 30 segundos
+            return elapsed_time.total_seconds() > 10
+        else:
+            # Si no hay registro previo, el usuario puede realizar una orden
+            return True
+        
+    
+    
+    
+    
+    def update_last_order_time(self, user_id):
+        # Define la zona horaria de Colombia
+        colombia_tz = pytz.timezone('America/Bogota')
+        now_colombia = datetime.now(colombia_tz)
+
+        query = """
+        UPDATE orders.user_last_order_time
+        SET last_order_time = %s
+        WHERE user_id = %s;
+        """
+        self.cursor.execute(query, (now_colombia, user_id))
+        if self.cursor.rowcount == 0:  # Si no existía un registro previo
+            insert_query = """
+            INSERT INTO orders.user_last_order_time (user_id, last_order_time)
+            VALUES (%s, %s);
+            """
+            self.cursor.execute(insert_query, (user_id, now_colombia))
+
+            
+            
+            
+        
+        
+        
         
     def close_connection(self):
         self.conn.close()
