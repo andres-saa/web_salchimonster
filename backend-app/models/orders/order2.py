@@ -37,8 +37,17 @@ class Order2:
             # Actualizar la última hora de compra
             self.update_last_order_time(user_id)
             self.conn.commit()
+            return order_id
         else:
-            None
+            
+            last_order_query = f"SELECT id FROM orders.orders where user_id = {user_id} ORDER BY id DESC LIMIT 1;"
+            self.cursor.execute(last_order_query)
+            order_id = self.cursor.fetchone()[0]   
+            return order_id
+            
+            
+            
+            
 
     def create_user(self, user_data):
         user_id = User().insert_user(user_data)
