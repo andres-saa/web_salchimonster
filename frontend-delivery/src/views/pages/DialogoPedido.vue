@@ -21,21 +21,22 @@
 
 
 
-  <Dialog closeOnEscape :closable="false" v-model:visible="store.visibles.currentOrder" modal
-    style="width: 30rem;max-height: 80vh;position: relative;">
-    <div id="factura">
+  <Dialog  closeOnEscape :closable="false" v-model:visible="store.visibles.currentOrder" modal
+    style="max-height: 80vh;width: 35rem; position: relative;">
+    
+    <div id="factura" style="width: 100%;">
 
 
      
     
-      <div class="" style="width: 100%;padding: ;">
+      <div class="" style="width: auto;">
        
-          <p class="" style="font-weight: bold;width: max-content; color: black;font-size: 1.7rem; margin:0rem auto;"> #{{ store.currentOrder.order_id }} </p>
+          <p class="" style="font-weight: bold;min-width: 100%; width: max-content; text-align: center; color: black;font-size: 1.7rem; margin:0rem;"> #{{ store.currentOrder.order_id }} </p>
 
 
 
           
-              <p style="padding: 0; margin: 0 auto;margin-bottom: 1rem; width: max-content; ">
+              <p style="padding: 0; margin: auto;margin-bottom: 1rem; width: max-content;min-width: max-content; ">
                 <b>
                   fecha: {{ store.currentOrder.latest_status_timestamp?.split('T')[0] }}
 
@@ -348,9 +349,7 @@ import { formatoPesosColombianos } from '../../service/formatoPesos';
 import { onMounted, ref } from 'vue'
 import { useOrderStore } from '../../store/order'
 import { orderService } from '../../service/orderService';
-
-
-
+import printJS from 'print-js';
 
 
 
@@ -361,37 +360,62 @@ import { orderService } from '../../service/orderService';
 
 const store = useOrderStore()
 
+// const IMPRIMIR = () => {
+//   const contenidoFactura = document.getElementById('factura').innerHTML;
+
+//   // Abrir una nueva ventana para imprimir
+//   const ventanaImpresion = window.open('', '_blank');
+
+//   ventanaImpresion.document.write('<html><head><title>Factura</title>');
+
+//   // Copiar estilos CSS de la página principal a la ventana de impresión
+//   const estilosPagina = document.getElementsByTagName('style');
+
+//   for (let i = 0; i < estilosPagina.length; i++) {
+//     ventanaImpresion.document.write(estilosPagina[i].outerHTML);
+//   }
+
+//   ventanaImpresion.document.write('<style>  @media print {  html{height: min-content;}  *{text-transform:uppercase;align-items:center; width:100%; font-family: sans-serif;padding:0;margin:0; font-size:o.9rem !IMPORTANT} body { padding:0; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
+//   ventanaImpresion.document.write('</head><body>');
+//   ventanaImpresion.document.write(contenidoFactura);
+
+//   ventanaImpresion.document.write('</body></html>');
+
+//   ventanaImpresion.document.close();
+
+//   // Imprimir la ventana
+//   ventanaImpresion.print();
+
+//   // Cerrar la ventana después de 1 segundo (puedes ajustar este tiempo)
+//   setTimeout(() => {
+//     ventanaImpresion.close();
+//   }, 0.01);
+// };
+
+
 const IMPRIMIR = () => {
-  const contenidoFactura = document.getElementById('factura').innerHTML;
-
-  // Abrir una nueva ventana para imprimir
-  const ventanaImpresion = window.open('', '_blank');
-
-  ventanaImpresion.document.write('<html><head><title>Factura</title>');
-
-  // Copiar estilos CSS de la página principal a la ventana de impresión
-  const estilosPagina = document.getElementsByTagName('style');
-
-  for (let i = 0; i < estilosPagina.length; i++) {
-    ventanaImpresion.document.write(estilosPagina[i].outerHTML);
-  }
-
-  ventanaImpresion.document.write('<style>  @media print {  html{height: min-content;}  *{text-transform:uppercase;align-items:center; width:100%; font-family: sans-serif;padding:0;margin:0; font-size:o.9rem !IMPORTANT} body { padding:0; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
-  ventanaImpresion.document.write('</head><body>');
-  ventanaImpresion.document.write(contenidoFactura);
-
-  ventanaImpresion.document.write('</body></html>');
-
-  ventanaImpresion.document.close();
-
-  // Imprimir la ventana
-  ventanaImpresion.print();
-
-  // Cerrar la ventana después de 1 segundo (puedes ajustar este tiempo)
-  setTimeout(() => {
-    ventanaImpresion.close();
-  }, 0.01);
+  printJS({
+    printable: 'factura',
+    type: 'html',
+    targetStyles: ['*'],
+    // style: `
+    //   html, body {
+    //     width: 100%;
+    //   }
+    //   #factura {
+    //     width: 100%; // Asegúrate de que #factura es el ID del contenedor principal de tu contenido imprimible
+    //     max-width: 100%;
+    //   }
+    //   .page-content { // Suponiendo que .page-content es una clase que puede estar afectando el contenido
+    //     width: 100%;
+    //     box-sizing: border-box;
+    //     padding: 10mm;
+    //   }
+    // `
+  });
 };
+
+
 
 onMounted(async () => {
   store.currentOrder.value = store.currentOrder
@@ -445,7 +469,7 @@ button {
 }
 * {
   text-transform: uppercase;
-  font-size: 0.9rem;
+  font-size: 12pt;
   /* color: black; */
 }
 
@@ -468,6 +492,37 @@ span {
   text-transform: uppercase;
   /* color: black; */
 }
+
+
+
+
+
+
+  @media print {
+    html, body {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; 
+    }
+    #factura {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box; 
+      font-size: 12pt;
+    }
+    .page-content {
+      width: 100%;
+      padding: 10mm;
+    }
+    #dialogo{
+      width: 890rem !important; 
+    }
+  }
+
+
+
+
 </style>
 
 
