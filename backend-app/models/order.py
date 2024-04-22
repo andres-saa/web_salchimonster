@@ -4,7 +4,8 @@ import os
 import json
 import locale
 from datetime import datetime, timedelta
-
+import pytz
+from datetime import datetime
 from schema.order import order_schema_post
 load_dotenv()
 
@@ -48,13 +49,12 @@ class Order:
 
 
 
+
+
     def get_sales_report_by_site_and_status(self, site_ids, status, start_date, end_date):
-        # Convert site_ids to a list if a single ID is provided
         if not isinstance(site_ids, list):
             site_ids = [site_ids]
 
-        # Assume input dates are given in Colombian time and convert them to UTC
-        # Here, you adjust both the input and output times to handle time zones correctly
         query = """
         SELECT
             SUM(co.total_order_price) AS total_sales,
@@ -75,7 +75,7 @@ class Order:
                         'payment_method', co.payment_method,
                         'total_order_price', co.total_order_price,
                         'current_status', co.current_status,
-                        'latest_status_timestamp', (co.latest_status_timestamp AT TIME ZONE 'UTC') AT TIME ZONE 'America/Bogota',
+                        'latest_status_timestamp', co.latest_status_timestamp,
                         'responsible', co.responsible,
                         'reason', co.reason,
                         'user_name', co.user_name,
@@ -86,18 +86,29 @@ class Order:
         FROM
             orders.combined_order_view co
         WHERE
-            (co.latest_status_timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'America/Bogota') >= %s AND
-            (co.latest_status_timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'America/Bogota') <= %s AND
+            co.latest_status_timestamp >= %s AND
+            co.latest_status_timestamp <= %s AND
             co.site_id = ANY(%s) AND
             co.current_status = %s
         """
 
         self.cursor.execute(query, (start_date, end_date, site_ids, status))
         result = self.cursor.fetchone()
+
         if result:
-            total_sales, total_orders, average_ticket, orders_info = result
+            total_sales, total_orders, average_ticket, orders_info_json = result
             if average_ticket:
                 average_ticket = round(average_ticket)  # Round the average ticket
+
+            # Convert timestamp to Colombia time zone (UTC-5)
+            tz_utc = pytz.utc
+            tz_colombia = pytz.timezone('America/Bogota')
+            orders_info = []
+            for order in orders_info_json:
+                timestamp_utc = datetime.fromisoformat(order['latest_status_timestamp'].replace("Z", "+00:00"))
+                timestamp_colombia = timestamp_utc.astimezone(tz_colombia)
+                order['latest_status_timestamp'] = timestamp_colombia.isoformat()
+                orders_info.append(order)
         else:
             total_sales = total_orders = average_ticket = 0
             orders_info = []
@@ -109,6 +120,71 @@ class Order:
             'orders_info': orders_info
         }
 
+
+
+    # def get_sales_report_by_site_and_status(self, site_ids, status, start_date, end_date):
+    # # Convert site_ids to a list if a single ID is provided
+    #     if not isinstance(site_ids, list):
+    #         site_ids = [site_ids]
+
+    #     # Adjusted SQL query to include detailed order information in JSON format
+    #     query = """
+    #     SELECT
+    #         SUM(co.total_order_price) AS total_sales,
+    #         COUNT(co.order_id) AS total_orders,
+    #         CAST(
+    #             AVG(co.total_order_price)
+    #             AS NUMERIC
+    #         ) AS average_ticket,
+    #         COALESCE(
+    #             JSON_AGG(
+    #                 JSON_BUILD_OBJECT(
+    #                     'order_id', co.order_id,
+    #                     'user_id', co.user_id,
+    #                     'site_name', co.site_name,
+    #                     'delivery_person_id', co.delivery_person_id,
+    #                     'order_notes', co.order_notes,
+    #                     'delivery_price', co.delivery_price,
+    #                     'payment_method', co.payment_method,
+    #                     'total_order_price', co.total_order_price,
+    #                     'current_status', co.current_status,
+    #                     'latest_status_timestamp', co.latest_status_timestamp,
+    #                     'responsible', co.responsible,
+    #                     'reason', co.reason,
+    #                     'user_name', co.user_name,
+    #                     'user_address', co.user_address,
+    #                     'user_phone', co.user_phone
+    #                 )
+    #             ), '[]') AS orders_info
+    #     FROM
+    #         orders.combined_order_view co
+    #     WHERE
+    #         co.latest_status_timestamp >= %s AND
+    #         co.latest_status_timestamp <= %s AND
+    #         co.site_id = ANY(%s) AND
+    #         co.current_status = %s
+    #     """
+
+    #     # Execute the query with date range, site_ids, and status as parameters
+    #     self.cursor.execute(query, (start_date, end_date, site_ids, status))
+    #     result = self.cursor.fetchone()
+    #     if result:
+    #         total_sales, total_orders, average_ticket, orders_info = result
+    #         if average_ticket:
+    #             average_ticket = round(average_ticket)  # Round the average ticket
+    #     else:
+    #         total_sales = total_orders = average_ticket = 0
+    #         orders_info = []
+
+    #     return {
+    #         'total_sales': total_sales,
+    #         'total_orders': total_orders,
+    #         'average_ticket': average_ticket,
+    #         'orders_info': orders_info  # This will contain detailed information about each order
+    #     }
+
+
+    
 #     def get_sales_report_by_site_and_status(self, site_ids, status, start_date, end_date):
 #         # Convertir site_ids en una lista si solo se proporciona un ID
 #         if not isinstance(site_ids, list):
