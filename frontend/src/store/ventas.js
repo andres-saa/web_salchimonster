@@ -426,27 +426,15 @@ export const useReportesStore = defineStore('reportes', {
           },
           
           setLoading(visibleValue, titleValue = 'cargando') {
-            // Comprobación comentada previamente
-            // if (this.loading.visible && visibleValue) {
-            //   return;
-            // }
-          
+
             // Si visibleValue es true, actualiza inmediatamente
-            if (visibleValue) {
+           
               this.loading = {
                 visible: visibleValue,
                 tittle: titleValue
               };
-            } else {
-              // Si visibleValue es false, espera 1 segundo antes de actualizar
-              setTimeout(() => {
-                this.loading = {
-                  visible: visibleValue,
-                  // El título se establece como 'cargando' cuando visible es falso, según la lógica original
-                  title: 'cargando'
-                };
-              }, 500); // 1000 milisegundos = 1 segundo
-            }
+
+            
           },
           
 

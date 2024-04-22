@@ -9,7 +9,7 @@ const URI = 'https://backend.salchimonster.com'
 const URI_SOCKET = 'backend.salchimonster.com'
 // const URI_SOCKET = 'localhost:8000'
 export {URI,URI_SOCKET}
-
+    
 
 // const products = [
 //     {

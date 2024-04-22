@@ -6,22 +6,18 @@
     
 
 
-  <CarouselBanner v-if="route.path == '/'" ></CarouselBanner>
+  <CarouselBanner v-if="route.path == '/'" />
   <!-- <img src="/images/banners/banner-1.jpeg" class="pb-6" alt="" style="width: 100%; "> -->
   <!-- <Button  style="position: sticky;top:rem;z-index: 1000; left:-0.5rem;" severity="help" text icon="pi pi-angle-left text-4xl"></Button> -->
 
-  <BarraCategorias style=""></BarraCategorias>
+  <BarraCategorias/>
 
 
-<!-- <Button  style="position: absolute; right: 0rem;" severity="help" text icon="pi pi-angle-right text-4xl"></Button> -->
 
-  <transition name="fade">
-        <RouterView style="">
+        <RouterView />
         
-        </RouterView>
-    </transition>
 
- 
+
 
 
 
@@ -126,118 +122,3 @@ onMounted(async () => {
 });
 
 </script>
-
-<style scoped>
-.boton-menu {
-    margin: 0;
-    border: none;
-    background-color: transparent;
-    font-size: 20px;
-    padding: 0 20px;
-}
-
-.menu-button {
-    background-color: transparent;
-    padding: 1rem;
-    margin: 0 1rem;
-    border: none;
-    font-size: 20px;
-    /* transition: all  0.3s; */
-    /* font-weight: bold; */
-}
-
-.menu-button:hover {
-    /* box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5); */
-    /* transform: scale(1.1); */
-    /* border-bottom:  2px red; */
-    /* color: var(--primary-color); */
-    /* padding:; */
-    cursor: pointer;
-
-
-}
-*:focus{
-    outline: none;
-}
-
-::-webkit-scrollbar {
-  width: 12px;
-  display: none;
-
-
-   /* Ancho de la barra de desplazamiento */
-}
-
-
-
-/* Estilo del pulgar de la barra de desplazamiento */
-/* WebKit (Chrome, Safari) */
-::-webkit-scrollbar-thumb {
-
-  background-color: white; /* Color del pulgar de la barra de desplazamiento */
-  border-radius: 6px; /* Radio de esquinas del pulgar */
-  transform: translateY(40px);
-  /* padding: 50px; */
-  /* display: none; */
-}
-
-.selected {
-    /* color: var(--primary-color); */
-    box-shadow: 0 0.5rem var(--primary-color);
-    /* padding: 1rem; */
-    /* font-weight: bold; */
-
-
-}
-
-.col-12 {
-    width: 100vw;
-    /* position: absolute; */
-    left: 0;
-    padding: 1.5rem;
-}
-
-
-
-
-/* Estado Final de Salida: desvanecido y desplazado hacia la derecha */
-
-/* Estado Inicial de Entrada: ligeramente desplazado hacia arriba y desenfocado */
-
-
-/* Estado Final de Entrada: totalmente opaco, sin desplazamiento y enfocado */
-
-
-
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-/* Estado Final de Salida: desvanecido y desplazado hacia la derecha */
-.fade-leave-to {
-  opacity: 0;
-  transform: translateX(20rem);
-}
-
-/* Estado Inicial de Entrada: ligeramente desplazado hacia arriba y desenfocado */
-.fade-enter-from {
-  opacity: 0;
-  transform: translateY(-10vh);
-  filter: blur(10px);
-}
-
-/* Estado Final de Entrada: totalmente opaco, sin desplazamiento y enfocado */
-.fade-enter-to {
-  opacity: 1;
-  transform: translateY(0);
-  filter: blur(0);
-}
-
-
-
-
-
-
-
-</style>

@@ -12,7 +12,8 @@
             currentProduct: {},
             visibles: {
                 currentProduct: false,
-                addAdditionToCart: false
+                addAdditionToCart: false,
+                last_order:''
             },
             cart: {
                 products: [],

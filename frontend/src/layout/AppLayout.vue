@@ -62,7 +62,6 @@ const isOutsideClicked = (event) => {
     <div class="layout-wrapper col-12 " :class="containerClass">
         <div class="col-12"
             style=" height: 150vh;top: -1rem; position: fixed; background-color: red; z-index:9999; left: 100%;box-shadow: 0 0 30px rgba(0, 0, 0, 0.585);">
-
         </div>
 
         <div class="col-12"
@@ -82,12 +81,10 @@ const isOutsideClicked = (event) => {
 
                 <transition name="fade">
                     <router-view class="p-0"></router-view>
-
                 </transition>
             </div>
-            <app-footer></app-footer>
+            <!-- <app-footer></app-footer> -->
         </div>
-        <!-- <app-config></app-config> -->
         <div class="layout-mask"></div>
     </div>
 </template>
@@ -95,26 +92,20 @@ const isOutsideClicked = (event) => {
 <style lang="scss" scoped>
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.1s ease, transform 0.1s ease;
 }
 
-/* Estado Final de Salida: desvanecido y desplazado hacia la derecha */
 .fade-leave-to {
   opacity: 0;
-  transform: translateX(20rem);
 }
 
-/* Estado Inicial de Entrada: ligeramente desplazado hacia arriba y desenfocado */
 .fade-enter-from {
   opacity: 0;
-  transform: translateY(-10vh);
-  filter: blur(10px);
+
 }
 
-/* Estado Final de Entrada: totalmente opaco, sin desplazamiento y enfocado */
 .fade-enter-to {
   opacity: 1;
-  transform: translateY(0);
-  filter: blur(0);
+
 }
 </style>

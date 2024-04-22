@@ -49,13 +49,7 @@ if(!siteId){
   }
 };
 
-
-
-
-
-
-
-    const intervalId = setInterval(obtenerEstado, 3000);
+    const intervalId = setInterval(obtenerEstado, 60000);
 
     // Llamar a obtenerEstado cuando el componente se monta
     onMounted(obtenerEstado);

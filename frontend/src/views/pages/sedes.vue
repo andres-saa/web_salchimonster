@@ -4,18 +4,18 @@
 <div class="grid col-12 lg:col-10 m-auto p-3 m-0 mb-8" style="max-width: 1024px">
     <div 
         v-for="sede in sedes.filter(sede => sede.city_id && sede.show_on_web)" 
-        style="border-radius: 1rem; overflow: hidden;" 
+        style="border-radius: 0.5rem; overflow: hidden;" 
         class="col-12 lg:col-6 p-0 mb-3 lg:p-3 m-0"
     >
-        <div class="col-12 p-0 m-0" style="position: relative;overflow: hidden;height: min-content;box-shadow: 0 0 10px black; border-radius: 1rem;">
+        <div class="col-12 p-0 m-0 shadow-3" style="position: relative;overflow: hidden;height: min-content;box-shadow: 0 0 10px black; border-radius: 0.5rem;">
             <img 
-                style="object-fit:cover; border-radius: 1rem; width: 100%;height: 30rem;"
+                style="object-fit:cover; border-radius: 0.5rem; width: 100%;height: 30rem;"
                 :src="`${URI}/read-product-image/600/site-${sede.site_id}`"
                 alt=""
             >
             <div 
                 class="xl:pl-4 pl-2" 
-                style="width: 100%;height: 40%;background: linear-gradient(to top, black, transparent);position: absolute; display: flex; flex-direction: column; justify-content: end;left: 0;bottom: 0;border-radius:0 0 1rem 1rem;"
+                style="width: 100%;height: 40%;background: linear-gradient(to top, black, transparent);position: absolute; display: flex; flex-direction: column; justify-content: end;left: 0;bottom: 0;border-radius:0 0 0.5rem 0.5rem;"
             >
                 <p class="xl:text-xl text-l m-0 " style="font-weight: bold; color:var(--primary-color)">
                     <span class="pr-4" style="text-transform: uppercase;">

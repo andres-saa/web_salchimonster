@@ -49,7 +49,7 @@
           <div style="position: relative;" :key="product.id" v-for="product in store.cart.products.slice(0, 4)">
             <Button class="p-0" :label="product.quantity" severity="danger" rounded style="width: 1.2rem;font-size: 0.8rem; height: 1.2rem;top: -.3rem; right: -.5rem; position: absolute;"/>
             <img class="img-cart" @mouseover="() => vueMenu = true" style="height: 2rem; object-fit: contain;"
-              :src="`https://backend.salchimonster.com/read-product-image/300/${product.product.product_name}`" alt="">
+              :src="`https://backend.salchimonster.com/read-product-image/96/${product.product.product_name}`" alt="">
             
           </div>
 
@@ -72,25 +72,6 @@
       </p>
       
 
-      <!-- <RouterLink style="background-color: green;" to="/pay" v-if="carro.products.length > 0 && screenWidth>555">
-        <button  class=" ordenar  " style="text-decoration: none;  display: flex;
-                             background-color:var(--primary-color)  ; 
-                             color: white; 
-                             align-items: center;  
-                         
-                             gap: 20px; width: auto ;
-                             background-color:;padding: 0.1rem 1rem;
-                             height: 0%;">
-
-          <i style="font-size: 2rem;color: white; " class="icono" :class="PrimeIcons.MONEY_BILL"> </i>
-
-
-          <span style="font-size: 2rem; background-color: var();">
-            Ordenar
-          </span>
-        </button>
-      </RouterLink> -->
-
 
       <a v-if="store.cart.products.length > 0 && screenWidth>720" >
 
@@ -103,8 +84,7 @@
                             
 
 
-    /* box-shadow: 0px 0px 10px rgb(255, 255, 255); */
-
+    
     ">
           <span :class="topbarMenuClasses"  style="font-size:2rem ; font-weight: bold;">
             {{ formatoPesosColombianos(Number(calcularTotalCarrito())) }}</span>

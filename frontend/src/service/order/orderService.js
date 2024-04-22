@@ -38,8 +38,8 @@ const preparar_orden = () => {
 
   const order = {
     "order_products": order_products,
-    // "site_id": site_id,
-      "site_id": 12,
+    "site_id": site_id,
+    // "site_id": 12,
     "delivery_person_id": 4,
     "payment_method_id": user.user.payment_method_option?.id,
     "delivery_price": delivery_price,
@@ -74,8 +74,7 @@ export const orderService = {
       const response = await axios.post(`${URI}/order`, order);
       if (response.status === 200) {
         cart.sending_order = false
-        site.webSocket.send('pedido melo')
-
+        cart.last_order = response.data
         report.setLoading(false,"enviando tu pedido")
 
         user.user = {

@@ -1,8 +1,7 @@
 <template>
-    <!-- {{ store.cart }} -->
 
 
-    <div class="col-12  my-4 md:my-8 p-0">
+    <div class="col-12  my-4 md:my-8 p-0" v-if="store.cart.products.length > 0">
         <div class="grid mx-auto " style="max-width:800px;">
 
 
@@ -150,6 +149,9 @@
         </div>
     </div>
 
+    <div v-else class="col-12 " style="display: flex;justify-content: center;height: 90vh; align-items: center;">
+        <img style="border-radius: 0;width: 100%; max-width: 500px;" src="/images/empty-cart.jpg" alt="">
+    </div>
 
     <dialogAddAditions></dialogAddAditions>
 </template>

@@ -9,12 +9,8 @@
 <span class="a4-size mb-6" style="display: flex; height: auto;">
 
 
-<InputNumber v-model="order_id"  class="mr-5 px-2" style="width: 100%; " placeholder="Numero de pedido"></InputNumber>
+<InputText v-model="order_id"  class="mr-5 px-2" style="width: 100%; " placeholder="Numero de pedido"></InputText>
 <Button class="px-4" style="background-color: var(--primary-color); font-weight: bold; border: none;" @click="getOrder()">Buscar</Button>
-
-
-
-
 </span>
 
 
@@ -71,7 +67,6 @@
 <script setup> 
 
 import { ref } from 'vue';
-import Sesion_admin from './sesion_admin.vue';
 import Sesion_main from './sesion_main.vue';
 import pedidoItem from '../../components/pedidoItem.vue';
 import { URI } from '../../service/conection';

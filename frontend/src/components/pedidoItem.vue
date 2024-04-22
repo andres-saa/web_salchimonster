@@ -16,7 +16,7 @@
           order.order_id }}  <span class="col text-right m-3 p-0" style="color: black; font-weight: bold; min-width: max-content;"> {{
         obtenerHoraFormateadaAMPM(order.order_status.timestamp )  }}</span></span>
 
-        
+         
   
   
   
