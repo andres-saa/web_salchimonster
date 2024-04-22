@@ -8,6 +8,17 @@ from models.payment_method import Pyment_method
 order_router = APIRouter()
 from pydantic import BaseModel
 
+from fastapi import APIRouter
+from schema.order import order_schema_post
+from models.order import Order
+from fastapi import APIRouter, HTTPException
+from datetime import datetime
+
+order_router = APIRouter()
+
+
+
+
 
 connected_clients: Dict[int, List[WebSocket]] = {}
 
@@ -154,3 +165,100 @@ def send_order(order_id: str = Path(..., description="The ID of the order to be 
     return {"message": "Order has been sent", "order_id": order_id}
 
 
+
+@order_router.get("/sales_report")
+def get_sales_report(site_ids: str, status: str, start_date: str, end_date: str):
+    # Convertir la cadena de site_ids en una lista de enteros
+    site_ids_list = [int(sid) for sid in site_ids.split(",")]
+
+    # Crear una instancia de Order
+    order_instance = Order()
+
+    try:
+        # Convertir las cadenas de fecha en objetos datetime
+        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+
+        # Llamar al método get_sales_report_by_site_and_status
+        total_sales = order_instance.get_sales_report_by_site_and_status(
+            site_ids=site_ids_list, 
+            status=status, 
+            start_date=start_date_obj, 
+            end_date=end_date_obj
+        )
+
+        return {"total_sales": total_sales}
+
+    finally:
+        # Asegurarse de cerrar la conexión
+        order_instance.close_connection()
+
+
+
+
+@order_router.get("/order_total_price/{order_id}")
+def get_order_total_price(order_id: int):
+    order_instance = Order()
+    try:
+        total_price = order_instance.get_order_total_price(order_id)
+        if total_price is None:
+            raise HTTPException(status_code=404, detail="Order not found")
+        return {"order_id": order_id, "total_price": total_price}
+    finally:
+        order_instance.close_connection()
+
+
+
+@order_router.get("/daily_sales")
+async def get_daily_sales(site_ids: str, status: str, start_date: str, end_date: str):
+    site_ids_list = [int(sid) for sid in site_ids.split(",")]
+    order_instance = Order()
+    try:
+        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+        daily_sales = order_instance.get_daily_sales_report(
+            start_date=start_date_obj, 
+            end_date=end_date_obj, 
+            site_ids=site_ids_list, 
+            status=status
+        )
+        return daily_sales
+    finally:
+        order_instance.close_connection()
+
+@order_router.get("/daily_orders")
+async def get_daily_orders(site_ids: str, status: str, start_date: str, end_date: str):
+    site_ids_list = [int(sid) for sid in site_ids.split(",")]
+    order_instance = Order()
+    try:
+        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+        daily_orders_report = order_instance.get_daily_orders_report(
+            start_date=start_date_obj, 
+            end_date=end_date_obj, 
+            site_ids=site_ids_list, 
+            status=status
+        )
+        return daily_orders_report
+    finally:
+        order_instance.close_connection()
+
+
+
+@order_router.get("/daily_average_ticket")
+async def get_daily_average_ticket(site_ids: str, status: str, start_date: str, end_date: str):
+    site_ids_list = [int(sid) for sid in site_ids.split(",")]
+    order_instance = Order()
+    try:
+        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+        daily_average_ticket = order_instance.get_daily_average_ticket(
+            start_date=start_date_obj,
+            end_date=end_date_obj,
+            site_ids=site_ids_list,
+            status=status
+        )
+        return daily_average_ticket
+    finally:
+        order_instance.close_connection()
+        

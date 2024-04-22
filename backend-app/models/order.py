@@ -47,95 +47,57 @@ class Order:
             return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
 
-    
+
     def get_sales_report_by_site_and_status(self, site_ids, status, start_date, end_date):
-        # Convertir site_ids en una lista si solo se proporciona un ID
+        # Convert site_ids to a list if a single ID is provided
         if not isinstance(site_ids, list):
             site_ids = [site_ids]
 
-        # Consulta SQL ajustada para incluir el total de la orden en orders_info y añadir site_name
+        # Assume input dates are given in Colombian time and convert them to UTC
+        # Here, you adjust both the input and output times to handle time zones correctly
         query = """
         SELECT
-    SUM(
-        product_prices.total_product_price +
-        COALESCE(addition_prices.total_addition_price, 0) +
-        COALESCE(topping_prices.total_topping_price, 0) +
-        COALESCE(change_prices.total_change_price, 0) +
-        COALESCE(accompaniment_prices.total_accompaniment_price, 0) 
-        
-    ) AS total_sales,
-    COUNT(o.order_id) AS total_orders,
-    CAST(
-        SUM(
-            product_prices.total_product_price +
-            COALESCE(addition_prices.total_addition_price, 0) +
-            COALESCE(topping_prices.total_topping_price, 0) +
-            COALESCE(change_prices.total_change_price, 0) +
-            COALESCE(accompaniment_prices.total_accompaniment_price, 0) 
-        ) / NULLIF(COUNT(o.order_id), 0)
-        AS NUMERIC
-    ) AS average_ticket,
-    COALESCE(
-    JSON_AGG(
-        JSON_BUILD_OBJECT(
-            'order_id', o.order_id,
-            'status', o.order_status,
-            'total_price', product_prices.total_product_price +
-            COALESCE(addition_prices.total_addition_price, 0) +
-            COALESCE(topping_prices.total_topping_price, 0) +
-            COALESCE(change_prices.total_change_price, 0) +
-            COALESCE(accompaniment_prices.total_accompaniment_price, 0), -- Agregar el precio de entrega a cada orden
-            'site_name', s.site_name,
-            'products', o.order_products,  -- Incluir los productos de la orden
-            'delivery_price', o.delivery_price,
-            'payment_method',o.payment_method,
-            'user_data', o.user_data 
-
-
-        )
-    ), '[]') AS orders_info
-FROM
-    public.orders o
-JOIN public.sites s ON o.site_id = s.site_id 
-CROSS JOIN LATERAL (
-    SELECT SUM((product->>'price')::numeric) AS total_product_price
-    FROM json_array_elements(o.order_products) AS product
-) AS product_prices
-LEFT JOIN LATERAL (
-    SELECT SUM((addition->>'price')::numeric) AS total_addition_price
-    FROM json_array_elements(o.order_products) AS product,
-    json_array_elements(product->'adiciones') AS addition
-) AS addition_prices ON true
-LEFT JOIN LATERAL (
-    SELECT SUM((topping->>'price')::numeric) AS total_topping_price
-    FROM json_array_elements(o.order_products) AS product,
-    json_array_elements(product->'toppings') AS topping
-) AS topping_prices ON true
-LEFT JOIN LATERAL (
-    SELECT SUM((change->>'price')::numeric) AS total_change_price
-    FROM json_array_elements(o.order_products) AS product,
-    json_array_elements(product->'cambios') AS change
-) AS change_prices ON true
-LEFT JOIN LATERAL (
-    SELECT SUM((accompaniment->>'price')::numeric) AS total_accompaniment_price
-    FROM json_array_elements(o.order_products) AS product,
-    json_array_elements(product->'acompanantes') AS accompaniment
-) AS accompaniment_prices ON true
-WHERE
-    (o.order_status->>'timestamp')::timestamp >= %s AND
-    (o.order_status->>'timestamp')::timestamp <= %s AND
-    o.site_id = ANY(%s) AND
-    o.order_status->>'status' = %s
-
+            SUM(co.total_order_price) AS total_sales,
+            COUNT(co.order_id) AS total_orders,
+            CAST(
+                AVG(co.total_order_price)
+                AS NUMERIC
+            ) AS average_ticket,
+            COALESCE(
+                JSON_AGG(
+                    JSON_BUILD_OBJECT(
+                        'order_id', co.order_id,
+                        'user_id', co.user_id,
+                        'site_name', co.site_name,
+                        'delivery_person_id', co.delivery_person_id,
+                        'order_notes', co.order_notes,
+                        'delivery_price', co.delivery_price,
+                        'payment_method', co.payment_method,
+                        'total_order_price', co.total_order_price,
+                        'current_status', co.current_status,
+                        'latest_status_timestamp', (co.latest_status_timestamp AT TIME ZONE 'UTC') AT TIME ZONE 'America/Bogota',
+                        'responsible', co.responsible,
+                        'reason', co.reason,
+                        'user_name', co.user_name,
+                        'user_address', co.user_address,
+                        'user_phone', co.user_phone
+                    )
+                ), '[]') AS orders_info
+        FROM
+            orders.combined_order_view co
+        WHERE
+            (co.latest_status_timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'America/Bogota') >= %s AND
+            (co.latest_status_timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'America/Bogota') <= %s AND
+            co.site_id = ANY(%s) AND
+            co.current_status = %s
         """
 
-        # Ejecutar la consulta con rango de fechas, site_ids y status como parámetros
         self.cursor.execute(query, (start_date, end_date, site_ids, status))
         result = self.cursor.fetchone()
         if result:
             total_sales, total_orders, average_ticket, orders_info = result
             if average_ticket:
-                average_ticket = round(average_ticket)  # Redondear el ticket promedio
+                average_ticket = round(average_ticket)  # Round the average ticket
         else:
             total_sales = total_orders = average_ticket = 0
             orders_info = []
@@ -146,6 +108,105 @@ WHERE
             'average_ticket': average_ticket,
             'orders_info': orders_info
         }
+
+#     def get_sales_report_by_site_and_status(self, site_ids, status, start_date, end_date):
+#         # Convertir site_ids en una lista si solo se proporciona un ID
+#         if not isinstance(site_ids, list):
+#             site_ids = [site_ids]
+
+#         # Consulta SQL ajustada para incluir el total de la orden en orders_info y añadir site_name
+#         query = """
+#         SELECT
+#     SUM(
+#         product_prices.total_product_price +
+#         COALESCE(addition_prices.total_addition_price, 0) +
+#         COALESCE(topping_prices.total_topping_price, 0) +
+#         COALESCE(change_prices.total_change_price, 0) +
+#         COALESCE(accompaniment_prices.total_accompaniment_price, 0) 
+        
+#     ) AS total_sales,
+#     COUNT(o.order_id) AS total_orders,
+#     CAST(
+#         SUM(
+#             product_prices.total_product_price +
+#             COALESCE(addition_prices.total_addition_price, 0) +
+#             COALESCE(topping_prices.total_topping_price, 0) +
+#             COALESCE(change_prices.total_change_price, 0) +
+#             COALESCE(accompaniment_prices.total_accompaniment_price, 0) 
+#         ) / NULLIF(COUNT(o.order_id), 0)
+#         AS NUMERIC
+#     ) AS average_ticket,
+#     COALESCE(
+#     JSON_AGG(
+#         JSON_BUILD_OBJECT(
+#             'order_id', o.order_id,
+#             'status', o.order_status,
+#             'total_price', product_prices.total_product_price +
+#             COALESCE(addition_prices.total_addition_price, 0) +
+#             COALESCE(topping_prices.total_topping_price, 0) +
+#             COALESCE(change_prices.total_change_price, 0) +
+#             COALESCE(accompaniment_prices.total_accompaniment_price, 0), -- Agregar el precio de entrega a cada orden
+#             'site_name', s.site_name,
+#             'products', o.order_products,  -- Incluir los productos de la orden
+#             'delivery_price', o.delivery_price,
+#             'payment_method',o.payment_method,
+#             'user_data', o.user_data 
+
+
+#         )
+#     ), '[]') AS orders_info
+# FROM
+#     public.orders o
+# JOIN public.sites s ON o.site_id = s.site_id 
+# CROSS JOIN LATERAL (
+#     SELECT SUM((product->>'price')::numeric) AS total_product_price
+#     FROM json_array_elements(o.order_products) AS product
+# ) AS product_prices
+# LEFT JOIN LATERAL (
+#     SELECT SUM((addition->>'price')::numeric) AS total_addition_price
+#     FROM json_array_elements(o.order_products) AS product,
+#     json_array_elements(product->'adiciones') AS addition
+# ) AS addition_prices ON true
+# LEFT JOIN LATERAL (
+#     SELECT SUM((topping->>'price')::numeric) AS total_topping_price
+#     FROM json_array_elements(o.order_products) AS product,
+#     json_array_elements(product->'toppings') AS topping
+# ) AS topping_prices ON true
+# LEFT JOIN LATERAL (
+#     SELECT SUM((change->>'price')::numeric) AS total_change_price
+#     FROM json_array_elements(o.order_products) AS product,
+#     json_array_elements(product->'cambios') AS change
+# ) AS change_prices ON true
+# LEFT JOIN LATERAL (
+#     SELECT SUM((accompaniment->>'price')::numeric) AS total_accompaniment_price
+#     FROM json_array_elements(o.order_products) AS product,
+#     json_array_elements(product->'acompanantes') AS accompaniment
+# ) AS accompaniment_prices ON true
+# WHERE
+#     (o.order_status->>'timestamp')::timestamp >= %s AND
+#     (o.order_status->>'timestamp')::timestamp <= %s AND
+#     o.site_id = ANY(%s) AND
+#     o.order_status->>'status' = %s
+
+#         """
+
+#         # Ejecutar la consulta con rango de fechas, site_ids y status como parámetros
+#         self.cursor.execute(query, (start_date, end_date, site_ids, status))
+#         result = self.cursor.fetchone()
+#         if result:
+#             total_sales, total_orders, average_ticket, orders_info = result
+#             if average_ticket:
+#                 average_ticket = round(average_ticket)  # Redondear el ticket promedio
+#         else:
+#             total_sales = total_orders = average_ticket = 0
+#             orders_info = []
+
+#         return {
+#             'total_sales': total_sales,
+#             'total_orders': total_orders,
+#             'average_ticket': average_ticket,
+#             'orders_info': orders_info
+#         }
         
         
     def update_all_orders_status(self):

@@ -8,6 +8,8 @@ from schema.order import OrderSchemaPost
 from models.user import User
 from schema.user import user_schema_post
 from datetime import datetime, timedelta
+from datetime import datetime, timedelta
+
 import pytz
 load_dotenv()
 
@@ -113,6 +115,7 @@ class Order2:
         self.cursor.execute(order_aditionals_insert_query, (order_id, aditional.aditional_item_instance_id, aditional.quantity, aditional_prices[aditional.aditional_item_instance_id]))
 
     def update_order_status(self, order_id, order_status):
+        
         # Define la zona horaria de Colombia
         colombia_tz = pytz.timezone('America/Bogota')
         
@@ -121,17 +124,32 @@ class Order2:
         
         # Consulta para insertar el estado de la orden
         order_status_insert_query = """
-        INSERT INTO orders.order_status (order_id, status)
-        VALUES (%s, %s);
+        INSERT INTO orders.order_status (order_id, status,timestamp)
+        VALUES (%s, %s,CURRENT_TIMESTAMP );
         """
         self.cursor.execute(order_status_insert_query, (order_id, 'generada',))
         
         # Consulta para insertar el historial del estado de la orden
         order_status_history_insert_query = """
-        INSERT INTO orders.order_status_history (order_id, status)
-        VALUES (%s, %s);
+        INSERT INTO orders.order_status_history (order_id, status,timestamp)
+        VALUES (%s, %s,CURRENT_TIMESTAMP );
         """
         self.cursor.execute(order_status_history_insert_query, (order_id, 'generada',))
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
     def get_order_count_by_site_id(self,site_id):
@@ -148,6 +166,8 @@ class Order2:
         
 
     
+
+
     def get_orders_by_site_id_for_today(self, site_id):
         # Get today's date in Colombia timezone
         colombia_tz = pytz.timezone('America/Bogota')
@@ -165,10 +185,15 @@ class Order2:
             WHERE site_id = %s AND latest_status_timestamp >= %s AND latest_status_timestamp < %s
             ORDER BY order_id, latest_status_timestamp DESC;
             """
-        self.cursor.execute(combined_order_query, (site_id,today_start,tomorrow_start))
+        self.cursor.execute(combined_order_query, (site_id, today_start, tomorrow_start))
         orders_info = self.cursor.fetchall()
         columns_info = [desc[0] for desc in self.cursor.description]
         orders_dict = [dict(zip(columns_info, row)) for row in orders_info]
+
+        # Convert and format timestamps to Colombia timezone
+        for order in orders_dict:
+            if 'latest_status_timestamp' in order:
+                order['latest_status_timestamp'] = order['latest_status_timestamp'].astimezone(colombia_tz)
 
         # Fetch additional order details
         for order in orders_dict:
@@ -207,80 +232,63 @@ class Order2:
                     grouped_additionals[additional_type] = [additional]
                 else:
                     grouped_additionals[additional_type].append(additional)
-            
+
             order['additional_items'] = grouped_additionals
 
         return orders_dict
-    
+
     
     def prepare_order(self, order_id):
-        # Define la zona horaria de Colombia
-        colombia_tz = pytz.timezone('America/Bogota')
-
-        # Obtiene la fecha y hora actual en la zona horaria de Colombia
-        now_colombia = datetime.now(colombia_tz)
-
-        # Prepara la orden
+    # Prepara la orden
         prepare_query = """
-        INSERT INTO orders.order_status (order_id, status)
-        VALUES (%s, 'en preparacion');
+        INSERT INTO orders.order_status (order_id, status, timestamp)
+        VALUES (%s, 'en preparacion', CURRENT_TIMESTAMP);
         """
         self.cursor.execute(prepare_query, (order_id,))
-        
+
         # Inserta el historial del estado
         history_query = """
-        INSERT INTO orders.order_status_history (order_id, status)
-        VALUES (%s, 'en preparacion');
+        INSERT INTO orders.order_status_history (order_id, status, timestamp)
+        VALUES (%s, 'en preparacion', CURRENT_TIMESTAMP);
         """
         self.cursor.execute(history_query, (order_id,))
         self.conn.commit()
 
     def cancel_order(self, order_id, responsible, reason):
-        # Define la zona horaria de Colombia
-        colombia_tz = pytz.timezone('America/Bogota')
-
-        # Obtiene la fecha y hora actual en la zona horaria de Colombia
-        now_colombia = datetime.now(colombia_tz)
-
         # Cancela la orden
         cancel_query = """
         INSERT INTO orders.order_status (order_id, status, reason, responsible, timestamp)
-        VALUES (%s, 'cancelada', %s, %s, %s);
+        VALUES (%s, 'cancelada', %s, %s, CURRENT_TIMESTAMP);
         """
-        self.cursor.execute(cancel_query, (order_id, reason, responsible, now_colombia))
+        self.cursor.execute(cancel_query, (order_id, reason, responsible))
         
         # Inserta el historial del estado
         history_query = """
         INSERT INTO orders.order_status_history (order_id, status, reason, responsible, timestamp)
-        VALUES (%s, 'cancelada', %s, %s, %s);
+        VALUES (%s, 'cancelada', %s, %s, CURRENT_TIMESTAMP);
         """
-        self.cursor.execute(history_query, (order_id, reason, responsible, now_colombia))
+        self.cursor.execute(history_query, (order_id, reason, responsible))
         self.conn.commit()
-        
+            
     def send_order(self, order_id):
-        # Define la zona horaria de Colombia
-        colombia_tz = pytz.timezone('America/Bogota')
-        now_colombia = datetime.now(colombia_tz)
-
         # Actualiza el estado de la orden a 'enviada'
         send_order_query = """
         INSERT INTO orders.order_status (order_id, status, timestamp)
-        VALUES (%s, 'enviada', %s);
+        VALUES (%s, 'enviada', CURRENT_TIMESTAMP);
         """
-        self.cursor.execute(send_order_query, (order_id, now_colombia))
+        self.cursor.execute(send_order_query, (order_id,))
 
         # Inserta el historial del estado
         order_status_history_insert_query = """
         INSERT INTO orders.order_status_history (order_id, status, timestamp)
-        VALUES (%s, 'enviada', %s);
+        VALUES (%s, 'enviada', CURRENT_TIMESTAMP);
         """
-        self.cursor.execute(order_status_history_insert_query, (order_id, now_colombia))
+        self.cursor.execute(order_status_history_insert_query, (order_id,))
         self.conn.commit()
   
     def update_product_instance_status(self, product_instance_id, new_status):
         """
         Update the status of a specific product instance.
-        
         Parameters:
         - product_instance_id: int or str, the identifier of the product instance.
         - new_status: str, the new status to set for the product instance.
@@ -292,13 +300,6 @@ class Order2:
         """
         self.cursor.execute(update_query, (new_status, product_instance_id))
         self.conn.commit()
-        
-        
-        
-        
-        
-        
-        
         
     def can_place_order(self, user_id):
         query = """

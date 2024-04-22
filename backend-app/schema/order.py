@@ -3,20 +3,18 @@ from typing import List, Optional
 from decimal import Decimal
 from datetime import date
 from schema.user import user_schema_post
-# class order_schema_post(BaseModel):
-#     order_products: List[dict]
-#     user_id: int
-#     site_id: int
-#     order_status: dict
-#     payment_method: str
-#     delivery_person_id: int
-#     status_history: List[dict]
-#     delivery_price: Decimal
-#     order_notes:str
-#     user_data: dict
+class order_schema_post(BaseModel):
+    order_products: List[dict]
+    user_id: int
+    site_id: int
+    order_status: dict
+    payment_method: str
+    delivery_person_id: int
+    status_history: List[dict]
+    delivery_price: Decimal
+    order_notes:str
+    user_data: dict
 
-   
-    
 class AdditionalItem(BaseModel):
     id: int
     name: Optional[str] = None  # Assuming NULL is allowed as there's no NOT NULL constraint
