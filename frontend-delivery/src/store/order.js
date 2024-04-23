@@ -35,7 +35,8 @@ export const useOrderStore = defineStore('cart', {
         TodayOrders: [],
         Notification: new Audio('/sound/pip.mp3'),
         webSocket: null,
-        currentCountOrders:0
+        currentCountOrders:0,
+        last_order_id:0
 
     }),
 

@@ -41,6 +41,27 @@ onMounted(() => {
     }
   }
 
+
+
+  async function fetchOrdersAndNotify() {
+    try {
+      const site_id = await sitestore.site.site_id; // Asumiendo que `sitestore` está correctamente importado/inicializado
+      const order_response = await orderService.is_recent_order_generated(site_id); // Asumir `orderService` está importado
+
+      if (order_response &&  store.last_order_id !== order_response) {
+        store.last_order_id = order_response;
+        await store.getTodayOrders() // Asegúrate de actualizar el estado con el nuevo conteo
+        await store.Notification.play();
+        store.Notification.addEventListener('ended', function() {
+          this.currentTime = 0;
+          this.play();
+        }, false);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    }
+  }
+
   const intervalId = setInterval(fetchOrdersAndNotify, 3000);
 
   // Limpieza del intervalo cuando el componente se desmonte
@@ -48,6 +69,18 @@ onMounted(() => {
     clearInterval(intervalId);
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
