@@ -106,14 +106,36 @@ import '@/assets/styles.scss';
 // import Vue from 'vue';
 // import VueCarousel from 'vue-carousel';
 
+import { registerSW } from 'virtual:pwa-register';
+
+
 
 
 
 import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
-import './registerServiceWorker'
 const app = createApp(App);
 const pinia = createPinia()
+
+
+
+registerSW({
+    onNeedRefresh() {
+      // Esta función se llama cuando hay una nueva versión del service worker disponible
+      // y la página necesita ser recargada para usar la nueva versión del caché.
+      if (confirm('Una nueva versión de esta aplicación está disponible. ¿Quieres recargar para actualizar?')) {
+        window.location.reload();
+      }
+    },
+    onOfflineReady() {
+      // Esta función se llama cuando el service worker ha cacheado todos los recursos
+      // y la aplicación está lista para funcionar offline.
+      console.log('La aplicación está lista para funcionar offline.');
+      // Aquí podrías mostrar alguna interfaz de usuario para informar al usuario.
+    },
+  });
+
+
 pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 app.use(router);
