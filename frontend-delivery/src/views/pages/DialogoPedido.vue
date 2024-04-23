@@ -31,12 +31,15 @@
     
       <div class="" style="width: auto;">
        
-          <p class="" style="font-weight: bold;min-width: 100%; width: max-content; text-align: center; color: black;font-size: 1.7rem; margin:0rem;"> #{{ store.currentOrder.order_id }} </p>
+          <p class="" id="id" style="font-weight: bold;min-width: 100%; width: max-content; text-align: center; color: black; margin:0rem;"> ID:{{ store.currentOrder.order_id }} </p>
+
+
+          <p class="" id="id" style="font-weight: bold;min-width: 100%; width: max-content; text-align: center; color: black; margin:0rem;"> ID:{{ store.currentOrder.user_name }} </p>
 
 
 
           
-              <p style="padding: 0; margin: auto;margin-bottom: 1rem; width: max-content;min-width: max-content; ">
+              <p style="padding: 0;color: black; margin: auto; margin-bottom: 1rem; width: max-content;min-width: max-content; ">
                 <b>
                   fecha: {{ store.currentOrder.latest_status_timestamp?.split('T')[0] }}
 
@@ -46,7 +49,7 @@
 
  <!-- <img src="https://cocina.salchimonster.com/images/logo.png" alt="" style="width: 2cm;"> -->
           <div class=""
-            style="font-weight: bold;color:white;margin: 0; background-color: black;align-items: center;display: grid; grid-template-columns: 60%  20% 20%; ">
+            style="font-weight: bold;color:white;margin: 0; background-color: black;align-items: center;display: grid; grid-template-columns: auto 20%; ">
 
             <div style="width: 100%;" >
 
@@ -60,14 +63,14 @@
                 x
               </b>
             </div> -->
-            <div>
+            <!-- <div>
               <p style="text-align: end;font-weight: bold;">
             
                 <b style="text-align: end;">
                   valor
                 </b>
               </p>
-            </div>
+            </div> -->
             
             <div >
               <p style="text-align: end;font-weight: bold;">
@@ -82,7 +85,7 @@
 
           <div  v-for="product in store.currentOrder.products">
 
-            <div style="display: grid; grid-template-columns: 60%  20% 20%;">
+            <div style="display: grid; grid-template-columns: auto 20%;">
               <div >
               <span>
                 {{ product.quantity }}
@@ -90,12 +93,11 @@
               </span>
             </div>
           
-            <div >
+            <!-- <div >
               <p style="text-align: end;color: black;">
-                <!-- {{ formatoPesosColombianos(product.price) }} -->
                 {{ formatoPesosColombianos(product.price) }}
               </p>
-            </div>
+            </div> -->
             <div >
               <p style="text-align: end;color: black;">
                 <!-- {{ formatoPesosColombianos(product.price) }} -->
@@ -127,20 +129,19 @@
 
 
             <div   v-for="aditional in items">
-              <div style="display: grid; grid-template-columns: 60%  20% 20%;">
+              <div style="display: grid; grid-template-columns: auto 20%;align-items: center;">
 
                 <div >
                   <p >
                     {{ aditional.aditional_quantity }}  {{ aditional.aditional_name }}
                   </p>
                 </div>
-
+<!-- 
                 <div >
                   <p style="text-align: end;color: black;">
-                    <!-- {{ formatoPesosColombianos(product.price) }} -->
                     {{ formatoPesosColombianos(aditional.aditional_price) }}
                   </p>
-                </div>
+                </div> -->
                 <div >
                   <p style="text-align: end;color: black;">
                     <!-- {{ formatoPesosColombianos(product.price) }} -->
@@ -206,7 +207,7 @@
 
           </div>
           <p  style="font-weight: bold;background-color: black;color: white;padding: 0; margin: 0; margin-top: 0.5rem;"><b>Notas</b></p>
-              <p class="notas" style="border: 1px solid;margin: 0; padding: 0.5rem;">
+              <p class="notas" style="border: 1px solid;margin: 0;color: black; padding: 0.5rem;">
                 {{ store.currentOrder.order_notes }}
               </p>
 
@@ -360,61 +361,49 @@ import printJS from 'print-js';
 
 const store = useOrderStore()
 
-// const IMPRIMIR = () => {
-//   const contenidoFactura = document.getElementById('factura').innerHTML;
-
-//   // Abrir una nueva ventana para imprimir
-//   const ventanaImpresion = window.open('', '_blank');
-
-//   ventanaImpresion.document.write('<html><head><title>Factura</title>');
-
-//   // Copiar estilos CSS de la página principal a la ventana de impresión
-//   const estilosPagina = document.getElementsByTagName('style');
-
-//   for (let i = 0; i < estilosPagina.length; i++) {
-//     ventanaImpresion.document.write(estilosPagina[i].outerHTML);
-//   }
-
-//   ventanaImpresion.document.write('<style>  @media print {  html{height: min-content;}  *{text-transform:uppercase;align-items:center; width:100%; font-family: sans-serif;padding:0;margin:0; font-size:o.9rem !IMPORTANT} body { padding:0; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
-//   ventanaImpresion.document.write('</head><body>');
-//   ventanaImpresion.document.write(contenidoFactura);
-
-//   ventanaImpresion.document.write('</body></html>');
-
-//   ventanaImpresion.document.close();
-
-//   // Imprimir la ventana
-//   ventanaImpresion.print();
-
-//   // Cerrar la ventana después de 1 segundo (puedes ajustar este tiempo)
-//   setTimeout(() => {
-//     ventanaImpresion.close();
-//   }, 0.01);
-// };
-
-
 const IMPRIMIR = () => {
-  printJS({
-    printable: 'factura',
-    type: 'html',
-    targetStyles: ['*'],
-    // style: `
-    //   html, body {
-    //     width: 100%;
-    //   }
-    //   #factura {
-    //     width: 100%; // Asegúrate de que #factura es el ID del contenedor principal de tu contenido imprimible
-    //     max-width: 100%;
-    //   }
-    //   .page-content { // Suponiendo que .page-content es una clase que puede estar afectando el contenido
-    //     width: 100%;
-    //     box-sizing: border-box;
-    //     padding: 10mm;
-    //   }
-    // `
-  });
+  const contenidoFactura = document.getElementById('factura').innerHTML;
+
+  // Abrir una nueva ventana para imprimir
+  const ventanaImpresion = window.open('', '_blank');
+
+  ventanaImpresion.document.write('<html><head><title>Factura</title>');
+
+  // Copiar estilos CSS de la página principal a la ventana de impresión
+  const estilosPagina = document.getElementsByTagName('style');
+
+  for (let i = 0; i < estilosPagina.length; i++) {
+    ventanaImpresion.document.write(estilosPagina[i].outerHTML);
+  }
+
+  ventanaImpresion.document.write('<style>  @media print { html{height: min-content;}  *{text-transform:uppercase;align-items:center; width:100%; font-family: sans-serif;padding:0;margin:0; font-size:o.9rem !IMPORTANT} body { padding:0; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
+  ventanaImpresion.document.write('</head><body>');
+  ventanaImpresion.document.write(contenidoFactura);
+
+  ventanaImpresion.document.write('</body></html>');
+
+  ventanaImpresion.document.close();
+
+  // Imprimir la ventana
+  ventanaImpresion.print();
+
+  // Cerrar la ventana después de 1 segundo (puedes ajustar este tiempo)
+  setTimeout(() => {
+    ventanaImpresion.close();
+  }, 0.01);
 };
 
+
+// const IMPRIMIR = () => {
+//   printJS({
+//     printable: 'factura',
+//     type: 'html',
+//     targetStyles: ['*'],
+//     style: `
+//       * { font-size: 30pt; }
+//     `
+//   });
+// };
 
 
 onMounted(async () => {
@@ -494,34 +483,14 @@ span {
 }
 
 
-
-
-
-
-  @media print {
-    html, body {
-      width: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden; 
-    }
-    #factura {
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box; 
-      font-size: 12pt;
-    }
-    .page-content {
-      width: 100%;
-      padding: 10mm;
-    }
-    #dialogo{
-      width: 890rem !important; 
-    }
+@media print {
+  * {
+    font-size: 30pt ; /* Ajusta el tamaño de fuente que necesites */
   }
-
-
-
+  #id{
+    font-size: 40pt;
+  }
+}
 
 </style>
 
