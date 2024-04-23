@@ -111,6 +111,7 @@ import '@/assets/styles.scss';
 
 import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+import './registerServiceWorker'
 const app = createApp(App);
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
