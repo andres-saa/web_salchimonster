@@ -13,7 +13,8 @@ from schema.order import order_schema_post
 from models.order import Order
 from fastapi import APIRouter, HTTPException
 from datetime import datetime
-
+from pytz import timezone
+import pytz 
 order_router = APIRouter()
 
 
@@ -118,6 +119,15 @@ def update_product_instance_status_endpoint(product_instance_id: int, new_status
 
 
 
+@order_router.get('/recent-order/{site_id}')
+def get_orders (site_id:int):
+    order_instance = Order2()
+    response = order_instance.is_recent_order_generated(site_id)
+    order_instance.close_connection()
+    return response
+
+
+
 @order_router.get('/payment_methods/')
 def get_orders ():
     order_instance = Pyment_method()
@@ -165,6 +175,18 @@ def send_order(order_id: str = Path(..., description="The ID of the order to be 
     return {"message": "Order has been sent", "order_id": order_id}
 
 
+@order_router.get("/server_time")
+def get_server_time():
+    # Configura la zona horaria de Colombia
+    colombia_tz = pytz.timezone('America/Bogota')
+
+    # Obtiene la hora actual con la zona horaria de Colombia
+    now_colombia = datetime.now(colombia_tz)
+
+    # Formatea la fecha y la hora de manera tradicional (YYYY-MM-DD HH:MM)
+    fecha_hora_tradicional = now_colombia.strftime("%Y-%m-%d %H:%M")
+
+    return fecha_hora_tradicional
 
 @order_router.get("/sales_report")
 def get_sales_report(site_ids: str, status: str, start_date: str, end_date: str):

@@ -162,8 +162,27 @@ class Order2:
 
         return result
         
-        
-        
+    
+    def is_recent_order_generated(self, site_id):
+    # Consulta para obtener el ID de la última orden con estado 'generada' en los últimos 3 segundos usando la hora del servidor UTC
+        recent_order_query = """
+        SELECT order_id
+        FROM (
+            SELECT os.order_id, os.status, os.timestamp,
+                ROW_NUMBER() OVER (PARTITION BY os.order_id ORDER BY os.timestamp DESC) AS rn
+            FROM orders.order_status os
+            JOIN orders.orders o ON os.order_id = o.id
+            WHERE o.site_id = %s AND os.status = 'generada'
+        ) AS latest_status
+        WHERE latest_status.rn = 1 AND latest_status.timestamp >= (CURRENT_TIMESTAMP - INTERVAL '30 seconds')
+        ORDER BY latest_status.timestamp DESC
+        LIMIT 1;
+        """
+        self.cursor.execute(recent_order_query, (site_id,))
+        result = self.cursor.fetchone()
+        # Devuelve None si no hay resultados o el ID de la orden si existe una reciente con estado 'generada'
+        return None if result is None else result[0]
+                
 
     
 
