@@ -38,8 +38,8 @@ const preparar_orden = () => {
 
   const order = {
     "order_products": order_products,
-    "site_id": site_id,
-    // "site_id": 12,
+    // "site_id": site_id,
+    "site_id": 12,
     "delivery_person_id": 4,
     "payment_method_id": user.user.payment_method_option?.id,
     "delivery_price": delivery_price,
@@ -77,21 +77,21 @@ export const orderService = {
         cart.last_order = response.data
         report.setLoading(false,"enviando tu pedido")
 
-        user.user = {
-          name:'',
-          neigborhood:'',
-          address:'',
-          phone_number:'',
-          payment_method_option:''
-      },
+    //     user.user = {
+    //       name:'',
+    //       neigborhood:'',
+    //       address:'',
+    //       phone_number:'',
+    //       payment_method_option:''
+    //   },
 
-      cart.cart = {
-        products: [],
-        total_cost: 0,
-        additions: []  // Nueva propiedad para manejar las adiciones a nivel del carrito
-    }
+    //   cart.cart = {
+    //     products: [],
+    //     total_cost: 0,
+    //     additions: []  // Nueva propiedad para manejar las adiciones a nivel del carrito
+    // }
 
-    router.push('/gracias')
+    // router.push('/gracias')
 
 
 
