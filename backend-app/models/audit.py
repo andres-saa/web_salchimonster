@@ -209,16 +209,19 @@ class AuditDAO:
         select_query = """
         SELECT 
             a.*, 
-            s.site_name, e.name as coordinator_name,
+            s.site_name, 
+            e.name as coordinator_name,
+            cl.name as checklist_name,
             COUNT(ai.id) FILTER (WHERE ai.status = true) as true_items,
             COUNT(ai.id) as total_items
         FROM 
             audits a
             INNER JOIN sites s ON a.site_id = s.site_id
             INNER JOIN employers e ON a.coordinator_id = e.id
+            INNER JOIN checklists cl ON a.checklist_id = cl.id
             LEFT JOIN audit_items ai ON a.id = ai.audit_id
         GROUP BY 
-            a.id, s.site_name, e.name;
+            a.id, s.site_name, e.name, cl.name;
         """
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
@@ -229,11 +232,12 @@ class AuditDAO:
             audit_dict = dict(zip(columns, audit))
             total_items = audit_dict['total_items']
             true_items = audit_dict['true_items']
-            # Calcular la calificación
+            # Calculate the score
             audit_dict['score'] = (5 / total_items) * true_items if total_items > 0 else 0
             audit_list.append(audit_dict)
 
         return audit_list
+
 
 
     def select_audit_by_id(self, audit_id):
@@ -347,7 +351,25 @@ class AuditDAO:
 
     def create_audit_with_items_and_warnings(self, audit_data: Audit, items_with_warnings: List[AuditItemWithWarning]):
         # 1. Crear la auditoría y obtener el ID
+        
+        
+        self.cursor.execute("""
+        SELECT id FROM audits 
+        WHERE coordinator_id = %s AND site_id = %s AND audit_date = %s AND checklist_id = %s;
+        """, 
+        (audit_data.coordinator_id, audit_data.site_id, audit_data.audit_date, audit_data.checklist_id))
+        existing_audit = self.cursor.fetchone()
+        
+        if existing_audit:
+            audit_id = existing_audit[0]
+            # Update the existing audit rather than creating a new one
+            return audit_id
+      
+
         audit_id = self.insert_audit(audit_data)
+        
+        
+        
 
         # 2. Obtener todos los ítems del checklist asociado
         self.cursor.execute("SELECT id FROM check_item WHERE group_id IN (SELECT id FROM checkgroup WHERE checklist_id = %s)", (audit_data.checklist_id,))
