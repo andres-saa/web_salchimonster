@@ -129,6 +129,81 @@ class AuditDAO:
 
         return groups_with_items, warnings
 
+
+
+
+    def get_audit_check_groups_with_filtered_items(self, coordinator_id, date, site_id):
+        # Filtramos las auditorías por ID del coordinador, fecha y site_id
+        self.cursor.execute("""
+            SELECT id FROM audits 
+            WHERE coordinator_id = %s AND audit_date = %s AND site_id = %s;
+        """, (coordinator_id, date, site_id))
+        audit_ids = [row[0] for row in self.cursor.fetchall()]
+        if not audit_ids:
+            return [], []
+
+        # Preparamos para buscar en todas las auditorías encontradas
+        checklist_ids_query = """
+            SELECT DISTINCT cl.id 
+            FROM audits a
+            INNER JOIN checklists cl ON a.checklist_id = cl.id
+            WHERE a.id = ANY(%s);
+        """
+        self.cursor.execute(checklist_ids_query, (audit_ids,))
+        checklist_ids = [row[0] for row in self.cursor.fetchall()]
+        if not checklist_ids:
+            return [], []
+
+        # Ajustamos la consulta para incluir múltiples checklist_ids
+        query = """
+        SELECT 
+            cg.name as group_name, 
+            ci.description as item_description, 
+            ai.status as item_status,
+            w.warning_text,
+            w.date as warning_date
+        FROM 
+            checkgroup cg
+            INNER JOIN check_item ci ON cg.id = ci.group_id
+            INNER JOIN checklists cl ON cg.checklist_id = cl.id
+            LEFT JOIN audit_items ai ON ci.id = ai.check_item_id AND ai.audit_id = ANY(%s)
+            LEFT JOIN warnings w ON ai.id = w.audit_item_id
+        WHERE 
+            cl.id = ANY(%s)
+        ORDER BY 
+            cg.name, ci.description;
+        """
+        self.cursor.execute(query, (audit_ids, checklist_ids))
+        rows = self.cursor.fetchall()
+
+        groups_with_items = []
+        temp_groups = {}
+        for row in rows:
+            group_name, item_description, item_status, warning_text, warning_date = row
+            if group_name not in temp_groups:
+                temp_groups[group_name] = {'items': []}
+            temp_groups[group_name]['items'].append({
+                'description': item_description, 
+                'status': item_status, 
+                'warning_text': warning_text, 
+                'warning_date': warning_date
+            })
+
+        for group_name, group_data in temp_groups.items():
+            groups_with_items.append({'group_name': group_name, 'items': group_data['items']})
+
+        warnings = [
+            {'group_name': group['group_name'], 'item_description': item['description'], 'warning_text': item['warning_text'], 'warning_date': item['warning_date']} 
+            for group in groups_with_items for item in group['items'] if item['warning_text']
+        ]
+
+        return groups_with_items, warnings
+
+    
+
+
+
+
         
     def select_all_audits(self):
         select_query = """
@@ -171,6 +246,20 @@ class AuditDAO:
             return dict(zip(columns, audit_data))
         else:
             return None
+
+
+
+    def select_unique_coordinators(self):
+        select_query = "SELECT * FROM unique_coordinator_audits;"
+        self.cursor.execute(select_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        items_data = self.cursor.fetchall()
+
+        if items_data:
+            return [dict(zip(columns, item_data)) for item_data in items_data]
+        else:
+            return []
+
 
 
     def insert_checklist_with_groups_and_items(self, checklist_data: Checklist):
