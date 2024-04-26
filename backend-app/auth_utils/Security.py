@@ -12,7 +12,7 @@ from typing import Optional
 class Security:
     def __init__(self):
         self.oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token-employer")
-        self.secret_key = "your_secret_key"  # Cambia esto a una clave secreta segura
+        self.secret_key = "nevos tokens"  # Cambia esto a una clave secreta segura
         self.token_expiration = timedelta(hours=1)
         self.algorithm="HS256"
 
