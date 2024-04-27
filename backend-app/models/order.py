@@ -94,7 +94,7 @@ class Order:
                         'user_name', co.user_name,
                         'user_address', co.user_address,
                         'user_phone', co.user_phone
-                    )
+                    ) ORDER BY co.order_id
                 ), '[]') AS orders_info
         FROM
             orders.combined_order_view co
