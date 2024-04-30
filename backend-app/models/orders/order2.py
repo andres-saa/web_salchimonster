@@ -9,6 +9,7 @@ from models.user import User
 from schema.user import user_schema_post
 from datetime import datetime, timedelta
 from datetime import datetime, timedelta
+from datetime import datetime, time
 
 import pytz
 load_dotenv()
@@ -189,13 +190,21 @@ class Order2:
 
     def get_orders_by_site_id_for_today(self, site_id):
         # Get today's date in Colombia timezone
+         # Get today's date in Colombia timezone
         colombia_tz = pytz.timezone('America/Bogota')
-        today_date = datetime.now(colombia_tz).date()
+        now = datetime.now(colombia_tz)
+        
+        # Adjusting start time to 2 AM today
+        if now.time() < time(2, 0):
+            today_date = (now - timedelta(days=1)).date()
+        else:
+            today_date = now.date()
+
         tomorrow_date = today_date + timedelta(days=1)
 
-        # Convert dates to datetime at midnight for use in SQL query
-        today_start = datetime.combine(today_date, datetime.min.time()).astimezone(colombia_tz).isoformat()
-        tomorrow_start = datetime.combine(tomorrow_date, datetime.min.time()).astimezone(colombia_tz).isoformat()
+        # Convert dates to datetime at 2 AM for use in SQL query
+        today_start = datetime.combine(today_date, time(2, 0)).astimezone(colombia_tz).isoformat()
+        tomorrow_start = datetime.combine(tomorrow_date, time(2, 0)).astimezone(colombia_tz).isoformat()
 
         # Fetch only today's orders from the combined order view
         combined_order_query = f"""
