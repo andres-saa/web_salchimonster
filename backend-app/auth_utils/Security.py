@@ -12,12 +12,13 @@ from typing import Optional
 class Security:
     def __init__(self):
         self.oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token-employer")
-        self.secret_key = "your_secret_key"  # Cambia esto a una clave secreta segura
+        self.secret_key = "nevos tokens"  # Cambia esto a una clave secreta segura
         self.token_expiration = timedelta(hours=1)
+        self.algorithm="HS256"
 
 security = Security()
 
-# Modelo Pydantic para el inicio de sesión
+
 class LoginSchema(BaseModel):
     dni: str
     password: str
@@ -29,13 +30,14 @@ def authenticate_user(dni: str, password: str):
     # print(user)
     employer_instance.close_connection()
 
-    print(user)
+    # print(user)
     if user and user.get("password") == password:  # Access the 'password' key in the dictionary
         return user
 
 # Función para crear un token JWT
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
+    print(data)
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:

@@ -45,8 +45,21 @@ class User:
         # Verifica si el usuario ya existe por número de teléfono
         existing_user = self.user_exists(user_data.user_phone)
         if existing_user:
-            return existing_user[0]  # Retorna el user_id si el teléfono ya está registrado
+            user_id = existing_user[0]
+            # Actualiza el usuario si ya existe
+            update_query = """
+            UPDATE users
+            SET user_name = %s, user_address = %s, site_id = %s
+            WHERE user_id = %s
+            RETURNING user_id;
+            """
+            self.cursor.execute(update_query, (
+                user_data.user_name, user_data.user_address, user_data.site_id, user_id
+            ))
+            self.conn.commit()
+            return user_id  # Retorna el user_id actualizado
 
+        # Inserta un nuevo usuario si no existe
         insert_query = """
         INSERT INTO users (
             user_name, user_phone, user_address, site_id
@@ -58,6 +71,7 @@ class User:
         user_id = self.cursor.fetchone()[0]
         self.conn.commit()
         return user_id
+
 
     def delete_user(self, user_id):
         # delete_query = "DELETE FROM users WHERE user_id = %s;"

@@ -58,6 +58,18 @@ def delete_audit(audit_id: int):
 
 
 
+@audit_router.get("/checklists-with-filters/")
+def get_checklists_with_filters(coordinator_id: int, date: str, site_id: int):
+    dao = AuditDAO()
+    try:
+        checklists = dao.get_audit_check_groups_with_filtered_items(coordinator_id, date, site_id)
+        if not checklists:
+            raise HTTPException(status_code=404, detail="No checklists found with the specified filters")
+        return checklists
+    finally:
+        dao.close_connection()
+
+
 @audit_router.post("/audit-items")
 def create_audit_item(audit_item: AuditItem):
     dao = AuditDAO()
@@ -299,5 +311,15 @@ def create_audit_with_items_and_warnings(audit: Audit, items_with_warnings: List
     try:
         audit_id = dao.create_audit_with_items_and_warnings(audit, items_with_warnings)
         return {"audit_id": audit_id}
+    finally:
+        dao.close_connection()
+        
+        
+@audit_router.get("/audits-coordinators")
+def create_audit_with_items_and_warnings():
+    dao = AuditDAO()
+    try:
+        acoordinators = dao.select_unique_coordinators()
+        return acoordinators
     finally:
         dao.close_connection()

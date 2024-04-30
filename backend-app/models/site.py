@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 from schema.directory import *
 load_dotenv()
-
+import json
 DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST')
@@ -67,27 +67,43 @@ class Site:
 
     def update_site(self, site_id, updated_data: site_schema_post):
         update_query = """
-        UPDATE sites
-        SET site_name = %s, site_address = %s, site_phone = %s
+        UPDATE sites SET
+            site_name = %s,
+            site_address = %s,
+            site_phone = %s,
+            site_business_hours = %s,
+            horario_semanal = %s::json,
+            wsp_link = %s,
+            city_id = %s,
+            maps = %s,
+            show_on_web = %s,
+            email_address = %s
         WHERE site_id = %s
         RETURNING *;
         """
-
         self.cursor.execute(update_query, (
-            updated_data.site_name, updated_data.site_address, updated_data.site_phone, site_id
+            updated_data.site_name,
+            updated_data.site_address,
+            updated_data.site_phone,
+            updated_data.site_business_hours,
+            json.dumps(updated_data.horario_semanal),
+            updated_data.wsp_link,
+            updated_data.city_id,
+            updated_data.maps,
+            updated_data.show_on_web,
+            updated_data.email_address,
+            site_id
         ))
-
         columns = [desc[0] for desc in self.cursor.description]
         updated_site_data = self.cursor.fetchone()
-
         if updated_site_data:
             return dict(zip(columns, updated_site_data))
         else:
             return None
-        
-        
-        
-        
+            
+            
+            
+            
         
         
         
