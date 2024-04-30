@@ -21,7 +21,7 @@
 
 
 
-  <Dialog  closeOnEscape :closable="false" v-model:visible="store.visibles.currentOrder" modal
+  <Dialog class="mx-3"  closeOnEscape :closable="false" v-model:visible="store.visibles.currentOrder" modal
     style="max-height: 80vh;width: 35rem; position: relative;">
     
     <div id="factura" style="width: 100%;">

@@ -1,5 +1,5 @@
 <template>
-  <div class="grid m-auto" style="max-width: 700px;">
+  <div class="grid mx-auto  m-0 p-0" style="max-width: 900px;">
 
     <DialogoPedido>
 
@@ -7,12 +7,10 @@
 
    
 
-    <div class="md:p-3 my-2 p-0 col-12 m-0 ">
-      <div class=" shadow-4" style="border-radius: 0.5rem;height: 80vh;overflow: hidden; background-color:#00bf7a
+    <div class="md:p-0 my-0 p-0 col-12 ">
+      <div class=" shadow-4 contenedor p-0 mb-0 py-0 mt-3" style="height: calc(100vh - 7rem);overflow: hidden; background-color:#00bf7a
 ">
-        <div style="height: 86%;width: 100%;">
-
-
+        <div  style="height: 100%;width: 100%;">
           <p class="col-12 text-center shadow-4" style="background-color: #ffffff61;">
             <span class="text-center text-2xl" style="color: black;font-weight: bold;"><i class="pi pi-history
  text-2xl
@@ -127,5 +125,24 @@ onMounted(() => {
   height: 10rem;
   width: 10rem;
   /* display: none;  */
+}
+
+.contenedor{
+  border-radius: 0.5rem;
+}
+
+@media  ( max-width: 900px)  {
+
+.contenedor{
+  height: 1000%;
+  /* width: 100vw; */
+  min-height: 20vh;
+  margin: 0;
+  border-radius: 0;
+
+}
+.top{
+margin-top:1rem;
+}
 }
 </style>
