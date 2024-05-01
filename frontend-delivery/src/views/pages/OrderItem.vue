@@ -1,6 +1,7 @@
 <template>
     <div @click="open" class="col-12 " style="background-color: rgba(255, 255, 255, 0.506);border-radius: 0.5rem;cursor: pointer;">
 
+        <Tag class="text-l" severity="help"> {{props.order.user_name}}</Tag>
         <div style="display: flex; align-items: center;justify-content: space-between;">
             <div style=" display: flex;align-items: center;">
                 <b style="min-width: max-content;color: black;">
@@ -11,7 +12,7 @@
                 <div style="position: relative;">
                     <img style="width: 100%;" :src="`https://backend.salchimonster.com/read-product-image/96/${product.name}`" alt="">
                     
-                    <Button severity="danger" class="p-0" rounded :label="product.quantity" style="width: 1.5rem;position: absolute;top: -.5rem;right: -.5rem; height: 1.5rem;border-radius: 1rem;">
+                    <Button  severity="danger" class="p-0" rounded :label="product.quantity" style="width: 1.5rem;position: absolute;top: -.5rem;right: -.5rem;z-index: 99; height: 1.5rem;border-radius: 1rem;">
 
                     </Button>
                 </div>

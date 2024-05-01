@@ -34,7 +34,7 @@
           <p class="" id="id" style="font-weight: bold;min-width: 100%; width: max-content; text-align: center; color: black; margin:0rem;"> ID:{{ store.currentOrder.order_id }} </p>
 
 
-          <p class="" id="id" style="font-weight: bold;min-width: 100%; width: max-content; text-align: center; color: black; margin:0rem;"> ID:{{ store.currentOrder.user_name }} </p>
+          <p class="" id="id" style="font-weight: bold;min-width: 100%; width: max-content; text-align: center; color: black; margin:0rem;"> {{ store.currentOrder.user_name }} </p>
 
 
 

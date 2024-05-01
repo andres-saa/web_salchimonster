@@ -1,0 +1,1 @@
+import{_ as o,r as _,o as c,c as s,a as t}from"./index-2f7350c3.js";const a={class:"col-12 p-0 m-0",style:{}},n={__name:"Home",setup(r){return(p,l)=>{const e=_("RouterView");return c(),s("div",a,[t(e,{class:"p-0"})])}}},d=o(n,[["__scopeId","data-v-c9c671a9"]]);export{d as default};
