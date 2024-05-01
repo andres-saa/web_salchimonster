@@ -62,8 +62,26 @@ onMounted(() => {
     });
 });
 
+
+
+const notif = ref(true)
 </script>
 
+
+
+
+
+
 <template>
+    <div  style="width:100vw;height:100vh;display:flex;position: absolute; align-items:center;justify-content:center; z-index: 999;top:0;left:0;background-color:rgba(0,0,0,0.5)" :closable="false" v-if="notif">
+
+        <div style="width:20rem;display:flex; gap:1rem;flex-direction:column;justify-content:center">
+            <img style="width:100%;" src="https://salchimonster.com/images/characters/2.png" alt="">
+            <Button rounded @click="notif = false" style="width: 100%;border-radius:2rem" severity="danger" icon="pi pi-bell" label="Aceptar notificaciones"></Button>
+
+        </div>
+   
+    </div>
+
     <router-view class="col-12 p-0" />
 </template>
