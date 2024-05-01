@@ -1,10 +1,22 @@
 <template>
 
 
-           
-<div class="grid p-1 pb-8" style="max-width: 1024px;margin: auto;" >
+
+
+<div class="grid p-1 pb-8" style="max-width: 1024px; margin: auto; position:relative" >
     
-    
+<div  style="position:absolute;display:flex;right:100%;gap:10rem; height:100vh;max-width:100%; justify-content:space-around; flex-direction:column;z-index: 9;">
+
+<img style="width:15vw;" v-for="character in [1,2,3,4,5]" :src="`/images/characters/line/${character}.png`" alt="">
+
+</div>
+
+
+<div  style="position:absolute;display:flex;left:100%;gap:10rem; height:100vh;max-width:100%; justify-content:space-around; flex-direction:column;z-index: 9;">
+
+<img style="width:15vw;" v-for="character in [1,2,3,4,5].reverse()" :src="`/images/characters/line/${character}.png`" alt="">
+
+</div>
     
 <p class="text-center text-3xl col-12" style="font-weight: bold;display: flex;gap: 1rem;align-items: center;">
   <div style="width: 100%;height: 5px; background-color: #ff6200">
@@ -21,9 +33,8 @@
 
     <div v-for="(product, index) in products" :key="product.id" class=" col-12 md:col-4 lg:col-3 sm:col-6">
 
-            <TarjetaMenu style="width: 100%;" :id="`tarjeta-${index}`"  :product="product"></TarjetaMenu>
+            <TarjetaMenu style="width: 100%;" :id="`tarjeta-${index}`" :index="index+1" :product="product"></TarjetaMenu>
     </div>
-
 
 
 

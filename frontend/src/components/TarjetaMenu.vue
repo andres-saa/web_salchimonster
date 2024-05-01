@@ -3,9 +3,16 @@
 <!-- {{ store.currentProduct }} -->
 
     <div class="container p-shadow col-12" style="border-radius: 0.5rem;height: 100%;position: relative;">
-    <div class="imagen">
+    
+        
+
+
+        
+    
+    
+        <div class="imagen" style="">
       
-            <img class="" style="width: 100%;height: 100%; background-color: rgb(255, 255, 255);object-fit: contain; border-radius: 0.2rem;" :src="`https://backend.salchimonster.com/read-product-image/300/${props.product.product_name}`" alt="" @click="open(props.product)">
+            <img class="" style="width: 100%;height: 100%; background-color: rgb(255, 255, 255);object-fit: contain; border-radius: 0.5rem;" :src="`https://backend.salchimonster.com/read-product-image/300/${props.product.product_name}`" alt="" @click="open(props.product)">
      
             
         </div>
@@ -19,7 +26,9 @@
                         {{props.product.product_name}}
                     </b>
                 </span>
-                <Button text style="color: black;" icon="pi pi-ellipsis-v p-0 text-xl" />
+                <!-- <Button text style="color: black;" icon="pi pi-ellipsis-v p-0 text-xl" /> -->
+                <img class="character" style="width:6rem;" v-for="character in [1]" :src="`/images/characters/${props.index}.png`" alt="">
+
 
 
 
@@ -82,6 +91,11 @@ const props = defineProps({
         type: Object,
         default: {}
     },
+    index: {
+        type: Number,
+        default: 12
+    },
+
 
 
 });
@@ -115,16 +129,24 @@ const imagenError = (Event) => {
     border-radius: 0.5rem 0.5rem 1.4rem 0.6rem;
 }
 
+.character{
+    display: none;
+}
+
 /* Responsive adjustments */
 @media (max-width: 576px) {
     .container {
     grid-template-columns: 1fr 2fr;
-    width: 100%; /* 1:2 ratio for image to details */
+    width: 100%;
         /* Stack elements vertically on smaller screens */
     }
 
     .imagen, .texto {
-        width: 100%; /* Ensure full width on smaller screens */
+        width: 100%;
+         /* Ensure full width on smaller screens */
+    }
+    .character{
+        display: inline;
     }
 }
 

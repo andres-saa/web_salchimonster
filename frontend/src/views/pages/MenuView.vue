@@ -12,21 +12,9 @@
 
   <BarraCategorias/>
 
-
-
+ 
         <RouterView />
         
-
-
-
-
-
-  
-    
-    
-
-
-
 </div>
 
     
