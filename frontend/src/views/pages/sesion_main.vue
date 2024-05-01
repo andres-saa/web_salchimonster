@@ -35,7 +35,7 @@
 </p>
   <div v-for="(product, index) in products" :key="product.id" class=" col-12 md:col-4 lg:col-3 sm:col-6">
 
-          <TarjetaMenu style="width: 100%;" :id="`tarjeta-${index}`"  :product="product"></TarjetaMenu>
+          <TarjetaMenu style="width: 100%;" :id="`tarjeta-${index}`" :index="index+1" :product="product"></TarjetaMenu>
   </div>
 
 
