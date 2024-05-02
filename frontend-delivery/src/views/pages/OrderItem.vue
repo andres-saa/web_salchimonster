@@ -1,7 +1,9 @@
 <template>
     <div @click="open" class="col-12 " style="background-color: rgba(255, 255, 255, 0.506);border-radius: 0.5rem;cursor: pointer;">
 
-        <Tag class="text-l" severity="help"> {{props.order.user_name}}</Tag>
+        <Tag class="text-l" :severity="props.order.user_phone == '1111111111'? 'danger' : 'help'"> {{props.order.user_phone == '1111111111'? 'ES UNA PRUEBA, RELAJATE' : props.order.user_name}}</Tag>
+
+
         <div style="display: flex; align-items: center;justify-content: space-between;">
             <div style=" display: flex;align-items: center;">
                 <b style="min-width: max-content;color: black;">

@@ -10,19 +10,22 @@
       <div class=" shadow-4 contenedor pb-2" style="overflow: hidden; background-color:#ffad53
 ">
 
-        <div style="height: 85%;width: 100%;">
+        <div style="height: 100%;width: 100%;">
           <p class="col-12 text-center shadow-4 " style="background-color: #ffffff61;">
             <span class="text-center text-2xl" style="color: black;font-weight: bold;"> <i class="pi pi-envelope
  text-2xl"></i> RECIBIDOS</span>
           </p>
 
+        
 
-          <div style="height: 100%; overflow-y: auto;">
+          <div class="lg:pb-8" style="height: 100%; overflow-y: auto;">
 
             <div class="px-3 py-2"
               v-for="orden in store.TodayOrders.filter(orden => orden.current_status == 'generada')">
               <OrderItem :order="orden"/>
             </div>
+
+           
           </div>
         </div>
 
@@ -41,19 +44,25 @@
    <div class="md:px-2 xl:pt-5  p-0 col-12 xl:col-4 top">
       <div class=" shadow-4 contenedor pb-2" style="overflow: hidden; background-color:#8e3693
 ">
-        <div style="height: 86%;width: 100%;">
+        <div style="height: 100%;width: 100%;">
 
           <p class="col-12 text-center shadow-4" style="background-color: #ffffff61;">
             <span class="text-center text-2xl" style="color: black;font-weight: bold;"> <i
                 class="pi pi-clock text-2xl"></i>
               EN PREPARACION</span>
           </p>
-          <div style="height: 100%; overflow-y: auto;">
+          <div class="lg:pb-8" style="height: 100%; overflow-y: auto;">
 
             <div class="px-3 py-2"
             v-for="orden in store.TodayOrders.filter(orden => orden.current_status == 'en preparacion')">
               <OrderItem :order="orden"/>
             </div>
+
+
+            
+          
+
+            
           </div>
 
 
@@ -66,7 +75,7 @@
     <div class="md:px-2 xl:pt-5 p-0 col-12 xl:col-4 top">
       <div class=" shadow-4 contenedor pb-2" style="overflow: hidden; background-color:#00bf7a
 ">
-        <div style="height: 100%;width: 100%;">
+        <div class="lg:pb-8" style="height: 100%;width: 100%;">
 
 
           <p class="col-12 text-center shadow-4" style="background-color: #ffffff61;">
@@ -79,7 +88,12 @@
             v-for="orden in store.TodayOrders.filter(orden => orden.current_status == 'enviada')">
               <OrderItem :order="orden"/>
             </div>
+
+
           </div>
+
+      
+          
 
 
 

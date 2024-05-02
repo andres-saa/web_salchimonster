@@ -5,13 +5,12 @@
 
 
 
-  <div class="grid m-auto" style="max-width: 400px;">
+
+  <div class="grid mx-auto mb-8" style="max-width: 400px;">
 
     <DialogoPedido>
 
     </DialogoPedido>
-
-
 
     <div id="cuadre" class=" cuadre my-2 p-2  m-0 " style="width: 100%;top: 5rem; display: flex;align-items: center;position: relative;">
      
@@ -35,6 +34,7 @@
             <div class="px-3 py-1" v-for="orden in store.TodayOrders.filter(order => order.current_status == 'enviada') ">
               <cuadreItem :order="orden" />
             </div>
+
           </div>
 
 

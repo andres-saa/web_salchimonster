@@ -16,12 +16,14 @@
  text-2xl
 "></i> PEDIDOS DE HOY</span>
           </p>
-          <div style="height: 100%; overflow-y: auto;">
+          <div class="pb-8" style="height: 100%; overflow-y: auto;">
 
             <div class="px-3 py-2"
             v-for="orden in store.TodayOrders">
               <OrderItem :order="orden"/>
             </div>
+
+
           </div>
 
 
