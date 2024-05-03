@@ -2,6 +2,27 @@ import { createRouter, createWebHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
 
 import pixel from './pixel';
+
+import { URI } from '@/service/conection'
+import { verCerrado } from '../service/state';
+import { useSitesStore } from '../store/site';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -67,6 +88,14 @@ const router = createRouter({
           path: '/pay',
           name: 'pay',
           component: () => import('@/views/pages/pay.vue'),
+          meta: { requireOpen: true },
+        },
+
+        {
+          path: '*',
+          name: 'all',
+          component: () => import('@/views/pages/sesion_main.vue'),
+          // meta: { requireOpen: true },
         },
       ]
     },
@@ -74,6 +103,39 @@ const router = createRouter({
 });
 
 
+
+
+const estado = async(site_id) => {
+  const response = await fetch(`${URI}/site/${site_id}/status`);
+  const data = await response.json();
+return data
+// console.log(data)
+}
+
+router.beforeEach(async(to, from, next) => {
+  const store  = useSitesStore()
+  const site_id = store.location.site.site_id
+  // alert(site_id)
+  // console.log(site_id)
+  const open = await estado(site_id)
+  console.log(open)
+
+  if (to.matched.some(record => record.meta.requireOpen)) {
+    // const token = thanks_data.value?.user_data;
+
+    if (open.status == 'closed') {
+      verCerrado.value = true
+      next('/')
+
+    } else {
+      // Si hay token, permite el acceso
+      next();
+    }
+  } else {
+    // Si la ruta no requiere autenticación, permite el acceso
+    next();
+  }
+});
 
 
 
