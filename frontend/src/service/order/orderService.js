@@ -77,21 +77,21 @@ export const orderService = {
         cart.last_order = response.data
         report.setLoading(false,"enviando tu pedido")
 
-    //     user.user = {
-    //       name:'',
-    //       neigborhood:'',
-    //       address:'',
-    //       phone_number:'',
-    //       payment_method_option:''
-    //   },
+        user.user = {
+          name:'',
+          neigborhood:'',
+          address:'',
+          phone_number:'',
+          payment_method_option:''
+      },
 
-    //   cart.cart = {
-    //     products: [],
-    //     total_cost: 0,
-    //     additions: []  // Nueva propiedad para manejar las adiciones a nivel del carrito
-    // }
+      cart.cart = {
+        products: [],
+        total_cost: 0,
+        additions: []  // Nueva propiedad para manejar las adiciones a nivel del carrito
+    }
 
-    // router.push('/gracias')
+    router.push('/gracias')
 
 
 
