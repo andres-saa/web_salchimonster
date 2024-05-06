@@ -31,7 +31,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     
     access_token_expires = timedelta(minutes=60)
     access_token = create_access_token(
-        data={"sub": user['dni'], "rol":user['position'], "dni":user['dni'] ,"id":user['id'],"site_id":user["site_id"] }, expires_delta=access_token_expires
+        data={"sub": user['dni'], "rol":user['position'],"name":user["name"], "site_name":user["site_name"], "dni":user['dni'] ,"id":user['id'],"site_id":user["site_id"] }, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -48,7 +48,7 @@ async def validate_and_renew_token(token: str = Depends(security.oauth2_scheme))
         # Si el token es válido, crear un nuevo token con la misma información pero con una nueva expiración
         access_token_expires = timedelta(minutes=60)  # O el tiempo de expiración que prefieras
         new_access_token = create_access_token(
-            data={"sub": payload["sub"], "rol": payload["rol"], "dni": payload["dni"], "id": payload["id"], "site_id": payload["site_id"]},
+            data={"sub": payload["sub"], "rol": payload["rol"], "name":payload["name"],"site_name":payload["site_name"], "dni": payload["dni"], "id": payload["id"], "site_id": payload["site_id"]},
             expires_delta=access_token_expires
         )
         return {"access_token": new_access_token, "token_type": "bearer"}

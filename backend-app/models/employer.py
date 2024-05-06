@@ -115,7 +115,12 @@ class Employer:
     
     
     def select_employer_by_dni(self, dni):
-        select_query = "SELECT * FROM employers WHERE dni = %s;"
+        select_query = """
+        SELECT employers.*, sites.site_name 
+        FROM employers
+        JOIN sites ON employers.site_id = sites.site_id
+        WHERE employers.dni = %s;
+        """
         self.cursor.execute(select_query, (dni,))
         columns = [desc[0] for desc in self.cursor.description]
         employer_data = self.cursor.fetchone()

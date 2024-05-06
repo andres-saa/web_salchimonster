@@ -6,6 +6,7 @@ from routes.site import site_router
 from routes.delivery_person import delivery_person_router  # Importa el nuevo router de delivery persons
 # from routes.order import order_router
 from routes.orders.order import order_router
+from routes.inventory.daily_inventory import daily_inventory_router
 from routes import files_router
 from routes.auth import auth
 from routes.category import category_router
@@ -53,7 +54,7 @@ app.add_middleware(
 
 
 app.include_router(recipe_data_sheet_router)
-
+app.include_router(daily_inventory_router)
 app.include_router(product_router)
 app.include_router(user_router)
 app.include_router(ingredient_router)
