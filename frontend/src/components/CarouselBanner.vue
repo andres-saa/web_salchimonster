@@ -13,7 +13,7 @@
       </div>
 
       
-      <div v-for="i in [2,3,4,5]" class="carousel-item p-0 col-12 " style="">
+      <div v-for="i in [2,3,4]" class="carousel-item p-0 col-12 " style="">
         <img  style="width: 100%;height:100% ;top: 0;max-height: 80vh;  object-fit:cover;" :src="`/images/banners/banner-${i}.jpeg`" alt="">
 
         <div>
