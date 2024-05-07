@@ -49,7 +49,7 @@
 
  <!-- <img src="https://cocina.salchimonster.com/images/logo.png" alt="" style="width: 2cm;"> -->
           <div class=""
-            style="font-weight: bold;color:white;margin: 0; background-color: black;align-items: center;display: grid; grid-template-columns: auto 20%; ">
+            style="font-weight: bold;color:white;margin: 0; background-color: black;align-items: center;display: grid; grid-template-columns: auto auto; ">
 
             <div style="width: 100%;" >
 
@@ -57,21 +57,7 @@
 
 
             </div>
-            <!-- <div >
-              <b>
-
-                x
-              </b>
-            </div> -->
-            <!-- <div>
-              <p style="text-align: end;font-weight: bold;">
-            
-                <b style="text-align: end;">
-                  valor
-                </b>
-              </p>
-            </div> -->
-            
+          
             <div >
               <p style="text-align: end;font-weight: bold;">
                 <b>
@@ -85,13 +71,13 @@
 
           <div  v-for="product in store.currentOrder.products">
 
-            <div style="display: grid; grid-template-columns: auto 20%;">
-              <div >
-              <span>
+            <div style="display: grid; grid-template-columns: auto auto;">
+             
+              <p>
                 {{ product.quantity }}
                 {{ product.name }}
-              </span>
-            </div>
+              </p>
+          
           
             <!-- <div >
               <p style="text-align: end;color: black;">
@@ -376,7 +362,7 @@ const IMPRIMIR = () => {
     ventanaImpresion.document.write(estilosPagina[i].outerHTML);
   }
 
-  ventanaImpresion.document.write('<style>  @media print { html{height: min-content;}  *{text-transform:uppercase;align-items:center; width:100%; font-family: sans-serif;padding:0;margin:0; font-size:o.9rem !IMPORTANT} body { padding:0; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
+  ventanaImpresion.document.write('<style>  @media print { html{height: min-content; padding:0.5cm}  *{text-transform:uppercase;align-items:center; width:100%; font-family: sans-serif;padding:0;margin:0; font-size:o.9rem !IMPORTANT} body { padding:0; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
   ventanaImpresion.document.write('</head><body>');
   ventanaImpresion.document.write(contenidoFactura);
 
