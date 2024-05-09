@@ -34,7 +34,7 @@ class DailyInventory:
         self.cursor.execute(query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
-    
+     
 
     def get_all_daily_inventory_reports_by_responsible_id_filtered(self, responsible_id: int, start_date: str, end_date: str):
         query = f"""
@@ -46,6 +46,7 @@ class DailyInventory:
         self.cursor.execute(query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
 
     def get_all_daily_inventory_reports_filtered(self, site_ids: list, start_date: str, end_date: str):
         if len(site_ids) == 1:

@@ -27,7 +27,7 @@ from routes.maintenance import maintenance_router, equipment_router
 from routes.recipe.ingredient import ingredient_router
 from routes.recipe.data_sheet import recipe_data_sheet_router
 from routes.aditional_new import adicional_new_router
-
+from routes.inventory.order_purchase import order_purchase_router
 from routes.role import role_router, rolegroup_router
 from routes.city import city_router
 from routes.neighborhood import neighborhood_router
@@ -54,6 +54,9 @@ app.add_middleware(
 
 
 app.include_router(recipe_data_sheet_router)
+
+app.include_router(order_purchase_router)
+
 app.include_router(daily_inventory_router)
 app.include_router(product_router)
 app.include_router(user_router)

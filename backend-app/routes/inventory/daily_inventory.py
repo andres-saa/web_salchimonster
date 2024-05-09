@@ -88,13 +88,12 @@ def get_inventory_report():
     inventory_report_Instance.close_connection()
     return data
 
-@daily_inventory_router.get('/daily_inventory_unit_measures')
+@daily_inventory_router.get('/daily_inventory_unit_measures' , tags=['purchase_order'])
 def get_inventory_report():
     inventory_report_Instance =  DailyInventory()
     data = inventory_report_Instance.get_all_daily_group_unit_measures()
     inventory_report_Instance.close_connection()
     return data
-
 
 @daily_inventory_router.get('/group_daily_inventory_items/{daily_item_group_name}')
 def get_inventory_items_by_group_name(daily_item_group_name: str):
