@@ -26,6 +26,9 @@ class DailyInventoryItems(BaseModel):
     daily_inventory_item_unit_measure_id:int
     name: str
 
+class UnitMeasure (BaseModel):
+    id:Optional[int] = None
+    name : str
 
 class InventoryComplete(BaseModel):
     daily_inventory:DailyInventory

@@ -101,6 +101,8 @@ class PurchaseOrder:
             site_ids_tuple = f"({site_ids[0]})"  # Asegura que se forme una tupla de un solo elemento
         else:
             site_ids_tuple = tuple(site_ids)
+        
+        
 
         query = f"""
         SELECT * FROM purchase.view_purchase_details
@@ -110,23 +112,59 @@ class PurchaseOrder:
         """
         self.cursor.execute(query)
         columns = [desc[0] for desc in self.cursor.description]
-        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+        results = self.cursor.fetchall()
+
+       # Crear una lista para almacenar los registros con la fecha convertida
+        converted_records = []
+        
+        # Zona horaria de Colombia
+        tz_colombia = pytz.timezone('America/Bogota')
+        
+        for row in results:
+            record = dict(zip(columns, row))
+            # Suponiendo que 'expedition_date' es el nombre de la columna de la fecha
+            utc_date = record['expedition_date']
+            # Convertir la fecha de UTC a hora de Colombia
+            local_date = utc_date.replace(tzinfo=pytz.utc).astimezone(tz_colombia)
+            # Actualizar el registro con la nueva fecha
+            record['expedition_date'] = local_date.strftime('%d-%m-%YT%H:%M:%S')
+            converted_records.append(record)
+        
+        return converted_records
 
 
 
 
      
 
-    # def get_all_daily_inventory_reports_by_responsible_id_filtered(self, responsible_id: int, start_date: str, end_date: str):
-    #     query = f"""
-    #     SELECT * FROM inventory.view_daily_inventory_details 
-    #     WHERE responsible_id = {responsible_id} 
-    #     AND date >= '{start_date}' 
-    #     AND date <= '{end_date}';
-    #     """
-    #     self.cursor.execute(query)
-    #     columns = [desc[0] for desc in self.cursor.description]
-    #     return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+    def get_all_purchase_order_by_responsible_id_filtered(self, responsible_id: int, start_date: str, end_date: str):
+        query = f"""
+        SELECT * FROM purchase.view_purchase_details 
+        WHERE responsible_id = {responsible_id} 
+        AND status_timestamp >= '{start_date}' 
+        AND status_timestamp <= '{end_date}';
+        """
+        self.cursor.execute(query)
+        columns = [desc[0] for desc in self.cursor.description]
+        results = self.cursor.fetchall()
+        
+        # Crear una lista para almacenar los registros con la fecha convertida
+        converted_records = []
+        
+        # Zona horaria de Colombia
+        tz_colombia = pytz.timezone('America/Bogota')
+        
+        for row in results:
+            record = dict(zip(columns, row))
+            # Suponiendo que 'expedition_date' es el nombre de la columna de la fecha
+            utc_date = record['expedition_date']
+            # Convertir la fecha de UTC a hora de Colombia
+            local_date = utc_date.replace(tzinfo=pytz.utc).astimezone(tz_colombia)
+            # Actualizar el registro con la nueva fecha
+            record['expedition_date'] = local_date.strftime('%d-%m-%YT%H:%M:%S')
+            converted_records.append(record)
+        
+        return converted_records
 
 
     # def get_all_daily_inventory_reports_filtered(self, site_ids: list, start_date: str, end_date: str):

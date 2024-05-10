@@ -72,6 +72,24 @@ class DailyInventory:
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
 
+    def insert_unit_measure(self, name):
+        query = f"""
+        INSERT INTO inventory.daily_inventory_unit_measures (name, status)
+        VALUES (%s, true);
+        """
+        self.cursor.execute(query, (name,))
+        self.conn.commit()
+
+    def disable_unit_measure(self, unit_measure_id):
+        query = f"""
+        UPDATE inventory.daily_inventory_unit_measures
+        SET status = false
+        WHERE id = %s;
+        """
+        self.cursor.execute(query, (unit_measure_id,))
+        self.conn.commit()
+
+
     def get_all_daily_Inventory_item_by_group_name (self,daily_inventory_group):
         query = f""" select * from inventory.complete_daily_items where group_name = '{daily_inventory_group}' and status = true ;        
         """
@@ -87,7 +105,7 @@ class DailyInventory:
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
     
     def get_all_daily_group_unit_measures (self):
-        query = f""" select * from inventory.daily_inventory_unit_measures;        
+        query = f""" select * from inventory.daily_inventory_unit_measures where status = true;        
         """
         self.cursor.execute(query)
         columns = [desc[0] for desc in self.cursor.description]

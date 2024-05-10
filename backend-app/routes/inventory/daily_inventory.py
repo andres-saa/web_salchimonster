@@ -1,6 +1,6 @@
 from models.inventory.daily_inventory import DailyInventory
 from fastapi import APIRouter,HTTPException, status
-from schema.inventory.inventory import GroupDailyInventoryItems,DailyInventoryItems,InventoryComplete
+from schema.inventory.inventory import GroupDailyInventoryItems,DailyInventoryItems,InventoryComplete,UnitMeasure
 
 
 
@@ -119,6 +119,13 @@ def insert_daily_inventory_item( daily_group_item :  DailyInventoryItems):
     return data
 
 
+@daily_inventory_router.post('/insert_unit_measure')
+def insert_daily_inventory_item( data_unit_measure :  UnitMeasure):
+    inventory_report_Instance =  DailyInventory()
+    data = inventory_report_Instance.insert_unit_measure(data_unit_measure.name)
+    inventory_report_Instance.close_connection()
+    return data
+
 
 @daily_inventory_router.put('/disable_daily_inventory_group/{group_id}')
 def disable_daily_inventory_group( group_id :  int):
@@ -127,6 +134,13 @@ def disable_daily_inventory_group( group_id :  int):
     inventory_report_Instance.close_connection()
     return data
 
+
+@daily_inventory_router.put('/disable_unit_measure/{unit_measure_id}')
+def disable_daily_inventory_group( unit_measure_id :  int):
+    inventory_report_Instance =  DailyInventory()
+    data = inventory_report_Instance.disable_unit_measure(unit_measure_id)
+    inventory_report_Instance.close_connection()
+    return data 
 
 @daily_inventory_router.put('/disable_daily_inventory_item/{item_id}')
 def disable_daily_inventory_group( item_id :  int):
