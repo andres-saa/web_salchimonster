@@ -101,7 +101,12 @@ def get_order_count_by_site_id(site_id:int):
     return result
 
 
-
+@order_router.put('/delivery_zero/{order_id}')
+def get_order_count_by_site_id(order_id:str):
+    order_instance = Order2()
+    result = order_instance.DelivZero(order_id)
+    order_instance.close_connection()
+    return result
 
 
 class updateProduct (BaseModel):

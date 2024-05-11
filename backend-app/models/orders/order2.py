@@ -79,6 +79,16 @@ class Order2:
         """
         self.cursor.execute(order_notes_insert_query, (order_id, order_notes))
 
+
+    def DelivZero(self, order_id):
+        order_notes_insert_query = f"""
+        UPDATE orders.order_details SET delivery_price = {0} where order_id = '{order_id}' ;
+        """
+        self.cursor.execute(order_notes_insert_query)
+        self.conn.commit()
+
+
+
     def insert_order_products(self, order_id, order_data):
         product_instance_ids = [str(product.product_instance_id) for product in order_data.order_products]
         ids_text = ', '.join(product_instance_ids)

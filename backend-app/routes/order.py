@@ -55,6 +55,8 @@ def get_orders_by_site(site_id: int):
     order_instance.close_connection()
     return orders
 
+
+
 @order_router.get("/orders/by_delivery_person/{delivery_person_id}")
 def get_orders_by_delivery_person(delivery_person_id: int):
     order_instance = Order()
