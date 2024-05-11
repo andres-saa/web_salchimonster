@@ -20,6 +20,34 @@
   </Dialog>
 
 
+  <Dialog :closable="false" style="width: 30rem;" modal v-model:visible="showDeleteDeliveryPrice">
+
+   <span style="text-transform: capitalize;">
+    Esta seguro de llevar a $0.00 el valor del domicilio para la orden <b>{{store.currentOrder.order_id}} </b> del cliente  <b>{{store.currentOrder.user_name}}</b>?
+   </span> 
+   
+   
+   <template #footer>
+
+    <div class="col-12 mb-0 pb-0 px-0 m-0" style="display: flex;justify-content: space-between;gap: 1rem;">
+
+      <Button  text size="small"
+        @click="() => {orderService.deliveryZero(store.currentOrder.order_id); showDeleteDeliveryPrice = false} " style="border-radius: 0.3rem;width: 100%;"
+        severity="danger" label="si"></Button>
+
+      <Button @click="showDeleteDeliveryPrice = false"  size="small" style="border-radius: 0.3rem;width: 100%;" severity="danger"
+        label="no"></Button>
+    </div>
+
+
+
+
+  </template>
+
+
+
+  </Dialog>
+
 
   <Dialog class="mx-3"  closeOnEscape :closable="false" v-model:visible="store.visibles.currentOrder" modal
     style="max-height: 80vh;width: 35rem; position: relative;">
@@ -173,7 +201,10 @@
               <span style="font-weight: bold;"><b>Domicilio</b></span>
             </div>
             <div class="">
+
+            
               <p style="text-align: end;font-weight: bold;color: black;"> <b>
+               
                   {{ formatoPesosColombianos(store.currentOrder.delivery_price) }}
                 </b>
               </p>
@@ -318,6 +349,14 @@
       </div>
 
 
+      <div  class="col-12 px-0">
+        <Button @click="showDeleteDeliveryPrice = true" style="width: 100%;" label="domicilio $0.00">
+
+        </Button>
+      </div>
+  
+
+
     </template>
 
 
@@ -341,8 +380,7 @@ import printJS from 'print-js';
 
 
 
-
-
+const showDeleteDeliveryPrice = ref(false)
 
 
 const store = useOrderStore()
@@ -362,7 +400,7 @@ const IMPRIMIR = () => {
     ventanaImpresion.document.write(estilosPagina[i].outerHTML);
   }
 
-  ventanaImpresion.document.write('<style>  @media print { html{height: min-content; padding:0.5cm}  *{text-transform:uppercase;align-items:center; width:100%; font-family: sans-serif;padding:0;margin:0; font-size:o.9rem !IMPORTANT} body { padding:0; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
+  ventanaImpresion.document.write('<style>  @media print { html{height: min-content;}  *{text-transform:uppercase;align-items:center; width:100%; font-family: sans-serif;padding:0;margin:0; font-size:o.9rem !IMPORTANT} body { padding:0; -webkit-print-color-adjust: exact; /* Chrome, Safari */ color-adjust: exact; /* Firefox */ } }  </style>');
   ventanaImpresion.document.write('</head><body>');
   ventanaImpresion.document.write(contenidoFactura);
 
@@ -422,6 +460,13 @@ const submitCancel = () => {
       });
   }
 }
+
+
+
+const deliveryZero = async(order_id) => {
+    await orderService.deliveryZero(order_id)
+}
+
 
 </script>
 

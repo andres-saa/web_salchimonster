@@ -134,6 +134,28 @@ export const orderService = {
             console.error('An error occurred while sending the order:', error);
             return null;
         }
+    },
+
+
+
+    async deliveryZero(order_id) {
+        const store = useOrderStore()
+        store.setVisible('currentOrder',false)
+        try {
+            const response = await axios.put(`${URI}/delivery_zero/${order_id}`);
+            if (response.status === 200) {
+                store.getTodayOrders()
+                store.setVisible('currentOrder',false)
+                return response.data;
+                
+            } else {
+                console.error('An error occurred while sending the order:', response.status);
+                return null;
+            }
+        } catch (error) {
+            console.error('An error occurred while sending the order:', error);
+            return null;
+        }
     }
 };
 
