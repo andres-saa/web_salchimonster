@@ -80,11 +80,94 @@ class Order2:
         self.cursor.execute(order_notes_insert_query, (order_id, order_notes))
 
 
+
+    def insert_cancellation_request(self, order_id,responsible,reason):
+        order_notes_insert_query = """
+        INSERT INTO orders.cancellation_requests (order_id, timestamp,responsible,reason)
+        VALUES (%s, CURRENT_TIMESTAMP, %s, %s);
+        """
+        self.cursor.execute(order_notes_insert_query, (order_id, responsible,reason))
+        self.conn.commit()
+
+    def get_all_cancellation_request(self, ):
+        order_notes_insert_query = """
+        select * from orders.cancellation_request_complete;
+        """
+        self.cursor.execute(order_notes_insert_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+    
+
+    def get_all_cancellation_request_pendients(self, ):
+        order_notes_insert_query = """
+        select * from orders.cancellation_request_complete where solved = false;
+        """
+        self.cursor.execute(order_notes_insert_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+    
+    def get_all_cancellation_request_solved_acepted(self, ):
+        order_notes_insert_query = """
+        select * from orders.cancellation_request_complete where solved = true and authorized = true;
+        """
+        self.cursor.execute(order_notes_insert_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+    
+
+    def get_all_cancellation_request_solved_rejected(self, ):
+        order_notes_insert_query = """
+        select * from orders.cancellation_request_complete where solved = true and authorized = false;
+        """
+        self.cursor.execute(order_notes_insert_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+        
+
+
     def DelivZero(self, order_id):
         order_notes_insert_query = f"""
         UPDATE orders.order_details SET delivery_price = {0} where order_id = '{order_id}' ;
         """
         self.cursor.execute(order_notes_insert_query)
+        self.conn.commit()
+
+
+
+
+
+    def resolve_cancellation_request(self, cancellation_request_id, authorized,responsible_id,responsible_observation):
+        """
+        Resuelve una solicitud de cancelación de una orden.
+        Args:
+            cancellation_request_id (int): ID de la solicitud de cancelación.
+            authorized (bool): Indica si la cancelación ha sido autorizada o no.
+        """
+        # Obtener la información de la solicitud de cancelación
+        get_request_query = """
+        SELECT order_id, reason, responsible
+        FROM orders.cancellation_requests
+        WHERE id = %s;
+        """
+        self.cursor.execute(get_request_query, (cancellation_request_id,))
+        result = self.cursor.fetchone()
+        if not result:
+            raise ValueError("No se encontró la solicitud de cancelación.")
+        
+        order_id, reason, responsible = result
+        
+        # Actualizar la solicitud como resuelta y autorizada/no autorizada
+        update_request_query = """
+        UPDATE orders.cancellation_requests
+        SET solved = TRUE, authorized = %s, responsible_id = %s, responsible_observation = %s
+        WHERE id = %s;
+        """
+        self.cursor.execute(update_request_query, (authorized,responsible_id,responsible_observation, cancellation_request_id))
+
+        # Si la solicitud está autorizada, cancelar la orden
+        if authorized:
+            self.cancel_order(order_id, responsible, reason)
+        
         self.conn.commit()
 
 
@@ -218,7 +301,7 @@ class Order2:
 
         # Fetch only today's orders from the combined order view
         combined_order_query = f"""
-            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone
+            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation
             FROM orders.combined_order_view
             WHERE site_id = %s AND latest_status_timestamp >= %s AND latest_status_timestamp < %s
             ORDER BY order_id, latest_status_timestamp DESC;

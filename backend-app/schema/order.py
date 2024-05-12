@@ -3,6 +3,7 @@ from typing import List, Optional
 from decimal import Decimal
 from datetime import date
 from schema.user import user_schema_post
+
 class order_schema_post(BaseModel):
     order_products: List[dict]
     user_id: int

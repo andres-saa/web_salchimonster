@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException,Path,Body,WebSocket,WebSocketDisconnect,websockets,Query
 from models.orders.order import Order
-from schema.orders.order import Orders,DeliveryPersons,OrderNotes,OrderStatus,OrderStatusHistory,PaymentMethodOptions
+from schema.orders.order import Orders,DeliveryPersons,OrderNotes,OrderStatus,OrderStatusHistory,PaymentMethodOptions,Cancellation_request
 from typing import List,Dict
 from schema.order import OrderSchemaPost
 from models.orders.order2 import Order2
@@ -101,6 +101,57 @@ def get_order_count_by_site_id(site_id:int):
     return result
 
 
+@order_router.get('/get_all_cancellation_request')
+def get_all_cancellation_request():
+    order_instance = Order2()
+    result = order_instance.get_all_cancellation_request()
+    order_instance.close_connection()
+    return result
+
+@order_router.get('/get_all_cancellation_request_acepted')
+def get_all_cancellation_request():
+    order_instance = Order2()
+    result = order_instance.get_all_cancellation_request_solved_acepted()
+    order_instance.close_connection()
+    return result
+
+
+@order_router.get('/get_all_cancellation_request_acepted')
+def get_all_cancellation_request():
+    order_instance = Order2()
+    result = order_instance.get_all_cancellation_request_solved_acepted()
+    order_instance.close_connection()
+    return result
+
+
+@order_router.get('/get_all_cancellation_request_pendients')
+def get_all_cancellation_request():
+    order_instance = Order2()
+    result = order_instance.get_all_cancellation_request_pendients()
+    order_instance.close_connection()
+    return result
+
+@order_router.get('/get_all_cancellation_request_rejected')
+def get_all_cancellation_request():
+    order_instance = Order2()
+    result = order_instance.get_all_cancellation_request_solved_rejected()
+    order_instance.close_connection()
+    return result
+
+@order_router.post('/insert-cancellation-order')
+def get_order_count_by_site_id(calncelation:Cancellation_request):
+    order_instance = Order2()
+    result = order_instance.insert_cancellation_request(
+        calncelation.order_id,
+        calncelation.responsible,
+        calncelation.reason
+    )
+    order_instance.close_connection()
+    return result
+
+
+
+
 @order_router.put('/delivery_zero/{order_id}')
 def get_order_count_by_site_id(order_id:str):
     order_instance = Order2()
@@ -122,6 +173,18 @@ def update_product_instance_status_endpoint(product_instance_id: int, new_status
     finally:
         order_instance.close_connection()
 
+
+@order_router.put("/resolve-cancellation/{cancellation_request_id}")
+def resolve_cancellation_request_endpoint(cancellation_request_id: int, authorized: bool = Body(..., embed=True),responsible_id: int = Body(..., embed=True),responsible_observation:str = Body(..., embed=True)  ):
+    order_instance = Order2()
+    try:
+        order_instance.resolve_cancellation_request(cancellation_request_id, authorized, responsible_id,responsible_observation)
+        return {"message": "Cancellation request resolved successfully", "cancellation_request_id": cancellation_request_id, "authorized": authorized}
+    except Exception as e:
+        order_instance.close_connection()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        order_instance.close_connection()
 
 
 @order_router.get('/recent-order/{site_id}')

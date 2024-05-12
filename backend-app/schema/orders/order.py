@@ -67,3 +67,13 @@ class OrderAdditionalItems(BaseModel):
     price: int
     additional_item_id: int
     order_item_id: int
+
+
+class Cancellation_request (BaseModel):
+    id: Optional[int] = None
+    order_id:str
+    responsible:str
+    reason:str
+
+
+
