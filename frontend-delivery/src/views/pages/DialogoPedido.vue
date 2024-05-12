@@ -1,23 +1,46 @@
 <template>
   <div>
     <Dialog v-model:visible="cancelDialogVisible" closeOnEscape :closable="true" modal style="width: 30rem;">
-    <template #header>
-      <h3>Cancelar Orden</h3>
-    </template>
-    <form @submit.prevent="submitCancel" style="display: flex;gap: 1rem; flex-direction: column;">
+      <template #header>
+        <h3> <b>Cancelar Orden</b> </h3>
+      </template>
+      <form @submit.prevent="submitCancel" style="display: flex;gap: 1rem; flex-direction: column;align-items:start">
+  
+        <span for="responsible">Responsable</span>
+        <Dropdown style="width: 100%;" id="responsible" v-model="cancelData.responsible" :options="responsibles" optionLabel="name"
+          placeholder="Selecciona un responsable"></Dropdown>
+  
+  
+        <span for="reason">Razón</span>
+        <Textarea style="resize: none; text-transform: lowercase; width:100%" id="reason" v-model="cancelData.reason" rows="5"
+          placeholder="Escribe la razón de la cancelación"></Textarea>
+  
+        <Button style="width: 100%;border-radius:0.5rem" label="cancelar" type="submit" class="p-button-danger" />
+      </form>
+  </Dialog>
 
+
+
+  <Dialog v-model:visible="cancelDialogVisibleAdmin" closeOnEscape :closable="true" modal style="width: 30rem;">
+    <template #header>
+      <h3> <b>Cancelar Orden</b> </h3>
+    </template>
+    <form @submit.prevent="sendRequest" style="display: flex;gap: 1rem; flex-direction: column;align-items:start">
+
+      <span class="advert" style="text-transform: lowercase; color:red;  font-weight: bold;"> Esta orden ya ha sido enviada por lo que debes solicitar permiso para cancelarla.</span>
       <span for="responsible">Responsable</span>
-      <Dropdown id="responsible" v-model="cancelData.responsible" :options="responsibles" optionLabel="name"
+      <Dropdown style="width: 100%;" id="responsible" v-model="cancelData.responsible" :options="responsibles" optionLabel="name"
         placeholder="Selecciona un responsable"></Dropdown>
 
 
       <span for="reason">Razón</span>
-      <Textarea style="resize: none; text-transform: lowercase;" id="reason" v-model="cancelData.reason" rows="5"
+      <Textarea style="resize: none; text-transform: lowercase; width:100%" id="reason" v-model="cancelData.reason" rows="5"
         placeholder="Escribe la razón de la cancelación"></Textarea>
 
-      <Button label="Cancelar Orden" type="submit" class="p-button-danger" />
+      <Button  style="width: 100%;border-radius:0.5rem" label="solicitar cancelacion" type="submit" class="p-button-danger" />
     </form>
   </Dialog>
+
 
 
   <Dialog :closable="false" style="width: 30rem;" modal v-model:visible="showDeleteDeliveryPrice">
@@ -50,7 +73,7 @@
 
 
   <Dialog class="mx-3"  closeOnEscape :closable="false" v-model:visible="store.visibles.currentOrder" modal
-    style="max-height: 80vh;width: 35rem; position: relative;">
+    style="max-height: 95vh;width: 35rem; position: relative;">
     
     <div id="factura" style="width: 100%;">
 
@@ -196,7 +219,6 @@
                 <b >{{ formatoPesosColombianos(store.currentOrder.total_order_price) }}</b>
               </p>
             </div>
-
             <div class="">
               <span style="font-weight: bold;"><b>Domicilio</b></span>
             </div>
@@ -346,6 +368,9 @@
           severity="success" label="enviar"></Button>
         <Button size="small" style="border-radius: 0.3rem;width: 100%;" @click="IMPRIMIR" severity="warning"
           label="imprimir"></Button>
+
+          <Button v-if="store.currentOrder.current_status == 'enviada'" size="small" style="border-radius: 0.3rem;width: 100%;" @click="cancelDialogVisibleAdmin = true" severity="danger"
+          label="CANCELAR "></Button>  
       </div>
 
 
@@ -366,6 +391,7 @@
 
 
   </Dialog>
+
   </div>
 
 </template>
@@ -377,13 +403,28 @@ import { useOrderStore } from '../../store/order'
 import { orderService } from '../../service/orderService';
 import printJS from 'print-js';
 
+const cancelDialogVisibleAdmin = ref(false)
+const store = useOrderStore()
+
+
+
+
+const sendRequest = async() => {
+  const data = {
+    "order_id": store.currentOrder.order_id,
+    "responsible": cancelData.value.responsible?.name,
+    "reason": cancelData.value.reason
+  }
+  await orderService.create_cancellling_request(data)
+  cancelDialogVisibleAdmin.value = false
+}
+
 
 
 
 const showDeleteDeliveryPrice = ref(false)
 
 
-const store = useOrderStore()
 
 const IMPRIMIR = () => {
   const contenidoFactura = document.getElementById('factura').innerHTML;
@@ -436,6 +477,7 @@ onMounted(async () => {
 
 
 const cancelDialogVisible = ref(false);
+
 const cancelData = ref({
   responsible: null,
   reason: 'Sin razon'
@@ -502,7 +544,10 @@ button {
   text-transform: uppercase;
 }
 
+.advert::first-letter{
+  text-transform: uppercase;
 
+}
 
 span {
   color: black

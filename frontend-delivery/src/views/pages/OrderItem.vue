@@ -51,7 +51,17 @@
             
             
         </div>
+
+        <Tag  v-if="props.order.calcel_sol_state != null" :severity="props.order.calcel_sol_state? 'success': 'danger'"> {{props.order.calcel_sol_state? 'REVISADO' : ' EN REVISION...' }} </Tag> <span style="font-weight: bold;" v-if="props.order.calcel_sol_state">  Y  </span>
+        <Tag v-if="props.order.calcel_sol_state" :severity="props.order.calcel_sol_asnwer? 'success': 'danger'">  {{props.order.calcel_sol_asnwer? 'APROBADO': 'RECHAZADO' }} </Tag> 
         
+        <P class="m-0"  v-if="props.order.calcel_sol_state "> <b>RESPONSABLE:</b>  {{props.order.cancelation_solve_responsible?.split(' ').slice(0,3).join(' ')  }} </P> 
+
+        <span v-if="props.order.responsible_observation">
+            <p> <b>OBSERVACIONES:</b> {{ props.order.responsible_observation || 'sin observaciones'}} </p> 
+            
+        </span>
+
        
 
     </div>

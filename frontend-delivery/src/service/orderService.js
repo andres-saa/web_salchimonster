@@ -63,8 +63,6 @@ export const orderService = {
 
 
 
-
-
     async prepareOrder(order_id) {
         const store = useOrderStore()
         store.setVisible('currentOrder',false)
@@ -121,6 +119,30 @@ export const orderService = {
 
         try {
             const response = await axios.post(`${URI}/order/${order_id}/send`);
+            if (response.status === 200) {
+                store.getTodayOrders()
+                store.setVisible('currentOrder',false)
+                return response.data;
+                
+            } else {
+                console.error('An error occurred while sending the order:', response.status);
+                return null;
+            }
+        } catch (error) {
+            console.error('An error occurred while sending the order:', error);
+            return null;
+        }
+    },
+
+
+
+
+    async create_cancellling_request(data) {
+        const store = useOrderStore()
+        store.setVisible('currentOrder',false)
+
+        try {
+            const response = await axios.post(`${URI}/insert-cancellation-order`,data);
             if (response.status === 200) {
                 store.getTodayOrders()
                 store.setVisible('currentOrder',false)
