@@ -27,11 +27,10 @@
     </template>
     <form @submit.prevent="sendRequest" style="display: flex;gap: 1rem; flex-direction: column;align-items:start">
 
-      <span class="advert" style="text-transform: lowercase; color:red;  font-weight: bold;"> Esta orden ya ha sido enviada por lo que debes solicitar permiso para cancelarla.</span>
+      <span class="advert" style="text-transform: lowercase; color:red;  font-weight: bold;"> Desde el 16 de mayo de 2024, la cancelación de órdenes requerirá autorización.</span>
       <span for="responsible">Responsable</span>
       <Dropdown style="width: 100%;" id="responsible" v-model="cancelData.responsible" :options="responsibles" optionLabel="name"
         placeholder="Selecciona un responsable"></Dropdown>
-
 
       <span for="reason">Razón</span>
       <Textarea style="resize: none; text-transform: lowercase; width:100%" id="reason" v-model="cancelData.reason" rows="5"
@@ -356,11 +355,7 @@
           @click="orderService.prepareOrder(store.currentOrder.order_id)" style="border-radius: 0.3rem;width: 100%;"
           severity="success" label="Preparar"></Button>
 
-        <Button v-if="store.currentOrder.current_status != 'enviada' && store.currentOrder.current_status != 'cancelada'
-
-
-          " size="small" @click="cancelDialogVisible = true" style="border-radius: 0.3rem;width: 100%;" severity="danger"
-          label="cancelar"></Button>
+  
 
 
         <Button v-if="store.currentOrder.current_status == 'en preparacion'" size="small"
@@ -369,7 +364,7 @@
         <Button size="small" style="border-radius: 0.3rem;width: 100%;" @click="IMPRIMIR" severity="warning"
           label="imprimir"></Button>
 
-          <Button v-if="store.currentOrder.current_status == 'enviada'" size="small" style="border-radius: 0.3rem;width: 100%;" @click="cancelDialogVisibleAdmin = true" severity="danger"
+          <Button  size="small" style="border-radius: 0.3rem;width: 100%;" @click="cancelDialogVisibleAdmin = true" severity="danger"
           label="CANCELAR "></Button>  
       </div>
 
@@ -408,6 +403,7 @@ const store = useOrderStore()
 
 
 
+      
 
 const sendRequest = async() => {
   const data = {
@@ -417,6 +413,8 @@ const sendRequest = async() => {
   }
   await orderService.create_cancellling_request(data)
   cancelDialogVisibleAdmin.value = false
+  store.Notification.pause()
+  store.Notification.currentTime = 0
 }
 
 
