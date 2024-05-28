@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 from schema.city import citySchema
 from schema.inventory.inventory import GroupDailyInventoryItems,DailyInventoryItems
-from schema.inventory.purchase_order import GroupPurchaseItems,PurchaseOrderItem
+from schema.inventory.purchase_order import GroupPurchaseItems,PurchaseOrderItem,PurchaseOrderStatus
 load_dotenv()
 import pytz
 
@@ -23,7 +23,7 @@ class PurchaseOrder:
         
     
     def get_all_purchase_orders(self):
-        query = "SELECT * FROM purchase.view_purchase_details;"
+        query = "SELECT * FROM purchase.view_purchase_details2;"
         self.cursor.execute(query)
         columns = [desc[0] for desc in self.cursor.description]
         results = self.cursor.fetchall()
@@ -45,7 +45,64 @@ class PurchaseOrder:
             converted_records.append(record)
         
         return converted_records
+
+
+
+    def get_all_purchase_order_history(self,purchase_order_id):
+        query = f"SELECT * FROM purchase.view_purchase_history where purchase_order_id = {purchase_order_id}"
+        self.cursor.execute(query)
+        columns = [desc[0] for desc in self.cursor.description]
+        results = self.cursor.fetchall()
+        
+        # Crear una lista para almacenar los registros con la fecha convertida
+        converted_records = []
+        
+        # Zona horaria de Colombia
+        tz_colombia = pytz.timezone('America/Bogota')
+        
+        for row in results:
+            record = dict(zip(columns, row))
+            # Suponiendo que 'expedition_date' es el nombre de la columna de la fecha
+            utc_date = record['status_timestamp']
+            # Convertir la fecha de UTC a hora de Colombia
+            local_date = utc_date.replace(tzinfo=pytz.utc).astimezone(tz_colombia)
+            # Actualizar el registro con la nueva fecha
+            record['status_timestamp'] = local_date.strftime('%d-%m-%YT%H:%M:%S')
+            converted_records.append(record)
+        
+        return converted_records
+
+
+    def get_all_purchase_orders_by_lap_id(self, lap_id):
+        query = f"SELECT * FROM purchase.view_purchase_details_complete where lap_id = {lap_id};"
+        self.cursor.execute(query)
+        columns = [desc[0] for desc in self.cursor.description]
+        results = self.cursor.fetchall()
+        
+        # Crear una lista para almacenar los registros con la fecha convertida
+        converted_records = []
+        
+        # Zona horaria de Colombia
+        tz_colombia = pytz.timezone('America/Bogota')
+        
+        for row in results:
+            record = dict(zip(columns, row))
+            # Suponiendo que 'expedition_date' es el nombre de la columna de la fecha
+            utc_date = record['expedition_date']
+            # Convertir la fecha de UTC a hora de Colombia
+            local_date = utc_date.replace(tzinfo=pytz.utc).astimezone(tz_colombia)
+            # Actualizar el registro con la nueva fecha
+            record['expedition_date'] = local_date.strftime('%d-%m-%YT%H:%M:%S')
+            converted_records.append(record)
+
+
+            utc_status_timestamp = record['status_timestamp']
+            local_status_timestamp = utc_status_timestamp.replace(tzinfo=pytz.utc).astimezone(tz_colombia)
+            record['status_timestamp'] = local_status_timestamp.strftime('%d-%m-%YT%H:%M:%S')
+        
+        return converted_records
     
+
     
     def get_all_purchase_orders_by_responsible_id (self, responsible_id:int):
         query = f""" select * from purchase.view_purchase_details where responsible_id = {responsible_id};        
@@ -73,12 +130,12 @@ class PurchaseOrder:
         return converted_records
     
 
-    def get_all_purchase_orders_by_lap_id (self, lap_id:int):
-        query = f""" select * from purchase.view_purchase_details where lap_id = {lap_id};        
-        """
-        self.cursor.execute(query)
-        columns = [desc[0] for desc in self.cursor.description]
-        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+    # def get_all_purchase_orders_by_lap_id (self, lap_id:int):
+    #     query = f""" select * from purchase.view_purchase_details where lap_id = {lap_id};        
+    #     """
+    #     self.cursor.execute(query)
+    #     columns = [desc[0] for desc in self.cursor.description]
+    #     return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
     
 
 
@@ -239,7 +296,7 @@ class PurchaseOrder:
 
 
     def get_purchase_order_entries_by_order_purchase_id (self,order_purchase_id):
-        query = f""" select * from purchase.detailed_purchase_entries where purchase_order_id = {order_purchase_id};        
+        query = f""" select * from purchase.detailed_purchase_entries5 where purchase_order_id = {order_purchase_id};        
         """
         self.cursor.execute(query)
         columns = [desc[0] for desc in self.cursor.description]
@@ -336,6 +393,46 @@ class PurchaseOrder:
         return group_id 
     
 
+
+
+    def chage_order_purchase_status(self, purchase_order_status: PurchaseOrderStatus):
+        # Construir la parte del receiver_id opcionalmente
+        receiver_id_value = 'NULL' if purchase_order_status.receiver_id is None else purchase_order_status.receiver_id
+        
+        insert_query = f"""
+        INSERT INTO purchase.purchase_order_status(
+        purchase_order_id, lap_id, responsible_id, status_timestamp, receiver_id)
+        VALUES (
+            {purchase_order_status.purchase_order_id}, 
+            {purchase_order_status.lap_id+1}, 
+            {purchase_order_status.responsible_id},
+            CURRENT_TIMESTAMP AT TIME ZONE 'UTC',
+            {receiver_id_value}) RETURNING id;
+        """
+        self.cursor.execute(insert_query)
+        group_id = self.cursor.fetchone()[0]
+
+        for item in purchase_order_status.ajusts:
+            insert_query_ajust = f"""
+            INSERT INTO purchase.order_purchase_entry_quantity_adjust(
+                order_purchase_entry_id, responsible_id, lap_id, quantity_adjusted)
+                VALUES ( {item.order_purchase_entry_id}, {purchase_order_status.responsible_id}, {purchase_order_status.lap_id}, {item.quantity_adjusted});
+                """
+            self.cursor.execute(insert_query_ajust)
+
+
+        insert_query_note = f"""
+            INSERT INTO purchase.purchase_order_status_notes(
+            purchase_order_status_id, note)
+            VALUES ({group_id}, '{purchase_order_status.order_purchase_notes}');
+                """
+        self.cursor.execute(insert_query_note)
+
+        self.conn.commit()
+        return group_id
+        
+
+    
     # def get_groups_with_items(self):
     #     query = """
     #     SELECT g.id as group_id, g.name as group_name, 

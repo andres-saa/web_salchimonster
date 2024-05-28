@@ -13,6 +13,23 @@ class PurchaseOrder(BaseModel):
     responsible_id:int
     site_id:int
 
+
+
+class PurchaseOrderAdjust(BaseModel):
+    order_purchase_entry_id:int
+    quantity_adjusted:float
+
+class PurchaseOrderStatus(BaseModel):
+    id:Optional[int] = None
+    purchase_order_id:int
+    lap_id:int
+    responsible_id:int
+    receiver_id:Optional[int] = None
+    ajusts:list[PurchaseOrderAdjust]
+    order_purchase_notes:Optional[str] = ''
+
+
+
 class OrderPurchaseEntry(BaseModel):
     id:Optional[int] = None
     quantity:float
@@ -29,7 +46,8 @@ class PurchaseOrderItem(BaseModel):
 
 class OrderComplete(BaseModel):
     order_purchase:PurchaseOrder
-    order_purchase_items:list[OrderPurchaseEntry] 
+    order_purchase_items:list[OrderPurchaseEntry]
+
 
 
 

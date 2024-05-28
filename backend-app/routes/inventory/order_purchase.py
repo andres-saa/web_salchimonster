@@ -1,7 +1,7 @@
 from models.inventory.purchase_order import PurchaseOrder
 from fastapi import APIRouter,HTTPException, status
 from schema.inventory.inventory import GroupDailyInventoryItems,DailyInventoryItems,InventoryComplete
-from schema.inventory.purchase_order import GroupPurchaseItems,PurchaseOrderItem,OrderComplete
+from schema.inventory.purchase_order import GroupPurchaseItems,PurchaseOrderItem,OrderComplete,PurchaseOrderStatus
 
 order_purchase_router = APIRouter()
 
@@ -92,12 +92,23 @@ def insert_complete_inventory(complete_order_data: OrderComplete):
     return {"message": "Inventory created successfully", "inventory_id": inventory_id}
 
 
-# @order_purchase_router.get('/get_groups_with_items')
-# def get_inventory_report():
-#     order_purchase_instance =  DailyInventory()
-#     data = order_purchase_instance.get_groups_with_items()
-#     order_purchase_instance.close_connection()
-#     return data
+
+
+@order_purchase_router.post('/prepare-purchase-order')
+def insert_complete_inventory(prepare_order_data: PurchaseOrderStatus):
+    inventory_instance = PurchaseOrder()
+    try:
+        inventory_id = inventory_instance.chage_order_purchase_status(prepare_order_data
+        )
+    except Exception as e:  
+        inventory_instance.close_connection()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    inventory_instance.close_connection()
+    return {"message": "Inventory created successfully", "inventory_id": inventory_id}
+
+
+
+
 
 
 
@@ -105,6 +116,16 @@ def insert_complete_inventory(complete_order_data: OrderComplete):
 def get_inventory_items_by_group_name(daily_item_group_name: str):
     order_purchase_instance =  PurchaseOrder()
     data = order_purchase_instance.get_all_purchase_order_item_by_group_name(daily_item_group_name)
+    order_purchase_instance.close_connection()
+    return data
+
+
+
+
+@order_purchase_router.get('/purchase-order-history/{purchase_order_id}' , tags=['purchase_order'])
+def get_inventory_items_by_group_name(purchase_order_id: str):
+    order_purchase_instance =  PurchaseOrder()
+    data = order_purchase_instance.get_all_purchase_order_history(purchase_order_id)
     order_purchase_instance.close_connection()
     return data
 
