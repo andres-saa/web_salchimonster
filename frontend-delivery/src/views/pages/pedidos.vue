@@ -109,8 +109,6 @@
 
   </div>
 
-
-  <div :class="dialog_pedido_visible ? 'before' : ''"></div>
 </template>
 
 <script setup>

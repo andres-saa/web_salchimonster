@@ -15,14 +15,6 @@ const requestNotificationPermission = async () => {
     }
 };
 
-const requestSoundPermission = async () => {
-    try {
-        await new AudioContext().resume();
-    } catch (error) {
-        console.error('Error requesting sound permission:', error);
-        alert('La reproducción de sonidos está deshabilitada. Por favor, habilite la reproducción de sonidos para recibir alertas auditivas.');
-    }
-};
 
 const playNotificationSound = () => {
     if (store.Notification.readyState >= 2) {
@@ -38,7 +30,7 @@ const playNotificationSound = () => {
 
 onMounted(() => {
     requestNotificationPermission();
-    requestSoundPermission(); // Solicitar permiso para reproducir sonidos
+
     const fetchOrdersAndNotify = async () => {
         try {
             const site_id = sitestore.site.site_id;
@@ -71,13 +63,21 @@ onMounted(() => {
 });
 
 const notif = ref(true)
+
+
+
+const sonido = new Audio('/sound/beep.mp3')
+const acept = () => {
+    notif.value = false
+    sonido.play()
+}
 </script>
 
 <template>
     <div  style="width:100vw;height:100vh;display:flex;position: absolute; align-items:center;justify-content:center; z-index: 999;top:0;left:0;background-color:rgba(0,0,0,0.5)" :closable="false" v-if="notif">
         <div style="width:20rem;display:flex; gap:1rem;flex-direction:column;justify-content:center;align-items:center">
             <img style="width:100%;" src="/images/NOTI.png" alt="">
-            <Button  rounded @click="notif = false" style="width:max-content;border-radius:2rem" severity="help" icon="pi pi-bell" label="Aceptar notificaciones"></Button>
+            <Button  rounded @click="acept" style="width:max-content;border-radius:2rem" severity="help" icon="pi pi-bell" label="Aceptar notificaciones"></Button>
         </div>
     </div>
     <router-view class="col-12 p-0" />

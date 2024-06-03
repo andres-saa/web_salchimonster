@@ -12,6 +12,14 @@ def get_categories(site_id:int):
     return categories
 
 
+
+@category_router.get("/categories/{site_id}/all")
+def get_categories(site_id:int):
+    category_instance = Category()
+    categories = category_instance.select_all_categories_all(site_id)
+    category_instance.close_connection()
+    return categories
+
 # @category_router.get("/site/{site_id}/active-categories")
 # def get_active_categories_by_site(site_id: int):
 #     category_instance = Category()

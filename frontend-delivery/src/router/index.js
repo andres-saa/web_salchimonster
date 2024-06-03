@@ -31,6 +31,42 @@ const router = createRouter({
               component: () => import('@/views/pages/cuadre.vue'),
               
             },
+
+            {
+              path: '/reporte-ventas/',
+              name: 'reporte-ventas',
+              component: () => import('@/views/pages/reporteVentas.vue'),
+              children: [
+                {
+                  path: '/reporte-ventas/valor-ventas',
+                  name: 'reporte-ventas-valor-ventas',
+                  component: () => import('@/views/pages/RepValorVentas.vue'),
+                },
+                {
+                  path: '/reporte-ventas/no-ordenes',
+                  name: 'reporte-ventas-no-ordenes',
+                  component: () => import('@/views/pages/RepNoOrdenes.vue'),
+                },
+                {
+                  path: '/reporte-ventas/ticket',
+                  name: 'reporte-ventas-ticket',
+                  component: () => import('@/views/pages/RepTicket.vue'),
+                }
+                ,
+                {
+                  path: '/reporte-ventas/clientes',
+                  name: 'reporte-ventas-clientes',
+                  component: () => import('@/views/pages/RepClientes.vue'),
+                },
+                {
+                  path: '/reporte-ventas/ordenes',
+                  name: 'reporte-ventas-ordenes',
+                  component: () => import('@/views/pages/ordenes.vue'),
+                }
+    
+              ]
+            },
+            
             {
               path: '/horarios',
               name: 'horarios',

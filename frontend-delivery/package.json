@@ -11,6 +11,7 @@
     "axios": "^1.6.8",
     "chart.js": "3.3.2",
     "install": "^0.13.0",
+    "jwt-decode": "^4.0.0",
     "npm": "^10.5.2",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
@@ -23,7 +24,8 @@
     "vue-carousel": "^0.18.0",
     "vue-router": "^4.2.4",
     "vue3-carousel": "^0.3.1",
-    "vuex": "^4.1.0"
+    "vuex": "^4.1.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",

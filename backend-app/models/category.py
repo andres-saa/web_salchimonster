@@ -49,5 +49,21 @@ class Category:
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
 
+
+    def select_all_categories_all(self, site_id):
+        # Definimos la consulta que verifica la existencia de instancias activas de productos por cada categoría
+        select_query = f"""
+        SELECT c.*
+        FROM inventory.active_product_categories_with_site AS c
+        WHERE c.site_id = {site_id};
+        """
+        self.cursor.execute(select_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+
+
+
+
     def close_connection(self):
         self.conn.close()

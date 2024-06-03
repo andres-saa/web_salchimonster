@@ -168,6 +168,7 @@ const menus = [
     { name: ' Cuadre de caja', to: '/cuadre' },
     { name: ' Menu', to: '/tienda-menu/productos/SALCHIPAPAS/3' },
     { name: ' Horarios', to: '/horarios' },
+    { name: ' Reportes', to: '/reporte-ventas/valor-ventas' }
 
 ]
 

@@ -104,11 +104,11 @@ const { onMenuToggle } = useLayout();
             <div class="layout-main  ">
                
 
-                <transition name="fade">
+       
                     <router-view class="p-0"></router-view>
-                </transition>
+               
             </div>
-            <app-footer></app-footer>
+            <!-- <app-footer></app-footer> -->
         </div>
         <div class="layout-mask"></div>
     </div>

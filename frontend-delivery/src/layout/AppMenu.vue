@@ -106,6 +106,11 @@ const model = ref([
                 icon: 'pi pi-fw pi-pencil',
                 to: '/horarios'
             },
+            {
+                label: 'Reportes',
+                icon: 'pi pi-fw pi-pencil',
+                to: '/reporte-ventas/valor-ventas'
+            },
             // {
             //     label: 'Gestion de Sedes',
             //     icon: 'pi pi-fw pi-pencil',
