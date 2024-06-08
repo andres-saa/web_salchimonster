@@ -15,9 +15,9 @@ def get_orders():
     return orders
 
 @order_router.get("/order/{order_id}")
-def get_order_by_id(order_id: int):
+def get_order_by_id(order_id: str):
     order_instance = Order()
-    order = order_instance.select_order_by_id(order_id)
+    order = order_instance.get_order_status_by_order_id(order_id)
     order_instance.close_connection()
     return order
 

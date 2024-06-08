@@ -1,5 +1,5 @@
 from models.inventory.purchase_order import PurchaseOrder
-from fastapi import APIRouter,HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 from schema.inventory.inventory import GroupDailyInventoryItems,DailyInventoryItems,InventoryComplete
 from schema.inventory.purchase_order import GroupPurchaseItems,PurchaseOrderItem,OrderComplete,PurchaseOrderStatus
 
@@ -169,3 +169,89 @@ def disable_daily_inventory_group( item_id :  int):
     data = order_purchase_instance.disable_order_purchase_item(item_id)
     order_purchase_instance.close_connection()
     return data
+
+
+
+
+import requests
+import json
+# Webhook para recibir mensajes de WhatsApp
+VERIFY_TOKEN = "obg0iystmnq4v0ln4r5fnjcvankhtjp0"  # Token de verificación que definirás tú mismo
+
+@order_purchase_router.get("/webhook")
+async def whatsapp_webhook(request: Request):
+    try:
+        body = await request.json()
+        if not body or "messages" not in body:
+            return {"status": "ignored"}
+
+        # Aquí puedes procesar el mensaje recibido
+        response = handle_whatsapp_message(body)
+        # print(body)
+        return {"status": "success", "response": response}
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON format")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@order_purchase_router.post("/webhook")
+async def whatsapp_webhook(request: Request):
+    try:
+        body = await request.json()
+        if not body:
+            raise HTTPException(status_code=400, detail="Received empty JSON")
+
+        # Aquí puedes procesar el mensaje recibido
+        response = handle_whatsapp_message(body)
+        # print(body)
+        return {"status": "success", "response": response}
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON format")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+
+
+
+
+def handle_whatsapp_message(body):
+    try:
+        entry = body.get("entry", [])
+        if not entry:
+            raise HTTPException(status_code=400, detail="No entry found in the request")
+
+        changes = entry[0].get("changes", [])
+        if not changes:
+            raise HTTPException(status_code=400, detail="No changes found in the request")
+
+        value = changes[0].get("value", {})
+        if not value:
+            raise HTTPException(status_code=400, detail="No value found in the request")
+
+        messages = value.get("messages", [])
+        if not messages:
+            raise HTTPException(status_code=400, detail="No messages found in the request")
+
+        # Verificar que el usuario haya enviado un mensaje antes de procesarlo
+        if messages[0]["type"] != "text":
+            raise HTTPException(status_code=400, detail="No text message found")
+
+        message = messages[0]
+        from_number = message["from"]
+        message_text = message["text"]["body"]
+
+        # Aquí defines la lógica de tu respuesta
+        response_text = f"Received your message: {from_number}"
+
+        print(response_text)
+        # Envía una respuesta usando la API de WhatsApp
+        # send_whatsapp_message(from_number, 'hello_world')
+
+        return response_text
+    except IndexError:
+        raise HTTPException(status_code=400, detail="Index error in message processing")
+    except KeyError:
+        raise HTTPException(status_code=400, detail="Key error in message processing")
+
+

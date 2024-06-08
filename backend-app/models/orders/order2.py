@@ -10,7 +10,7 @@ from schema.user import user_schema_post
 from datetime import datetime, timedelta
 from datetime import datetime, timedelta
 from datetime import datetime, time
-
+from config.wsp import enviar_mensaje_whatsapp
 import pytz
 load_dotenv()
 
@@ -20,6 +20,13 @@ DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
 DB_NAME = os.getenv('DB_NAME')
 
+
+
+api_key = 'obg0iystmnq4v0ln4r5fnjcvankhtjp0'
+source_number = '573053447255'
+destination_number = '573226892988'
+message = 'esta es una prueba de la api'
+source_name = 'Salchimonster'
 
 class Order2:
     def __init__(self):
@@ -40,6 +47,7 @@ class Order2:
             # Actualizar la última hora de compra
             self.update_last_order_time(user_id)
             self.conn.commit()
+            enviar_mensaje_whatsapp(api_key,source_number,destination_number,message,source_name)
             return order_id
         else:
             
@@ -255,7 +263,24 @@ class Order2:
         result  = self.cursor.fetchone()[0]
 
         return result
+    
+
+    def get_order_status_by_order_id(self, order_id):
+        # Limpieza del order_id para quitar espacios y el caracter #
+        clean_order_id = order_id.replace('#', '').strip().lower()
         
+        order_query = f"""
+        SELECT *
+        FROM orders.order_status AS os
+        JOIN orders.orders AS o ON os.order_id = o.id
+        WHERE LOWER(REPLACE(o.id, '#', '')) = '{clean_order_id}'
+        ORDER BY os.timestamp DESC
+        LIMIT 1;
+        """
+        self.cursor.execute(order_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()][0]
+    
     
     def is_recent_order_generated(self, site_id):
     # Consulta para obtener el ID de la última orden con estado 'generada' en los últimos 3 segundos usando la hora del servidor UTC
@@ -357,6 +382,126 @@ class Order2:
             order['additional_items'] = grouped_additionals
 
         return orders_dict
+
+
+    def get_order_by_id(self, order_id):
+        # Limpieza del order_id para quitar espacios y el caracter #, y convertir a minúsculas
+        clean_order_id = order_id.replace('#', '').strip().lower()
+
+        # Fetch the specific order from the combined order view
+        order_query = f"""
+        SELECT DISTINCT ON (order_id) order_id,site_id,responsible,reason, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, responsible_observation
+        FROM orders.combined_order_view
+        WHERE LOWER(REPLACE(order_id, '#', '')) = %s
+        ORDER BY order_id, latest_status_timestamp DESC
+        LIMIT 1;
+        """
+        self.cursor.execute(order_query, (clean_order_id,))
+        order_info = self.cursor.fetchone()
+
+        if not order_info:
+            return None  # Order not found
+
+        columns_info = [desc[0] for desc in self.cursor.description]
+        order_dict = dict(zip(columns_info, order_info))
+
+        # Fetch products related to the order
+        products_query = f"""
+        SELECT name, price, quantity, total_price, product_id
+        FROM orders.order_products WHERE order_id = %s;
+        """
+        self.cursor.execute(products_query, (clean_order_id,))
+        products = self.cursor.fetchall()
+        products_columns = [desc[0] for desc in self.cursor.description]
+        order_dict['products'] = [dict(zip(products_columns, row)) for row in products]
+
+        # Fetch additional items related to the order
+        additionals_query = f"""
+        SELECT 
+        aditional_name,
+        aditional_quantity,
+        aditional_type,
+        aditional_price,
+        total_aditional_price
+        FROM orders.vw_order_aditional_items WHERE order_id = %s;
+        """
+        self.cursor.execute(additionals_query, (clean_order_id,))
+        additionals = self.cursor.fetchall()
+        additionals_columns = [desc[0] for desc in self.cursor.description]
+
+        # Group additional items by type
+        grouped_additionals = {}
+        for row in additionals:
+            additional = dict(zip(additionals_columns, row))
+            additional_type = additional['aditional_type']
+            if additional_type not in grouped_additionals:
+                grouped_additionals[additional_type] = [additional]
+            else:
+                grouped_additionals[additional_type].append(additional)
+
+        order_dict['additional_items'] = grouped_additionals
+
+        return order_dict
+
+
+    def get_order_by_user_phone(self, user_phone):
+        # Limpieza del order_id para quitar espacios y el caracter #, y convertir a minúsculas
+        clean_order_id = user_phone.replace('#', '').strip().lower()
+
+        # Fetch the specific order from the combined order view
+        order_query = f"""
+        SELECT DISTINCT ON (order_id) order_id,site_id,responsible,reason, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, responsible_observation
+        FROM orders.combined_order_view
+        WHERE user_phone = '{user_phone}'
+        ORDER BY order_id DESC
+        LIMIT 1;
+        """
+        self.cursor.execute(order_query)
+        order_info = self.cursor.fetchone()
+
+        if not order_info:
+            return None  # Order not found
+
+        columns_info = [desc[0] for desc in self.cursor.description]
+        order_dict = dict(zip(columns_info, order_info))
+
+        # Fetch products related to the order
+        products_query = f"""
+        SELECT name, price, quantity, total_price, product_id
+        FROM orders.order_products WHERE order_id = %s;
+        """
+        self.cursor.execute(products_query, (clean_order_id,))
+        products = self.cursor.fetchall()
+        products_columns = [desc[0] for desc in self.cursor.description]
+        order_dict['products'] = [dict(zip(products_columns, row)) for row in products]
+
+        # Fetch additional items related to the order
+        additionals_query = f"""
+        SELECT 
+        aditional_name,
+        aditional_quantity,
+        aditional_type,
+        aditional_price,
+        total_aditional_price
+        FROM orders.vw_order_aditional_items WHERE order_id = %s;
+        """
+        self.cursor.execute(additionals_query, (clean_order_id,))
+        additionals = self.cursor.fetchall()
+        additionals_columns = [desc[0] for desc in self.cursor.description]
+
+        # Group additional items by type
+        grouped_additionals = {}
+        for row in additionals:
+            additional = dict(zip(additionals_columns, row))
+            additional_type = additional['aditional_type']
+            if additional_type not in grouped_additionals:
+                grouped_additionals[additional_type] = [additional]
+            else:
+                grouped_additionals[additional_type].append(additional)
+
+        order_dict['additional_items'] = grouped_additionals
+
+        return order_dict
 
     
     def prepare_order(self, order_id):

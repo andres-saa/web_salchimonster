@@ -92,6 +92,27 @@ def get_orders_gy_site(site_id:int):
     return result
 
 
+@order_router.get('/order/{order_id}')
+def get_orders_gy_site(order_id:str):
+    order_instance = Order2()
+    result = order_instance.get_order_status_by_order_id(order_id)
+    order_instance.close_connection()
+    return result
+
+
+@order_router.get('/order-by-id/{order_id}')
+def get_orders_gy_site(order_id:str):
+    order_instance = Order2()
+    result = order_instance.get_order_by_id(order_id)
+    order_instance.close_connection()
+    return result
+
+@order_router.get('/order-by-phone/{user_phone}')
+def get_orders_gy_site(user_phone:str):
+    order_instance = Order2()
+    result = order_instance.get_order_by_user_phone(user_phone)
+    order_instance.close_connection()
+    return result
 
 @order_router.get('/get_order_count_by_site_id/{site_id}')
 def get_order_count_by_site_id(site_id:int):
