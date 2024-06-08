@@ -188,15 +188,17 @@ const getHorarios = async () => {
 const saveChanges = async () => {
     guardando.value = true
     try {
-        // Formatear los datos para enviar solo la hora
+        // Formatear los datos para enviar solo la hora en formato 24 horas
         const horarioToSend = horario.value.map(item => {
-            const openingTime = item.opening_time instanceof Date ? item.opening_time.toLocaleTimeString() : item.opening_time;
-            const closing_time = item.closing_time instanceof Date ? item.closing_time.toLocaleTimeString() : item.closing_time;
+            const options = { hour12: false, hour: '2-digit', minute: '2-digit' };
+            
+            const openingTime  = item.opening_time instanceof Date ? item.opening_time.toLocaleTimeString([], options) : item.opening_time;
+            const closingTime  = item.closing_time instanceof Date ? item.closing_time.toLocaleTimeString([], options) : item.closing_time;
 
             return {
                 ...item,
-                opening_time: openingTime.split(' ')[0],
-                closing_time: closing_time.split(' ')[0] // Obtener solo la hora de la cadena de fecha y hora
+                opening_time: openingTime,
+                closing_time: closingTime
             };
         });
 
@@ -210,7 +212,7 @@ const saveChanges = async () => {
         });
 
         if (!response.ok)
-            throw ('Error al enviar los datos');
+            throw new Error('Error al enviar los datos');
 
         // Después de enviar los datos, deshabilitar la edición
         isEditing.value = false;
@@ -218,9 +220,9 @@ const saveChanges = async () => {
     } catch (error) {
         console.log(error);
         guardando.value = false
-
     }
 };
+
 
 
 const dias = ref(["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"])
