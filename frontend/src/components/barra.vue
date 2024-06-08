@@ -112,6 +112,20 @@
   <div v-if="!route.path.includes('cart') && !route.path.includes('pay')" class="whatsapp"  :style="!showElement? 'transform: translateX(-2.2rem)': ''"  style="">
  
 
+    <a href="https://wa.link/5mq1t0">  <button class="whatsapp-btn p-1" style="
+                             border: none; background-color:transparent; 
+                             transition: all ease .3s;
+                             /* border-radius: 50%;  */
+                             display: flex;align-items: center; justify-content: center;
+ 
+ 
+     
+ 
+     ">
+           <i class="" :class="PrimeIcons.WHATSAPP"
+             style=" ;position: relative;  font-weight:  bold; font-size: 1.8rem; color: rgb(255, 255, 255);width:auto">
+           </i>
+         </button></a>
  
         
 
