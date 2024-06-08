@@ -6,7 +6,7 @@
         persist: {
             key: 'cart', 
             storage: localStorage,
-            paths: ['cart']
+            paths: ['cart','last_order']
         },
         state: () => ({
             currentProduct: {},
@@ -20,6 +20,7 @@
                 total_cost: 0,
                 additions: []  // Nueva propiedad para manejar las adiciones a nivel del carrito
             },
+            last_order:'',
             sending_order:false
         }),
        
