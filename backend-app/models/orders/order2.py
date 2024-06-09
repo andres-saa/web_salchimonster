@@ -326,7 +326,7 @@ class Order2:
                 ROW_NUMBER() OVER (PARTITION BY os.order_id ORDER BY os.timestamp DESC) AS rn
             FROM orders.order_status os
             JOIN orders.orders o ON os.order_id = o.id
-            WHERE o.site_id = %s AND os.status = 'generada'
+            WHERE o.site_id = %s AND os.status = 'generada' AND o.authorized = true
         ) AS latest_status
         WHERE latest_status.rn = 1 AND latest_status.timestamp >= (CURRENT_TIMESTAMP - INTERVAL '30 seconds')
         ORDER BY latest_status.timestamp DESC
@@ -363,10 +363,91 @@ class Order2:
         combined_order_query = f"""
             SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation
             FROM orders.combined_order_view
-            WHERE site_id = %s AND latest_status_timestamp >= %s AND latest_status_timestamp < %s
+            WHERE site_id = %s AND latest_status_timestamp >= %s AND latest_status_timestamp < %s AND authorized = true
             ORDER BY order_id, latest_status_timestamp DESC;
             """
         self.cursor.execute(combined_order_query, (site_id, today_start, tomorrow_start))
+        orders_info = self.cursor.fetchall()
+        columns_info = [desc[0] for desc in self.cursor.description]
+        orders_dict = [dict(zip(columns_info, row)) for row in orders_info]
+
+        # Convert and format timestamps to Colombia timezone
+        for order in orders_dict:
+            if 'latest_status_timestamp' in order:
+                order['latest_status_timestamp'] = order['latest_status_timestamp'].astimezone(colombia_tz)
+
+        # Fetch additional order details
+        for order in orders_dict:
+            order_id = order['order_id']
+
+            # Fetch products related to the order
+            products_query = f"""
+            SELECT name, price, quantity, total_price, product_id 
+            FROM orders.order_products WHERE order_id = %s;
+            """
+            self.cursor.execute(products_query, (order_id,))
+            products = self.cursor.fetchall()
+            products_columns = [desc[0] for desc in self.cursor.description]
+            order['products'] = [dict(zip(products_columns, row)) for row in products]
+
+            # Fetch additional items related to the order
+            additionals_query = f"""
+            SELECT 
+            aditional_name,
+            aditional_quantity,
+            aditional_type,
+            aditional_price,
+            total_aditional_price
+            FROM orders.vw_order_aditional_items WHERE order_id = %s;
+            """
+            self.cursor.execute(additionals_query, (order_id,))
+            additionals = self.cursor.fetchall()
+            additionals_columns = [desc[0] for desc in self.cursor.description]
+
+            # Group additional items by type
+            grouped_additionals = {}
+            for row in additionals:
+                additional = dict(zip(additionals_columns, row))
+                additional_type = additional['aditional_type']
+                if additional_type not in grouped_additionals:
+                    grouped_additionals[additional_type] = [additional]
+                else:
+                    grouped_additionals[additional_type].append(additional)
+
+            order['additional_items'] = grouped_additionals
+
+        return orders_dict
+    
+
+
+
+
+    def get_orders_to_transfer(self):
+        # Get today's date in Colombia timezone
+         # Get today's date in Colombia timezone
+        colombia_tz = pytz.timezone('America/Bogota')
+        now = datetime.now(colombia_tz)
+        
+        # Adjusting start time to 2 AM today
+        if now.time() < time(2, 0):
+            today_date = (now - timedelta(days=1)).date()
+        else:
+            today_date = now.date()
+
+        tomorrow_date = today_date + timedelta(days=1)
+
+        # Convert dates to datetime at 2 AM for use in SQL query
+        today_start = datetime.combine(today_date, time(2, 0)).astimezone(colombia_tz).isoformat()
+        tomorrow_start = datetime.combine(tomorrow_date, time(2, 0)).astimezone(colombia_tz).isoformat()
+
+        # Fetch only today's orders from the combined order view
+        combined_order_query = f"""
+            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation
+            FROM orders.combined_order_view
+            WHERE  latest_status_timestamp >= %s AND latest_status_timestamp < %s AND authorized = false
+            ORDER BY order_id, latest_status_timestamp DESC;
+            """
+        self.cursor.execute(combined_order_query, ( today_start, tomorrow_start))
         orders_info = self.cursor.fetchall()
         columns_info = [desc[0] for desc in self.cursor.description]
         orders_dict = [dict(zip(columns_info, row)) for row in orders_info]

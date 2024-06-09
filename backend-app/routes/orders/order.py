@@ -107,6 +107,16 @@ def get_orders_gy_site(order_id:str):
     order_instance.close_connection()
     return result
 
+
+
+@order_router.get('/order-to-transfer')
+def get_orders_to_transfer():
+    order_instance = Order2()
+    result = order_instance.get_orders_to_transfer()
+    order_instance.close_connection()
+    return result
+
+
 @order_router.get('/order-by-phone/{user_phone}')
 def get_orders_gy_site(user_phone:str):
     order_instance = Order2()
