@@ -106,31 +106,66 @@ class Order2:
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
     
 
-    def get_all_cancellation_request_pendients(self, ):
-        order_notes_insert_query = """
-        select * from orders.cancellation_request_complete where solved = false;
+    def get_all_cancellation_request_pendients(self):
+        colombia_tz = pytz.timezone('America/Bogota')  # Define la zona horaria de Colombia
+        query = """
+        SELECT *
+        FROM orders.cancellation_request_complete
+        WHERE solved = FALSE order by timestamp desc    ;
         """
-        self.cursor.execute(order_notes_insert_query)
+        self.cursor.execute(query)
         columns = [desc[0] for desc in self.cursor.description]
-        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+        raw_results = self.cursor.fetchall()
+
+        results = []
+        for row in raw_results:
+            result_dict = dict(zip(columns, row))
+            # Convierte 'timestamp' de UTC a hora local de Colombia si existe en el resultado
+            if 'timestamp' in result_dict and result_dict['timestamp']:
+                result_dict['timestamp'] = result_dict['timestamp'].replace(tzinfo=pytz.utc).astimezone(colombia_tz)
+            results.append(result_dict)
+
+        return results
     
     def get_all_cancellation_request_solved_acepted(self, ):
+        colombia_tz = pytz.timezone('America/Bogota')  # Define la zona horaria de Colombia
+
         order_notes_insert_query = """
-        select * from orders.cancellation_request_complete where solved = true and authorized = true;
+        select * from orders.cancellation_request_complete where solved = true and authorized = true order by timestamp desc;
         """
         self.cursor.execute(order_notes_insert_query)
         columns = [desc[0] for desc in self.cursor.description]
-        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
-    
+        raw_results = self.cursor.fetchall()
+
+        results = []
+        for row in raw_results:
+            result_dict = dict(zip(columns, row))
+            # Convierte 'timestamp' de UTC a hora local de Colombia si existe en el resultado
+            if 'timestamp' in result_dict and result_dict['timestamp']:
+                result_dict['timestamp'] = result_dict['timestamp'].replace(tzinfo=pytz.utc).astimezone(colombia_tz)
+            results.append(result_dict)
+
+        return results
 
     def get_all_cancellation_request_solved_rejected(self, ):
+        colombia_tz = pytz.timezone('America/Bogota')  # Define la zona horaria de Colombia
+
         order_notes_insert_query = """
-        select * from orders.cancellation_request_complete where solved = true and authorized = false;
+        select * from orders.cancellation_request_complete where solved = true and authorized = false order by timestamp desc;
         """
         self.cursor.execute(order_notes_insert_query)
         columns = [desc[0] for desc in self.cursor.description]
-        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
-        
+        raw_results = self.cursor.fetchall()
+
+        results = []
+        for row in raw_results:
+            result_dict = dict(zip(columns, row))
+            # Convierte 'timestamp' de UTC a hora local de Colombia si existe en el resultado
+            if 'timestamp' in result_dict and result_dict['timestamp']:
+                result_dict['timestamp'] = result_dict['timestamp'].replace(tzinfo=pytz.utc).astimezone(colombia_tz)
+            results.append(result_dict)
+
+        return results
 
 
     def DelivZero(self, order_id):
