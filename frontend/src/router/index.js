@@ -85,6 +85,12 @@ const router = createRouter({
           meta: { requireOpen: true },
         },
         {
+          path: '/ingreso-call-center',
+          name: 'ingreso-call-center',
+          component: () => import('@/views/pages/auth/login.vue'),
+          meta: { requireOpen: true },
+        },
+        {
           path: '/pay',
           name: 'pay',
           component: () => import('@/views/pages/pay.vue'),
