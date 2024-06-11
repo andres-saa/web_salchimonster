@@ -1,6 +1,6 @@
 <template >
 
-<div v-if="!route.path.includes('cart') && !route.path.includes('pay') && !route.path.includes('gracias')" class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bottom: 0; left: 0; ; justify-content: center">
+<div v-if="!route.path.includes('cart') && !route.path.includes('pay') && !route.path.includes('menu') && !route.path.includes('gracias')" class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bottom: 0; left: 0; ; justify-content: center">
   <div :style="!showElement? 'transform: translateY(5rem);opacity:0': ''"  class="barra-carrito  px-5 " style=" 
                           
   /* width: auto; */

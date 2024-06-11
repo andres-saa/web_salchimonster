@@ -14,7 +14,9 @@ import { useRoute } from 'vue-router';
 import { domicilio } from '../service/cart';
 import { useSitesStore } from '../store/site';
 import { usecartStore } from '../store/shoping_cart';
+  import {loginStore} from '@/store/userCall.js'
 
+  const store = loginStore()
 const car = usecartStore()
 
 const siteStore = useSitesStore()
@@ -271,8 +273,9 @@ const fondoVisible = ref(false)
                 color: var(--primary-color);">
 
 
-                    {{ siteStore.location.city?.city_name || 'Definir ubicacion' }}  <span ST class="px-3 py-0 text-sm " :class="estado == 'abierto'? 'abierto': 'cerrado'"  style="text-transform: uppercase;" > {{estado}}</span> 
+                    {{ siteStore.location.city?.city_name || 'Definir ubicacion' }}  <span ST class="px-3 py-0 text-sm " :class="estado == 'abierto'? 'abierto': 'cerrado'"  style="text-transform: uppercase;" > {{estado}}</span> <Tag>{{store.rawUserData.name}}</Tag>
                 </span>
+                
 
                 <span style="
             margin-left: 0.5rem; 

@@ -1,0 +1,1 @@
+import{K as e}from"./index-700ceaa5.js";const s=e("user",{persist:{key:"user",storage:localStorage,paths:["user"]},state:()=>({user:{name:"",neigborhood:"",address:"",phone_number:"",payment_method_option:""}}),getters:{fucion:r=>0},actions:{async func(){return func}}});export{s as u};

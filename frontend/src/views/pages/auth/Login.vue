@@ -29,8 +29,9 @@
   import { ref } from 'vue';
   import { URI } from '../../../service/conection';
   import router from '@/router/index'
-  import {loginStore} from '@/store/userCall.js'
   import axios from 'axios';
+  import {loginStore} from '@/store/userCall.js'
+
   const store = loginStore()
 
 

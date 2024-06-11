@@ -69,7 +69,6 @@ const route = useRoute(); // Usando useRoute para acceder a los parámetros de l
 
 
 
-
 onMounted(async () => {
   getProducts();
   await nextTick();

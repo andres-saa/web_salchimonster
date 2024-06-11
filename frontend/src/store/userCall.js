@@ -28,7 +28,13 @@ export const loginStore = defineStore('userCall', {
     getters: {
         
         rawUserData(){
-          return  jwtDecode(this.userData.access_token)}
+            if(this.userData.access_token){
+                return  jwtDecode(this.userData.access_token)}
+                else {
+                    return {}
+                }
+            }
+         
         
     },
 
