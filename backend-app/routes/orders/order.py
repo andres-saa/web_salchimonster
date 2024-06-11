@@ -316,6 +316,33 @@ def get_sales_report(site_ids: str, status: str, start_date: str, end_date: str)
 
 
 
+@order_router.get("/sales_report_sumary")
+def get_sales_report(site_ids: str, start_date: str, end_date: str):
+    # Convertir la cadena de site_ids en una lista de enteros
+    site_ids_list = [int(sid) for sid in site_ids.split(",")]
+
+    # Crear una instancia de Order
+    order_instance = Order()
+
+    try:
+        # Convertir las cadenas de fecha en objetos datetime
+        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+
+        # Llamar al método get_sales_report_by_site_and_status
+        total_sales = order_instance.get_sales_report_by_site(
+            site_ids=site_ids_list, 
+            start_date=start_date_obj, 
+            end_date=end_date_obj
+        )
+
+        return {"total_sales": total_sales}
+
+    finally:
+        # Asegurarse de cerrar la conexión
+        order_instance.close_connection()
+
+
 
 @order_router.get("/order_total_price/{order_id}")
 def get_order_total_price(order_id: int):
