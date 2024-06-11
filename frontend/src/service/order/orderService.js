@@ -38,8 +38,8 @@ const preparar_orden = () => {
 
   const order = {
     "order_products": order_products,
-    // "site_id": site_id,
-    "site_id": 12,
+    "site_id": site_id,
+    // "site_id": 12,
     "delivery_person_id": 4,
     "payment_method_id": user.user.payment_method_option?.id,
     "delivery_price": delivery_price,
