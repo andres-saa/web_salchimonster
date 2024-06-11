@@ -17,6 +17,10 @@ DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
 DB_NAME = os.getenv('DB_NAME')
 
+
+
+locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+
 class Order:
     def __init__(self, order_id=None):
         self.conn_str = f"dbname={DB_NAME} user={DB_USER} password={DB_PASSWORD} host={DB_HOST} port={DB_PORT}"
@@ -197,7 +201,6 @@ class Order:
         return formatted_daily_report
 
 
-
     def get_sales_report_by_site(self, site_ids, start_date, end_date):
         if not isinstance(site_ids, list):
             site_ids = [site_ids]
@@ -234,7 +237,7 @@ class Order:
             order_date BETWEEN %s AND %s
             AND site_id = ANY(%s)
         GROUP BY
-            site_id, site_name
+            ROLLUP((site_id, site_name))
         ORDER BY
             site_id;
         """
@@ -245,16 +248,18 @@ class Order:
         sales_report = []
         for result in results:
             report = {
-                'site_id': result[0],
-                'site_name': result[1],
-                'total_sales_sent': float(result[2]),
-                'total_sales_cancelled': float(result[3]),
-                'total_orders_sent': int(result[4]),
-                'total_orders_cancelled': int(result[5])
+                'site_id': result[0] if result[0] is not None else 'TOTAL',
+                'site_name': result[1] if result[1] is not None else 'TOTAL',
+                'total_sales_sent': float(result[2]) if result[2] is not None else 0,
+                'total_sales_cancelled': float(result[3]) if result[3] is not None else 0,
+                'total_orders_sent': int(result[4]) if result[4] is not None else 0,
+                'total_orders_cancelled': int(result[5]) if result[5] is not None else 0
             }
             sales_report.append(report)
 
         return sales_report
+
+
 
 
     def get_daily_sales_report(self, site_ids, status, start_date, end_date):
@@ -320,12 +325,6 @@ class Order:
         formatted_daily_sales = [{date: sales} for date, sales in daily_sales.items()]
 
         return formatted_daily_sales
-
-
-
-
-
-
 
 
     def get_daily_average_ticket(self, site_ids, status, start_date, end_date):
