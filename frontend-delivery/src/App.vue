@@ -28,6 +28,18 @@ const playNotificationSound = () => {
     }
 };
 
+
+const stopNotificationSound = () => {
+    if (store.Notification.loop === true) {
+        store.Notification.loop = false; // Desactivar el bucle
+        store.Notification.pause(); // Pausar la reproducción
+        store.Notification.currentTime = 0; // Reiniciar el tiempo a 0
+    } else {
+        console.error('No sound is currently playing');
+    }
+};
+
+
 onMounted(() => {
     requestNotificationPermission();
 
@@ -35,12 +47,13 @@ onMounted(() => {
         try {
             const site_id = sitestore.site.site_id;
             const order_response = await orderService.is_recent_order_generated(site_id);
-            if (order_response && store.last_order_id !== order_response) {
-                store.last_order_id = order_response;
-                await store.getTodayOrders();
+            if (order_response) {
+                 store.last_order_id != order_response?  await store.getTodayOrders() : ''
+                    store.last_order_id = order_response;
+                
                 playNotificationSound();
                 
-                if (Notification.permission === 'granted') {
+                if (Notification.permission === 'granted' && store.last_order_id != order_response) {
                     const notification = new Notification('Nueva Orden en la página de WhatsApp', {
                         body: 'Nueva Orden en la página de WhatsApp',
                         icon: '/images/logo.png',
@@ -50,6 +63,8 @@ onMounted(() => {
                         window.focus();
                     };
                 }
+            } else{
+                stopNotificationSound()
             }
         } catch (error) {
             console.error('Error fetching orders:', error);
