@@ -227,6 +227,42 @@ def get_orders (site_id:int):
 
 
 
+@order_router.get('/recent-cancellation')
+def get_orders ():
+    order_instance = Order2()
+    response = order_instance.is_recent_cancellation_generated()
+    order_instance.close_connection()
+    return response
+
+
+
+@order_router.get('/recent-pendient-transfer')
+def get_orders ():
+    order_instance = Order2()
+    response = order_instance.is_recent_pendient_transfers()
+    order_instance.close_connection()
+    return response
+
+
+
+
+
+
+
+@order_router.put("/authorize_order/{order_id}")
+async def authorize_order(order_id: str, responsible_id: int = Body(..., embed=True)):
+    order_instance = Order2()
+    try:
+        result = order_instance.authorize_order(order_id, responsible_id)
+        return result
+    except Exception as e:
+        order_instance.close_connection()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        order_instance.close_connection()
+
+
+
 @order_router.get('/payment_methods/')
 def get_orders ():
     order_instance = Pyment_method()

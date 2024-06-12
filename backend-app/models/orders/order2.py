@@ -36,6 +36,7 @@ class Order2:
         
     def create_order(self, order_data: OrderSchemaPost):
         user_id = self.create_user(order_data.user_data)
+        
         # Verificar si el usuario puede realizar una nueva orden
         if self.can_place_order(user_id):
             order_id = self.create_order_entry(user_id, order_data)
@@ -46,8 +47,11 @@ class Order2:
             self.insert_order_notes(order_id,order_data.order_notes)
             # Actualizar la última hora de compra
             self.update_last_order_time(user_id)
+            
+
             self.conn.commit()
-            enviar_mensaje_whatsapp(api_key,source_number,destination_number,message,source_name)
+            # enviar_mensaje_whatsapp(api_key,source_number,destination_number,message,source_name)
+
             return order_id
         else:
             
@@ -65,13 +69,58 @@ class Order2:
         return user_id
 
     def create_order_entry(self, user_id, order_data):
-        order_insert_query = """
-        INSERT INTO orders.orders (user_id, site_id, delivery_person_id)
-        VALUES (%s, %s, %s) RETURNING id;
-        """
-        self.cursor.execute(order_insert_query, (user_id, order_data.site_id, order_data.delivery_person_id))
-        order_id = self.cursor.fetchone()[0]
+        if order_data.payment_method_id == 6:
+            order_insert_query = """
+            INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized)
+            VALUES (%s, %s, %s, false) RETURNING id;
+            """
+            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, order_data.delivery_person_id))
+            # Verificar resultado
+            result = self.cursor.fetchone()
+            if result is None:
+                raise ValueError("La orden no pudo ser creada.")
+            order_id = result[0]
+            self.create_or_update_event(3, 12, 1132, '1 minute', False)
+        else:
+            order_insert_query = """
+            INSERT INTO orders.orders (user_id, site_id, delivery_person_id)
+            VALUES (%s, %s, %s) RETURNING id;
+            """
+            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, order_data.delivery_person_id))
+            result = self.cursor.fetchone()
+            if result is None:
+                raise ValueError("La orden no pudo ser creada.")
+            order_id = result[0]
+            self.create_or_update_event(1, order_data.site_id, 1132, '1 minute', False)
         return order_id
+
+    
+    def create_or_update_event(self, event_type_id, site_id, employee_id, update_interval, solved=False):
+        # Primero, intentar eliminar cualquier evento existente que coincida con los criterios
+        delete_query = """
+        DELETE FROM events
+        WHERE event_type_id = %s AND site_id = %s AND employee_id = %s;
+        """
+        self.cursor.execute(delete_query, (event_type_id, site_id, employee_id))
+
+        # Después, insertar el nuevo evento
+        event_insert_query = """
+        INSERT INTO events (
+            event_timestamp, 
+            event_type_id, 
+            site_id, 
+            employee_id, 
+            update_interval, 
+            solved
+        ) VALUES (CURRENT_TIMESTAMP, %s, %s, %s, %s, %s) RETURNING id;
+        """
+        self.cursor.execute(event_insert_query, (event_type_id, site_id, employee_id, update_interval, solved))
+        event_id = self.cursor.fetchone()[0]
+        return event_id
+
+
+
+
 
     def insert_order_details(self, order_id, order_data):
         order_details_insert_query = """
@@ -95,6 +144,18 @@ class Order2:
         VALUES (%s, CURRENT_TIMESTAMP, %s, %s);
         """
         self.cursor.execute(order_notes_insert_query, (order_id, responsible,reason))
+
+        get_site_id_query = """
+        SELECT site_id FROM orders.orders
+        WHERE id = %s;
+        """
+        self.cursor.execute(get_site_id_query, (order_id,))
+        site_id_result = self.cursor.fetchone()
+        site_id = site_id_result[0]
+
+        self.mark_events_as_solved_by_site_id(site_id)
+        self.create_or_update_event(2, site_id, 1132, '1 minute', False)
+
         self.conn.commit()
 
     def get_all_cancellation_request(self, ):
@@ -275,18 +336,7 @@ class Order2:
         
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+    
         
         
     def get_order_count_by_site_id(self,site_id):
@@ -318,27 +368,52 @@ class Order2:
     
     
     def is_recent_order_generated(self, site_id):
-    # Consulta para obtener el ID de la última orden con estado 'generada' en los últimos 3 segundos usando la hora del servidor UTC
-        recent_order_query = """
-        SELECT order_id
-        FROM (
-            SELECT os.order_id, os.status, os.timestamp,
-                ROW_NUMBER() OVER (PARTITION BY os.order_id ORDER BY os.timestamp DESC) AS rn
-            FROM orders.order_status os
-            JOIN orders.orders o ON os.order_id = o.id
-            WHERE o.site_id = %s AND os.status = 'generada' AND o.authorized = true
-        ) AS latest_status
-        WHERE latest_status.rn = 1 AND latest_status.timestamp >= (CURRENT_TIMESTAMP - INTERVAL '30 seconds')
-        ORDER BY latest_status.timestamp DESC
+        # Consulta para verificar si existe algún evento de tipo 1 para la sede especificada en la vista 'recent_events'
+        recent_event_query = """
+        SELECT id
+        FROM public.recent_events
+        WHERE event_type_id = 1 AND site_id = %s
+        ORDER BY id DESC
         LIMIT 1;
         """
-        self.cursor.execute(recent_order_query, (site_id,))
+        self.cursor.execute(recent_event_query, (site_id,))
         result = self.cursor.fetchone()
-        # Devuelve None si no hay resultados o el ID de la orden si existe una reciente con estado 'generada'
+        # Devuelve None si no hay resultados o el timestamp del evento si existe un evento reciente de tipo 1
         return None if result is None else result[0]
-                
 
-    
+                    
+
+    def is_recent_cancellation_generated(self):
+        # Consulta para verificar si existe algún evento de tipo 1 para la sede especificada en la vista 'recent_events'
+        recent_event_query = """
+        SELECT id
+        FROM public.recent_events
+        WHERE event_type_id = 2
+        ORDER BY id DESC
+        LIMIT 1;
+        """
+        self.cursor.execute(recent_event_query)
+        result = self.cursor.fetchone()
+        # Devuelve None si no hay resultados o el timestamp del evento si existe un evento reciente de tipo 1
+        return None if result is None else result[0]
+
+
+
+    def is_recent_pendient_transfers(self):
+        # Consulta para verificar si existe algún evento de tipo 1 para la sede especificada en la vista 'recent_events'
+        recent_event_query = """
+        SELECT id
+        FROM public.recent_events
+        WHERE event_type_id = 3
+        ORDER BY id DESC
+        LIMIT 1;
+        """
+        self.cursor.execute(recent_event_query)
+        result = self.cursor.fetchone()
+        # Devuelve None si no hay resultados o el timestamp del evento si existe un evento reciente de tipo 1
+        return None if result is None else result[0]
+
+        
 
 
     def get_orders_by_site_id_for_today(self, site_id):
@@ -361,7 +436,7 @@ class Order2:
 
         # Fetch only today's orders from the combined order view
         combined_order_query = f"""
-            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation
+            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation,authorized
             FROM orders.combined_order_view
             WHERE site_id = %s AND latest_status_timestamp >= %s AND latest_status_timestamp < %s AND authorized = true
             ORDER BY order_id, latest_status_timestamp DESC;
@@ -619,6 +694,24 @@ class Order2:
 
         return order_dict
 
+        
+    def mark_events_as_solved_by_site_id(self, site_id):
+        """
+        Marca todos los eventos no resueltos para un site_id específico como resueltos.
+        Args:
+            site_id (int): ID del sitio para resolver todos los eventos asociados.
+        """
+        update_event_query = """
+        UPDATE events
+        SET solved = TRUE
+        WHERE site_id = %s AND solved = FALSE and event_type_id = 1;
+        """
+        self.cursor.execute(update_event_query, (site_id,))
+        affected_rows = self.cursor.rowcount  # Número de filas afectadas
+        self.conn.commit()
+        return affected_rows
+        
+        
     
     def prepare_order(self, order_id):
     # Prepara la orden
@@ -634,6 +727,20 @@ class Order2:
         VALUES (%s, 'en preparacion', CURRENT_TIMESTAMP);
         """
         self.cursor.execute(history_query, (order_id,))
+
+
+        get_site_id_query = """
+        SELECT site_id FROM orders.orders
+        WHERE id = %s;
+        """
+        self.cursor.execute(get_site_id_query, (order_id,))
+        site_id_result = self.cursor.fetchone()
+        site_id = site_id_result[0]
+
+        self.mark_events_as_solved_by_site_id(site_id)
+        
+
+
         self.conn.commit()
 
     def cancel_order(self, order_id, responsible, reason):
@@ -682,6 +789,45 @@ class Order2:
         """
         self.cursor.execute(update_query, (new_status, product_instance_id))
         self.conn.commit()
+
+
+
+
+    def authorize_order(self, order_id, responsible_id):
+        """
+        Authorize an order and update the responsible person.
+        
+        Args:
+            order_id (int): The ID of the order to authorize.
+            responsible_id (int): The ID of the responsible person authorizing the order.
+        
+        Returns:
+            dict: A dictionary with the order_id and a confirmation message.
+        """
+        try:
+            # Update the authorized status of the order
+            update_authorization_query = """
+            UPDATE orders.orders
+            SET authorized = TRUE, responsible_id = %s
+            WHERE id = %s;
+            """
+            self.cursor.execute(update_authorization_query, (responsible_id, order_id))
+            
+            # Insert a record into the order status history to reflect this change
+            order_status_history_insert_query = """
+            INSERT INTO orders.order_status_history (order_id, status, timestamp)
+            VALUES (%s, 'authorized', CURRENT_TIMESTAMP);
+            """
+            self.cursor.execute(order_status_history_insert_query, (order_id,))
+            
+            # Commit the transaction
+            self.conn.commit()
+
+            return {"order_id": order_id, "message": "Order authorized successfully"}
+        except Exception as e:
+            self.conn.rollback()
+            return {"order_id": order_id, "message": f"Failed to authorize order: {str(e)}"}
+
         
     def can_place_order(self, user_id):
         query = """

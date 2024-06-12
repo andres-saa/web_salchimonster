@@ -70,21 +70,21 @@ onMounted(() => {
 
 
 
-onBeforeUnmount( () => {
-    user.user = {
-          name:'',
-          neigborhood:'',
-          address:'',
-          phone_number:'',
-          payment_method_option:''
-      },
+// onBeforeUnmount( () => {
+//     user.user = {
+//           name:'',
+//           neigborhood:'',
+//           address:'',
+//           phone_number:'',
+//           payment_method_option:''
+//       },
 
-      store.cart = {
-        products: [],
-        total_cost: 0,
-        additions: []  // Nueva propiedad para manejar las adiciones a nivel del carrito
-    }
-})
+//       store.cart = {
+//         products: [],
+//         total_cost: 0,
+//         additions: []  // Nueva propiedad para manejar las adiciones a nivel del carrito
+//     }
+// })
 
 // onBeforeMount(() => {
 //     store.cart.products.length <= 0? router.push('/'):''
