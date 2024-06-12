@@ -13,6 +13,6 @@ import restauranteCerrado from './components/restauranteCerrado.vue';
   <RouterView />
   <siteDialog />
   <VistaProducto />
-  <barra />
+  <!-- <barra /> -->
 </template>
 <style scoped></style>
