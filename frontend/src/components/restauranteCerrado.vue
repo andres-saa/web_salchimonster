@@ -3,9 +3,10 @@
     
 
 <Dialog  v-model:visible="verCerrado" style="background-color:rgb(255, 255, 255);border-radius: 1rem;" maximizable modal header="Header" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-    <div style="background-color: rgba(76, 0, 0, 0); border-radius: 1rem;">
-        <p class="m-0 py-8 text-2xl" style="color: rgb(0, 0, 0)">
-        Esta restaurante esta cerrado abrimos a las {{hora?.split(':')[0]   }}:{{hora?.split(':')[1]}}
+    <div style="background-color: rgba(76, 0, 0, 0); border-radius: 1rem;display: flex;justify-content: center;align-items: center;gap: 1rem; flex-direction: column;">
+      <img style="width: 50%;" src="/images/characters/5.png" alt="">
+        <p class="m-0  text-2xl text-center" style="color: rgb(0, 0, 0)">
+        Esta restaurante esta cerrado <br> abrimos a las {{hora?.split(':')[0]   }}:{{hora?.split(':')[1]}}
     </p>
 
     <Button @click="verCerrado = false" style="position: absolute;right: -1rem;border: none; top: -1rem; background-color: var(--primary-color);display: flex;align-items: center;justify-content: center; border-radius: 50%; aspect-ratio: 1 / 1;">  <i class="text-2xl" style="font-weight: bold;" :class="PrimeIcons.TIMES"></i></Button>

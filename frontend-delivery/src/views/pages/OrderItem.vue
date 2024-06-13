@@ -62,7 +62,7 @@
             
         </span>
 
-       
+        <Tag severity="success" v-if="props.order.responsible_id"> <i class="pi pi-whatsapp mr-2"></i>   TRANSFERENCIA APROBADA</Tag> <br> <Tag severity="success" v-if="props.order.responsible_id">  {{props.order.name}}</Tag>
 
     </div>
     

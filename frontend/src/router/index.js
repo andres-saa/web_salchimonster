@@ -41,6 +41,7 @@ const router = createRouter({
               path: '/:menu_name/:category_id',
               name: 'sesion',
               component: () => import('@/views/pages/sesion.vue'),
+              meta: { title:'MENU' },
             },
             {
               path: '/',
@@ -55,36 +56,40 @@ const router = createRouter({
           path: '/sedes',
           name: 'sedes',
           component: () => import('@/views/pages/sedes.vue'),
+          meta: { title:'Sedes' },
         },
 
         {
           path: '/gracias',
           name: 'gracias',
           component: () => import('@/views/pages/gracias.vue'),
-          meta: { requirePay: true },
+          meta: { requirePay: true, title:'Gracias' },
         },
         {
           path: '/menu-view',
           name: 'menu-view',
           component: () => import('@/views/pages/MenuView.vue'),
+          meta: { title:'Menu' },
         },
         {
           path: '/menu',
           name: 'menu',
           component: () => import('@/views/pages/carta.vue'),
+          meta: { title:'Carta' },
         },
 
         {
           path: '/rastrear-pedido',
           name: 'rastrear-pedido',
           component: () => import('@/views/pages/rastrear.vue'),
+          meta: { title:'Rastrear pedido' },
         },
 
         {
           path: '/cart',
           name: 'cart',
           component: () => import('@/views/pages/cart.vue'),
-          meta: { requireOpen: true },
+          meta: { requireOpen: true, title:'Carrito de compras' },
         },
         {
           path: '/ingreso-call-center',
@@ -96,7 +101,7 @@ const router = createRouter({
           path: '/pay',
           name: 'pay',
           component: () => import('@/views/pages/pay.vue'),
-          meta: { requireOpen: true },
+          meta: { requireOpen: true, title:'Finalizar pedido' },
         },
 
         {
@@ -121,17 +126,34 @@ return data
 }
 
 router.beforeEach(async(to, from, next) => {
+  
+  
+
+
+  if (to.params.menu_name) {
+    // Configurar el título de la página usando el 'menu_name'
+    document.title = `${to.meta.title} - ${to.params.menu_name}`;
+  } else {
+    // Configurar un título por defecto si no hay 'menu_name'
+    document.title = to.meta.title || 'Salchimonster';
+  }
+
+
+
+
+
+
   const store  = useSitesStore()
   const site_id = store.location.site.site_id
   // alert(site_id)
   // console.log(site_id)
-  const open = await estado(site_id)
+  // const open = await estado(site_id)
   console.log(open)
 
   if (to.matched.some(record => record.meta.requireOpen)) {
     // const token = thanks_data.value?.user_data;
 
-    if (open.status == 'closed') {
+    if (store.status == 'cerrado') {
       verCerrado.value = true
       next('/')
 

@@ -20,10 +20,10 @@ import { usecartStore } from '../store/shoping_cart';
 const car = usecartStore()
 
 const siteStore = useSitesStore()
-const estado = ref(''); 
+const status = ref(''); 
 
 
-const obtenerEstado = async () => {
+const obtenerstatus = async () => {
 
 
 const siteId = siteStore.location.site.site_id  
@@ -38,23 +38,22 @@ if(!siteId){
     const data = await response.json();
     
     if (data.status === 'closed') {
-      estado.value = 'cerrado';
-      localStorage.setItem('estado', 'cerrado');
+      siteStore.status = 'cerrado';
     } else {
-      estado.value = 'abierto';
-      localStorage.setItem('estado', 'abierto');
+      siteStore.status = 'abierto';
+   
     }
   } catch (error) {
-    console.error('Error al obtener el estado:', error);
-    estado.value = 'cerrado';
-      localStorage.setItem('estado', 'cerrado');
+    console.error('Error al obtener el status:', error);
+    siteStore.status = 'cerrado';
+     
   }
 };
 
-    const intervalId = setInterval(obtenerEstado, 60000);
+    const intervalId = setInterval(obtenerstatus, 60000);
 
-    // Llamar a obtenerEstado cuando el componente se monta
-    onMounted(obtenerEstado);
+    // Llamar a obtenerstatus cuando el componente se monta
+    onMounted(obtenerstatus);
 
     // Limpiar el intervalo cuando el componente se desmonta para evitar fugas de memoria
     onUnmounted(() => clearInterval(intervalId));
@@ -273,7 +272,8 @@ const fondoVisible = ref(false)
                 color: var(--primary-color);">
 
 
-                    {{ siteStore.location.city?.city_name || 'Definir ubicacion' }}  <span ST class="px-3 py-0 text-sm " :class="estado == 'abierto'? 'abierto': 'cerrado'"  style="text-transform: uppercase;" > {{estado}}</span> <Tag>{{store.rawUserData.name}}</Tag>
+                    {{ siteStore.location.city?.city_name || 'Definir ubicacion' }}  <span ST class="px-3 py-0 text-sm " :class="siteStore.status == 'abierto'? 'abierto': 'cerrado'"  style="text-transform: uppercase;" > {{siteStore.status}}</span>
+                     <!-- <Tag>{{store.rawUserData.name}}</Tag> -->
                 </span>
                 
 

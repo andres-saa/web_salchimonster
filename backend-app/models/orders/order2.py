@@ -436,7 +436,7 @@ class Order2:
 
         # Fetch only today's orders from the combined order view
         combined_order_query = f"""
-            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation,authorized
+            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation,authorized,responsible_id,name
             FROM orders.combined_order_view
             WHERE site_id = %s AND latest_status_timestamp >= %s AND latest_status_timestamp < %s AND authorized = true
             ORDER BY order_id, latest_status_timestamp DESC;
@@ -581,7 +581,7 @@ class Order2:
 
         # Fetch the specific order from the combined order view
         order_query = f"""
-        SELECT DISTINCT ON (order_id) order_id,site_id,responsible,reason, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, responsible_observation
+        SELECT DISTINCT ON (order_id) order_id,site_id,responsible,reason, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, responsible_observation, responsible_id,name
         FROM orders.combined_order_view
         WHERE LOWER(REPLACE(order_id, '#', '')) = %s
         ORDER BY order_id, latest_status_timestamp DESC
@@ -641,7 +641,7 @@ class Order2:
 
         # Fetch the specific order from the combined order view
         order_query = f"""
-        SELECT DISTINCT ON (order_id) order_id,site_id,responsible,reason, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, responsible_observation
+        SELECT DISTINCT ON (order_id) order_id,site_id,responsible,reason, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, responsible_observation, responsible_id,name
         FROM orders.combined_order_view
         WHERE user_phone = '{user_phone}'
         ORDER BY order_id DESC
@@ -821,6 +821,15 @@ class Order2:
             self.cursor.execute(order_status_history_insert_query, (order_id,))
             
             # Commit the transaction
+
+            get_site_id_query = """
+            SELECT site_id FROM orders.orders
+            WHERE id = %s;
+            """
+            self.cursor.execute(get_site_id_query, (order_id,))
+            site_id_result = self.cursor.fetchone()
+            site_id = site_id_result[0]
+            self.create_or_update_event(1, site_id, 1132, '1 minute', False)
             self.conn.commit()
 
             return {"order_id": order_id, "message": "Order authorized successfully"}

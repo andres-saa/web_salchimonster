@@ -27,7 +27,7 @@
     
             <div class="field col-12 pb-0 p-0" style="width: 100%;">
                 <div style="display: flex; ;width: min-content; justify-content:start;gap: 1rem;align-items: center;"> 
-                <label for="site_id" style="color: black;">Ciudad   </label> 
+                <label for="site_id" style="color: black; min-width: max-content;">en que ciudad te encuentras?   </label> 
                 
                 <ProgressSpinner v-if="spinnersView.ciudad" style="width: 20px; height: 20px" strokeWidth="8" fill="var(--white)"
                 
@@ -38,14 +38,14 @@
                     site: {
                         site_name: 'default'
                     }   
-                }" v-model="currenCity" :options="cities" placeholder="" optionLabel="city_name" required="true" />
+                }" v-model="currenCity" :options="cities" placeholder="SELECCIONA UNA CIUDAD" optionLabel="city_name" required="true" />
 
             </div>
      
 
             <div class="field col-12 mt-0 pt-0 p-0" style="width: 100%;gap: ; display: block;">
                 <div style="display: flex;width: min-content; justify-content:start;gap: 1rem;align-items: center;"> 
-                <label for="site_id" style="color: black;">Barrio   </label> 
+                <label for="site_id" style="color: black;min-width: max-content;">Cual es tu barrio?   </label> 
                 
                 
                 <div v-if="spinnersView.barrio" style="display: flex; min-width: max-content;">
@@ -62,7 +62,7 @@
  
                 <Dropdown style="" filter v-model="currenNeigborhood" :disabled="!possibleNeigborhoods"
           :options="possibleNeigborhoods" optionLabel="name" required="true"
-          placeholder="Selecciona un barrio" />
+          placeholder="Selecciona un barrio" filterPlaceholder="Escribe el nombre de tu barrio" />
 
           
 

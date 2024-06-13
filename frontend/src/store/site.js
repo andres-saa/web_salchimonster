@@ -28,7 +28,8 @@ export const useSitesStore = defineStore('site', {
                 currentSite: false
             },
             current_delivery:0,
-            webSocket: null
+            webSocket: null,
+            status:'closed'
 
 
         }

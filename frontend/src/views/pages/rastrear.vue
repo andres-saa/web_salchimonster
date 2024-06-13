@@ -73,10 +73,11 @@
 
 <script setup> 
 
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 import Sesion_main from './sesion_main.vue';
 import pedidoItem from '../../components/pedidoItem.vue';
 import { URI } from '../../service/conection';
+import { usecartStore } from '@/store/shoping_cart';
 
 
 const order = ref({status:'false'})
@@ -87,7 +88,7 @@ const queja = ref()
 
 import { useReportesStore } from '../../store/ventas';
 const store = useReportesStore()
-
+const order_store = usecartStore()
 
 const getOrder = async() => {
   store.setLoading(true, 'buscando orden')
@@ -118,6 +119,12 @@ const getOrder = async() => {
     // mensaje.value = 'error'
   });
 }
+
+
+
+onMounted( () => {
+  order_id.value = order_store.last_order
+})
 
 
 const obtenerHoraFormateadaAMPM = (fecha) => {

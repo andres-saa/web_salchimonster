@@ -77,6 +77,11 @@
     <div id="factura" style="width: 100%;">
 
 
+
+      <Tag style="" class="tag mb-2" severity="success" v-if="store.currentOrder.responsible_id"> <i class="pi pi-whatsapp mr-2"></i>   TRANSFERENCIA APROBADA</Tag> <br> 
+      
+      <Tag class="tag" severity="success" v-if="store.currentOrder.responsible_id">  {{store.currentOrder.name}}</Tag>
+
      
     
       <div class="" style="width: auto;">
@@ -563,6 +568,10 @@ span {
   }
   #id{
     font-size: 40pt;
+  }
+
+  .tag{
+    display: none;
   }
 }
 
