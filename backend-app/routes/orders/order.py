@@ -333,8 +333,8 @@ def get_sales_report(site_ids: str, status: str, start_date: str, end_date: str)
 
     try:
         # Convertir las cadenas de fecha en objetos datetime
-        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
-        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+        start_date_obj = start_date
+        end_date_obj = end_date
 
         # Llamar al método get_sales_report_by_site_and_status
         total_sales = order_instance.get_sales_report_by_site_and_status(
@@ -362,8 +362,8 @@ def get_sales_report(site_ids: str, start_date: str, end_date: str):
 
     try:
         # Convertir las cadenas de fecha en objetos datetime
-        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
-        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+        start_date_obj = start_date
+        end_date_obj = end_date
 
         # Llamar al método get_sales_report_by_site_and_status
         total_sales = order_instance.get_sales_report_by_site(
@@ -398,8 +398,8 @@ async def get_daily_sales(site_ids: str, status: str, start_date: str, end_date:
     site_ids_list = [int(sid) for sid in site_ids.split(",")]
     order_instance = Order()
     try:
-        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
-        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+        start_date_obj =start_date
+        end_date_obj = end_date
         daily_sales = order_instance.get_daily_sales_report(
             start_date=start_date_obj, 
             end_date=end_date_obj, 
@@ -415,8 +415,8 @@ async def get_daily_orders(site_ids: str, status: str, start_date: str, end_date
     site_ids_list = [int(sid) for sid in site_ids.split(",")]
     order_instance = Order()
     try:
-        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
-        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+        start_date_obj = start_date
+        end_date_obj = end_date
         daily_orders_report = order_instance.get_daily_orders_report(
             start_date=start_date_obj, 
             end_date=end_date_obj, 
@@ -434,8 +434,8 @@ async def get_daily_average_ticket(site_ids: str, status: str, start_date: str, 
     site_ids_list = [int(sid) for sid in site_ids.split(",")]
     order_instance = Order()
     try:
-        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
-        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+        start_date_obj = start_date
+        end_date_obj = end_date
         daily_average_ticket = order_instance.get_daily_average_ticket(
             start_date=start_date_obj,
             end_date=end_date_obj,

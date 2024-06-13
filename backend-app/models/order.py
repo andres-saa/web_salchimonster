@@ -57,20 +57,18 @@ class Order:
         tz_utc = pytz.utc
 
         # Check if the dates are datetime objects, if not, convert from string
-        if isinstance(start_date, str):
-            start_date = datetime.strptime(start_date, "%Y-%m-%d")
-        if isinstance(end_date, str):
-            end_date = datetime.strptime(end_date, "%Y-%m-%d")
+        
 
+
+        start_date_utc = start_date
+        end_date_utc = end_date
         # Convert start_date and end_date from Colombia to UTC
-        start_date_utc = tz_colombia.localize(start_date).astimezone(tz_utc)
-        end_date_utc = tz_colombia.localize(end_date).astimezone(tz_utc)
+       
+        # # Adjust end_date_utc to include the entire last day
+        # end_date_utc += timedelta(days=0)
 
-        # Adjust end_date_utc to include the entire last day
-        end_date_utc += timedelta(days=0)
-
-        if not isinstance(site_ids, list):
-            site_ids = [site_ids]
+        # if not isinstance(site_ids, list):
+        #     site_ids = [site_ids]
 
         query = """
         SELECT
@@ -103,16 +101,15 @@ class Order:
         FROM
             orders.combined_order_view co
         WHERE
-            co.latest_status_timestamp >= %s AND
-            co.latest_status_timestamp < %s AND
-            co.site_id = ANY(%s) AND
-            co.current_status = %s
+        co.latest_status_timestamp BETWEEN %s AND %s
+        AND co.site_id = ANY(%s)
+        AND co.current_status = %s
         """
 
-        self.cursor.execute(query, (start_date_utc.isoformat(), end_date_utc.isoformat(), site_ids, status))
+        self.cursor.execute(query, (start_date_utc, end_date_utc, site_ids, status))
         
-        print("start",start_date_utc.isoformat())
-        print("end",end_date_utc.isoformat())
+        # print("start",start_date_utc.isoformat())
+        # print("end",end_date_utc.isoformat())
         result = self.cursor.fetchone()
 
         if result:
@@ -146,18 +143,12 @@ class Order:
         tz_colombia = pytz.timezone('America/Bogota')
         tz_utc = pytz.utc
 
-        # Convertir las fechas de entrada a objetos datetime si son cadenas
-        if isinstance(start_date, str):
-            start_date = datetime.strptime(start_date, "%Y-%m-%d")
-        if isinstance(end_date, str):
-            end_date = datetime.strptime(end_date, "%Y-%m-%d")
+        # Check if the dates are datetime objects, if not, convert from string
+        
 
-        # Asegurar que incluimos el último día completo
-        end_date = end_date + timedelta(days=1) - timedelta(seconds=1)
 
-        # Convertir las fechas a UTC para asegurarse de que la comparación sea correcta
-        start_date_utc = tz_colombia.localize(start_date).astimezone(tz_utc)
-        end_date_utc = tz_colombia.localize(end_date).astimezone(tz_utc)
+        start_date_utc = start_date
+        end_date_utc = end_date
 
         # Preparar la consulta SQL
         query = """
@@ -179,16 +170,16 @@ class Order:
         # Ajuste para sumar un día adicional en la fecha final
         end_date_adjusted = end_date_utc 
 
-        self.cursor.execute(query, (start_date_utc.date(), end_date_adjusted.date(), site_ids, status))
+        self.cursor.execute(query, (start_date_utc, end_date_adjusted, site_ids, status))
         results = self.cursor.fetchall()
 
         # Crear un diccionario de todos los días en el rango
         daily_report = {}
-        current_date = start_date
-        while current_date <= end_date:
-            formatted_date = current_date.strftime("%a-%d-%b").lower().replace('.', '')
-            daily_report[formatted_date] = 0.0
-            current_date += timedelta(days=1)
+        # current_date = start_date
+        # while current_date <= end_date:
+        #     formatted_date = current_date.strftime("%a-%d-%b").lower().replace('.', '')
+        #     daily_report[formatted_date] = 0.0
+        #     current_date += timedelta(days=1)
 
         # Actualizar con los resultados reales
         for result in results:
@@ -202,25 +193,15 @@ class Order:
 
 
     def get_sales_report_by_site(self, site_ids, start_date, end_date):
-        if not isinstance(site_ids, list):
-            site_ids = [site_ids]
-
-        # Definir las zonas horarias
         tz_colombia = pytz.timezone('America/Bogota')
         tz_utc = pytz.utc
 
-        # Comprobar si las fechas son objetos datetime, si no, convertirlas desde string
-        if isinstance(start_date, str):
-            start_date = datetime.strptime(start_date, "%Y-%m-%d")
-        if isinstance(end_date, str):
-            end_date = datetime.strptime(end_date, "%Y-%m-%d")
+        # Check if the dates are datetime objects, if not, convert from string
+        
 
-        # Asegurar que incluimos el último día completo
-        end_date = end_date + timedelta(days=1) - timedelta(seconds=1)
 
-        # Convertir las fechas a UTC para asegurarse de que la comparación sea correcta
-        start_date_utc = tz_colombia.localize(start_date).astimezone(tz_utc)
-        end_date_utc = tz_colombia.localize(end_date).astimezone(tz_utc)
+        start_date_utc = start_date
+        end_date_utc = end_date
 
         # Preparar la consulta SQL
         query = """
@@ -242,7 +223,7 @@ class Order:
             site_id;
         """
 
-        self.cursor.execute(query, (start_date_utc.date(), end_date_utc.date(), site_ids))
+        self.cursor.execute(query, (start_date_utc, end_date_utc, site_ids))
         results = self.cursor.fetchall()
 
         sales_report = []
@@ -271,19 +252,12 @@ class Order:
         tz_colombia = pytz.timezone('America/Bogota')
         tz_utc = pytz.utc
 
-        # Comprobar si las fechas son objetos datetime, si no, convertirlas desde string
-        if isinstance(start_date, str):
-            start_date = datetime.strptime(start_date, "%Y-%m-%d")
-        if isinstance(end_date, str):
-            end_date = datetime.strptime(end_date, "%Y-%m-%d")
-
-        # Asegurar que incluimos el último día completo
-        end_date = end_date + timedelta(days=1) - timedelta(seconds=1)
+        # Check if the dates are datetime objects, if not, convert from string
         
 
-        # Convertir las fechas a UTC para asegurarse de que la comparación sea correcta
-        start_date_utc = tz_colombia.localize(start_date).astimezone(tz_utc)
-        end_date_utc = tz_colombia.localize(end_date).astimezone(tz_utc)
+
+        start_date_utc = start_date
+        end_date_utc = end_date
 
         # Preparar la consulta SQL
         query = """
@@ -305,16 +279,12 @@ class Order:
         # Ajuste para sumar un día adicional en la fecha final
         end_date_adjusted = end_date_utc
 
-        self.cursor.execute(query, (start_date_utc.date(), end_date_adjusted.date(), site_ids, status))
+        self.cursor.execute(query, (start_date_utc, end_date_adjusted, site_ids, status))
         results = self.cursor.fetchall()
 
         # Crear un diccionario de todos los días en el rango
         daily_sales = {}
-        current_date = start_date
-        while current_date <= end_date:
-            formatted_date = current_date.strftime("%a-%d-%b").lower().replace('.', '')
-            daily_sales[formatted_date] = 0.0
-            current_date += timedelta(days=1)
+       
 
         # Actualizar con los resultados reales
         for result in results:
@@ -335,18 +305,12 @@ class Order:
         tz_colombia = pytz.timezone('America/Bogota')
         tz_utc = pytz.utc
 
-        # Comprobar si las fechas son objetos datetime, si no, convertirlas desde string
-        if isinstance(start_date, str):
-            start_date = datetime.strptime(start_date, "%Y-%m-%d")
-        if isinstance(end_date, str):
-            end_date = datetime.strptime(end_date, "%Y-%m-%d")
+        # Check if the dates are datetime objects, if not, convert from string
+        
 
-        # Asegurar que incluimos el último día completo
-        end_date = end_date + timedelta(days=1) - timedelta(seconds=1)
 
-        # Convertir las fechas a UTC para asegurarse de que la comparación sea correcta
-        start_date_utc = tz_colombia.localize(start_date).astimezone(tz_utc)
-        end_date_utc = tz_colombia.localize(end_date).astimezone(tz_utc)
+        start_date_utc = start_date
+        end_date_utc = end_date
 
         # Preparar la consulta SQL
         query = """
@@ -363,16 +327,13 @@ class Order:
             order_date;
         """
 
-        self.cursor.execute(query, (start_date_utc.date(), end_date_utc.date(), site_ids, status))
+        self.cursor.execute(query, (start_date_utc, end_date_utc, site_ids, status))
         results = self.cursor.fetchall()
 
         # Crear un diccionario de todos los días en el rango
         daily_average_ticket = {}
         current_date = start_date
-        while current_date <= end_date:
-            formatted_date = current_date.strftime("%a-%d-%b").lower().replace('.', '')
-            daily_average_ticket[formatted_date] = 0.0
-            current_date += timedelta(days=1)
+       
 
         # Actualizar con los resultados reales
         for result in results:
