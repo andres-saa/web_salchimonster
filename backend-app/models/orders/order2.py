@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from datetime import datetime, time
 from config.wsp import enviar_mensaje_whatsapp
 import pytz
+import requests
 load_dotenv()
 
 DB_USER = os.getenv('DB_USER')
@@ -335,8 +336,33 @@ class Order2:
         self.cursor.execute(order_status_history_insert_query, (order_id, 'generada',))
         
         
+
+    def enviar_mensaje_template(self,destino,bret,flo,mon,can,jam,pal,mod,sub,ken,lau,fecha,total):
+
+
+        url = "https://api.gupshup.io/wa/api/v1/template/msg"
+        headers = {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'apikey': 'obg0iystmnq4v0ln4r5fnjcvankhtjp0',
+            'cache-control': 'no-cache'
+        }
+        # Preparar los parámetros del template
+        params = ["Bryan", "SalchiGest",flo,bret,mon,can,jam,pal,mod,sub,ken,lau,fecha,f"${total}"]
+        data = {
+            'channel': 'whatsapp',
+            'source': '573053447255',
+            'destination': destino,
+            'src.name': 'Salchimonster',
+            'template': '{"id":"56986be2-6b17-42cf-8cf7-d439b9a97757","params":' + str(params) + '}'
+        }
+        # Convertir la lista params a formato JSON adecuado para la URL
+        data['template'] = data['template'].replace("'", '"')
+
+        response = requests.post(url, headers=headers, data=data)
+        return response.text
         
-    
+
         
         
     def get_order_count_by_site_id(self,site_id):

@@ -7,7 +7,9 @@ from models.orders.order2 import Order2
 from models.payment_method import Pyment_method
 order_router = APIRouter()
 from pydantic import BaseModel
-
+import schedule
+import time
+import pytz
 from fastapi import APIRouter
 from schema.order import order_schema_post
 from models.order import Order
@@ -15,6 +17,7 @@ from fastapi import APIRouter, HTTPException
 from datetime import datetime
 from pytz import timezone
 import pytz 
+from datetime import datetime, timedelta
 order_router = APIRouter()
 
 
@@ -22,6 +25,19 @@ order_router = APIRouter()
 
 
 connected_clients: Dict[int, List[WebSocket]] = {}
+
+def calcular_total_vendido(data):
+    resumen = {}
+    for registro in data:
+        # Ignorar el registro total
+        sitio = registro['site_name'].lower()  # Convertir nombre del sitio a minúsculas
+        # Asegurar que total_vendido es tratado como un entero
+        total_vendido = int(registro['total_sales_sent'])
+        # Formatear total_vendido como string con punto de separación
+        resumen[sitio] = f"{total_vendido:,}".replace(",", ".")
+    return resumen
+
+
 
 
 
@@ -327,6 +343,8 @@ def get_server_time():
 def get_sales_report(site_ids: str, status: str, start_date: str, end_date: str):
     # Convertir la cadena de site_ids en una lista de enteros
     site_ids_list = [int(sid) for sid in site_ids.split(",")]
+    print('start',start_date)
+    print('end',end_date)
 
     # Crear una instancia de Order
     order_instance = Order()
@@ -377,6 +395,72 @@ def get_sales_report(site_ids: str, start_date: str, end_date: str):
     finally:
         # Asegurarse de cerrar la conexión
         order_instance.close_connection()
+
+
+
+
+
+
+
+def get_sales_report(start_date: str, end_date: str):
+    order_instance = Order()
+    try:
+        # Configurar la zona horaria de Colombia
+        colombia_tz = pytz.timezone('America/Bogota')
+
+        # Convertir strings a objetos datetime en UTC
+        start_date_utc = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")  # Ajustado para incluir hora
+        end_date_utc = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")  # Ajustado para incluir hora
+
+        # Convertir de UTC a hora de Colombia
+        start_date_col = start_date_utc.astimezone(colombia_tz)
+        end_date_col = end_date_utc.astimezone(colombia_tz)
+
+        # Formatear fechas para la consulta y para el mensaje
+        formatted_start_date = start_date_col.strftime("%A %d de %B de %Y")
+        formatted_msg_date = start_date_col.strftime("%d de %B de %Y")
+
+        total_sales = order_instance.get_sales_report_by_site(
+            site_ids=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+            start_date=start_date,
+            end_date=end_date
+        )
+        sales_data = calcular_total_vendido(total_sales)
+        msj = Order2().enviar_mensaje_template(
+            '573216252922',
+            sales_data.get("bretaña", 0),
+            sales_data.get("flora", 0),
+            sales_data.get("montes", 0),
+            sales_data.get("caney", 0),
+            sales_data.get("jamundi", 0),
+            sales_data.get("palmira", 0),
+            sales_data.get("modelia", 0),
+            sales_data.get("suba", 0),
+            sales_data.get("kennedy", 0),
+            sales_data.get("laureles", 0),
+            formatted_msg_date,
+            sales_data.get("total", 0)
+        )
+
+        print(msj)
+        return {"total_sales": total_sales}
+    finally:
+        order_instance.close_connection()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -445,4 +529,34 @@ async def get_daily_average_ticket(site_ids: str, status: str, start_date: str, 
         return daily_average_ticket
     finally:
         order_instance.close_connection()
-        
+
+
+
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+scheduler = BackgroundScheduler(timezone=timezone('America/Bogota'))
+scheduler.start()
+
+def scheduled_job():
+    tz = pytz.timezone('America/Bogota')
+    current_time = datetime.now(tz)
+    # Ajusta el 'start_date' para que comience a las 10 AM del día anterior
+    start_date = current_time.replace(hour=10, minute=0, second=0, microsecond=0) - timedelta(days=1)
+    # Ajusta el 'end_date' para que termine a las 4 AM del día actual
+    end_date = current_time.replace(hour=4, minute=0, second=0, microsecond=0)
+    if current_time.hour < 4:
+        # Si la hora actual es menor a las 4 AM, ajusta el 'end_date' al día anterior
+        end_date -= timedelta(days=1)
+    
+    # Convertir a UTC y formatear de acuerdo a lo que la función espera
+    start_date_utc = start_date.astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')
+    end_date_utc = end_date.astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')
+    
+    get_sales_report(start_date_utc, end_date_utc)
+
+# Asegúrate de que el cron job está configurado para la hora correcta
+
+
+# Programa la tarea para que se ejecute todos los días a la 1 AM
+scheduler.add_job(scheduled_job, 'cron', hour=5, minute=0)

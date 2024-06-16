@@ -8,6 +8,7 @@ import pytz
 from datetime import datetime
 from schema.order import order_schema_post
 from datetime import datetime, timedelta
+import requests
 
 load_dotenv()
 
@@ -215,7 +216,7 @@ class Order:
         FROM
             orders.daily_order_sales_view
         WHERE
-            order_date BETWEEN %s AND %s
+            (order_date at time zone 'America/Bogota') BETWEEN %s AND %s
             AND site_id = ANY(%s)
         GROUP BY
             ROLLUP((site_id, site_name))
@@ -238,7 +239,49 @@ class Order:
             }
             sales_report.append(report)
 
+        
+        
         return sales_report
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def enviar_mensaje_template(self, destino, params):
+        url = "https://api.gupshup.io/wa/api/v1/template/msg"
+        headers = {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'apikey': 'obg0iystmnq4v0ln4r5fnjcvankhtjp0',
+            'cache-control': 'no-cache'
+        }
+        # Asegurarse de que los parámetros están en el formato correcto para el JSON
+        json_params = str(params).replace("'", '"')
+        data = {
+            'channel': 'whatsapp',
+            'source': '573053447255',
+            'destination': destino,
+            'src.name': 'Salchimonster',
+            'template': '{"id":"03930a95-275d-42c1-b295-72a6d364666b","params":' + json_params + '}'
+        }
+
+        response = requests.post(url, headers=headers, data=data)
+        return response.text
+
+
+
+
+
+
 
 
 
