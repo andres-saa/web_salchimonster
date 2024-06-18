@@ -19,7 +19,8 @@ from pytz import timezone
 import pytz 
 from datetime import datetime, timedelta
 order_router = APIRouter()
-
+from datetime import datetime, timedelta
+from dateutil import parser
 
 
 
@@ -496,19 +497,45 @@ async def get_daily_sales(site_ids: str, status: str, start_date: str, end_date:
 
 @order_router.get("/daily_orders")
 async def get_daily_orders(site_ids: str, status: str, start_date: str, end_date: str):
+    # Convertir IDs de sitios de string a lista de enteros
     site_ids_list = [int(sid) for sid in site_ids.split(",")]
+    
+    # Crear instancia de la clase Order
     order_instance = Order()
+    
     try:
-        start_date_obj = start_date
-        end_date_obj = end_date
-        daily_orders_report = order_instance.get_daily_orders_report(
-            start_date=start_date_obj, 
-            end_date=end_date_obj, 
-            site_ids=site_ids_list, 
+        # Convertir strings de fechas ISO 8601 a objetos datetime
+        start_date_obj = parser.isoparse(start_date)
+        end_date_obj = parser.isoparse(end_date)
+        
+        # Calcular fechas para el periodo anterior
+        previous_period_duration = end_date_obj - start_date_obj
+        previous_start_date_obj = start_date_obj - previous_period_duration - timedelta(days=1)
+        previous_end_date_obj = end_date_obj - previous_period_duration - timedelta(days=1)
+
+        # Obtener reportes para el periodo actual y el periodo anterior
+        current_period_orders = order_instance.get_daily_orders_report(
+            start_date=start_date_obj,
+            end_date=end_date_obj,
+            site_ids=site_ids_list,
             status=status
         )
-        return daily_orders_report
+        previous_period_orders = order_instance.get_daily_orders_report(
+            start_date=previous_start_date_obj,
+            end_date=previous_end_date_obj,
+            site_ids=site_ids_list,
+            status=status
+        )
+        
+        # Combinar los datos en un diccionario para la respuesta
+        response = {
+            "current_period": current_period_orders,
+            "previous_period": previous_period_orders
+        }
+        
+        return response
     finally:
+        # Cerrar la conexión a la base de datos
         order_instance.close_connection()
 
 

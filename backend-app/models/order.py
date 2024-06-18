@@ -216,7 +216,7 @@ class Order:
         FROM
             orders.daily_order_sales_view
         WHERE
-            (order_date at time zone 'America/Bogota') BETWEEN %s AND %s
+            order_date BETWEEN %s AND %s
             AND site_id = ANY(%s)
         GROUP BY
             ROLLUP((site_id, site_name))

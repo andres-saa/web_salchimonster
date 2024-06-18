@@ -69,6 +69,17 @@ class Product:
         products = self.cursor.fetchall()
         return [dict(zip(columns, row)) for row in products]
     
+
+
+    def deactivate_product(self, product_id):
+        update_query = f"""
+        UPDATE inventory.products SET visible = false WHERE id = {product_id}
+        """
+        self.cursor.execute(update_query)
+        self.conn.commit()
+        return 'ok'
+
+        
     
     def select_products_by_site_and_category_all(self, site_id: int, category_id: int):
         select_query = f"""

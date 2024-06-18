@@ -22,6 +22,15 @@ def create_product(product: Product_schema):
     return {"product_id": product_id}
 
 
+
+@product_router.put("/deactivate-product/{product_id}")
+def deactivate_product(product_id:int):
+    product_instance = Product()
+    product_id = product_instance.deactivate_product(product_id)
+    return {"product_id": product_id}
+
+
+
 @product_router.get("/products-active/category-id/{category_id}/site/{site_id}")
 def get_products_by_category_name_and_site(category_id: str, site_id: int):
     product_instance = Product()
