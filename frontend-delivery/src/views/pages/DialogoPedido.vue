@@ -374,13 +374,6 @@
       </div>
 
 
-      <div  class="col-12 px-0">
-        <Button @click="showDeleteDeliveryPrice = true" style="width: 100%;" label="domicilio $0.00">
-
-        </Button>
-      </div>
-  
-
 
     </template>
 

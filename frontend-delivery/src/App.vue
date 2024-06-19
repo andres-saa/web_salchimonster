@@ -72,6 +72,8 @@ onMounted(() => {
     };
     
     const intervalId = setInterval(fetchOrdersAndNotify, 3000);
+
+    
     onUnmounted(() => {
         clearInterval(intervalId);
     });
