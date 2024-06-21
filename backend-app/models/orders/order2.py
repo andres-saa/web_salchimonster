@@ -168,6 +168,15 @@ class Order2:
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
     
 
+    def get_all_cancellation_request_categories(self, ):
+        order_notes_insert_query = """
+        select * from orders.cancellation_request_categories where visible = true;
+        """
+        self.cursor.execute(order_notes_insert_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+    
+
     def get_all_cancellation_request_pendients(self):
         colombia_tz = pytz.timezone('America/Bogota')  # Define la zona horaria de Colombia
         query = """
@@ -241,7 +250,7 @@ class Order2:
 
 
 
-    def resolve_cancellation_request(self, cancellation_request_id, authorized,responsible_id,responsible_observation):
+    def resolve_cancellation_request(self, cancellation_request_id, authorized,responsible_id,responsible_observation,category_id):
         """
         Resuelve una solicitud de cancelación de una orden.
         Args:
@@ -262,9 +271,9 @@ class Order2:
         order_id, reason, responsible = result
         
         # Actualizar la solicitud como resuelta y autorizada/no autorizada
-        update_request_query = """
+        update_request_query = f"""
         UPDATE orders.cancellation_requests
-        SET solved = TRUE, authorized = %s, responsible_id = %s, responsible_observation = %s
+        SET solved = TRUE, authorized = %s, responsible_id = %s, responsible_observation = %s, category_id = {category_id}
         WHERE id = %s;
         """
         self.cursor.execute(update_request_query, (authorized,responsible_id,responsible_observation, cancellation_request_id))

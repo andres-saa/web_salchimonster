@@ -109,6 +109,15 @@ def get_orders_gy_site(site_id:int):
     return result
 
 
+@order_router.get('/order-cancellation-request-categories')
+def get_orders_gy_site():
+    order_instance = Order2()
+    result = order_instance.get_all_cancellation_request_categories()
+    order_instance.close_connection()
+    return result
+
+
+
 @order_router.get('/order/{order_id}')
 def get_orders_gy_site(order_id:str):
     order_instance = Order2()
@@ -223,10 +232,16 @@ def update_product_instance_status_endpoint(product_instance_id: int, new_status
 
 
 @order_router.put("/resolve-cancellation/{cancellation_request_id}")
-def resolve_cancellation_request_endpoint(cancellation_request_id: int, authorized: bool = Body(..., embed=True),responsible_id: int = Body(..., embed=True),responsible_observation:str = Body(..., embed=True)  ):
+def resolve_cancellation_request_endpoint(
+    
+    cancellation_request_id: int, 
+    authorized: bool = Body(..., embed=True),
+    responsible_id: int = Body(..., embed=True),
+    responsible_observation:str = Body(..., embed=True), category_id:int = Body(..., embed=True) ):
+    
     order_instance = Order2()
     try:
-        order_instance.resolve_cancellation_request(cancellation_request_id, authorized, responsible_id,responsible_observation)
+        order_instance.resolve_cancellation_request(cancellation_request_id, authorized, responsible_id,responsible_observation,category_id)
         return {"message": "Cancellation request resolved successfully", "cancellation_request_id": cancellation_request_id, "authorized": authorized}
     except Exception as e:
         order_instance.close_connection()
