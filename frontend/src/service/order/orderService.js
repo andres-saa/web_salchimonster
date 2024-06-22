@@ -5,7 +5,7 @@ import axios from "axios";
 import { URI } from "../conection";
 import { useReportesStore } from "../../store/ventas";
 import { useRoute } from "vue-router";
-
+import pixel from "../../router/pixel";
 import router from '../../router/index'
 const report = useReportesStore()
 const cart = usecartStore();
@@ -77,6 +77,22 @@ export const orderService = {
         cart.last_order = response.data
         report.setLoading(false,"enviando tu pedido")
 
+
+
+        pixel.sendTrackingEvent('Purchase', {
+          total: cart.cart.total_cost, // Este es el total en COP o convertido a otra moneda
+          currency: 'COP', // O la moneda a la que hayas convertido
+          items: cart.cart.products.map(p => {
+            return { 
+              id: p.product.id,
+              name: p.product.product_name,
+              quantity: p.quantity,
+              price: p.product.price
+            };
+          })
+        });
+
+      
         
 
     router.push('/gracias')

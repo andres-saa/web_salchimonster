@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model:visible="store.visibles.currentProduct" :style="{ width: '500px', }" header="Seleccion de sede"
+  <Dialog :close=" reset() "  v-model:visible="store.visibles.currentProduct" :style="{ width: '500px', }" header="Seleccion de sede"
     :modal="true" class="p-fluid pt-8 m-3"
     style="justify-content: center; background-color: white;position: relative ; border-radius: 1rem;padding-top: 2rem;">
 
@@ -48,10 +48,41 @@
         style="display: flex;align-items: center; max-height: 45rem; background-color:white;border-radius: 0.5rem; ">
 
 
-        <img class="col-12 p-2 m-0" :src="`https://backend.salchimonster.com/read-product-image/600/${store.currentProduct.product_name}`"
-          alt="" style="width: 100%;object-fit: contain; aspect-ratio: 1/1;">
+        <img :class="see? 'cargado': 'sin-cargar'" :onload="seeImage" class="col-12 p-2 m-0" :src="`https://backend.salchimonster.com/read-product-image/600/${store.currentProduct.product_name}`"
+          alt="" v-show="see" style="width: 100%;object-fit: contain; aspect-ratio: 1/1;">
 
       </div>
+
+
+
+
+      <div v-show="!see" class="col-12  p-0 mt-0 shadow-5"
+        style="display: flex;align-items: center; max-height: 45rem; background-color:white;border-radius: 0.5rem; ">
+
+
+        <div style="width: 100%; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center">
+          <ProgressSpinner   style="width: 100px; height: 100px" strokeWidth="5" 
+        animationDuration=".2s" aria-label="Custom ProgressSpinner" />
+
+
+
+        </div>
+      
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <!-- <p style="color: black;">{{ store.cart.additions }} {{ selectedAdditions }}</p> -->
 
 
@@ -142,9 +173,9 @@
 
 
 
-    <img style="     pointer-events: none;
+    <img :onLoad="seeImageLeftHand" v-show="see" :class="see? 'cargado-left-hand': 'sin-cargar'" style="     pointer-events: none;
    ; position: absolute;right: 95%; top: 20%;" :src="'/images/garra-sm-hor.png'" alt="">
-    <img style="     pointer-events: none;
+    <img :onLoad="seeImageRightHand" v-show="see"  :class="see? 'cargado-right-hand': 'sin-cargar'"  style="     pointer-events: none;
    ; position: absolute;left: 95%; top: 20%;" :src="'/images/garra-sm-izq.png'" alt="">
 
   </Dialog>
@@ -189,8 +220,36 @@ import { carService } from '../service/car/carService'
 import { adicionalesService } from '../service/restaurant/aditionalService';
 import { useSitesStore } from '../store/site';
 
+const sonido = new Audio('/sounds/sarpazo.mp3')
 
 const selectedAdditions = ref({});
+
+
+const see = ref(false)
+
+const seeImage = () => {
+  
+  see.value = true
+}
+
+
+const reset = () => {
+  see.value = seeLeftHand.value = seeRightHand.value = false
+}
+
+const seeLeftHand = ref(false)
+
+const seeImageLeftHand = () => {
+  seeLeftHand.value = true
+}
+
+const seeRightHand = ref(false)
+
+const seeImageRightHand = () => {
+  seeRightHand.value = true
+}
+
+
 
 
 const handleAdditionChange = (item, group) => {
@@ -861,7 +920,107 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 </script>
 
+
+
+
+
+
+
+
 <style scoped>
+
+@keyframes fadeIn {
+    from {
+       opacity: 0;
+        transform: translateX(-100px);
+        /* transform: scale(.5); */
+        /* background-color: rgb(255, 255, 0); */
+        /* filter: blur(1px); */
+    }
+    to {
+        opacity: 1;
+        /* filter: blur(1px); */
+
+    }
+}
+
+.cargado {
+    opacity: 0; /* Inicialmente invisible */
+    animation: fadeIn .1s ease-out forwards; /* Duración de 1 segundo, 'ease-out' para desacelerar hacia el final, y 'forwards' para mantener el estado final visible */
+}
+
+
+
+
+
+@keyframes fadeIn {
+    from {
+       opacity: 0;
+        transform: translateY(-100px);
+        /* transform: scale(.5); */
+        /* background-color: rgb(255, 255, 0); */
+        /* filter: blur(1px); */
+    }
+    to {
+        opacity: 1;
+        /* filter: blur(1px); */
+
+    }
+}
+
+
+
+@keyframes fadeInLeftHand {
+    from {
+       opacity: 0;
+        transform: translateX(-1000px);
+        /* transform: scale(.5); */
+        /* background-color: rgb(255, 255, 0); */
+        /* filter: blur(1px); */
+    }
+    to {
+        opacity: 1;
+        /* filter: blur(1px); */
+
+    }
+}
+
+.cargado-left-hand {
+    opacity: 0; /* Inicialmente invisible */
+    animation: fadeInLeftHand .1s ease-out forwards; /* Duración de 1 segundo, 'ease-out' para desacelerar hacia el final, y 'forwards' para mantener el estado final visible */
+}
+
+
+
+
+@keyframes fadeInRightHand {
+    from {
+       opacity: 0;
+        transform: translateX(1000px);
+        /* transform: scale(.5); */
+        /* background-color: rgb(255, 255, 0); */
+        /* filter: blur(1px); */
+    }
+    to {
+        opacity: 1;
+        /* filter: blur(1px); */
+
+    }
+}
+
+.cargado-right-hand {
+    opacity: 0; /* Inicialmente invisible */
+    animation: fadeInRightHand .1s ease-out forwards; /* Duración de 1 segundo, 'ease-out' para desacelerar hacia el final, y 'forwards' para mantener el estado final visible */
+}
+
+
+
+
+
+
+
+
+
 *::-webkit-scrollbar {
   overflow-y: auto;
   display: none;

@@ -1,7 +1,7 @@
 <template>
  
 
-    <div  class="container shadow-3 col-12"  style="border-radius: 0.5rem; height: 100%;position: relative;">
+    <div  class="container shadow-3 col-12"   style="border-radius: 0.5rem; height: 100%;position: relative;">
     
         
 
@@ -9,13 +9,15 @@
         
     
     
-    <div class="imagen" style="display: flex;align-items: center;">
+    <div class="imagen" style="display: flex;align-items: center; " @click="open(props.product)">
   
-        <img  v-show="loaded" :onload="see" :class="loaded? 'cargado': 'sin-cargar'" style="width: 100%; aspect-ratio: 1 / 1 ; border-radius: 1rem; background-color: rgb(255, 255, 255);object-fit: contain; border-radius: 0.5rem;" :src="`https://backend.salchimonster.com/read-product-image/300/${props.product.product_name}`" alt="" @click="open(props.product)">
-
+        <transition name="fade">
+        <img  v-show="loaded" @load="see" :class="loaded? 'cargado': 'sin-cargar'" style="width: 100%; aspect-ratio: 1 / 1 ; border-radius: 1rem; background-color: rgb(255, 255, 255);object-fit: contain; border-radius: 0.5rem;" :src="`https://backend.salchimonster.com/read-product-image/300/${props.product.product_name}`" alt="" >
+    </transition>
+    
         <div v-if="!loaded" style="width: 100%;display: flex;justify-content: center; align-items: center; aspect-ratio: 1 / 1; background-color: rgb(255, 255, 255);object-fit: contain; border-radius: 0.5rem;">
         
-            <ProgressSpinner   style="width: 100px; height: 100px" strokeWidth="4" 
+            <ProgressSpinner   style="width: 60px; height: 60px" strokeWidth="8" 
             animationDuration=".2s" aria-label="Custom ProgressSpinner" />
         
         </div>
@@ -32,7 +34,7 @@
                 </b>
             </span>
             <!-- <Button text style="color: black;" icon="pi pi-ellipsis-v p-0 text-xl" /> -->
-            <img class="character" style="width:6rem;" v-for="character in [1]" :src="`/images/characters/${props.index}.png`" alt="">
+            <img  class="character" style="width:6rem;" v-for="character in [1]" :v-lazy="`/images/characters/${props.index}.png`" alt="">
 
 
 
@@ -73,8 +75,9 @@
 <script setup>
 
 import  {formatoPesosColombianos} from '../service/formatoPesos'
-import { computed,ref } from 'vue';
+import { computed,ref,onMounted } from 'vue';
 import {usecartStore} from '../store/shoping_cart'
+
 
 const store = usecartStore()
 
@@ -94,11 +97,46 @@ const see = () => {
 
 const open = (product) => {
 
+
+
     store.setCurrentProduct(product)
     store.setVisible('currentProduct',true)
+    // speak()
 
 }
 
+
+
+
+
+function speak() {
+    var text = props.product.price
+    var msg = new SpeechSynthesisUtterance(text);
+
+    // Obtiene todas las voces disponibles
+    var voices = window.speechSynthesis.getVoices();
+    
+    // Filtra para encontrar una voz femenina en español
+    var femaleVoice = voices.find(voice => voice.lang === 'es-ES' && voice.gender === 'female');
+
+    // Si no encuentra una voz femenina específica, intenta al menos una en español
+    if (!femaleVoice) {
+        femaleVoice = voices.find(voice => voice.lang === 'es-ES');
+    }
+
+    // Asigna la voz encontrada al mensaje
+    if (femaleVoice) {
+        msg.voice = femaleVoice;
+    } else {
+        console.log('No se encontró una voz femenina en español.');
+    }
+
+    // Establece el idioma (aunque ya debería ser el correcto si la voz es correcta)
+    msg.lang = 'es-ES';
+    msg.rate = 1.2
+
+    window.speechSynthesis.speak(msg);
+}
 
 const props = defineProps({
     product: {
@@ -113,6 +151,26 @@ const props = defineProps({
 
 
 });
+
+
+onMounted(() => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        img.src = img.dataset.src;
+        loaded.value[img.dataset.index] = true; // Marca como cargado
+        observer.unobserve(img); // Detiene la observación una vez cargada la imagen
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('img.lazy').forEach((img, index) => {
+    img.dataset.index = index; // Asigna un índice a cada imagen para controlar su estado
+    observer.observe(img);
+  });
+});
+
 
 
 const truncatedDescription = computed(() => {

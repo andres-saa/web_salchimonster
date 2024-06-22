@@ -5997,16 +5997,16 @@ table .p-paginator-top {
 }
 @keyframes p-progress-spinner-color {
   100%, 0% {
-    stroke: #721c24;
+    stroke: var(--primary-color);
   }
   40% {
-    stroke: #004085;
+    stroke: var(--primary-color);
   }
   66% {
-    stroke: #155724;
+    stroke: var(--primary-color);
   }
   80%, 90% {
-    stroke: #856404;
+    stroke: var(--primary-color);
   }
 }
 .p-scrolltop {
