@@ -215,7 +215,7 @@ class Order:
         WHERE
             (order_date at time zone 'America/Bogota')  BETWEEN %s AND %s
             AND site_id = ANY(%s)
-        GROUP BY
+        GROUP BY 
             ROLLUP((site_id, site_name))
         ORDER BY
             site_id;
