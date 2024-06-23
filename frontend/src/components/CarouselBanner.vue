@@ -9,12 +9,12 @@
     
     <div class="carousel-inner p-0 " style=" width: 100%;height: ;">
       <div class="carousel-item active sm:d-none p-0" style="width: 100%;">
-        <img class="" style="width: 100%;height: 100%;max-height: 80vh;overflow: hidden;  object-fit: COVER; " :src="`/images/banners/banner-1.jpeg`" alt="">
+        <img class="" style="width: 100%;height: 100%;max-height: 100vh;overflow: hidden;  object-fit: COVER; " :src="`/images/banners/banner-0.jpeg`" alt="">
       </div>
 
       
-      <div v-for="i in [2,3,4]" class="carousel-item p-0 col-12 " style="">
-        <img  style="width: 100%;height:100% ;top: 0;max-height: 80vh;  object-fit:cover;" :src="`/images/banners/banner-${i}.jpeg`" alt="">
+      <div v-for="i in [1,2,3,4]" class="carousel-item p-0 col-12 " style="">
+        <img  style="width: 100%;height:100% ;top: 0;max-height: 100vh;  object-fit:cover;" :src="`/images/banners/banner-${i}.jpeg`" alt="">
 
         <div>
           
