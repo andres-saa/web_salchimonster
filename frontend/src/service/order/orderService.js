@@ -28,7 +28,9 @@ const preparar_orden = () => {
   })
 
   const site_id = site.location.site.site_id;
-  const delivery_price = site.location.neigborhood.delivery_price;
+  const payment_method_id = user.user.payment_method_option?.id;
+  const delivery_price = payment_method_id === 7 ? 0 : site.location.neigborhood.delivery_price;
+
   const order_notes = cart.cart.order_notes;
   const user_data = {
     "user_name": user.user.name,
@@ -41,7 +43,7 @@ const preparar_orden = () => {
     "site_id": site_id,
     // "site_id": 12,
     "delivery_person_id": 4,
-    "payment_method_id": user.user.payment_method_option?.id,
+    "payment_method_id": payment_method_id,
     "delivery_price": delivery_price,
     "order_notes": order_notes || 'SIN NOTAS',
     "user_data": user_data,
@@ -142,7 +144,7 @@ function validateOrder(order) {
     return false;
   }
 
-  if (!order.site_id || !order.delivery_price) {
+  if (!order.site_id || order.delivery_price == null) {
     alert('Site information is missing. Please select a valid site.');
     cart.sending_order = false
 

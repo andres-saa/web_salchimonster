@@ -88,11 +88,12 @@
                 </div>
 
                 <div class="col-6 my-0 py-0">
-                    <span><b>Domicilio</b></span>
+                    <span :style="siteStore.location.neigborhood.delivery_price == 0? 'text-decoration: line-through;':''"><b>Domicilio</b></span>
                 </div>
                 <div class="col-6 my-0  text-right py-0">
                     <!-- {{ siteStore.location }} -->
-                    <span><b>{{ formatoPesosColombianos(siteStore.location.neigborhood.delivery_price) }}</b></span>
+                    <span style="color: var(--primary-color);" v-if="siteStore.location.neigborhood.delivery_price == 0"> <b>Recoger en local</b> </span>
+                    <span v-else> <b>{{ formatoPesosColombianos(siteStore.location.neigborhood.delivery_price) }}</b></span>
                 </div>
                 <div class="col-6 my-0 py-0">
                     <span><b>Total</b></span>
@@ -156,11 +157,12 @@ import { useSitesStore } from '../../store/site';
 import { useRoute } from 'vue-router';
 import { orderService } from '../../service/order/orderService';
 import {onMounted, ref, watch} from 'vue'
+import { useUserStore } from '../../store/user';
 const sending = ref(false)
 const route = useRoute()
 const store = usecartStore()
 const siteStore = useSitesStore()
-
+const user = useUserStore()
 
 
 
@@ -187,6 +189,15 @@ const update = () => {
 
 onMounted(() => {
     update()
+
+    if (user.user.payment_method_option?.id != 7)
+        siteStore.setNeighborhoodPrice()
+    else {
+        siteStore.setNeighborhoodPriceCero()
+
+    }
+
+
 })
 
 
@@ -199,7 +210,7 @@ watch(() => store.cart.additions, () => {
 </script>
 <style scoped>
 .p-shadow {
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 .3rem 5px rgba(0, 0, 0, 0.15);
 }
 
 button {

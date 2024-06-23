@@ -132,8 +132,8 @@
                         </div>
                         
                     </div>
-                    <div @click="store.setVisible('addAdditionToCart',true)" class="col-12 p-0 m-0" style="display: flex;justify-content: end;">
-                        <Button rounded severity="danger" icon="pi pi-plus"></Button>
+                    <div  @click="store.setVisible('addAdditionToCart',true)" class="col-12 p-0 m-0" style="display: flex; justify-content: end;">
+                        <Button style="width: 2rem;left: .3rem; height: 2rem;" rounded severity="danger" icon="pi pi-plus"></Button>
 
                     </div>
 
@@ -167,11 +167,12 @@ import { useSitesStore } from '../../store/site';
 import { orderService } from '../../service/order/orderService'
 import { adicionalesService } from '../../service/restaurant/aditionalService';
 import dialogAddAditions from './dialogAddAditions.vue'
+import { useUserStore } from '../../store/user';
 const store = usecartStore()
 const siteStore = useSitesStore()
 const selectedAdditions = ref({})
 const agrupados = ref({})
-
+const user = useUserStore()
 
 
 const update = () => {
@@ -226,6 +227,16 @@ watch(() => store.visibles.addAdditionToCart, (newval)=> {
 
 const adicionales = ref([])
 onMounted(async () => {
+
+
+    if (user.user.payment_method_option?.id != 7)
+        siteStore.setNeighborhoodPrice()
+    else {
+        siteStore.setNeighborhoodPriceCero()
+
+    }
+
+
     const product_id = 53
 
 
@@ -389,7 +400,7 @@ img {
     padding: 0.1rem 1rem;
     /* border: 1px solid var(--primary-color); */
     border-radius: 0.5rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.274);
+    box-shadow: 0 .3rem 5px rgba(0, 0, 0, 0.174);
     /* bottom: 0.5rem; */
     position: absolute;
     right: 1rem;
@@ -471,5 +482,5 @@ button:hover {
 }
 
 .p-shadow {
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 .2rem 5px rgba(0, 0, 0, 0.15);
 }</style>

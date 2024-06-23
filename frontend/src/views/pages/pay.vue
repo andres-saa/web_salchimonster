@@ -71,7 +71,12 @@ const payment_method_options =  ref([])
 onMounted( async()=> {
     payment_method_options.value = await paymentMethodService.getPaymentMethods()
 
+    if (user.user.payment_method_option?.id != 7)
+        siteStore.setNeighborhoodPrice()
+    else {
+        siteStore.setNeighborhoodPriceCero()
 
+    }
 
 
 
@@ -80,12 +85,12 @@ onMounted( async()=> {
 
 watch(() => user.user.payment_method_option, (new_val) => {
 
-    // if(new_val.id == 7){
-    //     siteStore.current_delivery = siteStore.location.neigborhood.delivery_price
-    //     siteStore.location.neigborhood.delivery_price = 0
-    // }else{
-    //     siteStore.location.neigborhood.delivery_price = siteStore.current_delivery
-    // }
+    if(new_val.id == 7){
+        siteStore.current_delivery = siteStore.location.neigborhood.delivery_price
+        siteStore.location.neigborhood.delivery_price = 0
+    }else{
+        siteStore.setNeighborhoodPrice()
+    }
 })
 
 

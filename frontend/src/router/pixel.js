@@ -41,7 +41,7 @@ export default {
               content_ids: eventParams.items.map(item => item.id)
             });
           } else {
-            fbq('track', eventName, eventParams);
+            fbq('track', eventName);
           }
         }
         if (window.gtag) {

@@ -172,7 +172,7 @@ router.beforeEach(async(to, from, next) => {
 pixel.init()
 router.afterEach((to, from) => {
   // Esto rastreará una "PageView" cada vez que el usuario cambie de ruta
-  pixel.sendTrackingEvent('PageView');
+  pixel.sendTrackingEvent('track', 'PageView');
 });
 
 

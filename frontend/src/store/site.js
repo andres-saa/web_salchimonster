@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { URI,URI_SOCKET } from "../service/conection";
-
+import axios from "axios";
 
 
 
@@ -85,7 +85,28 @@ export const useSitesStore = defineStore('site', {
                 // location.reload() // Clean up the reference to the WebSocket
             };
             this.webSocket.onerror = (error) => console.error("WebSocket error:", error);
-        }
+        },
+        async setNeighborhoodPrice(){
+       
+                try {
+                    const response = await axios.get(`${URI}/neighborhood/${this.location.neigborhood.neighborhood_id}/`);
+                    if (response.status === 200) {
+                        this.location.neigborhood = response.data
+                        return response.data;
+                    } else {
+                        console.error('An error occurred while fetching the ingredients:', response.status);
+                        return null;
+                    }
+                } catch (error) {
+                    console.error('An error occurred while fetching the ingredients:', error);
+                    return null;
+                }
+      
+        },
+        async setNeighborhoodPriceCero(){
+       
+           this.location.neigborhood.delivery_price = 0
+    }
 
 
 
