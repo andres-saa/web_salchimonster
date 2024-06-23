@@ -46,3 +46,10 @@ def get_orders_gy_site(participant_id:int):
     return result
 
 
+@contest_router.get('/user-contest-participation/{participant_id}/{contest_id}')
+def get_all_participation_by_user(participant_id:int,contest_id:int):
+    order_instance = Contest()
+    result = order_instance.get_all_participation_by_user(participant_id,contest_id)
+    order_instance.close_connection()
+    return result
+

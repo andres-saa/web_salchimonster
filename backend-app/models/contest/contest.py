@@ -49,6 +49,12 @@ class Contest:
     
 
     
+    def get_all_participation_by_user (self,user_id,contest_id):
+        query = f"""SELECT * FROM contest.evidence_full_view WHERE participant_id = {user_id} and contest_id = {contest_id};
+        """
+        self.cursor.execute(query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
     
   
     def close_connection(self):
