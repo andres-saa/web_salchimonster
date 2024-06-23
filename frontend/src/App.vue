@@ -10,7 +10,7 @@ import restauranteCerrado from './components/restauranteCerrado.vue';
 <template>
   <restauranteCerrado>
   </restauranteCerrado>
-  <RouterView />
+  <RouterView class="p-0" />
   <siteDialog />
   <VistaProducto />
   <barra />
