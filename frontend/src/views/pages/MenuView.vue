@@ -1,7 +1,7 @@
 <template >
 
 
-<div class="p-0 m-0" style="min-height: 100vh;">
+<div class="px-0 mx-0 mt-5" style="min-height: 100vh;">
 
     
 

@@ -103,6 +103,12 @@ const router = createRouter({
           component: () => import('@/views/pages/pay.vue'),
           meta: { requireOpen: true, title:'Finalizar pedido' },
         },
+        {
+          path: '/colaboraciones',
+          name: 'colaboraciones',
+          component: () => import('@/views/pages/colaboraciones.vue'),
+          meta: {  title:'colaboraciones' },
+        },
 
         {
           path: '*',

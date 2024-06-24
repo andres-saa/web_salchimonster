@@ -246,7 +246,7 @@ const fondoVisible = ref(false)
 </script>
 
 <template>
-    <div v-if="!isInAdminProductsRoute && !isEntregasRoute" st class="layout-topbar shadow-3 px-3 md:pl-4 md:pr-4 lg:pl-8 lg:pr-8 "
+    <div v-if="!isInAdminProductsRoute && !isEntregasRoute" st class="layout-topbar shadow-3 px-3 md:pl-5 md:pr-5 lg:pl-7 lg:pr-7 "
         style=" z-index:999;background-color: white; ">
 
 
@@ -332,15 +332,7 @@ const fondoVisible = ref(false)
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses" style="z-index: 999 ;">
 
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-                <i class="pi pi-user"></i>
-                <span>Profile</span>
-            </button>
-            <button @click="onSettingsClick()" class="p-link layout-topbar-button">
-                <i class="pi pi-cog"></i>
-                <span>Settings</span>
-            </button>
-
+          
             <router-link to="/cart">
                 <button class="p-link layout-topbar-button p-0" style="position: relative;">
                     <i badge="5+" :class="PrimeIcons.SHOPPING_CART"></i>

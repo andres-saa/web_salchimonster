@@ -1,7 +1,14 @@
 <template >
 
-<div v-if="!route.path.includes('cart') && !route.path.includes('pay') && !route.path.includes('menu') && !route.path.includes('gracias')" class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bottom: 0; left: 0; ; justify-content: center">
-  <div :style="!showElement? 'transform: translateY(5rem);opacity:0': ''"  class="barra-carrito  px-5 " style=" 
+<div v-if="
+  !route.path.includes('cart') && 
+  !route.path.includes('pay') && 
+  !route.path.includes('menu') && 
+  !route.path.includes('colaboraciones') && 
+  !route.path.includes('gracias')  " 
+
+class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bottom: 0; left: 0; ; justify-content: center">
+  <div v-if=" store.cart.products.length > 0 " :style="!showElement? 'transform: translateY(5rem);opacity:0': ''"  class="barra-carrito  px-5 " style=" 
                           
   /* width: auto; */
   display: flex;
@@ -27,7 +34,7 @@
      
 
 
-      <div  @click="enviarAlCarro" style="">
+      <div   @click="enviarAlCarro" style="">
         <button class="    carro  " style="  
                             display: flex; 
                             background-color: ; 
@@ -46,7 +53,7 @@
           <i style="font-size: 2rem; " class="icono" :class="PrimeIcons.SHOPPING_CART"> </i>
 
 
-          <div style="position: relative;" :key="product.id" v-for="product in store.cart.products.slice(0, 4)">
+          <div  style="position: relative;" :key="product.id" v-for="product in store.cart.products.slice(0, 4)">
             <Button class="p-0" :label="product.quantity" severity="danger" rounded style="width: 1.2rem;font-size: 0.8rem; height: 1.2rem;top: -.3rem; right: -.5rem; position: absolute;"/>
             <img class="img-cart" @mouseover="() => vueMenu = true" style="height: 2rem; object-fit: contain;"
               :src="`https://backend.salchimonster.com/read-product-image/96/${product.product.product_name}`" alt="">

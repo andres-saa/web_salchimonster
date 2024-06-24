@@ -6,9 +6,11 @@ import AppSidebar from './AppSidebar.vue';
 import AppConfig from './AppConfig.vue';
 import { useLayout } from '@/layout/composables/layout';
 import Loading from '../components/Loading.vue';
+import router from '../router';
+import {useRoute} from 'vue-router'
 
 const { layoutConfig, layoutState, isSidebarActive } = useLayout();
-
+const route = useRoute()
 const outsideClickListener = ref(null);
 
 watch(isSidebarActive, (newVal) => {
@@ -74,7 +76,7 @@ const isOutsideClicked = (event) => {
         <div class="layout-sidebar">
             <app-sidebar></app-sidebar>
         </div>
-        <div class="layout-main-container  pr-0 pl-0 pt-7 " style="contain:paint ;">
+        <div class="layout-main-container  pr-0 pl-0 pt-4 pb-0 " :style="route.path.includes('colaboraciones')? 'background-color: var(--primary-color);':''" style="contain:paint ;">
 
             <div class="layout-main  ">
                

@@ -156,58 +156,23 @@ const menuOptions = ref(
         {
             name: 'Sedes',
             to:'sedes',
-            menus: [
-                {
-                    name: 'Cali',
-                    submenus: ["la potente",
-                        'la mas potente',
-                  
-                      
-                    ]
-                },
-                {
-                    name: 'Bogota',
-                    submenus: ["la potente",
-                        'la mas potente',
-                        'la mejor dicho pues',
-                        
-                    ]
-                },
-                {
-                    name: 'Palmira',
-                    submenus: ["la potente",
-                 
-                        
-                    ]
-                }
-                ,
-                {
-                    name: 'Jamundi',
-                    submenus: ["la potente",
-             
-                        
-                    ]
-                },
-                {
-                    name: 'Tulua',
-                    submenus: ["la potente",
-                      
-                        
-                    ]
-                }
-            
-            ]
+          
         },
         {
             name: 'Carta',
-            menus: [],
+        
             to:'menu'
         },
 
         {
             name: 'Rastrear pedido',
-            menus: [],
+           
             to:'rastrear-pedido'
+        },
+        {
+            name: 'Colaboraciones',
+           
+            to:'colaboraciones'
         },
         
     ]

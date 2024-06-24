@@ -1,11 +1,11 @@
 
 
 <template>
-<div class="grid col-12 lg:col-10 m-auto p-3 m-0 mb-8" style="max-width: 1024px">
+<div class="grid col-12 lg:col-10 m-auto p-3 my-5" style="max-width: 1024px">
     <div 
         v-for="sede in sedes.filter(sede => sede.city_id && sede.show_on_web)" 
         style="border-radius: 0.5rem; overflow: hidden;" 
-        class="col-12 lg:col-6 p-0 mb-3 lg:p-3 m-0"
+        class="col-12 lg:col-6 p-0 mb-3 lg:px-2 m-0"
     >
         <div class="col-12 p-0 m-0 shadow-3" style="position: relative;overflow: hidden;height: min-content;box-shadow: 0 0 10px black; border-radius: 0.5rem;">
             <img 
