@@ -89,7 +89,7 @@ const router = createRouter({
           path: '/cart',
           name: 'cart',
           component: () => import('@/views/pages/cart.vue'),
-          meta: { requireOpen: true, title:'Carrito de compras' },
+         
         },
         {
           path: '/ingreso-call-center',
@@ -161,7 +161,7 @@ router.beforeEach(async(to, from, next) => {
 
     if (store.status == 'cerrado') {
       verCerrado.value = true
-      next('/')
+      next()
 
     } else {
       // Si hay token, permite el acceso

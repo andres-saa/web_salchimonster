@@ -14,7 +14,7 @@ import { useRoute } from 'vue-router';
 import { domicilio } from '../service/cart';
 import { useSitesStore } from '../store/site';
 import { usecartStore } from '../store/shoping_cart';
-  import {loginStore} from '@/store/userCall.js'
+import {loginStore} from '@/store/userCall.js'
 
   const store = loginStore()
 const car = usecartStore()
@@ -24,7 +24,7 @@ const status = ref('');
 
 
 const obtenerstatus = async () => {
-
+    const siteStore = useSitesStore()
 
 const siteId = siteStore.location.site.site_id  
 // alert(siteId)

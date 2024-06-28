@@ -7,6 +7,7 @@ import { useReportesStore } from "../../store/ventas";
 import { useRoute } from "vue-router";
 import pixel from "../../router/pixel";
 import router from '../../router/index'
+import { Value } from "sass";
 const report = useReportesStore()
 const cart = usecartStore();
 const site = useSitesStore();
@@ -91,7 +92,8 @@ export const orderService = {
               quantity: p.quantity,
               price: p.product.price
             };
-          })
+          }),
+          value:cart.cart.total_cost
         });
 
       
