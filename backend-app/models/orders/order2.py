@@ -533,12 +533,10 @@ class Order2:
 
 
     def get_orders_to_transfer(self):
-        # Get today's date in Colombia timezone
-         # Get today's date in Colombia timezone
         colombia_tz = pytz.timezone('America/Bogota')
         now = datetime.now(colombia_tz)
         
-        # Adjusting start time to 2 AM today
+        # Ajuste para empezar desde las 2 AM de hoy
         if now.time() < time(2, 0):
             today_date = (now - timedelta(days=1)).date()
         else:
@@ -546,33 +544,36 @@ class Order2:
 
         tomorrow_date = today_date + timedelta(days=1)
 
-        # Convert dates to datetime at 2 AM for use in SQL query
+        # Convertir fechas a datetime a las 2 AM para usar en la consulta SQL
         today_start = datetime.combine(today_date, time(2, 0)).astimezone(colombia_tz).isoformat()
         tomorrow_start = datetime.combine(tomorrow_date, time(2, 0)).astimezone(colombia_tz).isoformat()
 
-        # Fetch only today's orders from the combined order view
-        combined_order_query = f"""
-            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation
+        # Consulta para obtener las órdenes de hoy desde la vista combinada de órdenes
+        combined_order_query = """
+            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, 
+            total_order_price, current_status, latest_status_timestamp, user_name, user_address, 
+            user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, 
+            responsible_observation
             FROM orders.combined_order_view
-            WHERE  latest_status_timestamp >= %s AND latest_status_timestamp < %s AND authorized = false
-            ORDER  latest_status_timestamp DESC;
+            WHERE latest_status_timestamp >= %s AND latest_status_timestamp < %s AND authorized = false
+            ORDER BY order_id, latest_status_timestamp DESC;
             """
-        self.cursor.execute(combined_order_query, ( today_start, tomorrow_start))
+        self.cursor.execute(combined_order_query, (today_start, tomorrow_start))
         orders_info = self.cursor.fetchall()
         columns_info = [desc[0] for desc in self.cursor.description]
         orders_dict = [dict(zip(columns_info, row)) for row in orders_info]
 
-        # Convert and format timestamps to Colombia timezone
+        # Convertir y formatear los timestamps a la zona horaria de Colombia
         for order in orders_dict:
             if 'latest_status_timestamp' in order:
                 order['latest_status_timestamp'] = order['latest_status_timestamp'].astimezone(colombia_tz)
 
-        # Fetch additional order details
+        # Obtener detalles adicionales de la orden
         for order in orders_dict:
             order_id = order['order_id']
 
-            # Fetch products related to the order
-            products_query = f"""
+            # Consultar productos relacionados con la orden
+            products_query = """
             SELECT name, price, quantity, total_price, product_id 
             FROM orders.order_products WHERE order_id = %s;
             """
@@ -581,13 +582,9 @@ class Order2:
             products_columns = [desc[0] for desc in self.cursor.description]
             order['products'] = [dict(zip(products_columns, row)) for row in products]
 
-            # Fetch additional items related to the order
-            additionals_query = f"""
-            SELECT 
-            aditional_name,
-            aditional_quantity,
-            aditional_type,
-            aditional_price,
+            # Consultar ítems adicionales relacionados con la orden
+            additionals_query = """
+            SELECT aditional_name, aditional_quantity, aditional_type, aditional_price, 
             total_aditional_price
             FROM orders.vw_order_aditional_items WHERE order_id = %s;
             """
@@ -595,7 +592,7 @@ class Order2:
             additionals = self.cursor.fetchall()
             additionals_columns = [desc[0] for desc in self.cursor.description]
 
-            # Group additional items by type
+            # Agrupar ítems adicionales por tipo
             grouped_additionals = {}
             for row in additionals:
                 additional = dict(zip(additionals_columns, row))
@@ -607,7 +604,13 @@ class Order2:
 
             order['additional_items'] = grouped_additionals
 
+        # Ordenar las órdenes por latest_status_timestamp en orden descendente (más recientes primero)
+        orders_dict.sort(key=lambda x: x['latest_status_timestamp'], reverse=True)
+
         return orders_dict
+
+
+
 
 
     def get_order_by_id(self, order_id):
