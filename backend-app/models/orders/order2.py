@@ -555,7 +555,7 @@ class Order2:
             SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation
             FROM orders.combined_order_view
             WHERE  latest_status_timestamp >= %s AND latest_status_timestamp < %s AND authorized = false
-            ORDER BY order_id, latest_status_timestamp DESC;
+            ORDER  latest_status_timestamp DESC;
             """
         self.cursor.execute(combined_order_query, ( today_start, tomorrow_start))
         orders_info = self.cursor.fetchall()

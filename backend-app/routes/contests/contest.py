@@ -18,7 +18,7 @@ import pytz
 
 from schema.contests.contest import Contest,evidence,Contest_entry 
 from models.contest.contest import Contest
-
+from schema.contests.contest import evidence_post
 
 
 contest_router = APIRouter()
@@ -26,9 +26,9 @@ contest_router = APIRouter()
 
 # @contest_router.post("/order")
 # async def create_order(order_data: OrderSchemaPost):
-#     order_instance = Order2()
+#     contest_instance = Order2()
 #     try:
-#         result = order_instance.create_order(order_data)
+#         result = contest_instance.create_order(order_data)
 #         # Notify the site associated with the order
 #         await notify_sites(order_data.site_id, "Order processed")
 #         return result
@@ -40,16 +40,24 @@ contest_router = APIRouter()
 
 @contest_router.get('/contests/{participant_id}')
 def get_orders_gy_site(participant_id:int):
-    order_instance = Contest()
-    result = order_instance.get_all_contests_with_participation(participant_id)
-    order_instance.close_connection()
+    contest_instance = Contest()
+    result = contest_instance.get_all_contests_with_participation(participant_id)
+    contest_instance.close_connection()
     return result
+
+@contest_router.post('/contest-entry/')
+def create_contest_entry(evidence:evidence_post):
+    contest_instance = Contest()
+    result = contest_instance.create_participation(evidence.evidence,evidence.Contest_entry)
+    contest_instance.close_connection()
+    return result
+
 
 
 @contest_router.get('/user-contest-participation/{participant_id}/{contest_id}')
 def get_all_participation_by_user(participant_id:int,contest_id:int):
-    order_instance = Contest()
-    result = order_instance.get_all_participation_by_user(participant_id,contest_id)
-    order_instance.close_connection()
+    contest_instance = Contest()
+    result = contest_instance.get_all_participation_by_user(participant_id,contest_id)
+    contest_instance.close_connection()
     return result
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile,FastAPI, File,Form,BackgroundTasks
+from fastapi import APIRouter, UploadFile,FastAPI, File,Form,BackgroundTasks,HTTPException
 from fastapi.responses import FileResponse
 from os import getcwd
 from os.path import splitext
@@ -10,9 +10,34 @@ from glob import glob
 
 from os import remove
 from fastapi.responses import JSONResponse
+from models.contest.contest import Contest
 # conn = siteDocumentConnection()
 from fastapi.middleware.cors import CORSMiddleware
 import time
+from PIL import Image
+from io import BytesIO
+from datetime import datetime,timedelta
+import pytz
+
+
+
+
+def get_image_creation_date(image_path):
+    try:
+        with Image.open(image_path) as img:
+            exif_data = img._getexif()
+            if exif_data:
+                date_taken_tag = 36867  # Tag EXIF para la fecha y hora original
+                if date_taken_tag in exif_data:
+                    date_taken = exif_data[date_taken_tag]
+                    datetime_taken = datetime.strptime(date_taken, '%Y:%m:%d %H:%M:%S')
+                    bogota_timezone = pytz.timezone('America/Bogota')
+                    localized_datetime = bogota_timezone.localize(datetime_taken)
+                    return localized_datetime
+            return None
+    except Exception as e:
+        print(f"Error al leer los metadatos EXIF: {e}")
+        return None
 app = FastAPI()
 
 # Configuración del middleware CORS
@@ -65,14 +90,38 @@ def resize_image(path: str, upload_dir: str, product_id: str, file_extension: st
             "product image " + product_id + " " + str(size["width"]) + 'x' + str(size["height"]) + file_extension)
         image.save(resized_file_path)
 
+
+
+
+# resize_image, file_path, upload_dir, evidence_id,contest_id,user_id, file_extension
+
+def resize_contest_image(path: str, upload_dir: str, evidence_id: str,contest_id:str,user_id:str, file_extension: str):
+    sizes = [
+        {"width": 96, "height": 96},
+        {"width": 300, "height": 300},
+        {"width": 600, "height": 600},
+    ]
+
+    for size in sizes:
+        size_defined = size["width"], size["height"]
+        image = Image.open(path, mode='r')
+        image.thumbnail(size_defined)
+        resized_file_path = upload_dir / (
+            "contest_"+contest_id+"_user_"+user_id+"_evidence_"+evidence_id+"_"+ str(size["width"]) + 'x' + str(size["height"]) + file_extension)
+        image.save(resized_file_path)
+
 @router.get("/")
 def root():
     return "hola"
+
 
 @router.post('/upload-product-image/{product_id}')
 async def upload_user_photo(product_id: str, file: UploadFile = File(...), background_tasks: BackgroundTasks = BackgroundTasks):
     # Directorio donde se guardarán las imágenes
     upload_dir = Path.cwd() / "files" / "images" / "products" / product_id
+
+    
+    
 
     # Eliminar la carpeta y archivos existentes
     if upload_dir.is_dir():
@@ -126,12 +175,68 @@ def get_photo_profile(product_id: str, height: str):
     return "Archivo no encontrado", 404
 
 
+@router.get('/read-contest-image/{height}/{user_id}/{contest_id}/{evidence_id}')
+def get_photo_profile( height: str,user_id:str, evidence_id: str,contest_id:str,):
+    timestamp = int(time.time())  # Obtener el timestamp actual
+
+    base_dir = Path(getcwd()) / "files" / "images" /"contests"/ f"contest_{contest_id}" / f"user_{user_id}"
+    pattern = f"{base_dir}/contest_{contest_id}_" + f"user_{user_id}_" + f"evidence_{evidence_id}_{height}x{height}.*"
+    # pattern = f"contest_{contest_id}_" + f"user_{user_id}_" + f"evidence_{evidence_id}" + file_extension
+
+    # Buscar archivos que coincidan con el patrón
+    files = glob(pattern)
+
+    if files:
+        # Si se encuentran archivos, devolver el primero
+        return FileResponse(files[0], headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Version": str(timestamp)
+        })
+
+    # Si no se encuentra ningún archivo, devolver un error
+    return "Archivo no encontrado", 404
 
 
 
 
+@router.post('/upload-constest-image/{user_id}/{contest_id}/{evidence_id}')
+async def upload_user_photo(user_id: str, evidence_id: str, contest_id: str, file: UploadFile = File(...), background_tasks: BackgroundTasks = BackgroundTasks()):
+    # Directorio donde se guardarán las imágenes
+    upload_dir = Path.cwd() / "files" / "images" / "contests" / f"contest_{contest_id}" / f"user_{user_id}"
+    contest_instance = Contest()
+    # Crear la carpeta si no existe
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    # Obtener la extensión del archivo
+    file_extension = splitext(file.filename)[1]
+
+    # Combinar el nombre del archivo con el directorio
+    file_path = upload_dir / (f"contest_{contest_id}_" + f"user_{user_id}_" + f"evidence_{evidence_id}" + file_extension)
+
+    with open(file_path, "wb") as myfile:
+        content = await file.read()
+        myfile.write(content)
+
+    # Obtener y mostrar la fecha de creación de la imagen
+    image_creation_date = get_image_creation_date(file_path)
+    bogota_now = datetime.now(pytz.timezone('America/Bogota'))
+
+    if image_creation_date is None or bogota_now - image_creation_date > timedelta(minutes=5):
+        contest_instance.deleteEvidenceByImageError(evidence_id)
+        raise HTTPException(status_code=400, detail="La foto fue tomada hace más de 5 minutos.")
 
 
+    rotate_image(file_path)
+
+    background_tasks.add_task(resize_contest_image, file_path, upload_dir, evidence_id, contest_id, user_id, file_extension)
+
+  
+    contest_instance.updateEntryImageUrl(evidence_id, f"/read-contest-image/300/{user_id}/{contest_id}/{evidence_id}")
+    contest_instance.close_connection()
+
+    return JSONResponse(content={"message": "hecho"}, status_code=200)
 
 
 

@@ -15,16 +15,19 @@ class Contest(BaseModel):
 class Contest_entry(BaseModel):
     id: Optional[int] = None
     participant_id:int
-    contest_it:int
-    evidence_id:int
+    contest_id:int
+
 
 
 class evidence(BaseModel):
     evidence_type_id: int
     evidence_entry:str
-    Contest_id:int
+    contest_id:int
 
 
+class evidence_post(BaseModel):
+    evidence:evidence
+    Contest_entry:Contest_entry
 
 
     
