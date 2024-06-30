@@ -44,7 +44,7 @@ class Order2:
             self.insert_order_details(order_id, order_data)
             self.insert_order_products(order_id, order_data)
             self.insert_order_aditionals(order_id, order_data)
-            self.update_order_status(order_id, order_data.order_status)
+            self.update_order_status(order_id, order_data.payment_method_id)
             self.insert_order_notes(order_id,order_data.order_notes)
             # Actualizar la última hora de compra
             self.update_last_order_time(user_id)
@@ -72,10 +72,10 @@ class Order2:
     def create_order_entry(self, user_id, order_data):
         if order_data.payment_method_id == 6:
             order_insert_query = """
-            INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized)
-            VALUES (%s, %s, %s, false) RETURNING id;
+            INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized,inserted_by_id)
+            VALUES (%s, %s, %s, false,%s) RETURNING id;
             """
-            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, order_data.delivery_person_id))
+            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, order_data.delivery_person_id, order_data.inserted_by))
             # Verificar resultado
             result = self.cursor.fetchone()
             if result is None:
@@ -84,10 +84,10 @@ class Order2:
             self.create_or_update_event(3, 12, 1132, '1 minute', False)
         else:
             order_insert_query = """
-            INSERT INTO orders.orders (user_id, site_id, delivery_person_id)
-            VALUES (%s, %s, %s) RETURNING id;
+            INSERT INTO orders.orders (user_id, site_id, delivery_person_id,inserted_by_id)
+            VALUES (%s, %s, %s,%s) RETURNING id;
             """
-            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, order_data.delivery_person_id))
+            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, order_data.delivery_person_id,order_data.inserted_by))
             result = self.cursor.fetchone()
             if result is None:
                 raise ValueError("La orden no pudo ser creada.")
@@ -322,27 +322,51 @@ class Order2:
         """
         self.cursor.execute(order_aditionals_insert_query, (order_id, aditional.aditional_item_instance_id, aditional.quantity, aditional_prices[aditional.aditional_item_instance_id]))
 
-    def update_order_status(self, order_id, order_status):
-        
-        # Define la zona horaria de Colombia
-        colombia_tz = pytz.timezone('America/Bogota')
-        
-        # Obtiene la fecha y hora actual en la zona horaria de Colombia
-        now_colombia = datetime.now(colombia_tz)
-        
-        # Consulta para insertar el estado de la orden
-        order_status_insert_query = """
-        INSERT INTO orders.order_status (order_id, status,timestamp)
-        VALUES (%s, %s,CURRENT_TIMESTAMP );
-        """
-        self.cursor.execute(order_status_insert_query, (order_id, 'generada',))
-        
-        # Consulta para insertar el historial del estado de la orden
-        order_status_history_insert_query = """
-        INSERT INTO orders.order_status_history (order_id, status,timestamp)
-        VALUES (%s, %s,CURRENT_TIMESTAMP );
-        """
-        self.cursor.execute(order_status_history_insert_query, (order_id, 'generada',))
+    def update_order_status(self, order_id, payment_method_id):
+
+        if  payment_method_id != 6:
+            
+            # Define la zona horaria de Colombia
+            colombia_tz = pytz.timezone('America/Bogota')
+            
+            # Obtiene la fecha y hora actual en la zona horaria de Colombia
+            now_colombia = datetime.now(colombia_tz)
+            
+            # Consulta para insertar el estado de la orden
+            order_status_insert_query = """
+            INSERT INTO orders.order_status (order_id, status,timestamp)
+            VALUES (%s, %s,CURRENT_TIMESTAMP );
+            """
+            self.cursor.execute(order_status_insert_query, (order_id, 'generada',))
+            
+            # Consulta para insertar el historial del estado de la orden
+            order_status_history_insert_query = """
+            INSERT INTO orders.order_status_history (order_id, status,timestamp)
+            VALUES (%s, %s,CURRENT_TIMESTAMP );
+            """
+            self.cursor.execute(order_status_history_insert_query, (order_id, 'generada',))
+        else:
+            
+            # Define la zona horaria de Colombia
+            colombia_tz = pytz.timezone('America/Bogota')
+            
+            # Obtiene la fecha y hora actual en la zona horaria de Colombia
+            now_colombia = datetime.now(colombia_tz)
+            
+            # Consulta para insertar el estado de la orden
+            order_status_insert_query = """
+            INSERT INTO orders.order_status (order_id, status,timestamp)
+            VALUES (%s, %s,CURRENT_TIMESTAMP );
+            """
+            self.cursor.execute(order_status_insert_query, (order_id, 'transferencia pendiente',))
+            
+            # Consulta para insertar el historial del estado de la orden
+            order_status_history_insert_query = """
+            INSERT INTO orders.order_status_history (order_id, status,timestamp)
+            VALUES (%s, %s,CURRENT_TIMESTAMP );
+            """
+            self.cursor.execute(order_status_history_insert_query, (order_id, 'transferencia pendiente',))
+
         
         
 
@@ -555,7 +579,11 @@ class Order2:
             user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, 
             responsible_observation
             FROM orders.combined_order_view
-            WHERE latest_status_timestamp >= %s AND latest_status_timestamp < %s AND authorized = false
+
+            WHERE 
+                latest_status_timestamp >= %s 
+                AND latest_status_timestamp < %s 
+                AND authorized = false  AND current_status = 'transferencia pendiente'
             ORDER BY order_id, latest_status_timestamp DESC;
             """
         self.cursor.execute(combined_order_query, (today_start, tomorrow_start))
@@ -853,8 +881,8 @@ class Order2:
             
             # Insert a record into the order status history to reflect this change
             order_status_history_insert_query = """
-            INSERT INTO orders.order_status_history (order_id, status, timestamp)
-            VALUES (%s, 'authorized', CURRENT_TIMESTAMP);
+            INSERT INTO orders.order_status (order_id, status, timestamp)
+            VALUES (%s, 'generada', CURRENT_TIMESTAMP);
             """
             self.cursor.execute(order_status_history_insert_query, (order_id,))
             

@@ -107,4 +107,5 @@ class OrderSchemaPost(BaseModel):
     payment_method_id: int
     delivery_price: Decimal
     order_notes: str
-    user_data: user_schema_post  
+    user_data: user_schema_post
+    inserted_by:Optional[int] = None
