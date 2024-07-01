@@ -209,46 +209,104 @@ class Order:
             SUM(CASE WHEN current_status = 'enviada' THEN total_sales ELSE 0 END) AS total_sales_sent,
             SUM(CASE WHEN current_status = 'cancelada' THEN total_sales ELSE 0 END) AS total_sales_cancelled,
             SUM(CASE WHEN current_status = 'enviada' THEN total_orders ELSE 0 END) AS total_orders_sent,
-            SUM(CASE WHEN current_status = 'cancelada' THEN total_orders ELSE 0 END) AS total_orders_cancelled
+            SUM(CASE WHEN current_status = 'cancelada' THEN total_orders ELSE 0 END) AS total_orders_cancelled,
+            COALESCE(creator_name, 'pagina web') AS creator_name,
+            SUM(CASE WHEN current_status = 'enviada' THEN total_sales ELSE 0 END) AS total_sales_by_creator,
+            COUNT(*) FILTER (WHERE current_status = 'enviada') AS total_orders_by_creator_sent,
+            COUNT(*) FILTER (WHERE current_status = 'cancelada') AS total_orders_by_creator_cancelled
         FROM
             orders.daily_order_sales_view
         WHERE
             (order_date at time zone 'America/Bogota')  BETWEEN %s AND %s
             AND site_id = ANY(%s)
         GROUP BY 
-            ROLLUP((site_id, site_name))
+            ROLLUP((site_id, site_name, COALESCE(creator_name, 'pagina web')))
         ORDER BY
-            site_id;
+            site_id, creator_name;
         """
 
         self.cursor.execute(query, (start_date_utc, end_date_utc, site_ids))
         results = self.cursor.fetchall()
 
-        sales_report = []
+        sales_report = {
+            'total_sales': [],
+            'creators': []
+        }
+
+        total_row = None  # Variable para almacenar temporalmente la fila de totales
+        site_sales = {}
+        creator_sales = {}
+        creator_totals = {
+            'name': 'TOTAL',
+            'sales': 0,
+            'orders_sent': 0,
+            'orders_cancelled': 0,
+            'orders_generated': 0
+        }
         for result in results:
-            report = {
-                'site_id': result[0] if result[0] is not None else 'TOTAL',
-                'site_name': result[1] if result[1] is not None else 'TOTAL',
-                'total_sales_sent': float(result[2]) if result[2] is not None else 0,
-                'total_sales_cancelled': float(result[3]) if result[3] is not None else 0,
-                'total_orders_sent': int(result[4]) if result[4] is not None else 0,
-                'total_orders_cancelled': int(result[5]) if result[5] is not None else 0
-            }
-            sales_report.append(report)
+            site_id = result[0]
+            site_name = result[1]
+            
+            if site_id is None and site_name is None:  # This is the TOTAL row
+                total_row = {
+                    'site_name': 'TOTAL',
+                    'total_sales_sent': float(result[2]) if result[2] is not None else 0,
+                    'total_sales_cancelled': float(result[3]) if result[3] is not None else 0,
+                    'total_orders_sent': int(result[4]) if result[4] is not None else 0,
+                    'total_orders_cancelled': int(result[5]) if result[5] is not None else 0,
+                    'site_id': 'TOTAL'
+                }
+            else:
+                if site_id not in site_sales:
+                    site_sales[site_id] = {
+                        'site_id': site_id,
+                        'site_name': site_name,
+                        'total_sales_sent': 0,
+                        'total_sales_cancelled': 0,
+                        'total_orders_sent': 0,
+                        'total_orders_cancelled': 0
+                    }
+                site_sales[site_id]['total_sales_sent'] += float(result[2]) if result[2] is not None else 0
+                site_sales[site_id]['total_sales_cancelled'] += float(result[3]) if result[3] is not None else 0
+                site_sales[site_id]['total_orders_sent'] += int(result[4]) if result[4] is not None else 0
+                site_sales[site_id]['total_orders_cancelled'] += int(result[5]) if result[5] is not None else 0
+            
+            creator_name = result[6]
+            if creator_name is not None:
+                if creator_name not in creator_sales:
+                    creator_sales[creator_name] = {
+                        'name': creator_name,
+                        'sales': 0,
+                        'orders_sent': 0,
+                        'orders_cancelled': 0,
+                        'orders_generated': 0
+                    }
+                creator_sales[creator_name]['sales'] += float(result[7]) if result[7] is not None else 0
+                creator_sales[creator_name]['orders_sent'] += int(result[8]) if result[8] is not None else 0
+                creator_sales[creator_name]['orders_cancelled'] += int(result[9]) if result[9] is not None else 0
+                creator_totals['sales'] += float(result[7]) if result[7] is not None else 0
+                creator_totals['orders_sent'] += int(result[8]) if result[8] is not None else 0
+                creator_totals['orders_cancelled'] += int(result[9]) if result[9] is not None else 0
 
-        
-        
+        # Append site_sales to total_sales
+        for site in site_sales.values():
+            sales_report['total_sales'].append(site)
+
+        # Append creator_sales to creators
+        for creator in creator_sales.values():
+            sales_report['creators'].append(creator)
+
+        # Calculate total generated orders for the total row
+        creator_totals['orders_generated'] = creator_totals['orders_sent'] + creator_totals['orders_cancelled']
+
+        # Append the total creator to creators
+        sales_report['creators'].append(creator_totals)
+
+        # Añadir la fila de totales al final
+        if total_row:
+            sales_report['total_sales'].append(total_row)
+
         return sales_report
-
-
-
-
-
-
-
-
-
-
 
 
 
