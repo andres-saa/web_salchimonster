@@ -197,35 +197,34 @@ class Order:
         tz_colombia = pytz.timezone('America/Bogota')
         tz_utc = pytz.utc
 
-        # Check if the dates are datetime objects, if not, convert from string
-        start_date_utc = start_date
-        end_date_utc = end_date
-
         # Preparar la consulta SQL
         query = """
-        SELECT
-            site_id,
-            site_name,
-            SUM(CASE WHEN current_status = 'enviada' THEN total_sales ELSE 0 END) AS total_sales_sent,
-            SUM(CASE WHEN current_status = 'cancelada' THEN total_sales ELSE 0 END) AS total_sales_cancelled,
-            SUM(CASE WHEN current_status = 'enviada' THEN total_orders ELSE 0 END) AS total_orders_sent,
-            SUM(CASE WHEN current_status = 'cancelada' THEN total_orders ELSE 0 END) AS total_orders_cancelled,
-            COALESCE(creator_name, 'pagina web') AS creator_name,
-            SUM(CASE WHEN current_status = 'enviada' THEN total_sales ELSE 0 END) AS total_sales_by_creator,
-            COUNT(*) FILTER (WHERE current_status = 'enviada') AS total_orders_by_creator_sent,
-            COUNT(*) FILTER (WHERE current_status = 'cancelada') AS total_orders_by_creator_cancelled
-        FROM
-            orders.daily_order_sales_view
-        WHERE
-            (order_date at time zone 'America/Bogota')  BETWEEN %s AND %s
-            AND site_id = ANY(%s)
-        GROUP BY 
-            ROLLUP((site_id, site_name, COALESCE(creator_name, 'pagina web')))
-        ORDER BY
-            site_id, creator_name;
-        """
+    SELECT
+        site_id,
+        site_name,
+        SUM(CASE WHEN current_status = 'enviada' THEN total_sales ELSE 0 END) AS total_sales_sent,
+        SUM(CASE WHEN current_status = 'cancelada' THEN total_sales ELSE 0 END) AS total_sales_cancelled,
+        SUM(CASE WHEN current_status = 'enviada' THEN total_orders ELSE 0 END) AS total_orders_sent,
+        SUM(CASE WHEN current_status = 'cancelada' THEN total_orders ELSE 0 END) AS total_orders_cancelled,
+        COALESCE(creator_name, 'pagina web') AS creator_name,
+        SUM(CASE WHEN current_status = 'enviada' THEN total_sales ELSE 0 END) AS total_sales_by_creator,
+        COUNT(*) FILTER (WHERE current_status = 'enviada') AS total_orders_by_creator_sent,
+        COUNT(*) FILTER (WHERE current_status = 'cancelada') AS total_orders_by_creator_cancelled,
+        COUNT(*) FILTER (WHERE responsible_id = creator_id AND creator_id IS NOT NULL) AS concreted_transferences,
+        COALESCE(creator_id,0) AS creator_id
+    FROM
+        orders.daily_order_sales_view
+    WHERE
+        (order_date at time zone 'America/Bogota') BETWEEN %s AND %s
+        AND site_id = ANY(%s)
+    GROUP BY 
+        ROLLUP((site_id, site_name, COALESCE(creator_name, 'pagina web') , COALESCE(creator_id, 0)))
+    ORDER BY
+        creator_id, creator_name;
+    """
 
-        self.cursor.execute(query, (start_date_utc, end_date_utc, site_ids))
+        # Ejecutar consulta
+        self.cursor.execute(query, (start_date, end_date, site_ids))
         results = self.cursor.fetchall()
 
         sales_report = {
@@ -233,7 +232,7 @@ class Order:
             'creators': []
         }
 
-        total_row = None  # Variable para almacenar temporalmente la fila de totales
+        total_row = None
         site_sales = {}
         creator_sales = {}
         creator_totals = {
@@ -241,19 +240,28 @@ class Order:
             'sales': 0,
             'orders_sent': 0,
             'orders_cancelled': 0,
-            'orders_generated': 0
+            'concreted_transferences': 0
         }
+
+        # Procesar resultados
         for result in results:
-            site_id = result[0]
-            site_name = result[1]
-            
-            if site_id is None and site_name is None:  # This is the TOTAL row
+            site_id, site_name = result[:2]
+            sales_sent, sales_cancelled = result[2] or 0, result[3] or 0
+            orders_sent, orders_cancelled = result[4] or 0, result[5] or 0
+            creator_name = result[6]
+            sales_by_creator = result[7] or 0
+            orders_by_creator_sent, orders_by_creator_cancelled = result[8] or 0, result[9] or 0
+            concreted_transferences = result[10] or 1
+            creator_id = result[11]
+
+            if site_id is None and site_name is None:
                 total_row = {
                     'site_name': 'TOTAL',
-                    'total_sales_sent': float(result[2]) if result[2] is not None else 0,
-                    'total_sales_cancelled': float(result[3]) if result[3] is not None else 0,
-                    'total_orders_sent': int(result[4]) if result[4] is not None else 0,
-                    'total_orders_cancelled': int(result[5]) if result[5] is not None else 0,
+                    'total_sales_sent': sales_sent,
+                    'total_sales_cancelled': sales_cancelled,
+                    'total_orders_sent': orders_sent,
+                    'total_orders_cancelled': orders_cancelled,
+                    'creator_id':0,
                     'site_id': 'TOTAL'
                 }
             else:
@@ -264,74 +272,67 @@ class Order:
                         'total_sales_sent': 0,
                         'total_sales_cancelled': 0,
                         'total_orders_sent': 0,
-                        'total_orders_cancelled': 0
+                        'total_orders_cancelled': 0,
+                        'creator_id':0,
                     }
-                site_sales[site_id]['total_sales_sent'] += float(result[2]) if result[2] is not None else 0
-                site_sales[site_id]['total_sales_cancelled'] += float(result[3]) if result[3] is not None else 0
-                site_sales[site_id]['total_orders_sent'] += int(result[4]) if result[4] is not None else 0
-                site_sales[site_id]['total_orders_cancelled'] += int(result[5]) if result[5] is not None else 0
-            
-            creator_name = result[6]
-            if creator_name is not None:
+                site_sales[site_id]['total_sales_sent'] += sales_sent
+                site_sales[site_id]['total_sales_cancelled'] += sales_cancelled
+                site_sales[site_id]['total_orders_sent'] += orders_sent
+                site_sales[site_id]['total_orders_cancelled'] += orders_cancelled
+
                 if creator_name not in creator_sales:
                     creator_sales[creator_name] = {
                         'name': creator_name,
+                        'creator_id': creator_id,
                         'sales': 0,
                         'orders_sent': 0,
                         'orders_cancelled': 0,
-                        'orders_generated': 0
+                        'concreted_transferences': 0
                     }
-                creator_sales[creator_name]['sales'] += float(result[7]) if result[7] is not None else 0
-                creator_sales[creator_name]['orders_sent'] += int(result[8]) if result[8] is not None else 0
-                creator_sales[creator_name]['orders_cancelled'] += int(result[9]) if result[9] is not None else 0
-                creator_totals['sales'] += float(result[7]) if result[7] is not None else 0
-                creator_totals['orders_sent'] += int(result[8]) if result[8] is not None else 0
-                creator_totals['orders_cancelled'] += int(result[9]) if result[9] is not None else 0
 
-        # Append site_sales to total_sales
-        for site in site_sales.values():
-            sales_report['total_sales'].append(site)
+                creator_sales[creator_name]['sales'] += sales_by_creator
+                creator_sales[creator_name]['orders_sent'] += orders_by_creator_sent
+                creator_sales[creator_name]['orders_cancelled'] += orders_by_creator_cancelled
 
-        # Append creator_sales to creators
-        for creator in creator_sales.values():
-            sales_report['creators'].append(creator)
+        creator_totals = {
+            'name': 'TOTAL',
+            'creator_id': 0,
+            'sales': 0,
+            'orders_sent': 0,
+            'orders_cancelled': 0,
+            'concreted_transferences': 0
+        }
 
-        # Calculate total generated orders for the total row
-        creator_totals['orders_generated'] = creator_totals['orders_sent'] + creator_totals['orders_cancelled']
+        # Calcular totales para cada creador y actualizar los totales generales
+        for creator_name, creator_info in creator_sales.items():
+            query_concreted = """
+            SELECT COUNT(*)
+            FROM orders.daily_order_sales_view
+            WHERE responsible_id = %s
+            AND (order_date at time zone 'America/Bogota') BETWEEN %s AND %s
+            """
+            self.cursor.execute(query_concreted, (creator_info['creator_id'], start_date, end_date))
+            concreted_transferences = self.cursor.fetchone()[0]
+            creator_info['concreted_transferences'] = concreted_transferences
 
-        # Append the total creator to creators
-        sales_report['creators'].append(creator_totals)
+            # Sumar los valores del creador a los totales
+            creator_totals['sales'] += creator_info['sales']
+            creator_totals['orders_sent'] += creator_info['orders_sent']
+            creator_totals['orders_cancelled'] += creator_info['orders_cancelled']
+            creator_totals['concreted_transferences'] += concreted_transferences
 
-        # Añadir la fila de totales al final
+        # Añadir el total de todos los creadores al final del reporte de creadores
+        creator_sales['TOTAL'] = creator_totals
+
+        # Añadir los diccionarios de ventas de sitios y creadores al reporte final
+        sales_report['total_sales'].extend(site_sales.values())
+        sales_report['creators'].extend(creator_sales.values())
+
+        # Incluir la fila de totales general si existe
         if total_row:
             sales_report['total_sales'].append(total_row)
 
         return sales_report
-
-
-
-
-    def enviar_mensaje_template(self, destino, params):
-        url = "https://api.gupshup.io/wa/api/v1/template/msg"
-        headers = {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'apikey': 'obg0iystmnq4v0ln4r5fnjcvankhtjp0',
-            'cache-control': 'no-cache'
-        }
-        # Asegurarse de que los parámetros están en el formato correcto para el JSON
-        json_params = str(params).replace("'", '"')
-        data = {
-            'channel': 'whatsapp',
-            'source': '573053447255',
-            'destination': destino,
-            'src.name': 'Salchimonster',
-            'template': '{"id":"03930a95-275d-42c1-b295-72a6d364666b","params":' + json_params + '}'
-        }
-
-        response = requests.post(url, headers=headers, data=data)
-        return response.text
-
 
 
 
