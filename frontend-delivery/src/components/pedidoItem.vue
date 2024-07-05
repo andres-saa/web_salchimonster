@@ -1,193 +1,159 @@
 <template>
-  <div class="col-12">
-    <div class="grid  pedido align-items-center" style="color: white; cursor: pointer;">
-      <div v-for="product in order.order_products">
-        <img class="" style="width: 60px; height: 60px; object-fit: contain;"
-          :src="`${URI}/read-product-image/96/${product.name}`" alt="" />
-      </div>
+  <div @click="open" class="col-12 "  :style="store.currentSearchingOrder.order_id == props.order.order_id? 'border:3px solid var(--primary-color)' : ''" style="background-color: rgba(255, 255, 255, 0.506);padding: .6rem; position: relative; border-radius: 0.5rem;cursor: pointer;">
+
 
      
-      <i v-if="estado.order_status == 'enviada'" class="pi pi-check "
-        style="font-size: 2rem; color: var(--primary-color); font-weight: bold;"></i>
-      <i v-if="estado.order_status == 'generada'" class="pi pi-star-fill p-3"
-        style="font-size: 2rem; color: var(--primary-color); font-weight: bold;"></i>
-
-      <span class="col text-right m-3 p-0" style="color: black; font-weight: bold; min-width: max-content;"> #{{
-        order.order_id }}  <span class="col text-right m-3 p-0" style="color: black; font-weight: bold; min-width: max-content;"> {{
-      obtenerHoraFormateadaAMPM(order.order_status.timestamp )  }}</span></span>
+      <Tag style="border-radius: .3rem" class="text mb-2" :severity="props.order.user_phone == '1111111111'? 'danger' : 'help'"> {{props.order.user_phone == '1111111111'? 'ES UNA PRUEBA, RELAJATE' : `CLIENTE --> ${props.order.user_name?.toUpperCase()}` }}</Tag>
 
 
+      <div style="display: flex; align-items: center;justify-content: space-between;">
+          <div style=" display: flex;align-items: center; gap: .5rem; flex-wrap: wrap;">
+              <b style="min-width: max-content;color: black;">
+      #{{props.order?.order_id}}
+          </b>
+
+          <div v-for="product in props.order.products.slice(0,3)" style="width: 3rem;height:100%;">
+              <div style="position: relative;">
+                  <img style="width: 100%; border-radius: 10%;background-color: white;" :src="`https://backend.salchimonster.com/read-product-image/96/${product.name}`" alt="">
+                  
+                  <Button  severity="danger" class="p-0" rounded :label="product.quantity" style="width: 1.5rem;position: absolute;top: -.5rem;right: -.5rem;z-index: 99; height: 1.5rem;border-radius: 1rem;">
+
+                  </Button>
+              </div>
+          
+             
+
+          </div>
 
 
-<!-- <span class="col text-right m-3 p-0" style="color: black; font-weight: bold; min-width: max-content;"> #{{
-        order.order_status.timestamp.hora.h }}</span> -->
 
-      <!-- Agrega la cuenta regresiva aquí -->
+          </div>
 
+          
+          
+          <span class="text-xl" style="display: flex; gap: 1rem;align-items: center;">
+              <b style="min-width: max-content;color: black;">
+          {{props.order?.latest_status_timestamp?.split('T')[1]?.split('.')[0]?.split(':').slice(0,2)?.join(':') }}
+          </b>
+          
+          <!-- <Tag style="border-radius: .3rem" v-if="props.order.current_status != 'en preparacion'" :severity="icons[props.order.current_status]">
+              
+          {{props.order.current_status }}
+          
+          </Tag> -->
 
-      <div v-if="order.order_status.status == 'en preparacion'" :class="minutos == 0 && segundos == 0 ? 'finalizado' : ''"
-        class="countdown-timer m-3" style="display: flex; align-items: center;justify-content: center;"
-        :style="{ borderRadius: '50%', position: 'relative', width: '3rem', height: '3rem' }">
+      
 
-        <div style="position: absolute; top: 50%; left: 50%; z-index: 99; transform: translate(-50%, -50%);">
-          {{ minutos }}:{{ segundos }}
-        </div>
+          <ProgressSpinner v-if="props.order.current_status == 'en preparacion'" style="width: 50px; height: 50px" strokeWidth="8"
+  animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+         
 
-       
+        
 
-        <div
-          :style="{ position: 'absolute', width: '100%', height: '100%', borderRadius: '50%', clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)' }">
-        </div>
-
+          </span>
+          
+          
       </div>
 
+      <Tag style="border-radius: .3rem"  v-if="props.order.calcel_sol_state != null" :severity="props.order.calcel_sol_state? 'success': 'danger'"> {{props.order.calcel_sol_state? 'REVISADO' : ' EN REVISION...' }} </Tag> <span style="font-weight: bold;" v-if="props.order.calcel_sol_state">  Y  </span>
+      <Tag style="border-radius: .3rem" v-if="props.order.calcel_sol_state" :severity="props.order.calcel_sol_asnwer? 'success': 'danger'">  {{props.order.calcel_sol_asnwer? 'APROBADO': 'RECHAZADO' }} </Tag> 
+      
+      <P class="m-0"  v-if="props.order.calcel_sol_state "> <b>RESPONSABLE:</b>  {{props.order.cancelation_solve_responsible?.split(' ').slice(0,3).join(' ')  }} </P> 
 
-    </div>
+      <span v-if="props.order.responsible_observation">
+          <p> <b>OBSERVACIONES:</b> {{ props.order.responsible_observation || 'sin observaciones'}} </p> 
+          
+      </span>
+
+      <Tag style="border-radius: .3rem" severity="success" v-if="props.order.responsible_id"> <i class="pi pi-whatsapp mr-2"></i>   TRANSFERENCIA APROBADA</Tag> <br> 
+      
+
+      
+      <!-- <p class="py-0 my-2"><b>TRANSFERENCIA APROBADA POR</b></p> -->
+      
+      <Tag style="border-radius: .3rem" severity="success" v-if="props.order.responsible_id">  {{props.order.name}}</Tag>
+
+  
+      <div v-if="props.order.inserted_by_name">
+          <p style="color: black;" class="py-0 my-1"><b>Vendido por</b></p>
+      <Tag style="border-radius: .3rem; background-color: black;" > 
+          {{ props.order.inserted_by_name}} ->
+      </Tag>
+     
+      </div>
+
+      <Tag style="border-radius: .3rem ; background-color: var(--primary-color);" v-else >
+         DIRECTO DE WEB ->
+      </Tag>
+     
+
+
+      <img v-if="props.order.inserted_by_name" class="pr-2"   style="height: 2rem; position: absolute; bottom: 1rem; right: .5rem;" src="/images/WhatsApp.svg.webp"
+      alt="">
+
+      <img v-else class="pr-2"   style="height: 1.5rem; position: absolute; bottom: 1rem; right: .5rem;" src="/images/logo.png"
+      alt="">
+
   </div>
+  
 </template>
 
 <script setup>
-import { defineProps, ref, onMounted, onUnmounted } from "vue";
-import { URI } from "../service/conection";
-// import { convertirA12h,obtenerHoraFormateadaAMPM } from "../service/un_pedido";
 
-const porcentajeCompletado = ref(0);
-const props = defineProps({
-  order: {
-    type: Object,
-    default: {},
-  },
-  estado: {
-    type: Object,
-    default: {},
-  },
-});
+import { useOrderStore } from '@/store/order';
 
 
-// Obtenemos el tiempo restante de localStorage o establecemos 15 minutos si no existe
-const tiempoRestante = ref(parseInt(localStorage.getItem(props.order.order_id)) || 15 * 60);
-const minutos = ref(Math.floor(tiempoRestante.value / 60));
-const segundos = ref(tiempoRestante.value % 60);
+const store = useOrderStore()
 
-function actualizarTiempo() {
-  if (props.order.order_status.status === 'en preparacion') {
-    tiempoRestante.value--;
-    minutos.value = Math.floor(tiempoRestante.value / 60);
-    segundos.value = tiempoRestante.value % 60;
-    localStorage.setItem(props.order.order_id, tiempoRestante.value);
 
-    porcentajeCompletado.value = ((15 * 60 - tiempoRestante.value) / (15 * 60)) * 100;
-    if (tiempoRestante.value <= 0) {
-      clearInterval(intervalId);
-      alert(`Se terminó el tiempo de preparación de la orden #${props.order.order_id}`);
-    }
-  }
+const open = () => {
+  store.setVisible('currentOrder',true)
+  store.setOrder(props.order)
 }
 
-const intervalId = setInterval(actualizarTiempo, 1000);
 
-onUnmounted(() => {
-  clearInterval(intervalId);
+const icons = {
+  generada: 'warning',
+  "en preparacion": 'info',
+  enviada:'success',
+  cancelada:'danger'
+}
+
+const props = defineProps({
+  order: {
+      type: Object,
+      default: {}
+  },
+
+
 });
+
+const format_date = (date) => {
+ const new_date = new Date(date)
+
+  const timeFormatter = new Intl.DateTimeFormat('en-US', {
+  hour: 'numeric',
+  minute: 'numeric',
+  hour12: true
+  })
+
+  const formatedDate = timeFormatter.format(new_date)
+  return formatedDate
+
+}
+
+
+
 </script>
 
 <style scoped>
-/* Estilos de la cuenta regresiva */
-.countdown-timer {
-  color: black;
-  font-weight: bold;
-  /* background-color: white; */
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 3rem;
-  width: 3rem;
-  outline: 0.3rem solid var(--primary-color);
-  animation:  parpadeoColor 1s infinite;
-  /* margin-top: 10px; */
+
+
+
+
+Tag{
+  border-radius: .5rem;
+
 }
 
-@keyframes parpadeoColor {
-  0% {
-    background-color: rgb(159, 221, 255); /* Color inicial */
-  }
-  50% {
-    background-color: rgb(255, 255, 179); /* Color intermedio */
-  }
-  100% {
-    background-color: rgb(151, 255, 167)(255, 195, 195); /* Color final */
-  }
-}
-
-.texto-negro {
-  color: black;
-}
-
-.finalizado {
-  background-color: rgb(255, 0, 0);
-}
-
-.before {
-  background-color: rgba(0, 0, 0, 0.8);
-  width: 100vw;
-  height: 100vh;
-  z-index: 999;
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform: scale(2);
-}
-
-
-.pedido {
-  /* background-color: white; */
-  border-radius: 0.5rem;
-  overflow: hidden;
-  background-color: rgba(255, 255, 255, 0.742);
-  transition: .3s all ease
-}
-
-.pedido:hover {
-  background-color: rgb(255, 255, 255);
-  /* transform:  translateX(10px); */
-}
-
-.RECIBIDOS {
-
-  background-color: rgba(246, 255, 0, 0.73)
-}
-
-
-.EN {
-
-  background-color: rgba(66, 255, 255, 0.73)
-}
-
-
-.ENVIADOS {
-  background-color: rgba(123, 255, 66, 0.73)
-}
-
-::-webkit-scrollbar {
-  width: 0.5rem;
-  /* Ancho de la barra de desplazamiento */
-  padding-top: 1rem;
-  position: absolute;
-  /* display: none; */
-}
-
-.clase {}
-
-/* Estilo del pulgar de la barra de desplazamiento */
-/* WebKit (Chrome, Safari) */
-::-webkit-scrollbar-thumb {
-  background-color: var(--primary-color);
-  /* Color del pulgar de la barra de desplazamiento */
-  border-radius: 9px;
-  /* border: 5px solid var(--primary-color); */
-  height: 10rem;
-  width: 10rem;
-  /* display: none;  */
-}
 </style>
