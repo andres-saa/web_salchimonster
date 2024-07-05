@@ -38,6 +38,14 @@ contest_router = APIRouter()
 
 
 
+@contest_router.get('/contests_all/{participant_id}')
+def get_orders_gy_site(participant_id:int):
+    contest_instance = Contest()
+    result = contest_instance.get_all_contests_with_participation(participant_id)
+    contest_instance.close_connection()
+    return result
+
+
 @contest_router.get('/contests/{participant_id}')
 def get_orders_gy_site(participant_id:int):
     contest_instance = Contest()

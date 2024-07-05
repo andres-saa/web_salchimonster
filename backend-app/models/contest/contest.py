@@ -26,6 +26,18 @@ class Contest:
             c.*, 
             (c.start_date AT TIME ZONE 'America/Bogota') AS start_date_bogota,
             (c.end_date AT TIME ZONE 'America/Bogota') AS end_date_bogota,
+            CASE
+                WHEN (c.end_date AT TIME ZONE 'America/Bogota') > (now() AT TIME ZONE 'America/Bogota')
+                THEN true
+                ELSE false
+            END AS vigent,
+
+            CASE
+                WHEN (c.start_date AT TIME ZONE 'America/Bogota') < (now() AT TIME ZONE 'America/Bogota')
+                THEN true
+                ELSE false
+            END AS started,
+
             EXISTS (
                 SELECT 1 
                 FROM contest.contest_entry ce 
@@ -66,7 +78,55 @@ class Contest:
         return results
 
 
-    
+
+    def get_all_contests_with_participation_vigent(self, user_id):
+        query = f"""
+        SELECT 
+            c.*, 
+            (c.start_date AT TIME ZONE 'America/Bogota') AS start_date_bogota,
+            (c.end_date AT TIME ZONE 'America/Bogota') AS end_date_bogota,
+            EXISTS (
+                SELECT 1 
+                FROM contest.contest_entry ce 
+                WHERE ce.participant_id = {user_id} AND ce.contest_id = c.id
+            ) AS entry_exists,
+            json_agg(
+                json_build_object(
+                    'employer_id', rbq.employer_id,
+                    'name', rbq.name,
+                    'dni', rbq.dni,
+                    'site_id', rbq.site_id,
+                    'contest_id', rbq.contest_id,
+                    'total_entries', rbq.total_entries
+                ) ORDER BY rbq.total_entries DESC
+            ) AS rbq,
+            MAX(rbq.total_entries) AS max_entries
+        FROM contest.contest c
+        LEFT JOIN (
+            SELECT 
+                rq.employer_id,
+                rq.name,
+                rq.dni,
+                rq.site_id,
+                rq.contest_id,
+                CASE
+                    WHEN c.contest_winner_type_id = 2 THEN rv.total_value
+                    ELSE rq.total_entries
+                END AS total_entries
+            FROM contest.rank_by_quantity rq
+            FULL OUTER JOIN contest.rank_by_total_value rv ON rq.employer_id = rv.employer_id AND rq.contest_id = rv.contest_id
+            JOIN contest.contest c ON c.id = rq.contest_id OR c.id = rv.contest_id
+        ) rbq ON c.id = rbq.contest_id WHERE c.end_date >= (now() at time zone 'America/Bogota')
+        GROUP BY c.id 
+        """
+        self.cursor.execute(query)
+        columns = [desc[0] for desc in self.cursor.description]
+        results = [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+        return results
+
+
+
+
 
     def get_all_constests_participate (self,contest_ids,user_id):
         query = f""" SELECT EXISTS (
