@@ -93,7 +93,7 @@ sites = [
     ),
     Site(
         site_id=29,
-        site_name="SHAPINERO",
+        site_name="CHAPINERO",
         username="salchi_chapi",
         password="salchi_chapi_1234"
     ),
