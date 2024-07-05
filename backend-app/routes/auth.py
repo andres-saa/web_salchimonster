@@ -91,6 +91,12 @@ sites = [
         username="admin-fotos",
         password="admin-fotos-sm"
     ),
+    Site(
+        site_id=29,
+        site_name="SHAPINERO",
+        username="salchi_chapi",
+        password="salchi_chapi_1234"
+    ),
 ]
 
 
