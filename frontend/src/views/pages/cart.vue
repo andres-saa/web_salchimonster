@@ -1,12 +1,12 @@
 <template>
 
 
-    <div class="col-12  my-4 md:my-8 p-0" v-if="store.cart.products.length > 0">
+    <div class="col-12  my-8 md:my-8 p-0" v-if="store.cart.products.length > 0">
         <div class="grid mx-auto " style="max-width:800px;">
 
 
 
-            <div class="col-12 text-sm md:col-6 p-2 md:px-4" style="display: flex; flex-direction: column; gap:1rem;justify-content: center;">
+            <div class="col-12 text-sm md:col-6 p-3 md:px-4" style="display: flex; flex-direction: column; gap:1rem;justify-content: center;">
 
                 <div class=" col-12 py-3 p-shadow"
                     style=" display: flex;align-items:end;position: relative; gap:1rem;border-radius: 0.3rem;"

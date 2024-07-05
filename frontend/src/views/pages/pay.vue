@@ -1,5 +1,5 @@
 <template>
-    <div class="col-12  my-4 md:my-8 p-0">
+    <div class="col-12  my-8  p-0" style="margin-top: 6rem;">
         <div class="grid mx-auto " style="max-width:800px;">
 
 <!-- {{ user.user.name }} -->
