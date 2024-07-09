@@ -1,15 +1,17 @@
 from pydantic import BaseModel, HttpUrl
 from typing import Optional
-from datetime import date
+from datetime import date, datetime
 
 
 class Contest(BaseModel):
     id: Optional[int] = None
     name:str
-    type_id:int
-    start_date:date
-    end_date:date
+    start_date:datetime
+    end_date:datetime
+    description:str
     evidence_type_id:int
+    instructions:str
+    contest_winner_type_id:int
 
 
 class Contest_entry(BaseModel):

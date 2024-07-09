@@ -42,6 +42,7 @@ class Category:
             WHERE p.site_id = c.site_id
             AND p.category_id = c.category_id
             AND p.status = TRUE
+            order by index
         )
         """
         self.cursor.execute(select_query)
