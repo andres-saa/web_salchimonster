@@ -133,12 +133,38 @@ class Contest:
     
 
     def create_contest(self,Contest):
-        query_insert_contest = f"""INSERT INTO contest.contest( name, start_date, end_date, evidence_type_id, description, instructions, contest_winner_type_id)
-                                VALUES ('{ Contest.name }', '{ Contest.start_date }', '{ Contest.end_date }', {Contest.evidence_type_id}, '{Contest.description}', '{Contest.instructions}',{Contest.contest_winner_type_id}) RETURNING id;"""
+        if Contest.contest_winner_type_id == 2:
+            Contest.evidence_type_id = 4
+
+        query_insert_contest = f"""INSERT INTO contest.contest( name, start_date, end_date, evidence_type_id, description, instructions, contest_winner_type_id , is_site_participation)
+                                VALUES ('{ Contest.name }', '{ Contest.start_date }', '{ Contest.end_date }', {Contest.evidence_type_id}, '{Contest.description}', '{Contest.instructions}',{Contest.contest_winner_type_id}, {Contest.is_site_participation}) RETURNING id;"""
         self.cursor.execute(query_insert_contest)
         contest_id = self.cursor.fetchone()[0]
         self.conn.commit()
         return contest_id
+    
+    def update_contest(self, Contest):
+
+        if Contest.contest_winner_type_id == 2:
+            Contest.evidence_type_id = 4
+        query_update_contest = f"""
+            UPDATE contest.contest
+            SET 
+                name = '{Contest.name}',
+                start_date = '{Contest.start_date}',
+                end_date = '{Contest.end_date}',
+                evidence_type_id = {Contest.evidence_type_id},
+                description = '{Contest.description}',
+                instructions = '{Contest.instructions}',
+                contest_winner_type_id = {Contest.contest_winner_type_id},
+                is_site_participation = {Contest.is_site_participation}
+            WHERE id = {Contest.id}
+            RETURNING id;
+        """
+        self.cursor.execute(query_update_contest)
+        updated_contest_id = self.cursor.fetchone()[0]
+        self.conn.commit()
+        return updated_contest_id
 
 
     def updateEntryImageUrl(self,evidence_id,url):

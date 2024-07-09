@@ -12,6 +12,7 @@ class Contest(BaseModel):
     evidence_type_id:int
     instructions:str
     contest_winner_type_id:int
+    is_site_participation:bool
 
 
 class Contest_entry(BaseModel):

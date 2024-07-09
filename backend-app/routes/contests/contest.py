@@ -70,6 +70,12 @@ def create_contest(contest:contest_schema):
     contest_instance.close_connection()
     return result
 
+@contest_router.put('/contest/')
+def create_contest(contest:contest_schema):
+    contest_instance = Contest()
+    result = contest_instance.update_contest(contest)
+    contest_instance.close_connection()
+    return result
 
 
 @contest_router.get('/contest_entry_option/')
