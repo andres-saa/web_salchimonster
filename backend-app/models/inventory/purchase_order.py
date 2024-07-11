@@ -1,5 +1,8 @@
+import psycopg2.extras
+from fastapi import HTTPException
 from pydantic import BaseModel
 import psycopg2
+from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import os
 from schema.city import citySchema
@@ -23,133 +26,63 @@ class PurchaseOrder:
         
     
     def get_all_purchase_orders(self):
-        query = "SELECT * FROM purchase.view_purchase_details2;"
-        self.cursor.execute(query)
-        columns = [desc[0] for desc in self.cursor.description]
-        results = self.cursor.fetchall()
+        query = "SELECT *, (status_timestamp at time zone 'America/Bogota') as status_timestamp FROM purchase.view_purchase_details_complete;"
         
-        # Crear una lista para almacenar los registros con la fecha convertida
-        converted_records = []
+        # Use the context manager with the correct cursor
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query)
+            results = cursor.fetchall()
         
-        # Zona horaria de Colombia
-        tz_colombia = pytz.timezone('America/Bogota')
-        
-        for row in results:
-            record = dict(zip(columns, row))
-            # Suponiendo que 'expedition_date' es el nombre de la columna de la fecha
-            utc_date = record['expedition_date']
-            # Convertir la fecha de UTC a hora de Colombia
-            local_date = utc_date.replace(tzinfo=pytz.utc).astimezone(tz_colombia)
-            # Actualizar el registro con la nueva fecha
-            record['expedition_date'] = local_date.strftime('%d-%m-%YT%H:%M:%S')
-            converted_records.append(record)
-        
-        return converted_records
-
+        return results
 
 
     def get_all_purchase_order_history(self,purchase_order_id):
-        query = f"SELECT * FROM purchase.view_purchase_history where purchase_order_id = {purchase_order_id}"
-        self.cursor.execute(query)
-        columns = [desc[0] for desc in self.cursor.description]
-        results = self.cursor.fetchall()
+        query = f"SELECT *, (status_timestamp at time zone 'America/Bogota') as status_timestamp FROM purchase.view_purchase_history where purchase_order_id = {purchase_order_id}"
+
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query)
+            results = cursor.fetchall()
         
-        # Crear una lista para almacenar los registros con la fecha convertida
-        converted_records = []
-        
-        # Zona horaria de Colombia
-        tz_colombia = pytz.timezone('America/Bogota')
-        
-        for row in results:
-            record = dict(zip(columns, row))
-            # Suponiendo que 'expedition_date' es el nombre de la columna de la fecha
-            utc_date = record['status_timestamp']
-            # Convertir la fecha de UTC a hora de Colombia
-            local_date = utc_date.replace(tzinfo=pytz.utc).astimezone(tz_colombia)
-            # Actualizar el registro con la nueva fecha
-            record['status_timestamp'] = local_date.strftime('%d-%m-%YT%H:%M:%S')
-            converted_records.append(record)
-        
-        return converted_records
+        return results
+    
 
 
     def get_all_purchase_orders_by_lap_id(self, lap_id):
-        query = f"SELECT * FROM purchase.view_purchase_details_complete where lap_id = {lap_id};"
-        self.cursor.execute(query)
-        columns = [desc[0] for desc in self.cursor.description]
-        results = self.cursor.fetchall()
+        query = f"""SELECT *, (expedition_date at time zone 'America/Bogota') as expedition_date, 
+                            (status_timestamp at time zone 'America/Bogota') as status_timestamp
+            FROM purchase.view_purchase_details_complete where lap_id = {lap_id};"""
         
-        # Crear una lista para almacenar los registros con la fecha convertida
-        converted_records = []
         
-        # Zona horaria de Colombia
-        tz_colombia = pytz.timezone('America/Bogota')
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query)
+            results = cursor.fetchall()
         
-        for row in results:
-            record = dict(zip(columns, row))
-            # Suponiendo que 'expedition_date' es el nombre de la columna de la fecha
-            utc_date = record['expedition_date']
-            # Convertir la fecha de UTC a hora de Colombia
-            local_date = utc_date.replace(tzinfo=pytz.utc).astimezone(tz_colombia)
-            # Actualizar el registro con la nueva fecha
-            record['expedition_date'] = local_date.strftime('%d-%m-%YT%H:%M:%S')
-            converted_records.append(record)
-
-
-            utc_status_timestamp = record['status_timestamp']
-            local_status_timestamp = utc_status_timestamp.replace(tzinfo=pytz.utc).astimezone(tz_colombia)
-            record['status_timestamp'] = local_status_timestamp.strftime('%d-%m-%YT%H:%M:%S')
-        
-        return converted_records
+        return results
     
 
     
     def get_all_purchase_orders_by_responsible_id (self, responsible_id:int):
-        query = f""" select * from purchase.view_purchase_details where responsible_id = {responsible_id};        
+        query = f""" select purchase_order_id,employer_name,site_name,current_status,(expedition_date - interval '5 hours') as expedition_date FROM purchase.view_purchase_details where responsible_id = {responsible_id};        
         """
-        self.cursor.execute(query)
-        columns = [desc[0] for desc in self.cursor.description]
-        results = self.cursor.fetchall()
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query)
+            results = cursor.fetchall()
         
-        # Crear una lista para almacenar los registros con la fecha convertida
-        converted_records = []
-        
-        # Zona horaria de Colombia
-        tz_colombia = pytz.timezone('America/Bogota')
-        
-        for row in results:
-            record = dict(zip(columns, row))
-            # Suponiendo que 'expedition_date' es el nombre de la columna de la fecha
-            utc_date = record['expedition_date']
-            # Convertir la fecha de UTC a hora de Colombia
-            local_date = utc_date.replace(tzinfo=pytz.utc).astimezone(tz_colombia)
-            # Actualizar el registro con la nueva fecha
-            record['expedition_date'] = local_date.strftime('%d-%m-%YT%H:%M:%S')
-            converted_records.append(record)
-        
-        return converted_records
-    
+        return results
 
-    # def get_all_purchase_orders_by_lap_id (self, lap_id:int):
-    #     query = f""" select * from purchase.view_purchase_details where lap_id = {lap_id};        
-    #     """
-    #     self.cursor.execute(query)
-    #     columns = [desc[0] for desc in self.cursor.description]
-    #     return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
-    
 
 
 
     def get_all_purchase_order_by_responsible_id_filtered(self, responsible_id: int, start_date: str, end_date: str):
         query = f"""
-        SELECT * FROM purchase.view_purchase_details
+        select purchase_order_id,employer_name,site_name,current_status, (expedition_date - interval '5 hours') as expedition_date FROM purchase.view_purchase_details
         WHERE responsible_id = {responsible_id} 
-        AND status_timestamp >= '{start_date}' 
-        AND status_timestamp <= '{end_date}';
+        AND (expedition_date - interval '5 hours') BETWEEN  '{start_date}' AND '{end_date}' order by expedition_date desc;
         """
-        self.cursor.execute(query)
-        columns = [desc[0] for desc in self.cursor.description]
-        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query)
+            results = cursor.fetchall()
+        return results
 
 
 
@@ -191,37 +124,60 @@ class PurchaseOrder:
 
 
 
-
-     
-
-    def get_all_purchase_order_by_responsible_id_filtered(self, responsible_id: int, start_date: str, end_date: str):
-        query = f"""
-        SELECT * FROM purchase.view_purchase_details 
-        WHERE responsible_id = {responsible_id} 
-        AND status_timestamp >= '{start_date}' 
-        AND status_timestamp <= '{end_date}';
+    def create_or_update_event(self, event_type_id, site_id, employee_id, update_interval, solved=False):
+        # Primero, intentar eliminar cualquier evento existente que coincida con los criterios
+        delete_query = """
+        DELETE FROM events
+        WHERE event_type_id = %s AND site_id = %s AND employee_id = %s;
         """
-        self.cursor.execute(query)
-        columns = [desc[0] for desc in self.cursor.description]
-        results = self.cursor.fetchall()
+        self.cursor.execute(delete_query, (event_type_id, site_id, employee_id))
+
+        event_insert_query = """
+        INSERT INTO events (
+            event_timestamp, 
+            event_type_id, 
+            site_id, 
+            employee_id, 
+            update_interval, 
+            solved
+        ) VALUES (CURRENT_TIMESTAMP, %s, %s, %s, %s, %s) RETURNING id;
+        """
+        self.cursor.execute(event_insert_query, (event_type_id, site_id, employee_id, update_interval, solved))
+        self.conn.commit()
+        event_id = self.cursor.fetchone()[0]
+        return event_id
+    
+
+    def mark_events_as_solved_by_site_id(self, site_id):
+        """
+        Marca todos los eventos no resueltos para un site_id específico como resueltos.
+        Args:
+            site_id (int): ID del sitio para resolver todos los eventos asociados.
+        """
+        update_event_query = """
+        UPDATE events
+        SET solved = TRUE
+        WHERE site_id = %s AND solved = FALSE and event_type_id = 5;
+        """
+        self.cursor.execute(update_event_query, (site_id,))
+        affected_rows = self.cursor.rowcount  # Número de filas afectadas
+        self.conn.commit()
+        return affected_rows
+
+
+
+    # def get_all_purchase_order_by_responsible_id_filtered(self, responsible_id: int, start_date: str, end_date: str):
+    #     query = f"""
+    #     SELECT *, (expedition_date at time zone 'America/Bogota' ) as expedition_date FROM purchase.view_purchase_details 
+    #     WHERE responsible_id = {responsible_id} 
+    #     AND status_timestamp at time zone 'America/Bogota' >= '{start_date}' 
+    #     AND status_timestamp at time zone 'America/Bogota' <= '{end_date}' order by purchase_order_id desc;
+    #     """
+    #     with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+    #         cursor.execute(query)
+    #         results = cursor.fetchall()
         
-        # Crear una lista para almacenar los registros con la fecha convertida
-        converted_records = []
-        
-        # Zona horaria de Colombia
-        tz_colombia = pytz.timezone('America/Bogota')
-        
-        for row in results:
-            record = dict(zip(columns, row))
-            # Suponiendo que 'expedition_date' es el nombre de la columna de la fecha
-            utc_date = record['expedition_date']
-            # Convertir la fecha de UTC a hora de Colombia
-            local_date = utc_date.replace(tzinfo=pytz.utc).astimezone(tz_colombia)
-            # Actualizar el registro con la nueva fecha
-            record['expedition_date'] = local_date.strftime('%d-%m-%YT%H:%M:%S')
-            converted_records.append(record)
-        
-        return converted_records
+    #     return results
 
 
     # def get_all_daily_inventory_reports_filtered(self, site_ids: list, start_date: str, end_date: str):
@@ -482,10 +438,21 @@ class PurchaseOrder:
 
     def insert_complete_order(self, responsible_id, site_id, items_data, initial_lap_id=1):
         # Insertar la orden de compra usando la hora actual del servidor con zona horaria UTC
+
+
+        not_can_insert = self.is_recent_order_generated(site_id)
+
+        if  not_can_insert:
+            return not_can_insert
+            
+
         insert_order_query = """
+
+
+        
         INSERT INTO purchase.purchase_orders (
             expedition_date, responsible_id, site_id
-        ) VALUES (CURRENT_TIMESTAMP AT TIME ZONE 'UTC', %s, %s) RETURNING id;
+        ) VALUES (CURRENT_TIMESTAMP, %s, %s) RETURNING id;
         """
         self.cursor.execute(insert_order_query, (responsible_id, site_id))
         order_id = self.cursor.fetchone()[0]
@@ -495,7 +462,7 @@ class PurchaseOrder:
         insert_status_query = """
         INSERT INTO purchase.purchase_order_status (
             purchase_order_id, lap_id, responsible_id, status_timestamp
-        ) VALUES (%s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'UTC');
+        ) VALUES (%s, %s, %s, CURRENT_TIMESTAMP);
         """
         self.cursor.execute(insert_status_query, (order_id, initial_lap_id, responsible_id))
         self.conn.commit()
@@ -515,8 +482,24 @@ class PurchaseOrder:
                 item.unit_measure_id
             ))
         self.conn.commit()
+        self.create_or_update_event( 5, site_id, responsible_id, '2 minutes',False)
 
         return order_id
+    
+
+    def is_recent_order_generated(self, site_id):
+        # Consulta para verificar si existe algún evento de tipo 1 para la sede especificada en la vista 'recent_events'
+        recent_event_query = """
+        SELECT id
+        FROM public.recent_events
+        WHERE event_type_id = 5 AND site_id = %s
+        ORDER BY id DESC
+        LIMIT 1;
+        """
+        self.cursor.execute(recent_event_query, (site_id,))
+        result = self.cursor.fetchone()
+        # Devuelve None si no hay resultados o el timestamp del evento si existe un evento reciente de tipo 1
+        return None if result is None else result[0]
 
 
         
