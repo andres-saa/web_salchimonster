@@ -1,7 +1,7 @@
 <script setup>
 import { computed, watch, ref } from 'vue';
 import AppTopbar from './AppTopbar.vue';
-// import AppFooter from './AppFooter.vue';
+import AppFooter from './AppFooter.vue';
 import AppSidebar from './AppSidebar.vue';
 import AppConfig from './AppConfig.vue';
 import { useLayout } from '@/layout/composables/layout';
@@ -78,14 +78,14 @@ const isOutsideClicked = (event) => {
         </div>
         <div class="layout-main-container  pr-0 pl-0 pt-4 pb-0 " :style="route.path.includes('colaboraciones')? 'background-color: var(--primary-color);':''" style="contain:paint ;">
 
-            <div class="layout-main  ">
+            <div class="layout-main" style="min-height: 100vh;">
                
 
                 <transition name="fade">
                     <router-view class="p-0"></router-view>
                 </transition>
             </div>
-            <!-- <app-footer></app-footer> -->
+            <app-footer></app-footer>
         </div>
         <div class="layout-mask"></div>
     </div>

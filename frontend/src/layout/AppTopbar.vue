@@ -316,13 +316,13 @@ const fondoVisible = ref(false)
                 style="display: flex; ">
 
 
-                <router-link :to="`/${menuTopbar.to}`" @click="handleDropDownMenu(false)" class="col-12">
-                    <button class="p-link boton-menu text-xl" style=""
+                <router-link :to="`/${menuTopbar.to}`" @click="handleDropDownMenu(false)" class="">
+                    <Button :label="menuTopbar.name" text  class="p-link boton-menu text-xl py-2 px-3" style="color:#4b5563;"
                         :class="curentMenu.name == menuTopbar.name || router.currentRoute.value.path == `/${menuTopbar.to}` ? 'selected' : 'boton-menu'">
                         <!-- <i class="pi pi-calendar"></i> -->
                         <!-- <h3> {{i}}</h3> -->
-                        {{ menuTopbar.name }}
-                    </button>
+                        
+                    </Button>
 
                 </router-link>
             </div>
@@ -426,10 +426,11 @@ const fondoVisible = ref(false)
 .boton-menu {
     // margin: 0;
     border: none;
-    background-color: transparent;
+   // background-color: transparent;
     // font-size: 20px; 
+    text-transform: capitalize;
     padding: 0 5px;
-    // font-weight: bold;
+    font-weight: bold;
 }
 
 .ver-mas {

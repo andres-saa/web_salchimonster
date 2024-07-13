@@ -174,6 +174,12 @@ const menuOptions = ref(
            
             to:'colaboraciones'
         },
+
+        {
+            name: 'PQRS',
+           
+            to:'pqrs-user'
+        },
         
     ]
 )

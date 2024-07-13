@@ -33,12 +33,12 @@
         &:focus {
             // @include focused();
         }
-        &:hover {
+        &:focus {
             // @include focused();
-            &:focus {
-            // @include focused();
-        }filter: brightness(1.1);
-        }
+          }
+          & {
+            filter: brightness(1.1);
+          }
     }
 
     .layout-topbar-button {

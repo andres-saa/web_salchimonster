@@ -11,9 +11,9 @@ const logoUrl = computed(() => {
 
 <template>
     <div class="layout-footer">
-        <!-- <img :src="logoUrl" alt="Logo" height="20" class="mr-2" />
-        by
-        <span class="font-medium ml-2">PrimeVue</span> -->
+        <div style="height: 20rem;top: 100%; width: 100%; background-color: var(--primary-color);">
+
+        </div>
     </div>
 </template>
 <style lang="scss" scoped></style>

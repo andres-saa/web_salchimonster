@@ -110,6 +110,15 @@ const router = createRouter({
           meta: {  title:'colaboraciones' },
         },
 
+        
+        {
+          path: '/pqrs-user',
+          name: 'pqrs-user',
+          component: () => import('@/views/pages/pqrUser.vue'),
+         
+        },
+
+
         {
           path: '*',
           name: 'all',
@@ -175,11 +184,18 @@ router.beforeEach(async(to, from, next) => {
 
 
 
+
+
+
 pixel.init()
-router.afterEach((to, from) => {
+router.afterEach( ( to, from ) => {
   // Esto rastreará una "PageView" cada vez que el usuario cambie de ruta
-  pixel.sendTrackingEvent('track', 'PageView');
+  pixel.sendTrackingEvent( 'PageView');
 });
+
+
+
+
 
 
 const validateToken = (token) => {

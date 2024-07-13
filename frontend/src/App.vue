@@ -8,6 +8,7 @@ import { verCerrado } from '@/service/state';
 import { onMounted, watch } from 'vue';
 import { useSitesStore } from './store/site';
 import { URI } from './service/conection';
+import validate from './views/pages/validate.vue';
 const siteStore  = useSitesStore()
 
 
@@ -56,9 +57,10 @@ onMounted(async() => {
 <template>
   <restauranteCerrado>
   </restauranteCerrado>
-  <RouterView class="p-0" style=""/>
+  <RouterView  class="p-0" style="min-height: 90vh;"/>
   <siteDialog />
   <VistaProducto />
+  <validate/>
   <barra />
 </template>
 <style scoped></style>

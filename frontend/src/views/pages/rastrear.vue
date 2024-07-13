@@ -5,7 +5,7 @@
 <div class="mb-6" style="background-color: rgb(255, 255, 255);position: sticky; top:4rem;z-index: 9999;z-index: 9999;">
     <div class="col-12 m-auto" style="max-width: 1024px;  background-color: white;">
 
-<p class="text-4xl text-center py-4" style="font-weight: bold;">Consultar estado de mi pedidio</p>
+<p class="text-4xl text-center py-4" style="font-weight: bold;">Consultar estado de mi pedido</p>
 <span class="a4-size mb-6" style="display: flex; height: auto;">
 
 

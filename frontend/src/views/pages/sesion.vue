@@ -3,7 +3,7 @@
 
 
 
-<div class="grid px-3 pb-8" style="max-width: 1024px; margin: auto; position:relative" >
+<div class="grid px-3 pb-8" style="max-width: 1024px;margin: auto; position:relative" >
     
 <div  style="position:absolute;display:flex;right:100%;gap:10rem; height:100vh;max-width:100%; justify-content:space-around; flex-direction:column;z-index: 9;">
 

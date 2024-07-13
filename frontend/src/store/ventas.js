@@ -30,6 +30,10 @@ export const useReportesStore = defineStore('reportes', {
             loading:{
                 visible:false,
                 tittle:'Cargando'
+            },
+
+            visible:{
+                show_validate:false
             }
 
         }
