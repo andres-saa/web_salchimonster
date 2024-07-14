@@ -8,6 +8,7 @@ from routes.delivery_person import delivery_person_router  # Importa el nuevo ro
 from routes.orders.order import order_router
 from routes.inventory.daily_inventory import daily_inventory_router
 from routes.inventory.monthly_inventory import monthly_inventory_router
+from routes.inventory.cdi_inventory import cdi_inventory_router
 from routes import files_router
 from routes.auth import auth
 from routes.category import category_router
@@ -42,6 +43,7 @@ from routes.work_scheduler import work_shift_router
 from routes.work_scheduler import work_day_router
 from routes.recipe.recipe import recipe_router
 from routes.contests.contest import contest_router
+from routes.pqrs.pqrs import Pqrs_router
 app = FastAPI()
 # from routes.area import area_router
 app.add_middleware(
@@ -61,6 +63,7 @@ app.include_router(order_purchase_router)
 app.include_router(contest_router)
 app.include_router(daily_inventory_router)
 app.include_router(monthly_inventory_router)
+app.include_router(cdi_inventory_router)
 app.include_router(product_router)
 app.include_router(user_router)
 app.include_router(ingredient_router)
@@ -86,7 +89,9 @@ app.include_router(work_day_router)
 app.include_router(maintenance_router)
 app.include_router(equipment_router)
 app.include_router(recipe_router)
-# app.include_router(area_router)
+
+# app.include_router(area_router)   
+app.include_router(Pqrs_router)
 app.include_router(login)
 app.include_router(permission_router)
 app.include_router(form_router)

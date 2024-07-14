@@ -155,7 +155,7 @@ class ShiftWorkDayCRUD:
     
     def select_work_days_with_records_by_date_and_site(self, start_date: date, end_date: date, site_id: int):
         self.cursor.execute("""
-            SELECT wd.id as work_day_id, wd.date, wd.site_id, wr.id as record_id, wr.employer_id, wr.start_time, wr.end_time, wr.rest
+            SELECT wd.id as work_day_id, wd.date, wd.site_id, wr.id as record_id, wr.employer_id, (wr.start_time at time zone 'America/Bogota') as start_time, (wr.end_time at time zone 'America/Bogota') as end_time, wr.rest
             FROM ShiftWorkDay wd
             LEFT JOIN ShiftWorkRecord wr ON wd.id = wr.work_day_id
             WHERE wd.date BETWEEN %s AND %s AND wd.site_id = %s;

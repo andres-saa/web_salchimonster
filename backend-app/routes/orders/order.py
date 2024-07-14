@@ -118,6 +118,21 @@ def get_orders_gy_site():
 
 
 
+class schema (BaseModel):
+    order_id:str
+    order_code:str
+
+@order_router.post('/validate-order-code')
+def validate_order_code(order_data:schema):
+    order_instance = Order2()
+    try:
+        result = order_instance.validate_order_code(order_data.order_id, order_data.order_code)
+        return {"valid": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        order_instance.close_connection()
+
 @order_router.get('/order/{order_id}')
 def get_orders_gy_site(order_id:str):
     order_instance = Order2()

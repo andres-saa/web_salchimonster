@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 import psycopg2
+from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import os
 from schema.city import citySchema
@@ -12,6 +13,8 @@ from datetime import datetime, timedelta
 from datetime import datetime, time
 from config.wsp import enviar_mensaje_whatsapp
 import pytz
+import random
+
 import requests
 load_dotenv()
 
@@ -40,11 +43,17 @@ class Order2:
         
         # Verificar si el usuario puede realizar una nueva orden
         if self.can_place_order(user_id):
+            
             order_id = self.create_order_entry(user_id, order_data)
+
+            if (not order_data.inserted_by):
+
+                self.generate_order_code(order_data.user_data.user_phone,order_id)
+
             self.insert_order_details(order_id, order_data)
             self.insert_order_products(order_id, order_data)
             self.insert_order_aditionals(order_id, order_data)
-            self.update_order_status(order_id, order_data.payment_method_id)
+            self.update_order_status(order_id, order_data.payment_method_id,order_data.inserted_by)
             self.insert_order_notes(order_id,order_data.order_notes)
             # Actualizar la última hora de compra
             self.update_last_order_time(user_id)
@@ -71,6 +80,8 @@ class Order2:
 
     def create_order_entry(self, user_id, order_data):
         if order_data.payment_method_id == 6:
+
+
             order_insert_query = """
             INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized,inserted_by_id)
             VALUES (%s, %s, %s, false,%s) RETURNING id;
@@ -81,7 +92,12 @@ class Order2:
             if result is None:
                 raise ValueError("La orden no pudo ser creada.")
             order_id = result[0]
+
+
+            
+
             self.create_or_update_event(3, 12, 1132, '1 minute', False)
+
         else:
             order_insert_query = """
             INSERT INTO orders.orders (user_id, site_id, delivery_person_id,inserted_by_id)
@@ -92,7 +108,10 @@ class Order2:
             if result is None:
                 raise ValueError("La orden no pudo ser creada.")
             order_id = result[0]
-            self.create_or_update_event(1, order_data.site_id, 1132, '1 minute', False)
+
+            if (order_data.inserted_by):
+                self.create_or_update_event(1, order_data.site_id, 1132, '1 minute', False)
+
         return order_id
 
     
@@ -322,37 +341,36 @@ class Order2:
         """
         self.cursor.execute(order_aditionals_insert_query, (order_id, aditional.aditional_item_instance_id, aditional.quantity, aditional_prices[aditional.aditional_item_instance_id]))
 
-    def update_order_status(self, order_id, payment_method_id):
+    def update_order_status(self, order_id, payment_method_id, inserted_by ):
 
         if  payment_method_id != 6:
+
+
+            validation = ''
+
+            if (not inserted_by):
+                validation = 'in validation'
+            else:
+                validation = 'generada'
             
-            # Define la zona horaria de Colombia
-            colombia_tz = pytz.timezone('America/Bogota')
-            
-            # Obtiene la fecha y hora actual en la zona horaria de Colombia
-            now_colombia = datetime.now(colombia_tz)
-            
-            # Consulta para insertar el estado de la orden
+
             order_status_insert_query = """
             INSERT INTO orders.order_status (order_id, status,timestamp)
             VALUES (%s, %s,CURRENT_TIMESTAMP );
             """
-            self.cursor.execute(order_status_insert_query, (order_id, 'generada',))
+            self.cursor.execute(order_status_insert_query, (order_id, validation,))
             
             # Consulta para insertar el historial del estado de la orden
             order_status_history_insert_query = """
             INSERT INTO orders.order_status_history (order_id, status,timestamp)
             VALUES (%s, %s,CURRENT_TIMESTAMP );
             """
-            self.cursor.execute(order_status_history_insert_query, (order_id, 'generada',))
+            self.cursor.execute(order_status_history_insert_query, (order_id, validation,))
+
+
         else:
             
-            # Define la zona horaria de Colombia
-            colombia_tz = pytz.timezone('America/Bogota')
-            
-            # Obtiene la fecha y hora actual en la zona horaria de Colombia
-            now_colombia = datetime.now(colombia_tz)
-            
+       
             # Consulta para insertar el estado de la orden
             order_status_insert_query = """
             INSERT INTO orders.order_status (order_id, status,timestamp)
@@ -394,6 +412,35 @@ class Order2:
 
         response = requests.post(url, headers=headers, data=data)
         return response.text
+    
+
+
+    def enviar_mensaje_code(self,destino,code):
+
+
+        url = "https://api.gupshup.io/wa/api/v1/template/msg"
+        headers = {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'apikey': 'obg0iystmnq4v0ln4r5fnjcvankhtjp0',
+            'cache-control': 'no-cache'
+        }
+        # Preparar los parámetros del template
+        params = [code]
+        data = {
+            'channel': 'whatsapp',
+            'source': '573053447255',
+            'destination': f'57{destino}',
+            'src.name': 'Salchimonster',
+            'template': '{"id":"273c05ca-a79a-46ca-ac1f-b9f75f124367","params":' + str(params) + '}'
+        }
+        # Convertir la lista params a formato JSON adecuado para la URL
+        data['template'] = data['template'].replace("'", '"')
+
+        response = requests.post(url, headers=headers, data=data)
+        print(destino,code)
+        return response.text
+    
         
 
         
@@ -440,7 +487,67 @@ class Order2:
         # Devuelve None si no hay resultados o el timestamp del evento si existe un evento reciente de tipo 1
         return None if result is None else result[0]
 
+
+
+    def generate_order_code(self,number_phone, order_id):
+        if len(number_phone) < 3:
+            raise ValueError("La cadena debe tener al menos 3 caracteres.")
+
+        sampled_numbers = random.sample(number_phone, 3)  # Randomly sample 3 digits from the sequence
+        code = ''.join(sampled_numbers)
+        query = "INSERT INTO orders.order_code_validation (order_id, code) values (%s, %s) returning order_id"
+
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, (order_id, code,))
+            self.conn.commit()
+            self.enviar_mensaje_code(number_phone,code)
+            result = cursor.fetchone()
+            print(code)
+    
+    def validate_order_code(self, order_id, code_to_validate):
+        query = "SELECT code FROM orders.order_code_validation WHERE order_id = %s"
+        
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, (order_id,))
+            result = cursor.fetchone()
+            if result:
+                stored_code = result['code']
+                if stored_code == code_to_validate:
+                    print("Order code validated successfully.")
+
+                    # Eliminar la validación del código de orden
+                    delete_validation_query = """
+                    DELETE FROM orders.order_code_validation WHERE order_id = %s
+                    """
+                    cursor.execute(delete_validation_query, (order_id,))
                     
+                    # Insertar el estado de la orden
+                    order_status_insert_query = """
+                    INSERT INTO orders.order_status (order_id, status, timestamp)
+                    VALUES (%s, %s, CURRENT_TIMESTAMP)
+                    """
+                    cursor.execute(order_status_insert_query, (order_id, 'generada'))
+                    
+                    # Insertar el historial del estado de la orden
+                    order_status_history_insert_query = """
+                    INSERT INTO orders.order_status_history (order_id, status, timestamp)
+                    VALUES (%s, %s, CURRENT_TIMESTAMP)
+                    """
+                    cursor.execute(order_status_history_insert_query, (order_id, 'generada'))
+                    self.create_or_update_event(1, 12, 1132, '1 minute', False)
+                    self.conn.commit()
+
+                    
+                    return True
+                
+                else:
+                    print("Invalid order code.")
+                    return False
+            else:
+                print("Order code not found.")
+                return False
+
+
 
     def is_recent_cancellation_generated(self):
         # Consulta para verificar si existe algún evento de tipo 1 para la sede especificada en la vista 'recent_events'
