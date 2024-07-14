@@ -43,6 +43,7 @@ from routes.work_scheduler import work_shift_router
 from routes.work_scheduler import work_day_router
 from routes.recipe.recipe import recipe_router
 from routes.contests.contest import contest_router
+from routes.pqrs.pqrs import Pqrs_router
 app = FastAPI()
 # from routes.area import area_router
 app.add_middleware(
@@ -88,7 +89,9 @@ app.include_router(work_day_router)
 app.include_router(maintenance_router)
 app.include_router(equipment_router)
 app.include_router(recipe_router)
-# app.include_router(area_router)
+
+# app.include_router(area_router)   
+app.include_router(Pqrs_router)
 app.include_router(login)
 app.include_router(permission_router)
 app.include_router(form_router)
