@@ -534,9 +534,16 @@ class Order2:
                     VALUES (%s, %s, CURRENT_TIMESTAMP)
                     """
                     cursor.execute(order_status_history_insert_query, (order_id, 'generada'))
-                    self.create_or_update_event(1, 12, 1132, '1 minute', False)
-                    self.conn.commit()
 
+                    site_id_query = "SELECT site_id from orders.orders where id = %s"
+                    cursor.execute(site_id_query,(order_id,))
+
+
+                    site_id = cursor.fetchone()['site_id']
+
+
+                    self.create_or_update_event(1, site_id, 1132, '1 minute', False)
+                    self.conn.commit()
                     
                     return True
                 
