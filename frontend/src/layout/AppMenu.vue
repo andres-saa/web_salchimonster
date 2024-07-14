@@ -107,6 +107,13 @@ const model = ref([
                 icon: 'pi pi-fw pi-info-circle',
                 to: '/colaboraciones'
             },
+
+            {
+                label: 'PQRS',
+                icon: 'pi pi-fw pi-info-circle',
+                to: '/pqrs-user'
+            },
+            
             // {
             //     label: 'Finalizar compra',
             //     icon: 'pi pi-fw pi-pencil',

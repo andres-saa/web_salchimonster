@@ -1,6 +1,6 @@
 <template>
 
-    <div style="position: sticky; top: 3rem; z-index: 999; background-color: white;" class="col-12 shadow-3 d-flex  lg:justify-content-center align-items-center mb-5 p-0 md:p-0">
+    <div style="position: sticky; top: 3rem; z-index: 999; background-color: white;" class="col-12 nav_bar shadow-3 d-flex  lg:justify-content-center align-items-center mb-5 p-0 md:p-0">
        
        
         <Button class="px-0" style="position: absolute;border: none;background-color: white;color: black; left: -0.5rem;z-index: 99;height: 100%;width: 1.7rem; border-radius: 0;" severity="help"  icon="pi pi-angle-left text-2xl"></Button>
@@ -122,5 +122,15 @@ const checkSelected = (section) => {
     /* position: absolute; */
     left: 0;
     padding: 1.5rem;
+}
+
+
+.navbar {
+  overflow-x: auto; /* Permite desplazamiento horizontal */
+  white-space: nowrap; /* Evita el salto de línea en el texto */
+}
+
+.navbar-item {
+  min-width: 100px; /* Ajusta el ancho mínimo de los elementos del navbar según sea necesario */
 }
 </style>

@@ -41,8 +41,8 @@ const preparar_orden = () => {
 
   const order = {
     "order_products": order_products,
-    // "site_id": site_id,
-    "site_id": 12,
+    "site_id": site_id,
+    // "site_id": 12,
     "delivery_person_id": 4,
     "payment_method_id": payment_method_id,
     "delivery_price": delivery_price,
@@ -99,8 +99,13 @@ export const orderService = {
       
         
 
-    // router.push('/gracias')
-    report.visible.show_validate = true
+        if (order.payment_method_id !== 6) {
+          report.visible.show_validate = true
+        }else{
+          router.push('/gracias')
+        }
+
+    
 
 
 

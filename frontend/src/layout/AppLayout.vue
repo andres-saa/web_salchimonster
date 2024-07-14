@@ -8,9 +8,32 @@ import { useLayout } from '@/layout/composables/layout';
 import Loading from '../components/Loading.vue';
 import router from '../router';
 import {useRoute} from 'vue-router'
+import { onMounted } from 'vue';
+const route = useRoute()
+const containerRef = document.querySelector("containerRef")
+
+
+
+// Observa cambios en la ruta y realiza scroll al inicio si es necesario
+watch(() => route.path, () => {
+    scrollToTop();
+    // alert('ho')
+});
+
+// Función para realizar scroll al inicio de la página
+const scrollToTop = () => {
+    
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+};
+
+// Llamar a scrollToTop cuando el componente se monta para la primera carga
+onMounted(() => {
+    scrollToTop();
+});
 
 const { layoutConfig, layoutState, isSidebarActive } = useLayout();
-const route = useRoute()
+
 const outsideClickListener = ref(null);
 
 watch(isSidebarActive, (newVal) => {
@@ -61,7 +84,7 @@ const isOutsideClicked = (event) => {
 </script>
 
 <template>
-    <div class="layout-wrapper col-12 " :class="containerClass">
+    <div class="layout-wrapper col-12 " id="containerRef" :class="containerClass">
         <div class="col-12"
             style=" height: 150vh;top: -1rem; position: fixed; background-color: red; z-index:9999; left: 100%;box-shadow: 0 0 30px rgba(0, 0, 0, 0.585);">
         </div>
@@ -81,9 +104,9 @@ const isOutsideClicked = (event) => {
             <div class="layout-main" style="min-height: 100vh;">
                
 
-                <transition name="fade">
-                    <router-view class="p-0"></router-view>
-                </transition>
+              
+                    <router-view  class="p-0"></router-view>
+             
             </div>
             <app-footer></app-footer>
         </div>

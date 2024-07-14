@@ -31,11 +31,11 @@ export default {
       };
       document.head.appendChild(script);
     },
-    sendTrackingEvent(eventName, eventParams) {
+    sendTrackingEvent(eventName, eventParams = {}) {
         if (window.fbq) {
           if (eventName === 'Purchase') {
             fbq('track', 'Purchase', {
-              value: eventParams.total,
+              value: eventParams.value,
               currency: 'COP',  // Asegúrate de ajustar esto si decides convertir a otra moneda
               content_type: 'product',
               content_ids: eventParams.items.map(item => item.id)

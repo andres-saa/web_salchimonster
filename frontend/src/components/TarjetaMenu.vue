@@ -34,7 +34,7 @@
                 </b>
             </span>
             <!-- <Button text style="color: black;" icon="pi pi-ellipsis-v p-0 text-xl" /> -->
-            <img  class="character" style="width:6rem;" v-for="character in [1]" :v-lazy="`/images/characters/${props.index}.png`" alt="">
+            <img  class="character" style="width:4rem;"  :src="`/images/characters/${props.index}.png`" alt="">
 
 
 

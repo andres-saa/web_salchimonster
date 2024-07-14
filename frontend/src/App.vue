@@ -60,7 +60,7 @@ onMounted(async() => {
   <RouterView  class="p-0" style="min-height: 90vh;"/>
   <siteDialog />
   <VistaProducto />
-  <validate/>
+
   <barra />
 </template>
 <style scoped></style>

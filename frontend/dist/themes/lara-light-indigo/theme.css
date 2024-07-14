@@ -8,7 +8,7 @@
   --background-topbar:#ffffff;
 
   /* color del menu cuando no hay nada seleccionado */
-  --text-color:#000;  
+  --text-color:#4b5563;  
   
   --text-color-secondary:#6c757d;
   /* color de menu seleccionado */
@@ -3937,16 +3937,15 @@ table .p-paginator-top {
 }
 
 .p-accordion .p-accordion-header .p-accordion-header-link {
-  padding: 1rem 1.25rem;
-  /* border: 1px solid #dee2e6; */
-  color: var(--primary-color);
-  background: white;
-  font-weight: 600;
-  border-radius: 4px;
-  transition: box-shadow 0.15s;
-  
+  padding: 1.25rem;
+  border: 1px solid #e5e7eb;
+  color: var(--text-color);
+  background: #f9fafb;
+  font-weight: 700;
+  border-radius: 6px;
+  transition: box-shadow 0.2s;
+  text-decoration: none;
 }
-
 
 .p-accordion .p-accordion-header .p-accordion-header-link .p-accordion-toggle-icon {
   margin-right: 0.5rem;

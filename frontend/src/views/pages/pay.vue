@@ -1,8 +1,9 @@
 <template>
-    <div class="col-12  my-8  p-0" style="margin-top: 6rem;">
+    <div class="col-12 px-2 my-8  p-0" style="margin-top: 6rem;">
+      <P class="text-center text-2xl my-8"><b>FINALIZAR COMPRA</b> </P>
         <div class="grid mx-auto " style="max-width:800px;">
 
-<!-- {{ user.user.name }} -->
+
 
 
             <div class="col-12 md:col-6 p-1 md:px-4" style="display: flex; flex-direction: column; gap:1rem;">
@@ -27,6 +28,7 @@
 
 <div class="flex flex-wrap align-items-center mb-2 gap-2" style="width: 100%;">
     <!-- <label for="username" class="p-sr-only">Username</label> -->
+    <p>El telefono debe estar disponible en WhatsApp para validar el pedido <img style="width: 1.5rem;" src="/images/WhatsApp.svg.webp" alt=""></p> 
     <InputMask v-model="user.user.phone_number" style="width: 100%;" prefix="+57" id="basic"  mask="999 999 9999" placeholder="TELEFONO" />
 </div>
 
@@ -49,6 +51,7 @@
 
         </div>
     </div>
+    <validate></validate>
 </template>
 
 
@@ -61,6 +64,7 @@ import { formatoPesosColombianos } from '../../service/formatoPesos';
 import { useSitesStore } from '../../store/site';
 import {useUserStore} from '../../store/user'
 import { paymentMethodService } from '../../service/restaurant/paymentMethodService';
+import validate from './validate.vue';
 const store = usecartStore()
 const siteStore = useSitesStore()
 const use = ref(0)

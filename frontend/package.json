@@ -15,12 +15,14 @@
         "pinia-plugin-persistedstate": "^3.2.1",
         "primeflex": "^3.3.1",
         "primeicons": "^6.0.1",
-        "primevue": "^3.30.2",
+        "primevue": "3.30.2",
         "vue": "^3.3.4",
         "vue-carousel": "^0.18.0",
         "vue-lazyload": "^3.0.0",
+        "vue-otp-input": "^1.0.0",
         "vue-router": "^4.2.4",
         "vue3-carousel": "^0.3.1",
+        "vue3-otp-input": "^0.5.21",
         "vuex": "^4.1.0"
     },
     "devDependencies": {
