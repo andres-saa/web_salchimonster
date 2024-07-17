@@ -8,3 +8,7 @@
 
 # Ignorar directorios '__pycache__' en cualquier lugar
 **/__pycache__/
+
+
+client_secrets.json
+credentials_module.json

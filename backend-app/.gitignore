@@ -6,6 +6,8 @@ my-env/
 .venv
 web-envi/
 backend-app/
+client_secrets.json
+credentials_module.json
 __pycache__/**
 __pycache__/
 *.py[cod]

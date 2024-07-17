@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes.product import product_router
 from routes.user import user_router
 from routes.site import site_router
-from routes.delivery_person import delivery_person_router  # Importa el nuevo router de delivery persons
+from routes.delivery_person import delivery_person_router 
+from routes.drive_files.drive_files import drive_file_router # Importa el nuevo router de delivery persons
 # from routes.order import order_router
 from routes.orders.order import order_router
 from routes.inventory.daily_inventory import daily_inventory_router
@@ -58,7 +59,7 @@ app.add_middleware(
 
 
 app.include_router(recipe_data_sheet_router)
-
+app.include_router(drive_file_router)
 app.include_router(order_purchase_router)
 app.include_router(contest_router)
 app.include_router(daily_inventory_router)
