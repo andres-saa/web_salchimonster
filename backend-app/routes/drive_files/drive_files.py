@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 import tempfile
-
+import os
 # Initialize router
 drive_file_router = APIRouter()
 
@@ -94,13 +94,18 @@ async def upload_file(
                     'parents': [{'id': folder_id}]
                 }
                 temp_file_path = None
+
                 with tempfile.NamedTemporaryFile(delete=False) as temp_file:
                     temp_file_path = temp_file.name
-                    temp_file.write(file.file.read())
+                    for chunk in iter(lambda: file.file.read(4096), b""):
+                        temp_file.write(chunk)
 
                 gd_file = drive.CreateFile(file_metadata)
                 gd_file.SetContentFile(temp_file_path)
                 gd_file.Upload()
+
+                os.remove(temp_file_path)  # Eliminar archivo temporal después de subirlo
+
                 return gd_file['id']
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")

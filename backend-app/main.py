@@ -45,6 +45,9 @@ from routes.work_scheduler import work_day_router
 from routes.recipe.recipe import recipe_router
 from routes.contests.contest import contest_router
 from routes.pqrs.pqrs import Pqrs_router
+from routes.video_training.sesion import sesion_router
+from routes.video_training.sequence_video import sequence_video_router
+from routes.video_training.video import video_router
 app = FastAPI()
 # from routes.area import area_router
 app.add_middleware(
@@ -56,8 +59,9 @@ app.add_middleware(
 )
 
 
-
-
+app.include_router(video_router)
+app.include_router(sequence_video_router)
+app.include_router(sesion_router)
 app.include_router(recipe_data_sheet_router)
 app.include_router(drive_file_router)
 app.include_router(order_purchase_router)
