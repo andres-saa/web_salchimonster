@@ -258,7 +258,7 @@ const fondoVisible = ref(false)
 
 
         <button @click="(siteStore.setVisible('currentSite',true))" class="p-link boton-menu layout-topbar-logo"
-            style=" font-size: 24px; font-weight: bold;  color: black; z-index: 99999;display:flex; justify-content: center; align-items: center;">
+            style=" font-size: 24px;  color: black; z-index: 99999;display:flex; justify-content: center; align-items: center;">
 
             <i sty :class="PrimeIcons.MAP_MARKER" style="font-size: 100%; color: var(--primary-color)"> </i>
 
@@ -317,10 +317,10 @@ const fondoVisible = ref(false)
 
 
                 <router-link :to="`/${menuTopbar.to}`" @click="handleDropDownMenu(false)" class="">
-                    <Button :label="menuTopbar.name" text  class="p-link boton-menu text-xl py-2 px-3" style="color:#4b5563;"
+                    <Button severity="secondary" text size="small"  :label="menuTopbar.name" class="p-link boton-menu text-xl py-2 px-3" style="font-weight: 500; box-shadow: none; color: var(--text-color);"
                         :class="curentMenu.name == menuTopbar.name || router.currentRoute.value.path == `/${menuTopbar.to}` ? 'selected' : 'boton-menu'">
-                        <!-- <i class="pi pi-calendar"></i> -->
-                        <!-- <h3> {{i}}</h3> -->
+                        
+                     
                         
                     </Button>
 
@@ -329,6 +329,8 @@ const fondoVisible = ref(false)
 
 
         </div>
+
+        
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses" style="z-index: 999 ;">
 
@@ -429,8 +431,8 @@ const fondoVisible = ref(false)
    // background-color: transparent;
     // font-size: 20px; 
     text-transform: capitalize;
-    padding: 0 5px;
-    font-weight: bold;
+    padding: 0 5px; 
+    // font-weight: bold;
 }
 
 .ver-mas {
@@ -473,7 +475,7 @@ const fondoVisible = ref(false)
     transition: all 0.2s ease;
     color: var(--primary-color);
     transform: translateX(-15px);
-    font-weight: bold;
+    // font-weight: bold;
 }
 
 .img-product {
@@ -530,9 +532,21 @@ const fondoVisible = ref(false)
 
 .selected {
     // border: 1px solid red;
-    box-shadow: 0px 5px 0px var(--primary-color);
+
     border-radius: 0;
 }
+
+
+.selected::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 0;
+      border-bottom: .3rem solid var(--primary-color); /* Borde inferior */
+    }
+
 
 *{ text-transform: lowercase;}
 

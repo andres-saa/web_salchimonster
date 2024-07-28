@@ -16,20 +16,16 @@ const obtenerstatus = async () => {
 
 const siteId = siteStore.location.site.site_id  
 
-if(!siteId){
-  alert()
-    return
-    
-}
+
 
   try {
     const response = await fetch(`${URI}/site/${siteId}/status`);
     const data = await response.json();
     
-    if (data.status === 'closed') {
-      siteStore.status = 'cerrado';
-    } else {
+    if (data.status === 'open') {
       siteStore.status = 'abierto';
+    } else {
+      siteStore.status = 'cerrado';
    
     }
   } catch (error) {

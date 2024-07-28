@@ -140,7 +140,7 @@ const menuOptions = ref(
     [
 
         {
-            name: 'Menu',
+            name: 'MENU',
             to:'',
             menus:[
                 {
@@ -154,23 +154,23 @@ const menuOptions = ref(
 
 
         {
-            name: 'Sedes',
+            name: 'SEDES',
             to:'sedes',
           
         },
         {
-            name: 'Carta',
+            name: 'CARTA',
         
             to:'menu'
         },
 
         {
-            name: 'Rastrear pedido',
+            name: 'RASTREAR PEDIDO',
            
             to:'rastrear-pedido'
         },
         {
-            name: 'Colaboraciones',
+            name: 'COLABORACIONES',
            
             to:'colaboraciones'
         },

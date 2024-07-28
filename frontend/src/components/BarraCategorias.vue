@@ -1,6 +1,6 @@
 <template>
 
-    <div style="position: sticky; top: 3rem; z-index: 999; background-color: white;" class="col-12 nav_bar shadow-3 d-flex  lg:justify-content-center align-items-center mb-5 p-0 md:p-0">
+    <div style="position: sticky; top: 3.5rem; z-index: 999; background-color: white;" class="col-12 nav_bar shadow-3 d-flex  lg:justify-content-center align-items-center mb-5 p-0 md:p-0">
        
        
         <Button class="px-0" style="position: absolute;border: none;background-color: white;color: black; left: -0.5rem;z-index: 99;height: 100%;width: 1.7rem; border-radius: 0;" severity="help"  icon="pi pi-angle-left text-2xl"></Button>
@@ -14,11 +14,11 @@
         
 
         <div v-for="section in categories" :key="section.id" class="p-1">
-            <button @click="navigateToCategory(section.category_name,section.category_id)"
+            <Button text severity="secondary" size="small" @click="navigateToCategory(section.category_name,section.category_id)" :label="section.category_name "
                 :class="checkSelected(section.category_id) ? 'selected menu-button' : 'menu-button'"
-                class="p-2   text-lg titulo" style="font-weight: 400; text-transform: uppercase;min-width: max-content;">
-                <span class="text-lg" style="min-width: max-content;">{{ section.category_name }}</span>
-            </button>
+                class="p-2   text-lg titulo" style=" text-transform: uppercase;color:var(--text-color); min-width: max-content;border-radius: 0;outline: none;box-shadow: none;">
+               
+            </Button>
         </div>
     </div>
     </div>
@@ -84,6 +84,7 @@ const checkSelected = (section) => {
     border: none;
     font-size: 20px;
     outline: none;
+    box-shadow: none;
 
 }
 
@@ -113,10 +114,33 @@ const checkSelected = (section) => {
     opacity: 0;
 }
 
+
 .selected {
-    box-shadow: 0 0.5rem var(--primary-color);
+    /* box-shadow: 0 0.4rem var(--primary-color) !important;
+     */
+     border-bottom: 3px none red !important;
+     margin-bottom: 0%;
+     margin-top: 0;
+     padding: 0;
+     
+     /* padding-bottom: 3px; */
 
 }
+
+
+
+.selected::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 0;
+      border-bottom: .3rem solid var(--primary-color); /* Borde inferior */
+    }
+
+
+
 .col-12 {
     width: 100vw;
     /* position: absolute; */
