@@ -28,3 +28,8 @@ class VideoUpdate(BaseModel):
     name:str
     description:str
     link:str
+
+
+class markVideo(BaseModel):
+    user_id:int
+    video_id:int

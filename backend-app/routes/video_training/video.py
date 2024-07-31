@@ -23,6 +23,16 @@ def list_video_training_video_by_sesion_id( sequence_id:int):
     return result
 
 
+
+@video_router.get( '/list-video-by-sequence-id-and-student-id/{sequence_id}/{student_id}' , tags=[ 'video_training -> video' ] )
+def list_video_training_video_by_sesion_id( sequence_id:int, student_id:int):
+    video_instance = Video()
+    result = video_instance.get_video_by_sequence_id_and_student_id(sequence_id,student_id)
+    return result
+
+
+
+
 @video_router.post( '/insert-video-training' , tags=[ 'video_training -> video' ] )
 def insert_video_training_video(data:video_post_schema):
     video_instance = Video()

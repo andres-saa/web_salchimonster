@@ -1,9 +1,10 @@
 import psycopg2
 from dotenv import load_dotenv
 import os
-from schema.employer import EmployerSchemaPost
+from schema.employer.employer import EmployerSchemaPost
 # Importa aquí tu esquema para employers si lo tienes
 # from schema.employer import employer_schema_post
+from db.db import Db as dataBase
 
 load_dotenv()
 
@@ -15,20 +16,15 @@ DB_NAME = os.getenv('DB_NAME')
 
 class Employer:
     def __init__(self):
+        self.db = dataBase()
         self.conn_str = f"dbname={DB_NAME} user={DB_USER} password={DB_PASSWORD} host={DB_HOST} port={DB_PORT}"
         self.conn = psycopg2.connect(self.conn_str)
         self.cursor = self.conn.cursor()
 
     def select_all_employers(self):
     # Consulta SQL que incluye un JOIN para obtener site_name
-        select_query = """
-        SELECT employers.*, sites.site_name 
-        FROM employers
-        JOIN sites ON employers.site_id = sites.site_id;
-        """
-        self.cursor.execute(select_query)
-        columns = [desc[0] for desc in self.cursor.description]
-        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+        query = "SELECT * from hhrr.employers_view;"
+        return self.db.fetch_all(query)
     
     def select_employers_basic(self):
     # Consulta SQL que incluye un JOIN para obtener site_name

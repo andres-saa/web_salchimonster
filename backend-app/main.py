@@ -15,7 +15,7 @@ from routes.auth import auth
 from routes.category import category_router
 from routes.adicional import adicional_router,salsa_router,topping_router,acompanante_router,cambio_router
 from routes.grupo_adicionales import grupo_adicionales_router,grupo_toppings_router,grupo_salsas_router,grupo_cambios_router,grupo_acompanantes_router
-from routes.employer import employer_router
+from routes.employer.employer import employer_router
 from routes.site_document import site_document_router
 from routes.login import login
 from routes.permission import permission_router
@@ -48,6 +48,8 @@ from routes.pqrs.pqrs import Pqrs_router
 from routes.video_training.sesion import sesion_router
 from routes.video_training.sequence_video import sequence_video_router
 from routes.video_training.video import video_router
+from routes.video_training.students import student_router
+from routes.contracts.contract import contract_router
 app = FastAPI()
 # from routes.area import area_router
 app.add_middleware(
@@ -59,6 +61,8 @@ app.add_middleware(
 )
 
 
+app.include_router(contract_router)
+app.include_router(student_router)
 app.include_router(video_router)
 app.include_router(sequence_video_router)
 app.include_router(sesion_router)

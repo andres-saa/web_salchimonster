@@ -21,6 +21,13 @@ class Video:
         query = 'SELECT * FROM video_training.sequence_videos_view where sequence_id = %s;'
         result = self.db.execute_query(query, [sequence_id],fetch=True)
         return result
+    
+
+        
+    def get_video_by_sequence_id_and_student_id(self, sequence_id:int, student_id:int):
+        query = 'SELECT * FROM video_training.sequence_videos_view_student where sequence_id = %s and student_id =%s;'
+        result = self.db.execute_query(query, [sequence_id, student_id],fetch=True)
+        return result
 
     def insert_video(self, data:video_post_schema,):
         query= 'INSERT INTO video_training.video (name, created_by, description, link) values (%s, %s, %s, %s) returning id'

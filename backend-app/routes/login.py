@@ -8,7 +8,7 @@ from typing import Optional
 
 # Importa tu modelo Employer y esquema de validación EmployerSchemaPost
 from models.employer import Employer
-from schema.employer import EmployerSchemaPost
+from schema.employer.employer import EmployerSchemaPost
 from auth_utils.Security import Security,authenticate_user,create_access_token
 login = APIRouter()
 

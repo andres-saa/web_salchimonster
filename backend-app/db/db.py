@@ -3,6 +3,8 @@ import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extras import RealDictCursor
 import os
+from pydantic import BaseModel
+from typing import Tuple,Dict,Any
 load_dotenv()
 
 DB_USER = os.getenv('DB_USER')
@@ -33,6 +35,9 @@ class Db:
             print(f"An error occurred: {e}")
 
 
+    
+
+
     def fetch_one(self, query, params=None):
         try:
             with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
@@ -56,6 +61,91 @@ class Db:
 
     def __enter__(self):
         return self
+    
+
+    def build_insert_query(self, table_name: str, data: BaseModel, returning: str = ''):
+        # Convertimos el objeto 'data' en un diccionario
+        data_dict = data.model_dump()
+
+        # Obtenemos las claves del diccionario, que serán los nombres de las columnas
+        columns = ', '.join(data_dict.keys())
+
+        # Creamos una lista de placeholders para los valores, usando la sintaxis de parámetros de psycopg2
+        values = ', '.join([f"%({key})s" for key in data_dict.keys()])
+
+        # Construimos la parte principal de la consulta INSERT
+        query = f'INSERT INTO {table_name} ({columns}) VALUES ({values})'
+
+        # Si se proporciona el parámetro 'returning', lo añadimos a la consulta
+        if returning:
+            query += f' RETURNING {returning}'
+
+        # Retornamos la consulta y el diccionario de datos
+        return query, data_dict
+    
+
+
+    def build_update_query(self, table_name: str, data: BaseModel, condition: str, returning: str = ''):
+        # Convertimos el objeto 'data' en un diccionario
+        data_dict = data.model_dump()
+
+        # Creamos una lista de asignaciones columna=valor
+        set_clause = ', '.join([f"{key} = %({key})s" for key in data_dict.keys()])
+
+        # Construimos la parte principal de la consulta UPDATE
+        query = f'UPDATE {table_name} SET {set_clause} WHERE {condition}'
+
+        # Si se proporciona el parámetro 'returning', lo añadimos a la consulta
+        if returning:
+            query += f' RETURNING {returning}'
+
+        # Retornamos la consulta y el diccionario de datos
+        return query, data_dict
+
+
+
+    def build_select_query(self, table_name: str, fields: list[str], condition: str = '', order_by: str = '', limit: int = 0, offset: int = 0):
+        # Construimos la lista de campos a seleccionar
+        columns = ', '.join(fields)
+
+        # Construimos la parte principal de la consulta SELECT
+        query = f'SELECT {columns} FROM {table_name}'
+
+        # Si se proporciona una condición, la añadimos a la consulta
+        if condition:
+            query += f' WHERE {condition}'
+
+        # Si se proporciona un orden, lo añadimos a la consulta
+        if order_by:
+            query += f' ORDER BY {order_by}'
+
+        # Si se proporciona un límite, lo añadimos a la consulta
+        if limit > 0:
+            query += f' LIMIT {limit}'
+
+        # Si se proporciona un offset, lo añadimos a la consulta
+        if offset > 0:
+            query += f' OFFSET {offset}'
+
+        # Retornamos la consulta construida
+        return query
+    
+
+
+    def build_soft_delete_query(self, table_name: str, condition: str, returning: str = ''):
+        # Definimos el campo y el valor a asignar
+        set_clause = "exist = FALSE"
+
+        # Construimos la parte principal de la consulta UPDATE
+        query = f'UPDATE {table_name} SET {set_clause} WHERE {condition}'
+
+        # Si se proporciona el parámetro 'returning', lo añadimos a la consulta
+        if returning:
+            query += f' RETURNING {returning}'
+
+        # Retornamos la consulta construida
+        return query
+
 
     def __exit__(self, exc_type, exc_val, exc_tb):
        
