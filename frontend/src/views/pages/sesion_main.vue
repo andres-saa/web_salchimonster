@@ -6,6 +6,14 @@
 
 
 
+  <Dialog class="p-0 m-0"  v-model:visible="store.visible.show_new_product" modal style="width: 30rem;padding: 0;"> 
+    <div style="max-width: 30rem;background-color: white;color: black;border-radius: .5rem;" class="">
+      <TarjetaMenuDialog :product="{ id: 241,product_id: 118,    site_id: 11,    status: true,    price: 10000,    product_name: 'CHOCOMONSTER',    product_description:' CHOCORRAMO APANADO',    category_id: 14,    category_name: 'NUEVOS'}"> </TarjetaMenuDialog>
+    </div>
+  </Dialog>
+
+
+
 
   <div  style="position:absolute;display:flex;right:100%;gap:10rem; height:100vh;max-width:100%; justify-content:space-around; flex-direction:column;z-index: 9;">
 
@@ -58,7 +66,7 @@ import { URI } from '../../service/conection';
 import router from '@/router/index.js';
 import { usecartStore } from '../../store/shoping_cart';
 import { useSitesStore } from '../../store/site';
-
+import TarjetaMenuDialog from '../../components/TarjetaMenuDialog.vue';
 const store2 = usecartStore()
 const siteStore = useSitesStore()
 
@@ -108,6 +116,46 @@ const getProducts = async (category_name) => {
 }
   }
  
+
+
+
+
+
+
+
+  
+const getProductBy_id = async (category_name) => {
+  const site_id = siteStore.location.site.site_id
+  const category_id = 3
+      try {
+      let response = await fetch(`${URI}/products-active/category-id/${category_id}/site/${site_id}`);
+      if (!response.ok) {
+          store.setLoading(false, 'cargando productos')
+
+          throw new Error(`HTTP error! status: ${response.status}`);
+
+      }
+      store.setLoading(false, 'cargando productos')
+
+      let data = await response.json();
+      products.value = data;
+  } catch (error) {
+      store.setLoading(false, 'cargando productos')
+
+      console.error('Error fetching data: ', error);
+  }
+}
+  
+
+
+
+
+
+
+
+
+
+
 
 
 

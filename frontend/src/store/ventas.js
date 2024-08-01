@@ -12,8 +12,7 @@ export const useReportesStore = defineStore('reportes', {
                     'dateRange',
                     'salesReport',
                     'selectedSites',
-                    'order_status', // Estado por defecto si no hay nada en localStorage
-                    // 'ventasCharData',
+                    'order_status', 
                     'visibleNotifications']
 
         
@@ -33,7 +32,8 @@ export const useReportesStore = defineStore('reportes', {
             },
 
             visible:{
-                show_validate:false
+                show_validate:false,
+                show_new_product:true
             }
 
         }

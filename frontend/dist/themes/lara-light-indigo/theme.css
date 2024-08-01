@@ -4313,7 +4313,7 @@ table .p-paginator-top {
 .p-dialog {
   border-radius: 4px;
   box-shadow: none;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  /* border: 1px solid rgba(0, 0, 0, 0.2); */
   width: 100vw;
 }
 .p-dialog .p-dialog-header {
