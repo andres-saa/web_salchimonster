@@ -37,7 +37,7 @@ class EmployerSchemaPost(BaseModel):
     shirt_size: Optional[str]
     jeans_sweater_size: Optional[str]
     food_handling_certificate: Optional[bool]
-    food_handling_certificate_number: Optional[str]
-    salary: Optional[int]
+    food_handling_certificate_number: Optional[int] = None
+    salary: Optional[int] = None
     boss_id: Optional[int]  # Nuevo campo boss_id
 

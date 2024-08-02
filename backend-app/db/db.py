@@ -5,6 +5,8 @@ from psycopg2.extras import RealDictCursor
 import os
 from pydantic import BaseModel
 from typing import Tuple,Dict,Any
+from typing import List, Dict, Optional
+from pydantic import BaseModel
 load_dotenv()
 
 DB_USER = os.getenv('DB_USER')
@@ -35,7 +37,47 @@ class Db:
             print(f"An error occurred: {e}")
 
 
+    def build_bulk_insert_query(table_name: str, data_list: List[BaseModel], returning: str = ''):
+        if not data_list:
+            raise ValueError("The data list cannot be empty")
+
+        # Convertimos la primera instancia de 'data_list' en un diccionario para obtener las claves
+        first_data_dict = data_list[0].model_dump()
+
+        # Obtenemos las claves del diccionario, que serán los nombres de las columnas
+        columns = ', '.join(first_data_dict.keys())
+
+        # Creamos una lista de placeholders para los valores, usando la sintaxis de parámetros de psycopg2
+        values_placeholders = ', '.join([f"%({key})s" for key in first_data_dict.keys()])
+        
+        # Construimos la parte principal de la consulta INSERT con múltiples valores
+        values = ', '.join([f"({values_placeholders})" for _ in data_list])
+        query = f'INSERT INTO {table_name} ({columns}) VALUES {values}'
+
+        # Si se proporciona el parámetro 'returning', lo añadimos a la consulta
+        if returning:
+            query += f' RETURNING {returning}'
+
+        # Convertimos la lista de datos en una lista de diccionarios para pasar a 'execute_bulk_insert'
+        data_dict_list = [data.model_dump() for data in data_list]
+
+        return query, data_dict_list
     
+
+    def execute_bulk_insert(self, query: str, params: Optional[List[Dict[str, any]]] = None, fetch: bool = False):
+        try:
+            with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                if params:
+                    # Ejecutar consulta con múltiples conjuntos de parámetros
+                    cursor.executemany(query, params)
+                else:
+                    cursor.execute(query)
+                self.conn.commit()
+                if fetch:
+                    return cursor.fetchall()
+        except Exception as e:
+            self.conn.rollback()
+        print(f"An error occurred: {e}")
 
 
     def fetch_one(self, query, params=None):
