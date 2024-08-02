@@ -1,22 +1,20 @@
 <template>
 
-    <div style="position: sticky; top: 3.5rem; z-index: 999; background-color: white;" class="col-12 nav_bar shadow-3 d-flex  lg:justify-content-center align-items-center mb-5 p-0 md:p-0">
+    <div style="position: sticky; top: 3.5rem; z-index: 999; background-color: white;overflow-x: auto;" class="col-12 nav_bar shadow-3 d-flex  lg:justify-content-center align-items-center mb-5 p-0 md:p-0">
        
        
-        <Button class="px-0" style="position: absolute;border: none;background-color: white;color: black; left: -0.5rem;z-index: 99;height: 100%;width: 1.7rem; border-radius: 0;" severity="help"  icon="pi pi-angle-left text-2xl"></Button>
+        <!-- <Button class="px-0" style="position: absolute;border: none;background-color: white;color: black; left: -0.5rem;z-index: 99;height: 100%;width: 1.7rem; border-radius: 0;" severity="help"  icon="pi pi-angle-left text-2xl"></Button>
 
 
-        <Button class="px-0" style="position: absolute;border: none;background-color: white;color: black; right: -0.5rem;z-index: 99;height: 100%; width: 1.7rem; border-radius: none;" severity="help"  icon="pi pi-angle-right text-2xl"></Button>
+        <Button class="px-0" style="position: absolute;border: none;background-color: white;color: black; right: -0.5rem;z-index: 99;height: 100%; width: 1.7rem; border-radius: none;" severity="help"  icon="pi pi-angle-right text-2xl"></Button> -->
 
-        <div class="col-12  d-flex p lg:justify-content-center align-items-center  p-0 md:p-1"
-        style="overflow-x: auto;background-color: rgba(255, 255, 255, 0.913)">
+        <div class=" d-flex p lg:justify-content-center align-items-center  p-0 m-0"
+        style="gap: 0; background-color: rgba(255, 255, 255, 0.913)">
 
-        
-
-        <div v-for="section in categories" :key="section.id" class="p-1">
+        <div v-for="section in categories" :key="section.id" class="p-0">
             <Button text severity="secondary" size="small" @click="navigateToCategory(section.category_name,section.category_id)" :label="section.category_name "
                 :class="checkSelected(section.category_id) ? 'selected menu-button' : 'menu-button'"
-                class="p-2   text-lg titulo" style=" text-transform: uppercase;color:var(--text-color); min-width: max-content;border-radius: 0;outline: none;box-shadow: none;">
+                class="p-2 mx-2  text-lg titulo" style=" text-transform: capitalize;width:max-content; color:var(--text-color); border-radius: 0;outline: none;box-shadow: none;">
                
             </Button>
         </div>
@@ -52,7 +50,7 @@ onMounted(async () => {
 
 const checkSelected = (section) => {
     const route = useRoute(); // Asegúrate de que tienes acceso a useRoute aquí
-    return route.path.includes(section); // Verifica si el path actual contiene la cadena section
+    return route.params.category_id == section; // Verifica si el path actual contiene la cadena section
 };
 
 
@@ -122,6 +120,7 @@ const checkSelected = (section) => {
      margin-bottom: 0%;
      margin-top: 0;
      padding: 0;
+     /* font-weight: bold; */
      
      /* padding-bottom: 3px; */
 
@@ -135,6 +134,7 @@ const checkSelected = (section) => {
       left: 0;
       bottom: 0;
       width: 100%;
+      font-weight: bold;
       height: 0;
       border-bottom: .3rem solid var(--primary-color); /* Borde inferior */
     }
