@@ -6,6 +6,7 @@ import os
 from db.db import Db as DataBase
 from schema.video_training.sesion import Sesion as sesion_schema, SesionUpdate as sesion_update_schema
 from schema.recipes.recipe_data_seet import RecipeDataSheet,RecipeDataSheetPost,RecipeDataSheetUpdate
+from schema.recipes.ingredients import RecipeDataIngredients
 from schema.video_training.user_sequence import ReplaceUserSequencesInput
 from schema.video_training.video import markVideo
 from datetime import time
@@ -17,9 +18,15 @@ class Recipe:
 
 
     def get_all_recipes(self):
-        query = self.db.build_select_query(table_name='recipes.recipe',fields=['*'],)
+        query = self.db.build_select_query(table_name='recipes.recipe',fields=['*'],order_by='id')
         return self.db.fetch_all(query)
     
+
+    
+
+    def get_all_recipes_enabled(self):
+        query = self.db.build_select_query(table_name='recipes.recipe',fields=['*'],condition='has_recipe = true',order_by='id')
+        return self.db.fetch_all(query)
 
 
     def get_recipe_data_sheet_by_product_id(self, id: int) -> Dict[str, List[Dict]]:
@@ -36,7 +43,7 @@ class Recipe:
 
         # Intentamos obtener el recipe_data_sheet para el product_id
         query = self.db.build_select_query(
-            table_name='recipes.recipe_data_sheet',
+            table_name='recipes.recipe_data_sheet_view',
             fields=['*'],
             condition=f'product_id = {id}'
         )
@@ -48,8 +55,8 @@ class Recipe:
                 product_id=id,
                 portion_size=0,
                 portion_number=0,
-                preparation_time=time(0, 0),
-                cooking_time=time(0, 0),
+                preparation_time='00:00:00',
+                cooking_time='00:00:00',
                 service_temperature=0,
                 selling_price=0,
                 taxes=0,
@@ -61,7 +68,7 @@ class Recipe:
             self.create_recipe_data_sheet(new_data_sheet)
             # Volvemos a intentar obtener el recipe_data_sheet recién creado
             query = self.db.build_select_query(
-                table_name='recipes.recipe_data_sheet',
+                table_name='recipes.recipe_data_sheet_view',
                 fields=['*'],
                 condition=f'product_id = {id}'
             )
@@ -75,11 +82,11 @@ class Recipe:
         query2 = self.db.build_select_query(
             table_name='recipes.recipe_ingredients_view',
             fields=['*'],
-            condition=f'recipe_data_sheet_id = {recipe_data_sheet_id}'
+            condition=f'recipe_data_sheet_id = {recipe_data_sheet_id}',order_by='id'
         )
         ingredients = self.db.fetch_all(query2)
         
-        return {'recipe_data_sheet': result, 'ingredients': ingredients}
+        return {'recipe_data_sheet': result[0], 'ingredients': ingredients}
 
     
 
@@ -100,6 +107,19 @@ class Recipe:
         return self.db.execute_query(query,params,True)
     
 
+    def create_recipe_data_ingredient(self,data:RecipeDataIngredients):
+        query, params = self.db.build_insert_query('recipes.recipe_data_ingredient',data,'id')
+        return self.db.execute_query(query=query, params=params,fetch=True)
+    
+    def delete_recipe_data_ingredient(self,id):
+        query = 'DELETE from recipes.recipe_data_ingredient where id = %s'
+        return self.db.execute_query(query=query,params=[id])
+    
+    def update_recipe_data_ingredient(self,id,data:RecipeDataIngredients):
+        query, params = self.db.build_update_query('recipes.recipe_data_ingredient',data,f'id = {id}','id')
+        return self.db.execute_query(query=query,params=params,fetch=True)
+    
+
     def update_recipe_data_sheet(self,id:int,data:RecipeDataSheetUpdate):
         query, params = self.db.build_update_query(
             table_name='recipes.recipe_data_sheet',
@@ -107,6 +127,11 @@ class Recipe:
             condition=f'id = {id}',
             returning='id')
         return self.db.execute_query(query,params,True)
+
+
+    def toggle_product_to_recipe(self,id:int,status:bool):
+        query=f'UPDATE inventory.products SET has_recipe = %s where id = %s returning id'
+        return self.db.execute_query(query,[status,id],True)
 
 
     def close_connection(self):

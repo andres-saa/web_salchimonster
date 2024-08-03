@@ -8,7 +8,7 @@ from schema.video_training.sesion import Sesion as sesion_schema, SesionUpdate a
 from schema.recipes.recipe_data_seet import RecipeDataSheet,RecipeDataSheetPost,RecipeDataSheetUpdate
 from schema.video_training.user_sequence import ReplaceUserSequencesInput
 from schema.video_training.video import markVideo
-from schema.recipes.ingredients import IngredientsPost
+from schema.recipes.ingredients import IngredientsPost,IngredientsUpdate
 from datetime import time
 from typing import Dict, List
 
@@ -25,6 +25,16 @@ class Ingredient:
     def create_ingredient(self,data:IngredientsPost):
         query , params = self.db.build_insert_query('recipes.ingredient',data,'id')
         return self.db.execute_query(query,params,True)
+    
+
+    def update_ingredient(self,id,data:IngredientsUpdate):
+        query , params = self.db.build_update_query(table_name='recipes.ingredient',data=data,condition=f'id = {id}',returning='id')
+        return self.db.execute_query(query,params,True)
+    
+    def delete_ingredient(self,id):
+        query  = self.db.build_soft_delete_query(table_name='recipes.ingredient',condition=f'id = {id}',returning='id')
+        return self.db.execute_query(query,fetch=True)
+        
         
 
 

@@ -17,7 +17,16 @@ class IngredientsPost (BaseModel):
     net_gross_weight:float
     shrinkage_persent:Optional[float] = None
    
-       
+
+class IngredientsUpdate (BaseModel):
+    name:str
+    purchasing_unit_measure_id:int
+    purchasing_price:int
+    net_gross_weight:float
+
+   
+
+ 
 
 class Ingredients (IngredientsPost):
     id:Optional[int] = None
@@ -25,8 +34,7 @@ class Ingredients (IngredientsPost):
     created_at:datetime
 
 
-class RecipeDataIngredients (IngredientsPost):
-    id:Optional[int]
+class RecipeDataIngredients (BaseModel):
     ingredient_id:int
     recipe_data_sheet_id:int
     unit_measure_id:int

@@ -10,8 +10,8 @@ from datetime import time, datetime
 class RecipeDataSheetUpdate (BaseModel):
     portion_size:int
     portion_number:int
-    preparation_time:time
-    cooking_time:time
+    preparation_time:str
+    cooking_time:str
     service_temperature:int
     selling_price:int
     taxes:int
