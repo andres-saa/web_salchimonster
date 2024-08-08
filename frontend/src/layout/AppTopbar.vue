@@ -182,6 +182,30 @@ const changeCurrentGroupMenu = (grupoMenu) => {
 }
 
 
+
+
+const scrollToElement = (selector) => {
+    const element = document.querySelector(selector);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        console.error('Elemento no encontrado:', selector);
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const curentMenu = ref({})
 
 // Ejemplo de cómo podrías utilizar getTokens

@@ -43,7 +43,9 @@ const siteId = siteStore.location.site.site_id
 // alert(siteId)
 
 if(!siteId){
+  verCerrado.value = false
     return
+    
 }
 
   try {
@@ -61,7 +63,7 @@ if(!siteId){
     }
   } catch (error) {
     console.error('Error al obtener el estado:', error);
-    estado.value = 'cerrado';
+    verCerrado.value = false
       localStorage.setItem('estado', 'cerrado');
   }
 };
