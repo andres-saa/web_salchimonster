@@ -54,6 +54,11 @@ def get_all_recipes(product_id:int):
     result = recipe_instance.get_recipe_data_sheet_by_product_id(product_id)
     return result
 
+@recipe_router.get("/get-recipe-summary-benefit" , tags=['recipe'])
+def get_all_recipes():
+    recipe_instance = Recipe()
+    result = recipe_instance.get_all_get_summary_benefit()
+    return result
 
 
 @recipe_router.post("/create-recipe-data-sheet" , tags=['recipe'])

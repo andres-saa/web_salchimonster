@@ -39,6 +39,7 @@ class RecipeDataIngredients (BaseModel):
     recipe_data_sheet_id:int
     unit_measure_id:int
     quantity:int
+    quantity_before_shrinkage:int
 
 class RecipeDataIngredientsUpdate (IngredientsPost):
     unit_measure_id:int

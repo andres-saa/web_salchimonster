@@ -112,10 +112,8 @@ class Employer:
     
     def select_employer_by_dni(self, dni):
         select_query = """
-        SELECT employers.*, sites.site_name 
-        FROM employers
-        JOIN sites ON employers.site_id = sites.site_id
-        WHERE employers.dni = %s;
+        SELECT * from permission.permission_employer_complete
+        WHERE dni = %s;
         """
         self.cursor.execute(select_query, (dni,))
         columns = [desc[0] for desc in self.cursor.description]
@@ -125,6 +123,7 @@ class Employer:
             return dict(zip(columns, employer_data))
         else:
             return None
+        
 
     def select_employers_grouped_by_site(self):
         select_query = """

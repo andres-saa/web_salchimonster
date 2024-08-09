@@ -93,7 +93,7 @@ class TrainingAttendeeModel:
         self.conn.commit()
 
         # Enviar invitaciones a los asistentes
-        self.enviar_invitaciones_a_capacitacion(training_id)
+        # self.enviar_invitaciones_a_capacitacion(training_id)
 
     # ... [método enviar_invitaciones_a_capacitacion y otros métodos] ...
 

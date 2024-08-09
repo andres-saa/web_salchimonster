@@ -22,6 +22,10 @@ class Recipe:
         return self.db.fetch_all(query)
     
 
+
+    def get_all_get_summary_benefit(self):
+        query = self.db.build_select_query(table_name='recipes.summary_benefit',fields=['*'],order_by='category_name')
+        return self.db.fetch_all(query)
     
 
     def get_all_recipes_enabled(self):
