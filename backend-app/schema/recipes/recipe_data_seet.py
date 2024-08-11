@@ -12,9 +12,9 @@ class RecipeDataSheetUpdate (BaseModel):
     portion_number:int
     preparation_time:str
     cooking_time:str
-    service_temperature:int
-    selling_price:int
-    taxes:int
+    service_temperature:float
+    selling_price:float
+    taxes:float
     presentation:str
     preparation_equipment:str
     elaboration:str
