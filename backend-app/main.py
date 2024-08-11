@@ -51,6 +51,7 @@ from routes.video_training.video import video_router
 from routes.video_training.students import student_router
 from routes.contracts.contract import contract_router
 from routes.permissions.permission import permission_router
+from routes.app.salchigest import salchigest_router
 app = FastAPI()
 # from routes.area import area_router
 app.add_middleware(
@@ -62,7 +63,7 @@ app.add_middleware(
 )
 
 
-
+app.include_router(salchigest_router)
 app.include_router(permission_router)
 app.include_router(contract_router)
 app.include_router(student_router)

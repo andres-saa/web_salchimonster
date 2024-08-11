@@ -53,25 +53,30 @@ async def notify_all_clients(site_id: int, message: str, sender: WebSocket):
                     del connected_clients[site_id]
                     
 
-@order_router.websocket("/ws/{site_id}")
-async def websocket_endpoint(websocket: WebSocket, site_id: int):
-    site_id = int(site_id)  # Ensure site_id is converted to integer, if not already
+
+
+
+connections: Dict[str, WebSocket] = {}
+
+@order_router.websocket("/ws/orders/{site_id}")
+async def websocket_endpoint(websocket: WebSocket, site_id: str):
     await websocket.accept()
-    if site_id not in connected_clients:
-        connected_clients[site_id] = []
-    connected_clients[site_id].append(websocket)
-    
+    connections[site_id] = websocket
+    print(connections)
+    await connections[site_id].send_text("Hola")
     try:
         while True:
-            # This can be a place to handle incoming messages or just keep the connection alive
-            await websocket.receive_text()
-            await notify_sites(site_id, 'hola')
+            data = await websocket.receive_text()
+            # Envía el mensaje a todos los clientes conectados
+            for connection_site_id, connection in connections.items():
+                if connection_site_id != site_id:
+                    await connection.send_text(data)
     except WebSocketDisconnect:
-        # Properly handle disconnections
-        connected_clients[site_id].remove(websocket)
-        if not connected_clients[site_id]:
-            del connected_clients[site_id]
-        print(f"Disconnected: {site_id}")
+        connections.pop(site_id, None)
+
+
+
+
 
 
 async def notify_sites(site_id: int, message: str):
