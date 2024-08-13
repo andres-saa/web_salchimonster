@@ -21,9 +21,22 @@ class RecipeDataSheetUpdate (BaseModel):
 
 
 
+
+# class updateBulkPurchasePrace(BaseModel):
+
+
+class updateLastPurchasePrice(BaseModel):
+    ingredient_id:int
+    last_price_purchase:float
+
+class cdi_percent(BaseModel):
+    percent:int
+
+class update_cdi_percent(BaseModel):
+    main:bool
+
 class RecipeDataSheetPost (RecipeDataSheetUpdate):
     product_id:int
-
 
 
 class RecipeDataSheet (RecipeDataSheetUpdate):

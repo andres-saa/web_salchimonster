@@ -1,9 +1,10 @@
 from fastapi import APIRouter
 from models.recipes.recipes import Recipe # Asume que tienes un módulo models con RecipeManager
 # from schema.recipes.re import Recipe  # Asume que tienes un módulo schema con Recipe
-from schema.recipes.recipe_data_seet import RecipeDataSheet,RecipeDataSheetPost,RecipeDataSheetUpdate
+from schema.recipes.recipe_data_seet import RecipeDataSheet,RecipeDataSheetPost,RecipeDataSheetUpdate,cdi_percent,update_cdi_percent,updateLastPurchasePrice
 from schema.recipes.ingredients import IngredientsPost,IngredientsUpdate
 from schema.recipes.ingredients import RecipeDataIngredients
+from typing import List
 recipe_router = APIRouter()
 from pydantic import BaseModel
 from models.recipes.ingredients import Ingredient
@@ -61,6 +62,29 @@ def get_all_recipes():
     return result
 
 
+@recipe_router.get("/get-cdi-prices-table" , tags=['recipe'])
+def get_all_recipes():
+    recipe_instance = Recipe()
+    result = recipe_instance.get_cdi_prices_table()
+    return result
+
+
+
+
+@recipe_router.put("/set-main-percent-to-sell/{id}" , tags=['recipe'])
+def get_all_recipes(id:int):
+    recipe_instance = Recipe()
+    result = recipe_instance.set_main_percent_to_sell(id)
+    return result
+
+
+@recipe_router.get("/get-prices-cdi-percents" , tags=['recipe'])
+def get_all_recipes():
+    recipe_instance = Recipe()
+    result = recipe_instance.get_cdi_percent_prices()
+    return result
+
+
 @recipe_router.post("/create-recipe-data-sheet" , tags=['recipe'])
 def get_all_recipes(data:RecipeDataSheetPost):
     recipe_instance = Recipe()
@@ -101,6 +125,21 @@ def get_all_recipes(data:IngredientsUpdate,id:int):
     return result
 
 
+
+@recipe_router.post("/create-cdi-percent-price" , tags=['recipe'])
+def get_all_recipes(data:cdi_percent):
+    recipe_instance = Recipe()
+    result = recipe_instance.create_cdi_percent_price(data)
+    return result
+
+
+@recipe_router.delete("/delete-cdi-percent-price/{id}" , tags=['recipe'])
+def get_all_recipes(id:int):
+    recipe_instance = Recipe()
+    result = recipe_instance.delete_cdi_percent_price(id)
+    return result
+
+
 @recipe_router.delete("/delete-ingredient/{id}" , tags=['recipe'])
 def get_all_recipes(id:int):
     recipe_instance = Ingredient()
@@ -114,6 +153,12 @@ def get_all_recipes(id:int,data:RecipeDataSheetUpdate):
     result = recipe_instance.update_recipe_data_sheet(id,data)
     return result
 
+
+@recipe_router.put("/update-bulk-last-purchase-price" , tags=['bulk'])
+def get_all_recipes(data:List[updateLastPurchasePrice]):
+    recipe_instance = Recipe()
+    result = recipe_instance.update_bulk_last_price(data)
+    return result
 
 
 

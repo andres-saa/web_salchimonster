@@ -17,6 +17,11 @@ class Ingredient:
         self.db = DataBase()
 
 
+
+    def get_cdi_prices_table(self):
+        query = self.db.build_select_query(table_name='recipes.ingredient_main_value',fields=['*'],)
+        return self.db.fetch_all(query)
+
     def get_all_ingredients(self):
         query = self.db.build_select_query(table_name='recipes.ingredient_view',fields=['*'],)
         return self.db.fetch_all(query)
