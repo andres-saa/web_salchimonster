@@ -28,6 +28,7 @@ class RecipeDataSheetUpdate (BaseModel):
 class updateLastPurchasePrice(BaseModel):
     ingredient_id:int
     last_price_purchase:float
+    iva:float
 
 class cdi_percent(BaseModel):
     percent:int

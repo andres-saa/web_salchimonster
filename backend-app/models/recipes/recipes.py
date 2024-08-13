@@ -52,8 +52,8 @@ class Recipe:
         # print(query)
 
         for item in data:
-            query=f'UPDATE inventory.purchase_prices set last_price_purchase = %s where ingredient_id = %s'
-            self.db.execute_query(query, [item.last_price_purchase, item.ingredient_id])
+            query=f'UPDATE inventory.purchase_prices set last_price_purchase = %s , iva = %s where ingredient_id = %s'
+            self.db.execute_query(query, [item.last_price_purchase, item.iva, item.ingredient_id])
 
 
     def set_main_percent_to_sell(self, id: int):

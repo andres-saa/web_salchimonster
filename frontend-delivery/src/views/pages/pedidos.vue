@@ -3,7 +3,7 @@
 
     <DialogoPedido>
 
-  </DialogoPedido>
+    </DialogoPedido>
 
     <div class="md:px-2 xl:pt-5 p-0 col-12 xl:col-4 top">
 
@@ -13,19 +13,19 @@
         <div style="height: 100%;width: 100%;">
           <p class="col-12 text-center shadow-4 " style="background-color: #ffffff61;">
             <span class="text-center text-2xl" style="color: black;font-weight: bold;"> <i class="pi pi-envelope
- text-2xl"></i> RECIBIDOS</span>
+            text-2xl"></i> RECIBIDOS</span>
           </p>
 
-        
+
 
           <div class="lg:pb-8" style="height: 100%; overflow-y: auto;">
 
             <div class="px-3 py-2"
               v-for="orden in store.TodayOrders.filter(orden => orden.current_status == 'generada')">
-              <OrderItem :order="orden"/>
+              <OrderItem :order="orden" />
             </div>
 
-           
+
           </div>
         </div>
 
@@ -41,7 +41,7 @@
 
 
 
-   <div class="md:px-2 xl:pt-5  p-0 col-12 xl:col-4 top">
+    <div class="md:px-2 xl:pt-5  p-0 col-12 xl:col-4 top">
       <div class=" shadow-4 contenedor pb-2" style="overflow: hidden; background-color:#8e3693
 ">
         <div style="height: 100%;width: 100%;">
@@ -54,15 +54,15 @@
           <div class="lg:pb-8" style="height: 100%; overflow-y: auto;">
 
             <div class="px-3 py-2"
-            v-for="orden in store.TodayOrders.filter(orden => orden.current_status == 'en preparacion')">
-              <OrderItem :order="orden"/>
+              v-for="orden in store.TodayOrders.filter(orden => orden.current_status == 'en preparacion')">
+              <OrderItem :order="orden" />
             </div>
 
 
-            
-          
 
-            
+
+
+
           </div>
 
 
@@ -85,15 +85,15 @@
           <div style="height: 100%; overflow-y: auto;">
 
             <div class="px-3 py-2"
-            v-for="orden in store.TodayOrders.filter(orden => orden.current_status == 'enviada')">
-              <OrderItem :order="orden"/>
+              v-for="orden in store.TodayOrders.filter(orden => orden.current_status == 'enviada')">
+              <OrderItem :order="orden" />
             </div>
 
 
           </div>
 
-      
-          
+
+
 
 
 
@@ -167,27 +167,28 @@ onMounted(() => {
 }
 
 
-.contenedor{
+.contenedor {
   height: calc(100vh - 8rem);
   border-radius: 0.5rem;
 }
 
-.top{
-  margin-top:0rem;
+.top {
+  margin-top: 0rem;
 }
 
-@media  ( max-width: 1200px)  {
+@media (max-width: 1200px) {
 
-  .contenedor{
+  .contenedor {
     height: 1000%;
     min-height: 20vh;
     margin: 0;
     border-radius: 0;
 
   }
-  .top{
-  margin-top:1rem;
-}
+
+  .top {
+    margin-top: 1rem;
+  }
 }
 
 .EN {

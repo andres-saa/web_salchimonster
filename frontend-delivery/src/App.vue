@@ -5,6 +5,10 @@ import { useOrderStore } from './store/order';
 import { useSitesStore } from './store/site';
 import { orderService } from './service/orderService';
 import { URI } from './service/conection';
+
+
+
+
 const sitestore = useSitesStore();
 const store = useOrderStore();
 
@@ -15,7 +19,7 @@ const requestNotificationPermission = async () => {
     }
 };
 
-
+3
 const playNotificationSound = () => {
     if (store.Notification.readyState >= 2) {
         store.Notification.play().then(() => {
