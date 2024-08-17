@@ -34,7 +34,7 @@
   <div style="width: 100%;height: 5px; background-color: #ff6200">
 
   </div>
-    SALCHIPAPAS
+    PROMOCIONES
 
     <div style="width: 100%;height: 5px; background-color:#ff6200">
 
@@ -93,7 +93,7 @@ watch(() => route.params.category_id, async () => {
 
 const getProducts = async (category_name) => {
   const site_id = siteStore.location.site.site_id
-  const category_id = 3
+  const category_id = 15
   if(category_id && site_id){
       store.setLoading(true, 'cargando productos')
       try {
