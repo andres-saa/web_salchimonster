@@ -81,16 +81,16 @@ const model = ref([
                 to: '/'
             },
 
-            {
-                label: 'Sedes',
-                icon: 'pi pi-fw pi-map-marker',
-                to: '/sedes'
-            },
-            {
-                label: 'Carta menu',
-                icon: 'pi pi-fw pi-info-circle',
-                to: '/menu'
-            },
+            // {
+            //     label: 'Sedes',
+            //     icon: 'pi pi-fw pi-map-marker',
+            //     to: '/sedes'
+            // },
+            // {
+            //     label: 'Carta menu',
+            //     icon: 'pi pi-fw pi-info-circle',
+            //     to: '/menu'
+            // },
 
             {
                 label: 'Rastrear pedido',
@@ -102,17 +102,17 @@ const model = ref([
                 icon: 'pi pi-fw pi-shopping-cart',
                 to: '/cart'
             },
-            {
-                label: 'Colaboraciones',
-                icon: 'pi pi-fw pi-info-circle',
-                to: '/colaboraciones'
-            },
+            // {
+            //     label: 'Colaboraciones',
+            //     icon: 'pi pi-fw pi-info-circle',
+            //     to: '/colaboraciones'
+            // },
 
-            {
-                label: 'PQRS',
-                icon: 'pi pi-fw pi-info-circle',
-                to: '/pqrs-user'
-            },
+            // {
+            //     label: 'PQRS',
+            //     icon: 'pi pi-fw pi-info-circle',
+            //     to: '/pqrs-user'
+            // },
             
             // {
             //     label: 'Finalizar compra',
