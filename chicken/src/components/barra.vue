@@ -8,7 +8,7 @@
   !route.path.includes('gracias')  " 
 
 class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bottom: 0; left: 0; ; justify-content: center">
-  <div v-if=" store.cart.products.length > 0 " :style="!showElement? 'transform: translateY(5rem);opacity:0': ''"  class="barra-carrito  px-5 " style=" 
+  <div v-if=" store.cart.products.length > 0 " :style="!showElement? 'transform: translateY(2rem);opacity:0': ''"  class="barra-carrito  px-5 " style=" 
                           
   /* width: auto; */
   display: flex;
@@ -21,6 +21,7 @@ class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bott
   max-width: min-content;
   /* z-index: 999;  */
   justify-content:center ;
+  border:  3px solid red;
   /* margin: auto; */
   /* touch-action: none;  */
   /* width: %;  */
@@ -116,7 +117,7 @@ class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bott
   </div>
 
 
-  <div v-if="!route.path.includes('cart') && !route.path.includes('pay')" class="whatsapp"  :style="!showElement? 'transform: translateX(-2.2rem)': ''"  style="">
+  <div v-if="!route.path.includes('cart') && !route.path.includes('pay')" class="whatsapp"  :style="!showElement? 'transform: translateX(-3rem)': ''"  style="">
  
 
     <a href="https://wa.link/5mq1t0">  <button class="whatsapp-btn p-1" style="
@@ -130,7 +131,7 @@ class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bott
  
      ">
            <i class="" :class="PrimeIcons.WHATSAPP"
-             style=" ;position: relative;  font-weight:  bold; font-size: 1.8rem; color: rgb(255, 255, 255);width:auto">
+             style=" position: relative;  font-weight:  bold; font-size: 2.5rem; color:#25D366 ;width:auto">
            </i>
          </button></a>
  
@@ -149,7 +150,7 @@ class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bott
  
      ">
            <i class="" :class="PrimeIcons.FACEBOOK"
-             style=" ;position: relative;  font-weight:  bold; font-size: 1.8rem; color: rgb(255, 255, 255);width:auto">
+             style=" ;position: relative;  font-weight:  bold; font-size: 2.5rem; color: rgb(255, 255, 255);color:#4267B2; width:auto">
            </i>
          </button>
          </a>
@@ -157,7 +158,7 @@ class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bott
          
 
          <a href="https://www.instagram.com/salchimonsterr/">  <button class="whatsapp-btn p-1" style="
-                             border: none; background-color:transparent; 
+                             border: none; background-color:transparent; color:#E1306C
                              transition: all ease .3s;
                              /* border-radius: 50%;  */
                              display: flex;align-items: center; justify-content: center;
@@ -167,7 +168,7 @@ class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bott
  
      ">
            <i class="" :class="PrimeIcons.INSTAGRAM"
-             style=" ;position: relative;  font-weight:  bold; font-size: 1.8rem; color: rgb(255, 255, 255);width:auto">
+             style=" ;position: relative;  font-weight:  bold; font-size: 2.5rem; color:#E1306C;width:auto">
            </i>
          </button></a>
 
@@ -183,7 +184,7 @@ class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bott
  
      ">
            <i class="" :class="PrimeIcons.YOUTUBE"
-             style=" ;position: relative;  font-weight:  bold; font-size: 1.8rem; color: rgb(255, 255, 255);width:auto">
+             style=" ;position: relative;  font-weight:  bold; font-size: 2.5rem; color: rgb(255, 0, 0);width:auto">
            </i>
          </button></a>
 
@@ -285,11 +286,11 @@ const enviarAlCarro = ()=> {
   transition: all .3s ease;
 }
 
-.background {
+/* .background {
 
   background: linear-gradient(to top, rgba(255, 255, 255, 1) , rgba(255, 255, 255, 0));
 
-}
+} */
 
 *{transition:  all .2s ease;}
 
@@ -543,7 +544,7 @@ const enviarAlCarro = ()=> {
 .whatsapp {
     /* background-color: red; */
     /* min-width: 1024px; */
-    width: 2.5rem;
+    width: 4rem;
     height: min-content;
     gap: .3rem;
     display: flex;
@@ -552,16 +553,20 @@ const enviarAlCarro = ()=> {
     transition: all ease .3s;
     left: 0rem;
     bottom: 9rem;
-    padding:  0.5rem 0;
+    padding:  0rem 0;
+    color: black;
 
     /* align-items: center; */
     justify-content: space-around;
-    background-color: var(--primary-color);
+    /* background-color: var(--primary-color); */
     border-radius: 0  1rem   1rem 0; 
     position: absolute;
-    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.391);
+    /* box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.391); */
  
   }
+
+
+  
 @media (max-width:500px)  {
   .whatsapp {
     /* background-color: red; */

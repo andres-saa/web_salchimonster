@@ -30,21 +30,24 @@
 
 
 
-  <p class="text-center text-3xl col-12 my-5" style="font-weight: bold;display: flex;gap: 1rem;align-items: center; flex-wrap: nowrap;justify-content: center;">
-  <div style="width: 100%;height: 5px; background-color: red">
 
-  </div>
+<p class="text-center text-3xl col-12 my-7" style="font-weight: bold;display: flex;border-radius:  1rem  1rem; gap: 1rem;align-items: center;background-color: red; justify-content: center;">
+  <!-- <div style="width: 100%;height: 5px; background-color: #ff6200">
 
-    <h2 class="m-0">
+  </div > -->
+
+
+    <h2 class="m-0 text-white">
+      <i class="fa-solid fa-drumstick-bite text-white"></i>
       <b>
         POLLO
       </b>
-      
+          
     </h2>
 
-  <div style="width: 100%;height: 5px; background-color:red">
+    <!-- <div style="width: 100%;height: 5px; background-color:#ff6200"> -->
 
-</div>
+<!-- </div> -->
     
 </p>
 
