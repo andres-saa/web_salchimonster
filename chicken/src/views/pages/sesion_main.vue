@@ -30,10 +30,11 @@
 
 
 
-  <p class="text-center text-3xl col-12 my-5" style="font-weight: bold;display: flex;gap: 1rem;align-items: center;">
+  <p class="text-center text-3xl col-12 my-5" style="font-weight: bold;display: flex;gap: 1rem;align-items: center; flex-wrap: nowrap;justify-content: center;">
   <div style="width: 100%;height: 5px; background-color: red">
 
   </div>
+
     <h2 class="m-0">
       <b>
         POLLO
@@ -41,7 +42,7 @@
       
     </h2>
 
-    <div style="width: 100%;height: 5px; background-color:red">
+  <div style="width: 100%;height: 5px; background-color:red">
 
 </div>
     
