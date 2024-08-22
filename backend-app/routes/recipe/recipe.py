@@ -18,6 +18,14 @@ def get_all_recipes():
 
 
 
+@recipe_router.get("/list-cdi-recipes" , tags=['recipe'])
+def get_all_recipes():
+    recipe_instance = Recipe()
+    result = recipe_instance.get_all_cdi_recipes()
+    return result
+
+
+
 @recipe_router.get("/list-recipes-enabled" , tags=['recipe'])
 def get_all_recipes():
     recipe_instance = Recipe()
@@ -53,6 +61,12 @@ def get_all_recipes(id:int, data:update):
 def get_all_recipes(product_id:int):
     recipe_instance = Recipe()
     result = recipe_instance.get_recipe_data_sheet_by_product_id(product_id)
+    return result
+
+@recipe_router.get("/list-cdi-recipe-by-recipe-id/{product_id}" , tags=['recipe'])
+def get_all_recipes(product_id:int):
+    recipe_instance = Recipe()
+    result = recipe_instance.get_cdi_recipe_data_sheet_by_product_id(product_id)
     return result
 
 @recipe_router.get("/get-recipe-summary-benefit" , tags=['recipe'])

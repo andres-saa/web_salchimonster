@@ -18,7 +18,7 @@ from routes.grupo_adicionales import grupo_adicionales_router,grupo_toppings_rou
 from routes.employer.employer import employer_router
 from routes.site_document import site_document_router
 from routes.login import login
-# from routes.permission import permission_router
+from routes.permission import permission_employer_router
 from routes.form import form_router
 from routes.training import training_router, attendee_router, assigned_attendee_router
 from routes.training_document import training_document_router
@@ -64,6 +64,7 @@ app.add_middleware(
 
 
 app.include_router(salchigest_router)
+app.include_router(permission_employer_router)
 app.include_router(permission_router)
 app.include_router(contract_router)
 app.include_router(student_router)

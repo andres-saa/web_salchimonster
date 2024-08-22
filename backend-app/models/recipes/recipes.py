@@ -83,6 +83,11 @@ class Recipe:
         return self.db.fetch_all(query)
     
 
+    def get_all_cdi_recipes(self):
+        query = self.db.build_select_query(table_name='recipes.cdi_ingredient_view_list',fields=['*'],order_by='id')
+        return self.db.fetch_all(query)
+    
+
     def get_cdi_prices_table(self):
         query = self.db.build_select_query(table_name='recipes.ingredient_main_value',fields=['*'],)
         return self.db.fetch_all(query)
@@ -160,6 +165,40 @@ class Recipe:
         ingredients = self.db.fetch_all(query2)
         
         return {'recipe_data_sheet': result[0], 'ingredients': ingredients}
+
+
+
+
+
+
+    def get_cdi_recipe_data_sheet_by_product_id(self, id: int) -> Dict[str, List[Dict]]:
+   
+
+        query = self.db.build_select_query(
+                table_name='recipes.cdi_recipe_view',
+                fields=['*'],
+                condition=f'id = {id}'
+            )
+        
+        result = self.db.fetch_all(query)
+        
+        query2 = self.db.build_select_query(
+            table_name='recipes.cdi_recipe_ingredients_view',
+            fields=['*'],
+            condition=f'cdi_recipe_data_sheet_id = {id}',order_by='ingredient_id'
+        )
+
+        ingredients = self.db.fetch_all(query2)
+
+
+        query3 = self.db.build_select_query(
+            table_name='recipes.cdi_ingredient_view_list',
+            fields=['*'],
+            condition=f'id = {id}',order_by='id'
+        )
+        recipe = self.db.fetch_all(query3)
+        
+        return {'recipe_data_sheet': result[0], 'ingredients': ingredients, 'recipe':recipe[0]}
 
     
 
