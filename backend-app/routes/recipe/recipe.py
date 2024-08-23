@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from models.recipes.recipes import Recipe # Asume que tienes un módulo models con RecipeManager
 # from schema.recipes.re import Recipe  # Asume que tienes un módulo schema con Recipe
-from schema.recipes.recipe_data_seet import RecipeDataSheet,RecipeDataSheetPost,RecipeDataSheetUpdate,cdi_percent,update_cdi_percent,updateLastPurchasePrice
+from schema.recipes.recipe_data_seet import RecipeDataSheet,RecipeDataSheetPost,RecipeDataSheetUpdate,cdi_percent,update_cdi_percent,updateLastPurchasePrice,post_cdi_recipe_data_sheet
 from schema.recipes.ingredients import IngredientsPost,IngredientsUpdate
-from schema.recipes.ingredients import RecipeDataIngredients
+from schema.recipes.ingredients import RecipeDataIngredients,CdiRecipeDataIngredients
 from typing import List
 recipe_router = APIRouter()
 from pydantic import BaseModel
@@ -106,10 +106,24 @@ def get_all_recipes(data:RecipeDataSheetPost):
     return result
 
 
+
+@recipe_router.post("/create-cdi-recipe-data-sheet" , tags=['recipe'])
+def get_all_recipes(data:post_cdi_recipe_data_sheet):
+    recipe_instance = Recipe()
+    result = recipe_instance.create_cdi_recipe_data_sheet(data)
+    return result
+
 @recipe_router.post("/create-recipe-data-ingredient" , tags=['recipe'])
 def get_all_recipes(data:RecipeDataIngredients):
     recipe_instance = Recipe()
     result = recipe_instance.create_recipe_data_ingredient(data)
+    return result
+
+
+@recipe_router.post("/create-cdi-recipe-data-ingredient" , tags=['recipe'])
+def get_all_recipes(data:CdiRecipeDataIngredients):
+    recipe_instance = Recipe()
+    result = recipe_instance.create_cdi_recipe_data_ingredient(data)
     return result
 
 
@@ -119,10 +133,24 @@ def get_all_recipes(id:int):
     result = recipe_instance.delete_recipe_data_ingredient(id)
     return result
 
+
+@recipe_router.delete("/delete-cdi-recipe-data-ingredient/{id}" , tags=['recipe'])
+def get_all_recipes(id:int):
+    recipe_instance = Recipe()
+    result = recipe_instance.delete_cdi_recipe_data_ingredient(id)
+    return result
+
 @recipe_router.put("/update-recipe-data-ingredient/{id}" , tags=['recipe'])
 def get_all_recipes(id:int,data:RecipeDataIngredients):
     recipe_instance = Recipe()
     result = recipe_instance.update_recipe_data_ingredient(id,data)
+    return result
+
+
+@recipe_router.put("/update-cdi-recipe-data-ingredient/{id}" , tags=['recipe'])
+def get_all_recipes(id:int,data:CdiRecipeDataIngredients):
+    recipe_instance = Recipe()
+    result = recipe_instance.update_cdi_recipe_data_ingredient(id,data)
     return result
 
 @recipe_router.post("/create-ingredient" , tags=['recipe'])

@@ -50,3 +50,17 @@ class RecipeDataSheetDelete (BaseModel):
     exist:bool = False
 
 
+class CdiRecipeDataSheet (BaseModel):
+    name:str
+    iva:float
+    pasamanos:bool
+
+
+class cdi_recipe_data_sheet_on_ingredient (BaseModel):
+    unit_measure_id:int
+    convert_value:float
+    cdi_recipe_data_sheet_id:Optional[int] = None
+
+class post_cdi_recipe_data_sheet (BaseModel):
+    cdi_recipe_data_sheet:CdiRecipeDataSheet
+    cdi_recipe_data_sheet_on_ingredient:cdi_recipe_data_sheet_on_ingredient

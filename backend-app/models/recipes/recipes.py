@@ -2,11 +2,12 @@ from typing import Optional
 from pydantic import BaseModel
 import psycopg2
 from dotenv import load_dotenv
+import asyncio
 import os
 from db.db import Db as DataBase
 from schema.video_training.sesion import Sesion as sesion_schema, SesionUpdate as sesion_update_schema
-from schema.recipes.recipe_data_seet import RecipeDataSheet,RecipeDataSheetPost,RecipeDataSheetUpdate,cdi_percent,update_cdi_percent,updateLastPurchasePrice
-from schema.recipes.ingredients import RecipeDataIngredients
+from schema.recipes.recipe_data_seet import RecipeDataSheet,cdi_recipe_data_sheet_on_ingredient, RecipeDataSheetPost,RecipeDataSheetUpdate,post_cdi_recipe_data_sheet,cdi_percent,update_cdi_percent,updateLastPurchasePrice,cdi_recipe_data_sheet_on_ingredient,CdiRecipeDataSheet
+from schema.recipes.ingredients import RecipeDataIngredients,CdiRecipeDataIngredients
 from schema.video_training.user_sequence import ReplaceUserSequencesInput
 from schema.video_training.video import markVideo
 from datetime import time
@@ -207,16 +208,61 @@ class Recipe:
         return self.db.execute_query(query,params,True)
     
 
+    def  create_cdi_recipe_data_sheet(self,data:post_cdi_recipe_data_sheet):
+        query , params = self.db.build_insert_query('recipes.cdi_recipe_data_sheet',data.cdi_recipe_data_sheet,'id')
+
+        recipe_data_sheet_id =  self.db.execute_query(query,params,True)[0]['id']
+
+
+        new_recipe_on_ingredient = cdi_recipe_data_sheet_on_ingredient(
+            unit_measure_id = data.cdi_recipe_data_sheet_on_ingredient.unit_measure_id,
+            convert_value =  data.cdi_recipe_data_sheet_on_ingredient.convert_value,
+            cdi_recipe_data_sheet_id = recipe_data_sheet_id
+        )
+
+
+
+        new_data = new_recipe_on_ingredient
+
+        query2 , params2 = self.db.build_insert_query('recipes.cdi_recipe_data_sheet_on_ingredient',new_recipe_on_ingredient,'id')
+
+        recipe_data_sheet_id2 = self.db.execute_query(query2,params2,True)
+
+        print(query2, params2)
+
+
+
+        return recipe_data_sheet_id
+    
+
+    
+
     def create_recipe_data_ingredient(self,data:RecipeDataIngredients):
         query, params = self.db.build_insert_query('recipes.recipe_data_ingredient',data,'id')
         return self.db.execute_query(query=query, params=params,fetch=True)
+    
+
+
+    def create_cdi_recipe_data_ingredient(self,data:CdiRecipeDataIngredients):
+        query, params = self.db.build_insert_query('recipes.cdi_recipe_data_ingredient',data,'id')
+        return self.db.execute_query(query=query, params=params,fetch=True)
+
     
     def delete_recipe_data_ingredient(self,id):
         query = 'DELETE from recipes.recipe_data_ingredient where id = %s'
         return self.db.execute_query(query=query,params=[id])
     
+
+    def delete_cdi_recipe_data_ingredient(self,id):
+        query = 'DELETE from recipes.cdi_recipe_data_ingredient where id = %s'
+        return self.db.execute_query(query=query,params=[id])
+    
     def update_recipe_data_ingredient(self,id,data:RecipeDataIngredients):
         query, params = self.db.build_update_query('recipes.recipe_data_ingredient',data,f'id = {id}','id')
+        return self.db.execute_query(query=query,params=params,fetch=True)
+    
+    def update_cdi_recipe_data_ingredient(self,id,data:CdiRecipeDataIngredients):
+        query, params = self.db.build_update_query('recipes.cdi_recipe_data_ingredient',data,f'id = {id}','id')
         return self.db.execute_query(query=query,params=params,fetch=True)
     
 

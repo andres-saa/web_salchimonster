@@ -47,3 +47,9 @@ class RecipeDataIngredientsUpdate (IngredientsPost):
 
 
 
+class CdiRecipeDataIngredients (BaseModel):
+    ingredient_id:int
+    cdi_recipe_data_sheet_id:int
+    unit_measure_id:int
+    quantity:float
+
