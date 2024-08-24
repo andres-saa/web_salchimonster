@@ -6,7 +6,7 @@ import asyncio
 import os
 from db.db import Db as DataBase
 from schema.video_training.sesion import Sesion as sesion_schema, SesionUpdate as sesion_update_schema
-from schema.recipes.recipe_data_seet import RecipeDataSheet,cdi_recipe_data_sheet_on_ingredient, RecipeDataSheetPost,RecipeDataSheetUpdate,post_cdi_recipe_data_sheet,cdi_percent,update_cdi_percent,updateLastPurchasePrice,cdi_recipe_data_sheet_on_ingredient,CdiRecipeDataSheet
+from schema.recipes.recipe_data_seet import RecipeDataSheet,cdi_recipe_data_sheet_on_ingredient,post_cdi_recipe_data_sheet_pasamanos, RecipeDataSheetPost,RecipeDataSheetUpdate,post_cdi_recipe_data_sheet,cdi_percent,update_cdi_percent,updateLastPurchasePrice,cdi_recipe_data_sheet_on_ingredient,CdiRecipeDataSheet
 from schema.recipes.ingredients import RecipeDataIngredients,CdiRecipeDataIngredients
 from schema.video_training.user_sequence import ReplaceUserSequencesInput
 from schema.video_training.video import markVideo
@@ -85,7 +85,11 @@ class Recipe:
     
 
     def get_all_cdi_recipes(self):
-        query = self.db.build_select_query(table_name='recipes.cdi_ingredient_view_list',fields=['*'],order_by='id')
+        query = self.db.build_select_query(table_name='recipes.cdi_ingredient_view_list',fields=['*'],order_by='id' , condition='pasamanos = false')
+        return self.db.fetch_all(query)
+    
+    def get_all_cdi_recipes_pasamanos(self):
+        query = self.db.build_select_query(table_name='recipes.cdi_ingredient_view_list',fields=['*'],order_by='id',condition='pasamanos = true')
         return self.db.fetch_all(query)
     
 
@@ -233,6 +237,51 @@ class Recipe:
 
 
         return recipe_data_sheet_id
+    
+
+
+    def  create_cdi_recipe_data_sheet_pasamanos(self,data:post_cdi_recipe_data_sheet_pasamanos):
+        query , params = self.db.build_insert_query('recipes.cdi_recipe_data_sheet',data.cdi_recipe_data_sheet,'id')
+
+        recipe_data_sheet_id =  self.db.execute_query(query,params,True)[0]['id']
+
+
+        new_recipe_on_ingredient = cdi_recipe_data_sheet_on_ingredient(
+            unit_measure_id = data.cdi_recipe_data_sheet_on_ingredient.unit_measure_id,
+            convert_value =  data.cdi_recipe_data_sheet_on_ingredient.convert_value,
+            cdi_recipe_data_sheet_id = recipe_data_sheet_id
+        )
+
+
+
+        new_data = new_recipe_on_ingredient
+
+        query2 , params2 = self.db.build_insert_query('recipes.cdi_recipe_data_sheet_on_ingredient',new_recipe_on_ingredient,'id')
+
+        recipe_data_sheet_id2 = self.db.execute_query(query2,params2,True)[0]['id']
+
+
+
+        ingredient = CdiRecipeDataIngredients (
+
+            ingredient_id = data.cdi_recipe_data_Ingredient.ingredient_id,
+            cdi_recipe_data_sheet_id = recipe_data_sheet_id,
+            unit_measure_id = data.cdi_recipe_data_sheet_on_ingredient.unit_measure_id,
+            quantity = 1
+
+        )
+            
+
+
+        self.create_cdi_recipe_data_ingredient(ingredient)
+
+        print(query2, params2)
+
+
+
+        return recipe_data_sheet_id
+    
+    
     
 
     

@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from models.recipes.recipes import Recipe # Asume que tienes un módulo models con RecipeManager
 # from schema.recipes.re import Recipe  # Asume que tienes un módulo schema con Recipe
-from schema.recipes.recipe_data_seet import RecipeDataSheet,RecipeDataSheetPost,RecipeDataSheetUpdate,cdi_percent,update_cdi_percent,updateLastPurchasePrice,post_cdi_recipe_data_sheet
+from schema.recipes.recipe_data_seet import RecipeDataSheet,RecipeDataSheetPost,RecipeDataSheetUpdate,cdi_percent,update_cdi_percent,updateLastPurchasePrice,post_cdi_recipe_data_sheet,post_cdi_recipe_data_sheet_pasamanos
 from schema.recipes.ingredients import IngredientsPost,IngredientsUpdate
 from schema.recipes.ingredients import RecipeDataIngredients,CdiRecipeDataIngredients
 from typing import List
@@ -22,6 +22,13 @@ def get_all_recipes():
 def get_all_recipes():
     recipe_instance = Recipe()
     result = recipe_instance.get_all_cdi_recipes()
+    return result
+
+
+@recipe_router.get("/list-cdi-recipes-pasamanos" , tags=['recipe'])
+def get_all_recipes():
+    recipe_instance = Recipe()
+    result = recipe_instance.get_all_cdi_recipes_pasamanos()
     return result
 
 
@@ -111,6 +118,14 @@ def get_all_recipes(data:RecipeDataSheetPost):
 def get_all_recipes(data:post_cdi_recipe_data_sheet):
     recipe_instance = Recipe()
     result = recipe_instance.create_cdi_recipe_data_sheet(data)
+    return result
+
+
+
+@recipe_router.post("/create-cdi-recipe-data-sheet-pasamanos" , tags=['recipe'])
+def get_all_recipes(data:post_cdi_recipe_data_sheet_pasamanos):
+    recipe_instance = Recipe()
+    result = recipe_instance.create_cdi_recipe_data_sheet_pasamanos(data)
     return result
 
 @recipe_router.post("/create-recipe-data-ingredient" , tags=['recipe'])

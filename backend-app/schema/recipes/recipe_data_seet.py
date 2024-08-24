@@ -61,6 +61,20 @@ class cdi_recipe_data_sheet_on_ingredient (BaseModel):
     convert_value:float
     cdi_recipe_data_sheet_id:Optional[int] = None
 
+
+class CdiRecipeDataIngredients (BaseModel):
+    ingredient_id:int
+    cdi_recipe_data_sheet_id:int
+    unit_measure_id:int
+    quantity:float
+
 class post_cdi_recipe_data_sheet (BaseModel):
     cdi_recipe_data_sheet:CdiRecipeDataSheet
     cdi_recipe_data_sheet_on_ingredient:cdi_recipe_data_sheet_on_ingredient
+
+
+
+class post_cdi_recipe_data_sheet_pasamanos (BaseModel):
+    cdi_recipe_data_sheet:CdiRecipeDataSheet
+    cdi_recipe_data_sheet_on_ingredient:cdi_recipe_data_sheet_on_ingredient
+    cdi_recipe_data_Ingredient: CdiRecipeDataIngredients
