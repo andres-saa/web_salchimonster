@@ -26,6 +26,7 @@ class RecipeDataSheetUpdate (BaseModel):
 
 
 class updateLastPurchasePrice(BaseModel):
+    name:str
     ingredient_id:int
     last_price_purchase:float
     iva:float
@@ -51,6 +52,7 @@ class RecipeDataSheetDelete (BaseModel):
 
 
 class CdiRecipeDataSheet (BaseModel):
+    ingredient_id:Optional[int] = None
     name:str
     iva:float
     pasamanos:bool

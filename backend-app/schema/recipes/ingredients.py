@@ -53,3 +53,14 @@ class CdiRecipeDataIngredients (BaseModel):
     unit_measure_id:int
     quantity:float
 
+
+
+class newRecipeDataIngredients (BaseModel):
+    recipe_data_sheet_id:int
+    cdi_recipe_data_sheet_id:int
+    unit_measure_id:int
+    quantity:float
+    quantity_before_shrinkage:float
+
+
+

@@ -6,8 +6,8 @@ import asyncio
 import os
 from db.db import Db as DataBase
 from schema.video_training.sesion import Sesion as sesion_schema, SesionUpdate as sesion_update_schema
-from schema.recipes.recipe_data_seet import RecipeDataSheet,cdi_recipe_data_sheet_on_ingredient,post_cdi_recipe_data_sheet_pasamanos, RecipeDataSheetPost,RecipeDataSheetUpdate,post_cdi_recipe_data_sheet,cdi_percent,update_cdi_percent,updateLastPurchasePrice,cdi_recipe_data_sheet_on_ingredient,CdiRecipeDataSheet
-from schema.recipes.ingredients import RecipeDataIngredients,CdiRecipeDataIngredients
+from schema.recipes.recipe_data_seet import RecipeDataSheet,cdi_recipe_data_sheet_on_ingredient,post_cdi_recipe_data_sheet_pasamanos,CdiRecipeDataSheet, RecipeDataSheetPost,RecipeDataSheetUpdate,post_cdi_recipe_data_sheet,cdi_percent,update_cdi_percent,updateLastPurchasePrice,cdi_recipe_data_sheet_on_ingredient,CdiRecipeDataSheet
+from schema.recipes.ingredients import RecipeDataIngredients,CdiRecipeDataIngredients,newRecipeDataIngredients
 from schema.video_training.user_sequence import ReplaceUserSequencesInput
 from schema.video_training.video import markVideo
 from datetime import time
@@ -54,7 +54,9 @@ class Recipe:
 
         for item in data:
             query=f'UPDATE inventory.purchase_prices set last_price_purchase = %s , iva = %s where ingredient_id = %s'
+            query2=f'UPDATE recipes.cdi_recipe_data_sheet set name = %s , iva = %s where ingredient_id = %s'
             self.db.execute_query(query, [item.last_price_purchase, item.iva, item.ingredient_id])
+            self.db.execute_query(query2, [item.name, item.iva, item.ingredient_id])
 
 
     def set_main_percent_to_sell(self, id: int):
@@ -84,12 +86,25 @@ class Recipe:
         return self.db.fetch_all(query)
     
 
+    def to_pt(self, cdi_recipe_data_sheet_id:int):
+        query = "update recipes.cdi_recipe_data_sheet set pasamanos = false where id = %s"
+        return self.db.execute_query(query, params=[cdi_recipe_data_sheet_id])
+
+    def to_pasamanos(self, cdi_recipe_data_sheet_id:int):
+        query = "update recipes.cdi_recipe_data_sheet set pasamanos = true where id = %s"
+        return self.db.execute_query(query, params=[cdi_recipe_data_sheet_id])
+    
+
     def get_all_cdi_recipes(self):
         query = self.db.build_select_query(table_name='recipes.cdi_ingredient_view_list',fields=['*'],order_by='id' , condition='pasamanos = false')
         return self.db.fetch_all(query)
     
     def get_all_cdi_recipes_pasamanos(self):
         query = self.db.build_select_query(table_name='recipes.cdi_ingredient_view_list',fields=['*'],order_by='id',condition='pasamanos = true')
+        return self.db.fetch_all(query)
+    
+    def get_all_cdi_recipes_all(self):
+        query = self.db.build_select_query(table_name='recipes.cdi_ingredient_view_list',fields=['*'],order_by='id')
         return self.db.fetch_all(query)
     
 
@@ -162,14 +177,17 @@ class Recipe:
             raise Exception(f"Failed to retrieve or create recipe data sheet for product_id {id}")
         
         recipe_data_sheet_id = result[0]['id']
+
         query2 = self.db.build_select_query(
-            table_name='recipes.recipe_ingredients_view',
+            table_name='recipes.new_recipe_ingredients_view',
             fields=['*'],
-            condition=f'recipe_data_sheet_id = {recipe_data_sheet_id}',order_by='id'
+            condition=f'recipe_data_sheet_id = {recipe_data_sheet_id}',order_by='ingredient_name'
         )
         ingredients = self.db.fetch_all(query2)
         
         return {'recipe_data_sheet': result[0], 'ingredients': ingredients}
+
+
 
 
 
@@ -295,8 +313,15 @@ class Recipe:
     def create_cdi_recipe_data_ingredient(self,data:CdiRecipeDataIngredients):
         query, params = self.db.build_insert_query('recipes.cdi_recipe_data_ingredient',data,'id')
         return self.db.execute_query(query=query, params=params,fetch=True)
-
     
+    
+
+    def create_new_recipe_data_ingredient(self,data:newRecipeDataIngredients):
+        query, params = self.db.build_insert_query('recipes.new_recipe_data_ingredient',data,'id')
+        return self.db.execute_query(query=query, params=params,fetch=True)
+
+
+
     def delete_recipe_data_ingredient(self,id):
         query = 'DELETE from recipes.recipe_data_ingredient where id = %s'
         return self.db.execute_query(query=query,params=[id])
@@ -318,6 +343,24 @@ class Recipe:
     def update_recipe_data_sheet(self,id:int,data:RecipeDataSheetUpdate):
         query, params = self.db.build_update_query(
             table_name='recipes.recipe_data_sheet',
+            data=data, 
+            condition=f'id = {id}',
+            returning='id')
+        return self.db.execute_query(query,params,True)
+    
+
+    def update_recipe_data_sheet(self,id:int,data:RecipeDataSheetUpdate):
+        query, params = self.db.build_update_query(
+            table_name='recipes.recipe_data_sheet',
+            data=data, 
+            condition=f'id = {id}',
+            returning='id')
+        return self.db.execute_query(query,params,True)
+    
+
+    def update_cdi_recipe_data_sheet(self,id:int,data:CdiRecipeDataSheet):
+        query, params = self.db.build_update_query(
+            table_name='recipes.cdi_recipe_data_sheet',
             data=data, 
             condition=f'id = {id}',
             returning='id')

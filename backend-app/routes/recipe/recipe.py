@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from models.recipes.recipes import Recipe # Asume que tienes un módulo models con RecipeManager
 # from schema.recipes.re import Recipe  # Asume que tienes un módulo schema con Recipe
-from schema.recipes.recipe_data_seet import RecipeDataSheet,RecipeDataSheetPost,RecipeDataSheetUpdate,cdi_percent,update_cdi_percent,updateLastPurchasePrice,post_cdi_recipe_data_sheet,post_cdi_recipe_data_sheet_pasamanos
+from schema.recipes.recipe_data_seet import RecipeDataSheet,RecipeDataSheetPost,RecipeDataSheetUpdate,cdi_percent,CdiRecipeDataSheet, update_cdi_percent,updateLastPurchasePrice,post_cdi_recipe_data_sheet,post_cdi_recipe_data_sheet_pasamanos
 from schema.recipes.ingredients import IngredientsPost,IngredientsUpdate
-from schema.recipes.ingredients import RecipeDataIngredients,CdiRecipeDataIngredients
+from schema.recipes.ingredients import RecipeDataIngredients,CdiRecipeDataIngredients,newRecipeDataIngredients
 from typing import List
 recipe_router = APIRouter()
 from pydantic import BaseModel
@@ -25,10 +25,35 @@ def get_all_recipes():
     return result
 
 
+
+@recipe_router.post("/pasamanos_to_pt/{cdi_recipe_data_sheet_id}" , tags=['recipe'])
+def get_all_recipes(cdi_recipe_data_sheet_id:int):
+    recipe_instance = Recipe()
+    result = recipe_instance.to_pt(cdi_recipe_data_sheet_id)
+    return result
+
+
+
+
+
+@recipe_router.post("/pt_to_pasamanos/{cdi_recipe_data_sheet_id}" , tags=['recipe'])
+def get_all_recipes(cdi_recipe_data_sheet_id:int):
+    recipe_instance = Recipe()
+    result = recipe_instance.to_pasamanos(cdi_recipe_data_sheet_id)
+    return result
+
+
 @recipe_router.get("/list-cdi-recipes-pasamanos" , tags=['recipe'])
 def get_all_recipes():
     recipe_instance = Recipe()
     result = recipe_instance.get_all_cdi_recipes_pasamanos()
+    return result
+
+
+@recipe_router.get("/list-cdi-recipes-all" , tags=['recipe'])
+def get_all_recipes():
+    recipe_instance = Recipe()
+    result = recipe_instance.get_all_cdi_recipes_all()
     return result
 
 
@@ -135,6 +160,16 @@ def get_all_recipes(data:RecipeDataIngredients):
     return result
 
 
+
+
+
+
+@recipe_router.post("/create-new-recipe-data-ingredient" , tags=['recipe'])
+def get_all_recipes(data:newRecipeDataIngredients):
+    recipe_instance = Recipe()
+    result = recipe_instance.create_new_recipe_data_ingredient(data)
+    return result
+
 @recipe_router.post("/create-cdi-recipe-data-ingredient" , tags=['recipe'])
 def get_all_recipes(data:CdiRecipeDataIngredients):
     recipe_instance = Recipe()
@@ -209,6 +244,13 @@ def get_all_recipes(id:int,data:RecipeDataSheetUpdate):
     recipe_instance = Recipe()
     result = recipe_instance.update_recipe_data_sheet(id,data)
     return result
+
+@recipe_router.put("/update-cdi-recipe-data-sheet/{id}" , tags=['recipe'])
+def get_all_recipes(id:int,data:CdiRecipeDataSheet):
+    recipe_instance = Recipe()
+    result = recipe_instance.update_cdi_recipe_data_sheet(id,data)
+    return result
+
 
 
 @recipe_router.put("/update-bulk-last-purchase-price" , tags=['bulk'])
