@@ -19,7 +19,7 @@ class Permission:
 
 
     def get_all_rol(self):
-        query = self.db.build_select_query(table_name='permission.rol',fields=['*'],)
+        query = self.db.build_select_query(table_name='permission.rol',fields=['*'],condition='exist = true')
         return self.db.fetch_all(query)
     
     def get_all_rol_by_rol_id(self,rol_id):
