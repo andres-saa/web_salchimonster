@@ -16,6 +16,14 @@ class IngredientsPost (BaseModel):
     purchasing_format_id:Optional[int] = None
     net_gross_weight:float
     shrinkage_persent:Optional[float] = None
+    iva:Optional[float] = None
+
+
+
+class cdi_price (BaseModel):
+    ingredient_id:int
+    last_price_purchase : float
+    iva: float
    
 
 class IngredientsUpdate (BaseModel):

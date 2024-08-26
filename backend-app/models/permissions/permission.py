@@ -9,6 +9,7 @@ from schema.recipes.recipe_data_seet import RecipeDataSheet,RecipeDataSheetPost,
 from schema.video_training.user_sequence import ReplaceUserSequencesInput
 from schema.video_training.video import markVideo
 from schema.recipes.ingredients import IngredientsPost,IngredientsUpdate
+from schema.permision.permision import toggle_permision
 from datetime import time
 from typing import Dict, List
 
@@ -20,6 +21,29 @@ class Permission:
     def get_all_rol(self):
         query = self.db.build_select_query(table_name='permission.rol',fields=['*'],)
         return self.db.fetch_all(query)
+    
+    def get_all_rol_by_rol_id(self,rol_id):
+        query = self.db.build_select_query(table_name='permission.permission_rol',fields=['*'],condition=f"rol_id = {rol_id}")
+        return self.db.fetch_all(query)
+    
+
+    def toggle_permisssion(self,datos:toggle_permision,id:int,status:bool):
+        
+
+
+
+
+
+        
+        if (status):
+            query , params = self.db.build_insert_query(table_name='permission.permission_rol',data=datos,returning='id')
+            return self.db.execute_query(query,params,fetch=False)
+
+        
+
+        delete = self.db.build_delete_query(table_name='permission.permission_rol',condition=f"id = {id}")
+        self.db.execute_query(delete,params=[]) 
+    
     
     def get_all_permission(self):
         query = self.db.build_select_query(table_name='permission.permission',fields=['*'],)

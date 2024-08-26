@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 
@@ -11,4 +12,10 @@ class RolPost (BaseModel):
 class Rol (RolPost):
     id:int
 
+
+
+
+class toggle_permision(BaseModel):
+    rol_id:int
+    permission_id:int
 

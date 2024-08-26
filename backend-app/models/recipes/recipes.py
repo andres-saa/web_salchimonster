@@ -96,15 +96,15 @@ class Recipe:
     
 
     def get_all_cdi_recipes(self):
-        query = self.db.build_select_query(table_name='recipes.cdi_ingredient_view_list',fields=['*'],order_by='id' , condition='pasamanos = false')
+        query = self.db.build_select_query(table_name='recipes.cdi_ingredient_view_list',fields=['*'], condition='pasamanos = false')
         return self.db.fetch_all(query)
     
     def get_all_cdi_recipes_pasamanos(self):
-        query = self.db.build_select_query(table_name='recipes.cdi_ingredient_view_list',fields=['*'],order_by='id',condition='pasamanos = true')
+        query = self.db.build_select_query(table_name='recipes.cdi_ingredient_view_list',fields=['*'],condition='pasamanos = true')
         return self.db.fetch_all(query)
     
     def get_all_cdi_recipes_all(self):
-        query = self.db.build_select_query(table_name='recipes.cdi_ingredient_view_list',fields=['*'],order_by='id')
+        query = self.db.build_select_query(table_name='recipes.cdi_ingredient_view_list',fields=['*'])
         return self.db.fetch_all(query)
     
 
@@ -323,7 +323,7 @@ class Recipe:
 
 
     def delete_recipe_data_ingredient(self,id):
-        query = 'DELETE from recipes.recipe_data_ingredient where id = %s'
+        query = 'DELETE from recipes.new_recipe_data_ingredient where id = %s'
         return self.db.execute_query(query=query,params=[id])
     
 
