@@ -482,7 +482,7 @@ class PurchaseOrder:
                 item.unit_measure_id
             ))
         self.conn.commit()
-        self.create_or_update_event( 5, site_id, responsible_id, '2 minutes',False)
+        self.create_or_update_event( 5, site_id, responsible_id, '1 minutes',False)
 
         return order_id
     

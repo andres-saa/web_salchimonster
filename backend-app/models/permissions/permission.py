@@ -29,12 +29,6 @@ class Permission:
 
     def toggle_permisssion(self,datos:toggle_permision,id:int,status:bool):
         
-
-
-
-
-
-        
         if (status):
             query , params = self.db.build_insert_query(table_name='permission.permission_rol',data=datos,returning='id')
             return self.db.execute_query(query,params,fetch=False)
