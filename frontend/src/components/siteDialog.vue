@@ -146,12 +146,7 @@ const cart = usecartStore()
 
 watch(() =>  store.location.site.site_id ,() => {
     
-    cart.cart =  {
-          products: [],
-          total_cost: 0,
-          additions: [],
     
-}
 
 location.reload()
 
