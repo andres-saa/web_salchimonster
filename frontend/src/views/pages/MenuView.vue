@@ -6,7 +6,7 @@
     
 
 
-  <CarouselBanner v-if="route.path == '/'" />
+  <CarouselBanner />
   <!-- <img src="/images/banners/banner-1.jpeg" class="pb-6" alt="" style="width: 100%; "> -->
   <!-- <Button  style="position: sticky;top:rem;z-index: 1000; left:-0.5rem;" severity="help" text icon="pi pi-angle-left text-4xl"></Button> -->
 

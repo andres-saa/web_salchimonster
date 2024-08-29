@@ -43,6 +43,14 @@ const router = createRouter({
               component: () => import('@/views/pages/sesion.vue'),
               meta: { title:'MENU' },
             },
+
+            {
+              path: '/:menu_name/:category_id/:product_name/:product_id',
+              name: 'sesion_2',
+              component: () => import('@/views/pages/sesion.vue'),
+              meta: { title:'MENU' },
+            },
+
             {
               path: '/',
               name: 'main',

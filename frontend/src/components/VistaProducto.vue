@@ -221,10 +221,10 @@ import { adicionalesService } from '../service/restaurant/aditionalService';
 import { useSitesStore } from '../store/site';
 
 const sonido = new Audio('/sounds/sarpazo.mp3')
-
+const route = useRoute();
 const selectedAdditions = ref({});
 
-
+const store = usecartStore()
 const see = ref(false)
 
 const seeImage = () => {
@@ -235,7 +235,30 @@ const seeImage = () => {
 
 const reset = () => {
   see.value = seeLeftHand.value = seeRightHand.value = false
+  
 }
+
+
+watch(() => store.visibles.currentProduct, (newval) => {
+
+
+  if (newval){
+    return
+  }
+
+  const new_route = `/${route.params.menu_name}/${route.params.category_id}`
+
+
+  if(route.path != '/'){
+    router.push(new_route)
+  }
+
+
+
+
+
+
+})
 
 const seeLeftHand = ref(false)
 
@@ -314,7 +337,7 @@ const addToCart = (product) => {
 };
 
 const adicionales = ref([])
-const store = usecartStore()
+
 
 const checkedAdition = ref({})
 
@@ -322,7 +345,7 @@ const checkedAdition = ref({})
 
 const salsas = ref()
 const cambios = ref()
-const route = useRoute();
+
 // const adicionales = ref()
 const toppings = ref()
 const acompanantes = ref()

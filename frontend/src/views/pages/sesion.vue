@@ -54,7 +54,7 @@
 </div>
 
 
-
+    
 
 
 
@@ -81,8 +81,63 @@ const route = useRoute(); // Usando useRoute para acceder a los parámetros de l
 
 
 onMounted(async () => {
+
+
+
+
+
     getProducts();
     await nextTick();
+
+
+
+
+
+    const product_id = route.params.product_id
+
+    
+
+    if (product_id) {
+        const product = await getProductById(product_id)
+
+
+        // {
+        //     "product_instance_id": 780,
+        //     "product_id": 85,
+        //     "product_name": "BACONMONSTER",
+        //     "product_description": "PAPA AMARILLA, SALCHICHA PREMIUM SM, QUESO GRATINADO, BACON, QUESO CHEDDAR Y SALSAS.",
+        //     "category_id": 3,
+        //     "category_name": "SALCHIPAPAS",
+        //     "site_id": 3,
+        //     "site_name": "CANEY",
+        //     "product_instance_status": true,
+        //     "product_instance_price": 40500
+        // }
+
+
+        const new_product =   {
+            "id": product.product_instance_id,
+            "product_id": product.product_id,
+            "site_id": product.site_id,
+            "status": true,
+            "price": product.product_instance_price,
+            "product_name":product.product_name,
+            "product_description": product.product_description,
+            "category_id": product.category_id,
+            "category_name":product.category_name,
+            "last_price": null
+        }
+    
+        store2.setCurrentProduct({...new_product})
+        store2.setVisible('currentProduct', true)
+
+    }
+
+
+
+
+
+
 });
 
 watch(() => route.params.category_id, async () => {
@@ -91,6 +146,42 @@ watch(() => route.params.category_id, async () => {
     await nextTick(); 
     }
 },{deep:true});
+
+
+
+
+
+
+
+
+const getProductById = async (id) => {
+
+   
+        store.setLoading(true, 'cargando productos')
+        try {
+        let response = await fetch(`${URI}/product/${id}`);
+        if (!response.ok) {
+            store.setLoading(false, 'cargando')
+
+            throw new Error(`HTTP error! status: ${response.status}`);
+
+        }
+        store.setLoading(false, 'cargando ')
+
+        let data = await response.json();
+       return data[0]
+    } catch (error) {
+        store.setLoading(false, 'cargando productos')
+
+        console.error('Error fetching data: ', error);
+    }
+    
+}
+   
+
+
+
+
 
 
 
@@ -116,8 +207,8 @@ const getProducts = async (category_name) => {
 
         console.error('Error fetching data: ', error);
     }
-}
     }
+}
    
 
 

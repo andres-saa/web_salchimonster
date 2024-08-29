@@ -90,8 +90,12 @@
 import { formatoPesosColombianos } from '../service/formatoPesos'
 import { computed, ref, onMounted } from 'vue';
 import { usecartStore } from '../store/shoping_cart'
+import router from '@/router/index.js'
+import {useRoute} from 'vue-router'
 
 
+
+const route = useRoute()
 const store = usecartStore()
 
 const addToCart = (productToAdd) => {
@@ -114,8 +118,23 @@ const open = (product) => {
 
     store.setCurrentProduct(product)
     store.setVisible('currentProduct', true)
-    // speak()
 
+    
+    if(route.path != '/'){
+       
+
+    const category_name = route.params.menu_name
+    const category_id = route.params.category_id
+
+    const ruta = `/${category_name}/${category_id}/${product.product_name}/${product.id}`
+    router.push(ruta)
+
+
+
+    }
+
+  
+    
 }
 
 
