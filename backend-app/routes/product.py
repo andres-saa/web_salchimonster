@@ -4,6 +4,8 @@ from schema.product import ProductSchemaPost
 from schema.product import Product as Product_schema
 from typing import List
 from pydantic import BaseModel
+
+
 product_router = APIRouter()
 
 @product_router.get("/products")
@@ -117,6 +119,8 @@ def get_products_by_category_name(category_name: str):
         product_instance.close_connection()
 
 
+
+
 @product_router.put("/products/{product_id}")
 def update_product(product_id: int, product: ProductSchemaPost):
     product_instance = Product()
@@ -128,6 +132,23 @@ def update_product(product_id: int, product: ProductSchemaPost):
     updated_product = product_instance.select_product_by_id(product_id)
     product_instance.close_connection()
     return {"message": "Product updated successfully", "product_id": product_id}
+
+
+
+
+@product_router.get("/product/{product_id}")
+def update_product(product_id: int):
+    product_instance = Product()
+
+    product = product_instance.select_product_by_id(product_id)
+    product_instance.close_connection()
+    return product
+
+
+
+
+
+
 
 
 @product_router.get("/products/name/{product_name}/sites")
