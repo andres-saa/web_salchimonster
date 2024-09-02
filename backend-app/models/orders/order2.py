@@ -779,7 +779,7 @@ class Order2:
         # Fetch products related to the order
         products_query = f"""
         SELECT name, price, quantity, total_price, product_id
-        FROM orders.order_products WHERE order_id = %s;
+        FROM orders.order_products WHERE LOWER(REPLACE(order_id, '#', '')) = %s;
         """
         self.cursor.execute(products_query, (clean_order_id,))
         products = self.cursor.fetchall()
@@ -794,7 +794,7 @@ class Order2:
         aditional_type,
         aditional_price,
         total_aditional_price
-        FROM orders.vw_order_aditional_items WHERE order_id = %s;
+        FROM orders.vw_order_aditional_items WHERE LOWER(REPLACE(order_id, '#', '')) = %s;
         """
         self.cursor.execute(additionals_query, (clean_order_id,))
         additionals = self.cursor.fetchall()
@@ -839,7 +839,7 @@ class Order2:
         # Fetch products related to the order
         products_query = f"""
         SELECT name, price, quantity, total_price, product_id
-        FROM orders.order_products WHERE order_id = %s;
+        FROM orders.order_products WHERE LOWER(REPLACE(order_id, '#', '')) = %s;
         """
         self.cursor.execute(products_query, (clean_order_id,))
         products = self.cursor.fetchall()
@@ -854,7 +854,7 @@ class Order2:
         aditional_type,
         aditional_price,
         total_aditional_price
-        FROM orders.vw_order_aditional_items WHERE order_id = %s;
+        FROM orders.vw_order_aditional_items LOWER(REPLACE(order_id, '#', '')) = %s
         """
         self.cursor.execute(additionals_query, (clean_order_id,))
         additionals = self.cursor.fetchall()
