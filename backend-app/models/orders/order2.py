@@ -46,9 +46,9 @@ class Order2:
             
             order_id = self.create_order_entry(user_id, order_data)
 
-            if (not order_data.inserted_by):
+            # if (not order_data.inserted_by):
 
-                self.generate_order_code(order_data.user_data.user_phone,order_id)
+            #     self.generate_order_code(order_data.user_data.user_phone,order_id)
 
             self.insert_order_details(order_id, order_data)
             self.insert_order_products(order_id, order_data)
