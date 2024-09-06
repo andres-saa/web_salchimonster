@@ -346,12 +346,12 @@ class Order2:
         if  payment_method_id != 6:
 
 
-            validation = ''
+            validation = 'generada'
 
-            if (not inserted_by):
-                validation = 'in validation'
-            else:
-                validation = 'generada'
+            # if (not inserted_by):
+            #     validation = 'in validation'
+            # else:
+            #     validation = 'generada'
             
 
             order_status_insert_query = """
