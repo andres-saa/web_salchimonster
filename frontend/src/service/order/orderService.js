@@ -100,11 +100,11 @@ export const orderService = {
       
         
 
-        if (order.payment_method_id !== 6) {
-          report.visible.show_validate = true
-        }else{
+        // if (order.payment_method_id !== 6) {
+        //   report.visible.show_validate = true
+        // }else{
           router.push('/gracias')
-        }
+        // }
 
     
 
