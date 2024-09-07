@@ -19,28 +19,21 @@ const requestNotificationPermission = async () => {
     }
 };
 
-3
+
 const playNotificationSound = () => {
-    if (store.Notification.readyState >= 2) {
+
         store.Notification.play().then(() => {
             store.Notification.loop = true;
-        }).catch(error => {
-            console.error('Error playing sound:', error);
-        });
-    } else {
-        console.error('Sound not ready for playback');
-    }
-};
 
+})
+}
 
 const stopNotificationSound = () => {
-    if (store.Notification.loop === true) {
+  
         store.Notification.loop = false; // Desactivar el bucle
         store.Notification.pause(); // Pausar la reproducción
         store.Notification.currentTime = 0; // Reiniciar el tiempo a 0
-    } else {
-        console.error('No sound is currently playing');
-    }
+
 };
 
 
@@ -57,16 +50,7 @@ onMounted(() => {
                 
                 playNotificationSound();
                 
-                if (Notification.permission === 'granted' && store.last_order_id != order_response) {
-                    const notification = new Notification('Nueva Orden en la página de WhatsApp', {
-                        body: 'Nueva Orden en la página de WhatsApp',
-                        icon: '/images/logo.png',
-                        image: `${URI}/read-product-image/300/site-${site_id}`
-                    });
-                    notification.onclick = () => {
-                        window.focus();
-                    };
-                }
+            
             } else{
                 stopNotificationSound()
             }
@@ -75,9 +59,7 @@ onMounted(() => {
         }
     };
     
-    const intervalId = setInterval(fetchOrdersAndNotify, 3000);
-
-    
+    const intervalId = setInterval(fetchOrdersAndNotify, 15000);    
     onUnmounted(() => {
         clearInterval(intervalId);
     });

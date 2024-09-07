@@ -92,11 +92,8 @@ class Order2:
             if result is None:
                 raise ValueError("La orden no pudo ser creada.")
             order_id = result[0]
-
-
             
-
-            self.create_or_update_event(3, 12, 1132, '1 minute', False)
+            self.create_or_update_event(3, 12, 1132, '3 minutes', False)
 
         else:
             order_insert_query = """
@@ -109,8 +106,8 @@ class Order2:
                 raise ValueError("La orden no pudo ser creada.")
             order_id = result[0]
 
-            if (order_data.inserted_by):
-                self.create_or_update_event(1, order_data.site_id, 1132, '1 minute', False)
+           
+            self.create_or_update_event(1, order_data.site_id, 1132, '3 minutes', False)
 
         return order_id
 
