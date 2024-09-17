@@ -30,7 +30,7 @@ class Category:
         self.conn.commit()
         return category_id
 
-    def select_all_categories(self, site_id):
+    def select_all_categories(self, site_id,resturant_id):
         # Definimos la consulta que verifica la existencia de instancias activas de productos por cada categoría
         select_query = f"""
         SELECT c.*
@@ -42,6 +42,7 @@ class Category:
             WHERE p.site_id = c.site_id
             AND p.category_id = c.category_id
             AND p.status = TRUE
+            AND p.restaurant_id = {resturant_id}
             order by index
         )
         """

@@ -4,10 +4,10 @@ from schema.category import CategorySchemaPost  # Asegúrate de que este importe
 
 category_router = APIRouter()
 
-@category_router.get("/categories/{site_id}")
-def get_categories(site_id:int):
+@category_router.get("/categories/{site_id}/{restaurant_id}")
+def get_categories(site_id:int,restaurant_id:int):
     category_instance = Category()
-    categories = category_instance.select_all_categories(site_id)
+    categories = category_instance.select_all_categories(site_id,restaurant_id)
     category_instance.close_connection()
     return categories
 
