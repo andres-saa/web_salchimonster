@@ -70,7 +70,7 @@ const estado = ref('');
 
 
 
-    const intervalId = setInterval(obtenerEstado, 3000);
+    const intervalId = setInterval(obtenerEstado, 60000);
 
     onMounted(obtenerEstado);
 

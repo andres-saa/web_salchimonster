@@ -3,10 +3,11 @@ from fastapi import APIRouter
 
 from models.pqrs.pqrs import Pqrs
 from schema.pqrs.pqrs import Pqrs as pqrs_schema
-
+import random
 
 
 Pqrs_router = APIRouter()
+
 
 
 @Pqrs_router.get('/get-pqrs-by-place-id/{place_id}', tags=['pqrs'])
@@ -29,6 +30,12 @@ def get_qprs_by_place_id(data:pqrs_schema):
 
 
 
+
+
+
+
+
+
 @Pqrs_router.put('/update_pqrs/{id}', tags=['pqrs'])
 def get_qprs_by_place_id(data:pqrs_schema, id:int):
 
@@ -47,3 +54,6 @@ def get_qprs_by_place_id( id:int):
     result = pqrs_instance.deactivate_pqrs(id)
     pqrs_instance.close_connection()
     return result   
+
+
+

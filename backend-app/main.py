@@ -133,3 +133,5 @@ app.include_router(shift_work_day_router)
 app.include_router(shift_work_record_router)
 app.include_router(shift_work_shift_router)
 app.include_router(adicional_new_router)
+
+
