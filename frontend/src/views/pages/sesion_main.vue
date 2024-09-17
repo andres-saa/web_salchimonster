@@ -97,7 +97,7 @@ const getProducts = async (category_name) => {
   if(category_id && site_id){
       store.setLoading(true, 'cargando productos')
       try {
-      let response = await fetch(`${URI}/products-active/category-id/${category_id}/site/${site_id}`);
+      let response = await fetch(`${URI}/products-active/category-id/${category_id}/site/${site_id}/1`);
       if (!response.ok) {
           store.setLoading(false, 'cargando productos')
 
