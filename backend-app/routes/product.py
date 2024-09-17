@@ -33,11 +33,11 @@ def deactivate_product(product_id:int):
 
 
 
-@product_router.get("/products-active/category-id/{category_id}/site/{site_id}")
-def get_products_by_category_name_and_site(category_id: str, site_id: int):
+@product_router.get("/products-active/category-id/{category_id}/site/{site_id}/{restaurant_id}")
+def get_products_by_category_name_and_site(category_id: str, site_id: int, restaurant_id):
     product_instance = Product()
     try:
-        products = product_instance.select_products_by_site_and_category_active(site_id,category_id)
+        products = product_instance.select_products_by_site_and_category_active(site_id,category_id,restaurant_id)
         if not products:
             raise HTTPException(status_code=404, detail="No products found for the given category name and site")
         return products
