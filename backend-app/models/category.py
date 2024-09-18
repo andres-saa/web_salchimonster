@@ -57,7 +57,7 @@ class Category:
         select_query = f"""
         SELECT c.*
         FROM inventory.active_product_categories_with_site AS c
-        WHERE c.site_id = {site_id} AND restaurant_id = {restaurant_id};
+        WHERE c.site_id = {site_id} AND c.restaurant_id = {restaurant_id};
         """
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
