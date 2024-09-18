@@ -9,7 +9,7 @@ export const categoriesService = {
         const site_id = store.site.site_id
         if(site_id){
             try {
-                const response = await axios.get(`${URI}/categories/${site_id}/all`);
+                const response = await axios.get(`${URI}/categories/${site_id}/all/1`);
                 if (response.status === 200) {
                     response.data.push({
                         "category_id": 1000,
