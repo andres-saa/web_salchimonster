@@ -52,12 +52,12 @@ class Category:
 
 
 
-    def select_all_categories_all(self, site_id):
+    def select_all_categories_all(self, site_id,restaurant_id):
         # Definimos la consulta que verifica la existencia de instancias activas de productos por cada categoría
         select_query = f"""
         SELECT c.*
         FROM inventory.active_product_categories_with_site AS c
-        WHERE c.site_id = {site_id};
+        WHERE c.site_id = {site_id} AND restaurant_id = {restaurant_id};
         """
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
