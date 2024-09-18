@@ -36,6 +36,7 @@ class Category:
         SELECT c.*
         FROM inventory.active_product_categories_with_site AS c
         WHERE c.site_id = {site_id}
+        AND C.restaurant_id = {resturant_id}
         AND EXISTS (
             SELECT 1
             FROM inventory.complete_product_instances AS p
