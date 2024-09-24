@@ -81,10 +81,10 @@ class Product:
 
         
     
-    def select_products_by_site_and_category_all(self, site_id: int, category_id: int):
+    def select_products_by_site_and_category_all(self, site_id: int, category_id: int, restaurant_id:int):
         select_query = f"""
         select * from inventory.complete_product_instances
-        WHERE site_id = {site_id} AND category_id = {category_id} order by price;
+        WHERE site_id = {site_id} AND category_id = {category_id} AND  restaurant_id = {restaurant_id} order by price;
         """
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
