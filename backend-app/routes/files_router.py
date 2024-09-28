@@ -162,8 +162,17 @@ def get_photo_profile(product_id: str, height: str):
     # Buscar archivos que coincidan con el patrón
     files = glob(pattern)
 
+
+
     if files:
-        return FileResponse(files[0])
+        # Si se encuentran archivos, devolver el primero
+        return FileResponse(files[0], headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Version": str(timestamp)
+        })
+        
 
     # Si no se encuentra ningún archivo, devolver un error
     return "Archivo no encontrado", 404
