@@ -2,7 +2,6 @@ import psycopg2
 from dotenv import load_dotenv
 import os
 import json
-import locale
 from datetime import datetime, timedelta
 import pytz
 from datetime import datetime
@@ -20,7 +19,6 @@ DB_NAME = os.getenv('DB_NAME')
 
 
 
-locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
 
 class Order:
     def __init__(self, order_id=None):
