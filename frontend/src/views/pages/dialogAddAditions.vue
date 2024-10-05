@@ -1,6 +1,7 @@
 
 <template>
-    <Dialog class="mx-3" :closable="true" style="background-color: white;"
+    <div>
+        <Dialog class="mx-3" :closable="true" style="background-color: white;"
         v-model:visible="store.visibles.addAdditionToCart" modal header="Header"
         :style="{ width: '30rem', 'border-radius': '0.5rem' }">
 
@@ -69,6 +70,8 @@
         <Button @click="store.setVisible('addAdditionToCart', false)" icon="pi pi-times"
             style="position: absolute; right: -1rem; top: -1rem;" rounded severity="danger"> </Button>
     </Dialog>
+    </div>
+   
 </template>
 
 <script setup>

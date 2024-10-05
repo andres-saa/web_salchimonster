@@ -171,14 +171,14 @@ router.beforeEach(async(to, from, next) => {
   // alert(site_id)
   // console.log(site_id)
   // const open = await estado(site_id)
-  console.log(open)
+  // console.log(open)
 
   if (to.matched.some(record => record.meta.requireOpen)) {
     // const token = thanks_data.value?.user_data;
 
     if (store.status == 'cerrado' && site_id) {
       verCerrado.value = true
-      next()
+      next('/cart')
 
     } else {
       // Si hay token, permite el acceso
@@ -195,10 +195,10 @@ router.beforeEach(async(to, from, next) => {
 
 
 
-pixel.init()
+// pixel.init()
 router.afterEach( ( to, from ) => {
   // Esto rastreará una "PageView" cada vez que el usuario cambie de ruta
-  pixel.sendTrackingEvent( 'PageView');
+  // pixel.sendTrackingEvent( 'PageView');
 });
 
 

@@ -115,10 +115,10 @@ const app = createApp(App);
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
-console.log("pinia",pinia)
+// console.log("pinia",pinia)
 
 app.use(pinia)
-app.use(router);
+app.use(router)
 app.use(PrimeVue, { ripple: true });
 app.use(ToastService);
 app.use(DialogService);

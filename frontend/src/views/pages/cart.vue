@@ -1,8 +1,9 @@
 <template>
 
 
-    <div class="col-12  my-8 md:my-8 p-0" v-if="store.cart.products.length > 0">
-        <P class="text-center text-2xl my-8"><b>CARRITO DE COMPRAS</b> </P>
+    <div>
+        <div class="col-12  my-8 md:my-8 p-0" v-if="store.cart.products.length > 0">
+        <p class="text-center text-2xl my-8"><b>CARRITO DE COMPRAS</b> </p>
 
         <div class="grid mx-auto " style="max-width:800px;">
 
@@ -156,6 +157,9 @@
     </div>
 
     <dialogAddAditions></dialogAddAditions>
+    </div>
+
+
 </template>
 
 
@@ -260,7 +264,7 @@ onMounted(async () => {
 
 
 })
-// orderService.sendOrder()
+
 
 </script>
 

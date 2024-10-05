@@ -123,13 +123,15 @@
             </router-link>
 
 
-            <router-link to="/pay" v-if="route.path.includes('cart')">
+
+            <Tag  v-if="siteStore.status == 'cerrado'" style="width: 100%;height: 2.5rem;" class="mt-2" severity="danger"> Este Restaurante esta cerrado</Tag>
+            <router-link to="/pay" v-if="route.path.includes('cart') && siteStore.status != 'cerrado'">
                 <Button iconPos="right" icon="pi pi-arrow-right" label="Pedir" class="mt-2" severity="help"
                     style="outline: none;width: 100%; border: none;font-weight: bold; background-color: black;"></Button>
             </router-link>
 
-            <router-link to="/pay" v-else>
-                <Button :disabled="store.sending_order" @click=" ()  => {
+            <router-link to="/pay" v-else-if="siteStore.status != 'cerrado'">
+                <Button  :disabled="store.sending_order || siteStore.status == 'cerrado'" @click=" ()  => {
                     orderService.sendOrder()
                     sending = true
                 }" iconPos="right" icon="pi pi-arrow-right" label="Finalizar pedido"
@@ -158,12 +160,13 @@ import { useRoute } from 'vue-router';
 import { orderService } from '../../service/order/orderService';
 import {onMounted, ref, watch} from 'vue'
 import { useUserStore } from '../../store/user';
+
+
 const sending = ref(false)
 const route = useRoute()
 const store = usecartStore()
 const siteStore = useSitesStore()
 const user = useUserStore()
-
 
 
 

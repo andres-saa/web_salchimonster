@@ -6,7 +6,7 @@ function formatoPesosColombianos(numero) {
   // Ejemplo de uso
   const numero = 1000000; // Este es el valor en memoria
   const numeroFormateado = formatoPesosColombianos(numero); // Formatear el número
-  console.log(numeroFormateado); // Esto mostrará "COP 1.000.000" en la consola
+  // console.log(numeroFormateado); // Esto mostrará "COP 1.000.000" en la consola
   
 
   export {formatoPesosColombianos}

@@ -48,9 +48,15 @@
         style="display: flex;align-items: center; max-height: 45rem; background-color:white;border-radius: 0.5rem; ">
 
 
-        <img :class="see? 'cargado': 'sin-cargar'" :onload="seeImage" class="col-12 p-2 m-0" :src="`https://backend.salchimonster.com/read-product-image/600/${store.currentProduct.product_name}`"
-          alt="" v-show="see" style="width: 100%;object-fit: contain; aspect-ratio: 1/1;">
+       
 
+
+          <img 
+                    style="width: 100%; aspect-ratio: 1 / 1 ; border-radius: 1rem; background-color: rgb(255, 255, 255);object-fit: contain; border-radius: 0.5rem;"
+                     :src="currentImage(store.currentProduct.product_name)"
+                    @load="loadHighResImage(store.currentProduct.product_name)"
+                    alt="">
+   
       </div>
 
 
@@ -60,13 +66,7 @@
         style="display: flex;align-items: center; max-height: 45rem; background-color:white;border-radius: 0.5rem; ">
 
 
-        <div style="width: 100%; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center">
-          <ProgressSpinner   style="width: 100px; height: 100px" strokeWidth="5" 
-        animationDuration=".2s" aria-label="Custom ProgressSpinner" />
-
-
-
-        </div>
+       
       
       </div>
 
@@ -178,6 +178,8 @@
     <img :onLoad="seeImageRightHand" v-show="see"  :class="see? 'cargado-right-hand': 'sin-cargar'"  style="     pointer-events: none;
    ; position: absolute;left: 95%; top: 20%;" :src="'/images/garra-sm-izq.png'" alt="">
 
+
+
   </Dialog>
 </template>
 
@@ -219,6 +221,31 @@ import { curentProduct } from '../service/productServices';
 import { carService } from '../service/car/carService'
 import { adicionalesService } from '../service/restaurant/aditionalService';
 import { useSitesStore } from '../store/site';
+
+
+
+
+const highResLoaded = ref({});
+    const currentImageSrc = ref({}); // Objeto para mantener la imagen actual de cada sede
+
+    const lowResImage = (product_name) => `${URI}/read-product-image/96/${product_name}`;
+    const highResImage = (product_name) => `${URI}/read-product-image/600/${product_name}`;
+
+    const currentImage = (site_id) => {
+      return currentImageSrc.value[site_id] || lowResImage(site_id);
+    };
+
+    const loadHighResImage = (site_id) => {
+      const img = new Image();
+      img.src = highResImage(site_id);
+      img.onload = () => {
+        currentImageSrc.value[site_id] = highResImage(site_id); // Reemplaza el src de la imagen cuando está completamente cargada
+        highResLoaded.value[site_id] = true;
+      };
+    };
+
+
+
 
 const sonido = new Audio('/sounds/sarpazo.mp3')
 const route = useRoute();
@@ -327,7 +354,7 @@ const addToCart = (product) => {
 
   additionsArray.forEach(adition => {
     store.addAdditionToCart(adition)
-    console.log(adition)
+    //console.log(adition)
   })
 
   selectedAdditions.value = {}; // Resetear las adiciones seleccionadas
@@ -398,7 +425,7 @@ const isInAdminProductsRoute =
 const ruta = ref(router.currentRoute)
 const version_tienda = ref(1)
 const screenWidth = ref(window.innerWidth);
-console.log(screenWidth.value)
+//console.log(screenWidth.value)
 // Función para actualizar el valor del ancho de la pantalla
 const updateScreenWidth = () => {
   screenWidth.value = window.innerWidth;
@@ -442,7 +469,7 @@ if (!storedVersion) {
 
     // Perform any additional actions needed when the version changes
     // For example, you might want to update the UI or perform other logic.
-    console.log('Version updated. Do additional actions here.');
+    //console.log('Version updated. Do additional actions here.');
   }
 }
 
@@ -593,15 +620,15 @@ onMounted(() => {
     // localStorage.setItem('totalCart',0)
   }
 
-  console.log(JSON.parse((localStorage.getItem('menu'))))
+  //console.log(JSON.parse((localStorage.getItem('menu'))))
   // cart.value = JSON.parse(localStorage.getItem('cart'))
 
   if (localStorage.getItem('menu') && localStorage.getItem('versionMenu') && parseFloat(localStorage.getItem('versionMenu')) == version_menu.value) {
     const version_local = parseFloat(localStorage.getItem('versionMenu'))
-    console.log(version_local, version_menu.value)
+    //console.log(version_local, version_menu.value)
 
 
-    console.log('habia')
+    //console.log('habia')
     menuOptions.value[0].menus = JSON.parse(localStorage.getItem('menu'))
     // menuOptions.value[0].version = JSON.parse(localStorage.getItem('versionMenu'))
 
@@ -621,7 +648,7 @@ onMounted(() => {
     menuOptions.value[0].menus = menuGlobal
     localStorage.setItem('menu', JSON.stringify(menuGlobal))
     localStorage.setItem('versionMenu', version_menu.value)
-    console.log('nuevo menu')
+    //console.log('nuevo menu')
     localStorage.removeItem('cart')
     localStorage.removeItem('currentNeigborhood')
 
@@ -685,7 +712,7 @@ const changePossiblesNeigborhoods = () => {
   currenCity.value.sites.map(site => {
     site.neigborhoods.map(neigborhood => {
       neigborhoods.push({ name: neigborhood.name, neigborhood: neigborhood, site: site })
-      console.log(site)
+      //console.log(site)
     })
   })
 
@@ -723,7 +750,7 @@ const setNeigborhood = () => {
     currenSite: currenNeigborhood.value.site.name,
     currenSiteId: currenNeigborhood.value.site.site_id,
   }))
-  // console.log(localStorage.getItem('currentNeigborhood'))
+  // //console.log(localStorage.getItem('currentNeigborhood'))
   localStorage.setItem('currenSiteWsp', currenNeigborhood.value.site.wsp)
 
   setShowDialog()
@@ -748,7 +775,7 @@ const searchCountry = (event) => {
   }, 250);
 };
 
-console.log(router.currentRoute)
+//console.log(router.currentRoute)
 
 const topbarMenuClasses = computed(() => {
   return {
@@ -775,7 +802,7 @@ const cargarAdiciones = (item, gratis = 0) => {
 
     if (negativePriceCount >= gratis && item.price == 0) {
       checkedAdiciones.value[item.name] = false
-      console.log('ya')
+      //console.log('ya')
 
       toast.add({ severity: 'error', summary: 'Recuerda', detail: `solo puede elegir ${gratis} acompanantes gratis`, life: 3000 });
 
@@ -791,13 +818,13 @@ const cargarAdiciones = (item, gratis = 0) => {
     } else if (item.topping_id) {
       currentToppings.value.push(item);
     } else if (item.acompanante_id) {
-      console.log('here')
+      //console.log('here')
       currentAcompanantes.value.push(item);
-      console.log(item)
-      console.log(currentAcompanantes)
+      //console.log(item)
+      //console.log(currentAcompanantes)
     }
 
-    // console.log(item.acompanante_id)
+    // //console.log(item.acompanante_id)
 
 
   } else if (item.adicional_id) {
@@ -837,7 +864,7 @@ const cargarAdiciones = (item, gratis = 0) => {
 
 
 
-  console.log(currentAditions.value)
+  //console.log(currentAditions.value)
 };
 
 function sumarPrecios(arrayDeObjetos) {
@@ -857,7 +884,7 @@ function sumarPrecios(arrayDeObjetos) {
   return suma;
 }
 // const cargarAcomp = (item) => {
-//   console.log('hola');
+//   //console.log('hola');
 
 //   // Asegúrate de que checkedAdiciones y currentAditions estén definidos en el ámbito adecuado
 
@@ -876,7 +903,7 @@ function sumarPrecios(arrayDeObjetos) {
 
 
 const cargarSalsas = (item) => {
-  console.log('hola');
+  //console.log('hola');
 
   if (item === 'TODAS LAS SALSAS') {
     // Si seleccionas 'TODAS LAS SALSAS', establece todas las demás opciones como false
@@ -925,7 +952,7 @@ const cargarSalsas = (item) => {
     }
   }
 
-  console.log(currentSalsas.value);
+  //console.log(currentSalsas.value);
 };
 
 

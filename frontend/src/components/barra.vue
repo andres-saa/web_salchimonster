@@ -54,7 +54,7 @@ class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bott
 
 
           <div  style="position: relative;" :key="product.id" v-for="product in store.cart.products.slice(0, 4)">
-            <Button class="p-0" :label="product.quantity" severity="danger" rounded style="width: 1.2rem;font-size: 0.8rem; height: 1.2rem;top: -.3rem; right: -.5rem; position: absolute;"/>
+            <Button class="p-0" :label="`${product.quantity}`" severity="danger" rounded style="width: 1.2rem;font-size: 0.8rem; height: 1.2rem;top: -.3rem; right: -.5rem; position: absolute;"/>
             <img class="img-cart" @mouseover="() => vueMenu = true" style="height: 2rem; object-fit: contain;"
               :src="`https://backend.salchimonster.com/read-product-image/96/${product.product.product_name}`" alt="">
             
@@ -80,7 +80,7 @@ class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bott
       
 
 
-      <a v-if="store.cart.products.length > 0 && screenWidth>720" >
+      <a v-if="store.cart.products.length > 0" >
 
 
 
@@ -93,8 +93,7 @@ class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bott
 
     
     ">
-          <span :class="topbarMenuClasses"  style="font-size:2rem ; font-weight: bold;">
-            {{ formatoPesosColombianos(Number(calcularTotalCarrito())) }}</span>
+          
         </button>
       </a>
 

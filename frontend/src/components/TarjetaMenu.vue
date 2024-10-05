@@ -11,20 +11,15 @@
 
         <div class="imagen" style="display: flex;align-items: center; " @click="open(props.product)">
 
-            <transition name="fade">
-                <img v-show="loaded" @load="see" :class="loaded ? 'cargado' : 'sin-cargar'"
+      
+                <img  
                     style="width: 100%; aspect-ratio: 1 / 1 ; border-radius: 1rem; background-color: rgb(255, 255, 255);object-fit: contain; border-radius: 0.5rem;"
-                    :src="`https://backend.salchimonster.com/read-product-image/300/${props.product.product_name}`"
+                     :src="currentImage(props.product.product_name)"
+                    @load="loadHighResImage(props.product.product_name)"
                     alt="">
-            </transition>
+   
 
-            <div v-if="!loaded"
-                style="width: 100%;display: flex;justify-content: center; align-items: center; aspect-ratio: 1 / 1; background-color: rgb(255, 255, 255);object-fit: contain; border-radius: 0.5rem;">
-
-                <ProgressSpinner style="width: 60px; height: 60px" strokeWidth="8" animationDuration=".2s"
-                    aria-label="Custom ProgressSpinner" />
-
-            </div>
+          
 
         </div>
 
@@ -92,7 +87,27 @@ import { computed, ref, onMounted } from 'vue';
 import { usecartStore } from '../store/shoping_cart'
 import router from '@/router/index.js'
 import {useRoute} from 'vue-router'
+import { URI } from '../service/conection';
 
+
+const highResLoaded = ref({});
+    const currentImageSrc = ref({}); // Objeto para mantener la imagen actual de cada sede
+
+    const lowResImage = (product_name) => `${URI}/read-product-image/96/${product_name}`;
+    const highResImage = (product_name) => `${URI}/read-product-image/300/${product_name}`;
+
+    const currentImage = (site_id) => {
+      return currentImageSrc.value[site_id] || lowResImage(site_id);
+    };
+
+    const loadHighResImage = (site_id) => {
+      const img = new Image();
+      img.src = highResImage(site_id);
+      img.onload = () => {
+        currentImageSrc.value[site_id] = highResImage(site_id); // Reemplaza el src de la imagen cuando está completamente cargada
+        highResLoaded.value[site_id] = true;
+      };
+    };
 
 
 const route = useRoute()
@@ -186,6 +201,8 @@ const props = defineProps({
 
 
 onMounted(() => {
+
+    highResLoaded.value = {};
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {

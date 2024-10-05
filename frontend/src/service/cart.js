@@ -99,20 +99,20 @@ const domicilio = ref()
 
 
 
-onMounted( async() => {
+// onMounted( async() => {
 
-    let barrio = {}
+//     let barrio = {}
 
-    if (localStorage.getItem('currentNeigborhood')){
-        barrio = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
-        getNeighborhood(barrio.neighborhood_id).then(data => domicilio.value = data)
+//     if (localStorage.getItem('currentNeigborhood')){
+//         barrio = JSON.parse(localStorage.getItem('currentNeigborhood')).currenNeigborhood
+//         getNeighborhood(barrio.neighborhood_id).then(data => domicilio.value = data)
 
-    }else{
-        barrio = 'definir domicilio'
-    } 
+//     }else{
+//         barrio = 'definir domicilio'
+//     } 
 
     
-})
+// })
 
 
 const getNeighborhood = async(neighborhood_id) => {
