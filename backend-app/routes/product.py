@@ -69,7 +69,9 @@ def update_product_and_instances(product_instance_id: int, product: ProductSchem
             "price": product.price,
             "description": product.description,
             "category_id": product.category_id,
-            "status": True
+            "status": True,
+            "parent_id":product.parent_id,
+            "img_identifier":product.img_identifier
         }
         
         

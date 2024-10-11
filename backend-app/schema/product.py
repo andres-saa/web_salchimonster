@@ -11,6 +11,8 @@ class ProductSchemaPost(BaseModel):
     description:str
     category_id:int
     status: bool
+    img_identifier:str
+    parent_id:int
     
 
 

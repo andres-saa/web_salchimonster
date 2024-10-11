@@ -155,12 +155,13 @@ class Product:
             # Actualiza la información del producto principal
             update_product_query = """
             UPDATE inventory.products
-            SET name = %s, description = %s
+            SET name = %s, description = %s , img_identifier = %s
             WHERE id = %s;
             """
             self.cursor.execute(update_product_query, (
                 product_info['name'],
                 product_info['description'],
+                product_info['img_identifier'],
                 product_info['product_id']
             ))
 

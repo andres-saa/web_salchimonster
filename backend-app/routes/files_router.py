@@ -18,7 +18,8 @@ from PIL import Image
 from io import BytesIO
 from datetime import datetime,timedelta
 import pytz
-
+import random
+import string
 
 
 
@@ -237,8 +238,98 @@ async def upload_user_photo(user_id: str, evidence_id: str, contest_id: str, fil
     return JSONResponse(content={"message": "hecho"}, status_code=200)
 
 
+def generate_random_string(length=8):
+    """Genera un string aleatorio para usar como identificador único."""
+    letters = string.ascii_letters + string.digits
+    return ''.join(random.choice(letters) for _ in range(length))
 
 
+
+
+@router.get('/read-photo-product/{image_identifier}')
+def get_photo_product(image_identifier: str):
+    base_dir = Path(getcwd()) / "files" / "images" / "products"
+    pattern = f"{base_dir}/product_image_{image_identifier}.*"
+
+    # Buscar archivos que coincidan con el patrón
+    files = glob(pattern)
+
+    if files:
+        # Si se encuentran archivos, devolver el primero
+        return FileResponse(files[0], headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        })
+
+    return "Archivo no encontrado", 404
+
+
+def resize_image_for_all_resolutions(path: str, upload_dir: Path, random_value: str, file_extension: str):
+    sizes = [96, 300, 600]  # Resoluciones de ejemplo
+    for size in sizes:
+        image = Image.open(path, mode='r')
+        image.thumbnail((size, size))
+        size_dir = upload_dir / str(size)  # Carpeta para cada resolución
+        size_dir.mkdir(parents=True, exist_ok=True)
+        resized_file_path = size_dir / (f"product_image_{random_value}_{size}{file_extension}")
+        image.save(resized_file_path)
+
+@router.post('/upload-photo-product')
+async def upload_photo_product(file: UploadFile = File(...), background_tasks: BackgroundTasks = BackgroundTasks()):
+    # Directorio base donde se guardarán las imágenes
+    upload_dir = Path.cwd() / "files" / "images" / "products"
+    
+    # Crear la carpeta base si no existe
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    # Generar un valor aleatorio para la imagen
+    random_value = generate_random_string()
+
+    # Obtener la extensión del archivo
+    file_extension = splitext(file.filename)[1]
+
+    # Combinar el nombre del archivo con el valor aleatorio
+    original_file_path = upload_dir / (f"product_image_{random_value}{file_extension}")
+
+    # Guardar el archivo original
+    with open(original_file_path, "wb") as myfile:
+        content = await file.read()
+        myfile.write(content)
+
+    # Rotar la imagen si es necesario
+    rotate_image(original_file_path)
+
+    # Redimensionar la imagen en segundo plano (para diferentes resoluciones)
+    background_tasks.add_task(resize_image_for_all_resolutions, original_file_path, upload_dir, random_value, file_extension)
+
+    # Guardar el identificador de la imagen en la base de datos si es necesario
+    # Ejemplo: db.save_image_url(random_value)
+
+    return JSONResponse(content={"message": "hecho", "image_identifier": random_value}, status_code=200)
+
+
+@router.get('/read-photo-product/{image_identifier}/{width}')
+def get_photo_product(image_identifier: str, width: int):
+    # Directorio base de las imágenes
+    base_dir = Path(getcwd()) / "files" / "images" / "products" / str(width)
+    
+    # Patrón para encontrar la imagen con el identificador y el ancho solicitado
+    pattern = f"{base_dir}/product_image_{image_identifier}_{width}.*"
+
+    # Buscar archivos que coincidan con el patrón
+    files = glob(pattern)
+
+    if files:
+        # Si se encuentran archivos, devolver el primero
+        return FileResponse(files[0], headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        })
+
+    # Si no se encuentra ningún archivo, devolver un error
+    return "Archivo no encontrado", 404
 
 
 # @router.post('/upload-site-documet/')
