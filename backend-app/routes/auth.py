@@ -97,6 +97,12 @@ sites = [
         username="salchi_chapi",
         password="salchi_chapi_1234"
     ),
+     Site(
+        site_id=30,
+        site_name="USAQUEN",
+        username="salchi_usa",
+        password="salchi_usa_2024"
+    ),
 ]
 
 
