@@ -7,9 +7,11 @@ export const categoriesService = {
     async getCategories() {
       
         const site_id = store.site.site_id
+
+        const restaurant = store.restaurant_id
         if(site_id){
             try {
-                const response = await axios.get(`${URI}/categories/${site_id}/all/1`);
+                const response = await axios.get(`${URI}/categories/${site_id}/all/${restaurant}`);
                 if (response.status === 200) {
                     response.data.push({
                         "category_id": 1000,

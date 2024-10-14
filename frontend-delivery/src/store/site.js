@@ -19,7 +19,9 @@ export const useSitesStore = defineStore('site', {
 
             site:{
 
-            }
+            },
+            restaurant_id:1
+
 
 
         }

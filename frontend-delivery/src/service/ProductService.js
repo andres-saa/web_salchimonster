@@ -1,11 +1,16 @@
 import axios from "axios";
 import { URI } from "../service/conection";
+import { useSitesStore } from "../store/site";
 
 export const productService = {
+
+
     
-    async getProductsByCategorySite(category_id,site_id) {
+    async getProductsByCategorySite(category_id,site_id,restaurant_id = 1) {
+        const store = useSitesStore()
+        const restaurant = store.restaurant_id
         try {
-            const response = await axios.get(`${URI}/products-all/category-id/${category_id}/site/${site_id}`);
+            const response = await axios.get(`${URI}/products-all/category-id/${category_id}/site/${site_id}/${restaurant}`);
             if (response.status === 200) {
                 return response.data;
             } else {
@@ -17,6 +22,7 @@ export const productService = {
             return null;
         }
     },
+
     async updateProductInstanceStatus(product_instance_id, new_status) {
         try {
             const response = await axios.put(`${URI}/product-instance/${product_instance_id}/status`, {

@@ -4,10 +4,15 @@
         <BarraCategorias>
         
     </BarraCategorias>
+    
   
     <RouterView>
 
     </RouterView>
+
+
+
+    
     </div>
     
 </template>

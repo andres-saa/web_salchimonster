@@ -6,7 +6,7 @@
 
             <img class=""
                 style="width: 100%;height: 100%; background-color: rgb(255, 255, 255);object-fit: contain; border-radius: 0.2rem;"
-                :src="`https://backend.salchimonster.com/read-product-image/300/${props.product.product_name}`" alt=""
+                :src="`https://backend.salchimonster.com/read-photo-product/${props.product.img_identifier}/300`" alt=""
                 @click="open(props.product)">
 
 

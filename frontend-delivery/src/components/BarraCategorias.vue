@@ -31,12 +31,14 @@
 
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import router from '@/router/index.js';
 import { useRoute } from 'vue-router';
 import { categoriesService } from '../service/restaurant/categoriesService'
 
+import { useSitesStore } from '../store/site';
 
+const store = useSitesStore()
 
 const categories = ref([]);
 
@@ -53,6 +55,10 @@ const navigateToCategory = (categoryName,category_id) => {
 onMounted(async () => {
     categories.value = await categoriesService.getCategories()});
 
+
+watch(() => store.restaurant_id, async() => {
+    categories.value = await categoriesService.getCategories()
+} )
 
 const checkSelected = (section) => {
     const route = useRoute(); // Asegúrate de que tienes acceso a useRoute aquí
