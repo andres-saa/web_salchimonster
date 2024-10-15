@@ -16,7 +16,7 @@
                     v-for="product in store.cart.products">
 
                     <img style="width:5rem;object-fit:cover; height:5rem"
-                        :src="`https://backend.salchimonster.com/read-product-image/96/${product.product.product_name}`" alt="">
+                        :src="`https://backend.salchimonster.com/read-photo-product/${product.product.img_identifier}/600`" alt="">
 
                     <Button class="ml-2" @click="store.removeProductFromCart(product.product.id)" icon="pi pi-trash"
                         severity="danger" rounded

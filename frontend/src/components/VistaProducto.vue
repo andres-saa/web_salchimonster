@@ -53,8 +53,8 @@
 
           <img 
                     style="width: 100%; aspect-ratio: 1 / 1 ; border-radius: 1rem; background-color: rgb(255, 255, 255);object-fit: contain; border-radius: 0.5rem;"
-                     :src="currentImage(store.currentProduct.product_name)"
-                    @load="loadHighResImage(store.currentProduct.product_name)"
+                     :src="`${URI}/read-photo-product/${store.currentProduct.img_identifier}/600`"
+                   
                     alt="">
    
       </div>
@@ -228,8 +228,9 @@ import { useSitesStore } from '../store/site';
 const highResLoaded = ref({});
     const currentImageSrc = ref({}); // Objeto para mantener la imagen actual de cada sede
 
-    const lowResImage = (product_name) => `${URI}/read-product-image/96/${product_name}`;
-    const highResImage = (product_name) => `${URI}/read-product-image/600/${product_name}`;
+    const lowResImage = (product_name) => `${URI}/read-photo-product/${product_name}/96`;
+    const highResImage = (product_name) => `${URI}/read-photo-product/${product_name}/600`;
+
 
     const currentImage = (site_id) => {
       return currentImageSrc.value[site_id] || lowResImage(site_id);
