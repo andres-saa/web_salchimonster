@@ -256,11 +256,7 @@ def get_photo_product(image_identifier: str):
 
     if files:
         # Si se encuentran archivos, devolver el primero
-        return FileResponse(files[0], headers={
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            "Pragma": "no-cache",
-            "Expires": "0"
-        })
+        return FileResponse(files[0])
 
     return "Archivo no encontrado", 404
 
@@ -322,11 +318,7 @@ def get_photo_product(image_identifier: str, width: int):
 
     if files:
         # Si se encuentran archivos, devolver el primero
-        return FileResponse(files[0], headers={
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            "Pragma": "no-cache",
-            "Expires": "0"
-        })
+        return FileResponse(files[0])
 
     # Si no se encuentra ningún archivo, devolver un error
     return "Archivo no encontrado", 404
