@@ -98,6 +98,13 @@ class Product:
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
     
+    
+    def select_all_restaurants(self):
+        select_query = "SELECT * FROM restaurants.restaurant;"
+        self.cursor.execute(select_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+    
 
     def select_product_by_id(self, product_id):
         select_query = "SELECT * FROM inventory.product_full_view WHERE product_instance_id = %s;"
@@ -173,7 +180,7 @@ class Product:
             for site in all_sites:
                 site_id = site[0]
                 update_or_insert_product_instance_query = f"""
-                update  inventory.product_instances set price = {product_info['price']} where product_id = {product_info['product_id']}
+                update  inventory.product_instances set price = {product_info['price']}, last_price = {product_info['last_price']} where product_id = {product_info['product_id']}
                 
                 """
                 self.cursor.execute(update_or_insert_product_instance_query)
@@ -249,6 +256,92 @@ class Product:
             self.cursor.execute("ROLLBACK;")
             return f"Error al actualizar: {str(e)}"
 
+
+    
+    def create_product_and_its_instances(self, product_info, additional_item_ids):
+        try:
+            # Inicia una transacción
+            self.cursor.execute("BEGIN;")
+
+            # Inserta el nuevo producto en la tabla inventory.products
+            insert_product_query = """
+            INSERT INTO inventory.products (name, description, category_id, has_recipe, gramos, img_identifier)
+            VALUES (%s, %s, %s, %s, %s, %s) RETURNING id;
+            """
+            self.cursor.execute(insert_product_query, (
+                product_info['name'],
+                product_info['description'],
+                product_info['category_id'],
+                product_info.get('has_recipe', False),
+                product_info.get('gramos', 0),  # Valor por defecto si no se provee
+                product_info.get('img_identifier', '')
+            ))
+            # Recupera el ID del nuevo producto
+            new_product_id = self.cursor.fetchone()[0]
+
+            # Recupera todos los site_id disponibles
+            self.cursor.execute("SELECT site_id FROM public.sites WHERE show_on_web = true;")
+            all_sites = self.cursor.fetchall()
+
+            # Crea las instancias del producto en todas las sedes
+            for site in all_sites:
+                site_id = site[0]
+
+                insert_product_instance_query = """
+                INSERT INTO inventory.product_instances (product_id, site_id, status, price, last_price, restaurant_id)
+                VALUES (%s, %s, %s, %s, %s, %s);
+                """
+                self.cursor.execute(insert_product_instance_query, (
+                    new_product_id,
+                    site_id,
+                    True,  # Asumiendo que el estado inicial es activo
+                    product_info['price'],
+                    product_info.get('last_price', 0),  # Valor por defecto para last_price
+                    product_info['restaurant_id']
+                ))
+
+            # Inserta las instancias de adicionales y crea las relaciones con el producto
+            for additional_id in additional_item_ids:
+                for site in all_sites:
+                    site_id = site[0]
+
+                    # Obtener el precio del adicional desde la tabla de adicionales
+                    self.cursor.execute(f"SELECT price FROM orders.aditional_items WHERE id = {additional_id}")
+                    aditiona_price = self.cursor.fetchone()[0]
+
+                    # Inserta la instancia del adicional en cada sede
+                    insert_additional_instance_query = """
+                    INSERT INTO orders.aditional_item_instances (price, status, aditional_item_id, site_id, category_id)
+                    VALUES (%s, %s, %s, %s, %s) RETURNING id;
+                    """
+                    self.cursor.execute(insert_additional_instance_query, (
+                        aditiona_price,
+                        True,
+                        additional_id,
+                        site_id,
+                        product_info['category_id']
+                    ))
+                    additional_instance_id = self.cursor.fetchone()[0]
+
+                    # Relaciona el adicional con la instancia del producto
+                    insert_product_additional_relation_query = """
+                    INSERT INTO orders.product_aditional_item_instances (aditional_item_instance_id, product_instance_id)
+                    SELECT %s, id FROM inventory.product_instances WHERE product_id = %s AND site_id = %s;
+                    """
+                    self.cursor.execute(insert_product_additional_relation_query, (
+                        additional_instance_id,
+                        new_product_id,
+                        site_id
+                    ))
+
+            # Confirma los cambios
+            self.cursor.execute("COMMIT;")
+            return f"Producto '{product_info['name']}' creado con éxito en todas las sedes."
+
+        except Exception as e:
+            # Si algo falla, revierte la transacción
+            self.cursor.execute("ROLLBACK;")
+            return f"Error al crear el producto: {str(e)}"
 
 
 

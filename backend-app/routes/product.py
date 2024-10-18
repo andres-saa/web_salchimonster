@@ -15,6 +15,18 @@ def get_products():
     product_instance.close_connection()
     return products
 
+
+
+
+@product_router.get("/restaurants")
+def get_productss():
+    product_instance = Product()
+    products = product_instance.select_all_restaurants()
+    product_instance.close_connection()
+    return products
+
+
+
 @product_router.post("/products")
 def create_product(product: Product_schema):
     product_instance = Product()
@@ -67,6 +79,7 @@ def update_product_and_instances(product_instance_id: int, product: ProductSchem
             "product_id":existing_product[0]['product_id'],
             "name": product.name,
             "price": product.price,
+            "last_price": product.last_price,
             "description": product.description,
             "category_id": product.category_id,
             "status": True,
@@ -80,6 +93,36 @@ def update_product_and_instances(product_instance_id: int, product: ProductSchem
         # Llama al método de actualización que maneja tanto el producto como sus instancias y adicionales
         update_result = product_instance.update_product_and_its_instances(product_info, additional_item_ids)
         return {"message": update_result}
+
+    finally:
+        product_instance.close_connection()
+        
+        
+@product_router.post("/products/create/")
+def create_product_and_instances(product: ProductSchemaPost, additional_item_ids: list[int]):
+    product_instance = Product()
+    
+    try:
+        # Convertir el esquema de entrada en un diccionario
+        product_info = {
+            "name": product.name,
+            "price": product.price,
+            "description": product.description,
+            "category_id": product.category_id,
+            "restaurant_id": product.restaurant_id,
+            "status": True,
+            "has_recipe": product.has_recipe,
+            "gramos": product.gramos,
+            "img_identifier": product.img_identifier
+        }
+
+        # Llama al método de creación que maneja tanto el producto como sus instancias y adicionales
+        create_result = product_instance.create_product_and_its_instances(product_info, additional_item_ids)
+        
+        return {"message": create_result}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating product: {str(e)}")
 
     finally:
         product_instance.close_connection()

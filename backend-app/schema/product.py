@@ -5,14 +5,18 @@ from typing import Optional
 
 
 class ProductSchemaPost(BaseModel):
-    product_id: int
+    product_id: Optional[int] = None
     name: str
     price:int
+    last_price:Optional[int] = None
     description:str
     category_id:int
     status: bool
     img_identifier:str
-    parent_id:int
+    parent_id: Optional[int] = None
+    restaurant_id: Optional[int] = None
+    has_recipe: Optional[bool] = False
+    gramos: Optional[int] = None
     
 
 
