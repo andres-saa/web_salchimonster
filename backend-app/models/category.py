@@ -86,6 +86,17 @@ class Category:
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+    
+    
+    def select_all_categories_all_add_product(self,restaurant_id):
+        # Definimos la consulta que verifica la existencia de instancias activas de productos por cada categoría
+        select_query = f"""
+        SELECT *
+        FROM inventory.product_categories  where resturant_id = {restaurant_id};
+        """
+        self.cursor.execute(select_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
 
 

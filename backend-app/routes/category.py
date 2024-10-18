@@ -28,6 +28,16 @@ def get_categories(site_id:int,restaurant_id:int):
     category_instance.close_connection()
     return categories
 
+
+
+
+@category_router.get("/categories-add-product/{restaurant_id}")
+def get_categories(restaurant_id:int):
+    category_instance = Category()
+    categories = category_instance.select_all_categories_all_add_product(restaurant_id)
+    category_instance.close_connection()
+    return categories
+
 # @category_router.get("/site/{site_id}/active-categories")
 # def get_active_categories_by_site(site_id: int):
 #     category_instance = Category()
