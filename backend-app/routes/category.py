@@ -29,8 +29,6 @@ def get_categories(site_id:int,restaurant_id:int):
     return categories
 
 
-
-
 @category_router.get("/categories-add-product/{restaurant_id}")
 def get_categories(restaurant_id:int):
     category_instance = Category()
