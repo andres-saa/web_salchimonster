@@ -72,6 +72,21 @@ class Order2:
             
             
             
+    def traslate_order(self, order_id:str, site_id:int):
+        query = "update orders.orders set site_id = %s where id = %s returning id;"
+        result = self.cursor.execute(query,(site_id,order_id,))
+        
+        order_status_insert_query = """
+                    INSERT INTO orders.order_status (order_id, status, timestamp)
+                    VALUES (%s, %s, CURRENT_TIMESTAMP)
+                    """
+        self.cursor.execute(order_status_insert_query, (order_id, 'generada'))
+                    
+        self.conn.commit()
+        
+        self.create_or_update_event(1, site_id, 1132, '3 minutes', False)
+        return result
+        
             
 
     def create_user(self, user_data):

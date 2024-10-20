@@ -42,6 +42,18 @@ def calcular_total_vendido(data):
 
 
 
+
+
+class traslate(BaseModel):
+    site_id:int
+    order_id:str
+    
+@order_router.put('/traslate-order/')
+def traslate(data:traslate):
+    order_instance = Order2()
+    result = order_instance.traslate_order(data.order_id,data.site_id)
+    return result
+
 async def notify_all_clients(site_id: int, message: str, sender: WebSocket):
     for client in connected_clients[site_id]:
         if client != sender:  # Evita enviar el mensaje de vuelta al emisor original
