@@ -176,7 +176,7 @@ const menuOptions = ref(
         },
 
         {
-            name: 'PQRS',
+            name: 'AYUDA/PQR',
            
             to:'pqrs-user'
         },
