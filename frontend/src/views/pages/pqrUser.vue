@@ -79,7 +79,7 @@
   
         <div class="input" v-if="selectedType && selectedType != 8">
           <h5 class="field">Número de teléfono</h5>
-          <InputNumber v-model="userPhone" style="width: 100%;" placeholder="Escriba su número de teléfono"></InputNumber>
+          <InputNumber :useGrouping="false" v-model="userPhone" style="width: 100%;" placeholder="Escriba su número de teléfono"></InputNumber>
         </div>
   
         <div class="input" v-if="selectedType && selectedType != 8">
