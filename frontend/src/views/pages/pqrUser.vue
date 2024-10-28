@@ -163,6 +163,7 @@ const handleSubmit = async () => {
       channel_id: 1, // Ajustar según el canal,
       rating:rating.value || null,
       site_id: selecteSite.value || null,
+      order_id:orderId.value || null,
       network_id:4
     },
     user: {
@@ -180,6 +181,7 @@ const handleSubmit = async () => {
    last_id.value = result?.pqr_id[0]?.id
    if (selectedType.value == 8){
     visibleDialogGRacias.value = true
+    emi
    } else {
     visibleDialog.value = true
    }
