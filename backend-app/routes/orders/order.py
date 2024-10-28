@@ -126,6 +126,17 @@ def get_orders_gy_site(site_id:int):
     return result
 
 
+
+class traslate(BaseModel):
+    site_id:int
+    order_id:str
+
+@order_router.put('/traslate-order/')
+def traslate(data:traslate):
+    order_instance = Order2()
+    result = order_instance.traslate_order(data.order_id,data.site_id)
+    return result
+
 @order_router.get('/order-cancellation-request-categories')
 def get_orders_gy_site():
     order_instance = Order2()
