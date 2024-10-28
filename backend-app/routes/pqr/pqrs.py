@@ -52,13 +52,15 @@ def create_pqrs():
     return result
 
 
+
+from typing import Optional
 class ChangeStatusRequest(BaseModel):
     pqr_request_id: int
     status_id: int
     responsible_id: int
-    value: float = 0.0
+    value: Optional[int] = None
     notes: str = ''
-    order_id:str = None
+    order_id:Optional[str] = None
 
 
 @pqr_router.post("/change-pqr-status", tags=["pqr"])
