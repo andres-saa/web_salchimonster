@@ -52,6 +52,7 @@ class Pqrs:
             network_id = data.network_id
         )
         
+        
         # Inserta la nueva PQR en la base de datos
         query, params = self.db.build_insert_query(table_name='pqr.pqr_request', data=data_to_send, returning='id')
         pqr_id = self.db.execute_query(query=query, params=params, fetch=True)

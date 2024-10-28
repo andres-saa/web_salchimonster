@@ -6,9 +6,9 @@ class PQRRequest(BaseModel):
     content: str
     channel_id: int
     rating:Optional[int] = None
-    order_id:Optional[str] = None
     site_id:Optional[int] = None
     network_id:Optional[int] = None
+    order_id:Optional[str] = None
     
 
 
