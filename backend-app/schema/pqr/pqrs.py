@@ -9,6 +9,7 @@ class PQRRequest(BaseModel):
     site_id:Optional[int] = None
     network_id:Optional[int] = None
     order_id:Optional[str] = None
+    tag_id:Optional[int] = None
     
 
 

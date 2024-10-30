@@ -54,6 +54,7 @@ from routes.permissions.permission import permission_router
 from routes.app.salchigest import salchigest_router
 from routes.requisitions.requisition import requisition_router
 from routes.pqr.pqrs import pqr_router
+from routes.cachier_money.cachier_money import cachier_money_router
 app = FastAPI()
 # from routes.area import area_router
 app.add_middleware(
@@ -64,6 +65,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
+app.include_router(cachier_money_router)
 app.include_router(pqr_router)
 app.include_router(requisition_router)
 app.include_router(salchigest_router)

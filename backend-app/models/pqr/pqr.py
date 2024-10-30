@@ -49,7 +49,8 @@ class Pqrs:
             rating=data.rating,
             order_id = data.order_id,
             site_id = data.site_id,
-            network_id = data.network_id
+            network_id = data.network_id,
+            tag_id= data.tag_id
         )
         
         
@@ -86,6 +87,13 @@ class Pqrs:
         pqr_id = self.db.execute_query(query=query,fetch=True)
         return pqr_id
     
+            
+    def get_all_tags(self):
+        query = self.db.build_select_query(table_name='pqr.pqr_tag',fields=["*"])
+        pqr_id = self.db.execute_query(query=query,fetch=True)
+        return pqr_id
+    
+    
     def get_all_channels(self):
         query = self.db.build_select_query(table_name='pqr.pqr_channel',fields=["*"])
         pqr_id = self.db.execute_query(query=query,fetch=True)
@@ -99,7 +107,7 @@ class Pqrs:
     
             
     def get_all_status(self):
-        query = self.db.build_select_query(table_name='pqr.pqr_status',fields=["*"])
+        query = self.db.build_select_query(table_name='pqr.pqr_status',fields=["*"],order_by='index')
         pqr_id = self.db.execute_query(query=query,fetch=True)
         return pqr_id
     

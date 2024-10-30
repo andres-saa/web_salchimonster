@@ -33,6 +33,14 @@ def create_pqrs():
 
 
 
+@pqr_router.get("/get-all-pqr-tags",tags=["pqr"])
+def create_pqrs():
+    pqr_instance = Pqrs()
+    result = pqr_instance.get_all_tags()
+    return result
+
+
+
 @pqr_router.get("/get-all-pqr-channel",tags=["pqr"])
 def create_pqrs():
     pqr_instance = Pqrs()
