@@ -23,7 +23,7 @@ class Employer:
 
     def select_all_employers(self):
     # Consulta SQL que incluye un JOIN para obtener site_name
-        query = "SELECT * from hhrr.employers_view;"
+        query = "SELECT * from permission.permission_employer_complete"
         return self.db.fetch_all(query)
     
     def select_employers_basic(self):
@@ -88,8 +88,8 @@ class Employer:
             birth_department, birth_city, blood_type, marital_status, education_level, contract_type, 
             eps, pension_fund, severance_fund, has_children, housing_type, has_vehicle, vehicle_type, 
             household_size, emergency_contact, shirt_size, jeans_sweater_size, food_handling_certificate, 
-            food_handling_certificate_number, salary, boss_id, password
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)  
+            food_handling_certificate_number, salary, boss_id, password,rol_id
+        ) VALUES (%s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)  
         RETURNING id;
         """
         self.cursor.execute(insert_query, (
@@ -102,7 +102,8 @@ class Employer:
             employer_data.has_vehicle, employer_data.vehicle_type, employer_data.household_size, employer_data.emergency_contact, 
             employer_data.shirt_size, employer_data.jeans_sweater_size, employer_data.food_handling_certificate, 
             employer_data.food_handling_certificate_number, employer_data.salary, employer_data.boss_id,
-            employer_data.password  
+            employer_data.password,employer_data.rol_id
+              
         ))
         employer_id = self.cursor.fetchone()[0]
         self.conn.commit()
@@ -158,7 +159,7 @@ class Employer:
             marital_status = %s, education_level = %s, contract_type = %s, eps = %s, pension_fund = %s, severance_fund = %s, 
             has_children = %s, housing_type = %s, has_vehicle = %s, vehicle_type = %s, household_size = %s, 
             emergency_contact = %s, shirt_size = %s, jeans_sweater_size = %s, food_handling_certificate = %s, 
-            food_handling_certificate_number = %s, salary = %s, boss_id = %s, password = %s  -- Aquí se actualiza la contraseña
+            food_handling_certificate_number = %s, salary = %s, boss_id = %s, password = %s, rol_id = %s  -- Aquí se actualiza la contraseña
         WHERE id = %s
         RETURNING *;
         """
@@ -172,8 +173,8 @@ class Employer:
             updated_data.has_vehicle, updated_data.vehicle_type, updated_data.household_size, updated_data.emergency_contact, 
             updated_data.shirt_size, updated_data.jeans_sweater_size, updated_data.food_handling_certificate, 
             updated_data.food_handling_certificate_number, updated_data.salary, updated_data.boss_id, 
-            updated_data.password,  # Asegúrate de que updated_data incluye la contraseña
-            employer_id  # ID del empleador que se está actualizando
+            updated_data.password,updated_data.rol_id,  # Asegúrate de que updated_data incluye la contraseña
+            employer_id,  # ID del empleador que se está actualizando
         ))
 
         updated_employer_data = self.cursor.fetchone()

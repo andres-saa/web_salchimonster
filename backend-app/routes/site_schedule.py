@@ -46,6 +46,20 @@ def get_site_status(site_id: int, schedule_instance: site_schedule = Depends()):
         
 
 
+@site_schedule_router.put("/open-close-site/site/{site_id}/status/{status}" ,tags=["open site"])
+def get_site_status(site_id: int, status:bool , schedule_instance: site_schedule = Depends()):
+    is_open = schedule_instance.update_sites_open_status(status=status,site_id=site_id)
+    return is_open
+    
+    
+    
+@site_schedule_router.get("/is-open-status/{site_id}" ,tags=["open site"])
+def get_site_status(site_id: int, schedule_instance: site_schedule = Depends()):
+    is_open = schedule_instance.get_site_open_status(site_id=site_id)
+    return is_open
+    
+          
+
 # @site_schedule_router.put("/site-schedule/update")
 # def update_multiple_schedules_all(schedule_data_list: List[site_schedule_schema]):
 #     site_schedule_instance = site_schedule()

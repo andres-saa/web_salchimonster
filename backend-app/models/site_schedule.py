@@ -72,9 +72,9 @@ class site_schedule:
         print(current_day_of_week)
         query = f"""
         SELECT opening_time, closing_time
-        FROM site_schedule
+        FROM site_schedule_open
         WHERE site_id = {site_id}
-        AND day_of_week = '{current_day_of_week}';
+        AND day_of_week = '{current_day_of_week}' AND open = true;
         """
         
         self.cursor.execute(query)
@@ -148,6 +148,46 @@ class site_schedule:
             self.cursor.execute(update_query)
         
         self.conn.commit()
+        
+        
+        
+    def update_sites_open_status(self, status:bool,site_id:int):
+        
+        update_query = f"""UPDATE sites 
+        SET open = {status}  
+        WHERE site_id = {site_id} returning status;"""
+
+        result = self.cursor.execute(update_query)
+        self.conn.commit()
+        return self.cursor.fetchall()[0][0]
+    
+    
+    def get_site_open_status(self, site_id: int) -> bool:
+        query = f"""SELECT open FROM sites 
+                    WHERE site_id = {site_id};"""
+        
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        
+        if result is not None:
+            return bool(result[0])  # Convert to boolean if not None
+        else:
+            return None  # or raise an exception if the site_id does not exist
+
+
+
+
+    def get_site_open_status(self, site_id: int):
+        query = f"""SELECT open FROM sites 
+                    WHERE site_id = {site_id};"""
+        
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        
+        if result is not None:
+            return bool(result[0])  # Convert to boolean if not None
+        else:
+            return None  # or raise an exception if the site_id does not exist
 
     def close_connection(self):
         self.conn.close()
