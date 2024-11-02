@@ -36,8 +36,8 @@
 
 
     <div class="container mt-8 col-12 p-4 shadow-3" style="max-width: 400px; margin: auto;">
-      <h2 class="mb-0">🔥 <b>MONTER HELP</b> 🔥</h2>
-      <h2 style="color: var(--primary-color)" class="my-0"><b>Siempre te escuchamos</b></h2>
+      <h2 class="mb-0">🔥 <b>MONTER AYUDA</b> 🔥</h2>
+      <h2 style="color: var(--primary-color)" class="my-0"><b>Cada dia mejoramos</b></h2>
       <img src="/public/images/characters/5.png">
   
       <div class="form" style="width: 100%; display: flex; flex-direction: column; gap: 1rem;">
@@ -46,6 +46,34 @@
           <h5 class="field">¿Cómo te podemos ayudar?</h5>
           <Dropdown v-model="selectedType" optionValue="id" style="width: 100%; text-transform: uppercase;" :options="types" optionLabel="name"></Dropdown>
         </div>
+
+
+         <!-- Selección de Sede -->
+         <div class="input" v-if="(selectedType && selectedType != 8)" >
+          <h5 class="field">Por favor clasifica tu inconveniente</h5>
+          <Dropdown :options="tags" v-model="selecte_tag"   style="width: 100%;">
+  
+            <template #option="option">
+                <div style="display: flex;align-items: center;gap: 1rem; ">
+                  <Tag :style="`background-color:${option.option.color}`" style="height: 1.5rem;aspect-ratio: 1 / 1; border-radius:50%;">
+                    
+                  </Tag> <h6 class="p-0 m-0">{{ option.option.name }}</h6>
+                </div>
+            </template>
+
+
+
+            <template #value="value">
+                <div style="display: flex;align-items: center;gap: 1rem; ">
+                  <Tag :style="`background-color:${value.value.color}`" style="height: 1.5rem;aspect-ratio: 1 / 1; border-radius:50%;">
+                    
+                  </Tag> <h6 class="p-0 m-0">{{ value.value.name }}</h6>
+                </div>
+            </template>
+            
+          </Dropdown>
+        </div>
+  
   
         <!-- Selección de Sede -->
         <div class="input" v-if="(selectedType)">
@@ -72,17 +100,17 @@
         </div>
   
         <!-- Información del Usuario -->
-        <div class="input" v-if="selectedType && selectedType != 8">
+        <div class="input" v-if="selectedType ">
           <h5 class="field">Nombre</h5>
           <InputText v-model="userName" style="width: 100%;" placeholder="Escriba su nombre por favor"></InputText>
         </div>
   
-        <div class="input" v-if="selectedType && selectedType != 8">
+        <div class="input" v-if="selectedType ">
           <h5 class="field">Número de teléfono</h5>
           <InputNumber :useGrouping="false" v-model="userPhone" style="width: 100%;" placeholder="Escriba su número de teléfono"></InputNumber>
         </div>
   
-        <div class="input" v-if="selectedType && selectedType != 8">
+        <div class="input" v-if="selectedType ">
           <h5 class="field">Dirección (opcional)</h5>
           <InputText v-model="userAddress" style="width: 100%;" placeholder="Escriba su dirección"></InputText>
         </div>
@@ -102,7 +130,7 @@ import { URI } from '../../service/conection';
 import router from '../../router';
 
 const last_id = ref()
-
+const selecte_tag = ref({})
 const visibleDialog = ref(false)
 const pqrs = ref([]);
 const visibleDialogGRacias = ref(false)
@@ -116,6 +144,7 @@ const userPhone = ref('');
 const userAddress = ref('');
 const comments = ref('');
 const rating = ref(null);
+const tags = ref([{}])
 
 const update = async () => {
   pqrs.value = await pqrsService.getPqrsByPlaceId(1);
@@ -132,6 +161,12 @@ const handleSubmit = async () => {
     return;
   }
 
+  if ( selectedType.value != 8 && !selecte_tag.value) {
+    alert('Por favor, Clasifica tu inconveniente');
+    return;
+  }
+
+
 
   if (selectedType.value != 8 && !comments.value) {
     alert('Por favor, Cuentenos lo sucedido');
@@ -142,7 +177,7 @@ const handleSubmit = async () => {
   if (selectedType.value != 8 && (!userName.value || !userPhone.value)) {
     alert('Por favor, complete los campos obligatorios (nombre y teléfono).');
     return;
-  }
+  } 
 
   if (!selecteSite.value) {
     alert('Por favor, Seleccione la sede');
@@ -164,7 +199,8 @@ const handleSubmit = async () => {
       rating:rating.value || null,
       site_id: selecteSite.value || null,
       order_id:orderId.value || null,
-      network_id:4
+      network_id:4,
+      tag_id:selecte_tag.value?.id || 7
     },
     user: {
       user_name: userName.value || '',
@@ -195,6 +231,7 @@ onMounted(async () => {
   update();
   types.value = await fetchService.get(`${URI}/get-all-pqrs-types`);
   sites.value = await fetchService.get(`${URI}/sites`);
+  tags.value = await fetchService.get(`${URI}/get-all-pqr-tags`);
   selectedType.value = 8;
 });
 

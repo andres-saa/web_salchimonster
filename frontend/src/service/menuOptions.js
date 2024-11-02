@@ -169,11 +169,11 @@ const menuOptions = ref(
            
             to:'rastrear-pedido'
         },
-        {
-            name: 'COLABORACIONES',
+        // {
+        //     name: 'COLABORACIONES',
            
-            to:'colaboraciones'
-        },
+        //     to:'colaboraciones'
+        // },
 
         {
             name: 'AYUDA/PQR',

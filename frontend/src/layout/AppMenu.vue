@@ -109,7 +109,7 @@ const model = ref([
             },
 
             {
-                label: 'PQRS',
+                label: 'PQRS/AYUDA',
                 icon: 'pi pi-fw pi-info-circle',
                 to: '/pqrs-user'
             },
