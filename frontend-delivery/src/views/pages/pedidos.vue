@@ -7,13 +7,12 @@
 
     <div class="md:px-2 xl:pt-5 p-0 col-12 xl:col-4 top">
 
-      <div class=" shadow-4 contenedor pb-2" style="overflow: hidden; background-color:#ffad53
+      <div class=" shadow-4 contenedor pb-2" style="overflow: hidden; background-color:#640097
 ">
 
         <div style="height: 100%;width: 100%;">
           <p class="col-12 text-center shadow-4 " style="background-color: #ffffff61;">
-            <span class="text-center text-2xl" style="color: black;font-weight: bold;"> <i class="pi pi-envelope
-            text-2xl"></i> RECIBIDOS</span>
+            <span class="text-center text-2xl" style="color: black;font-weight: bold;">  RECIBIDOS</span>
           </p>
 
 
@@ -42,13 +41,12 @@
 
 
     <div class="md:px-2 xl:pt-5  p-0 col-12 xl:col-4 top">
-      <div class=" shadow-4 contenedor pb-2" style="overflow: hidden; background-color:#8e3693
+      <div class=" shadow-4 contenedor pb-2" style="overflow: hidden; background-color:#007bff
 ">
         <div style="height: 100%;width: 100%;">
 
           <p class="col-12 text-center shadow-4" style="background-color: #ffffff61;">
-            <span class="text-center text-2xl" style="color: black;font-weight: bold;"> <i
-                class="pi pi-clock text-2xl"></i>
+            <span class="text-center text-2xl" style="color: black;font-weight: bold;"> 
               EN PREPARACION</span>
           </p>
           <div class="lg:pb-8" style="height: 100%; overflow-y: auto;">
@@ -73,14 +71,13 @@
 
 
     <div class="md:px-2 xl:pt-5 p-0 col-12 xl:col-4 top">
-      <div class=" shadow-4 contenedor pb-2" style="overflow: hidden; background-color:#00bf7a
+      <div class=" shadow-4 contenedor pb-2" style="overflow: hidden; background-color:#22c55e
 ">
         <div class="lg:pb-8" style="height: 100%;width: 100%;">
 
 
           <p class="col-12 text-center shadow-4" style="background-color: #ffffff61;">
-            <span class="text-center text-2xl" style="color: black;font-weight: bold;"><i class="pi pi-send text-2xl
-"></i> ENVIADOS</span>
+            <span class="text-center text-2xl" style="color: black;font-weight: bold;">  ENVIADOS</span>
           </p>
           <div style="height: 100%; overflow-y: auto;">
 
@@ -198,7 +195,7 @@ onMounted(() => {
 
 
 .ENVIADOS {
-  background-color: rgba(123, 255, 66, 0.73)
+  background-color:#22c55e
 }
 
 ::-webkit-scrollbar {

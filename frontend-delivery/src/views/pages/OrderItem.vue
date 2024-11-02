@@ -2,8 +2,7 @@
     <div @click="open" class="col-12 " style="background-color: rgba(255, 255, 255, 0.506);padding: .6rem; position: relative; border-radius: 0.5rem;cursor: pointer;">
 
  
-       
-        <Tag style="border-radius: .3rem" class="text mb-2" :severity="props.order.user_phone == '1111111111'? 'danger' : 'help'"> {{props.order.user_phone == '1111111111'? 'ES UNA PRUEBA, RELAJATE' : `CLIENTE --> ${props.order.user_name?.toUpperCase()}` }}</Tag>
+  
 
 
         <div style="display: flex; align-items: center;justify-content: space-between;">
@@ -36,11 +35,11 @@
             {{props.order?.latest_status_timestamp?.split('T')[1]?.split('.')[0]?.split(':').slice(0,2)?.join(':') }}
             </b>
             
-            <!-- <Tag style="border-radius: .3rem" v-if="props.order.current_status != 'en preparacion'" :severity="icons[props.order.current_status]">
+            <Tag style="border-radius: .3rem" v-if="props.order.current_status != 'en preparacion'" :severity="icons[props.order.current_status]">
                 
             {{props.order.current_status }}
             
-            </Tag> -->
+            </Tag>
 
         
 
@@ -73,26 +72,26 @@
         
         <Tag style="border-radius: .3rem" severity="success" v-if="props.order.responsible_id">  {{props.order.name}}</Tag>
 
-    
+<!--     
         <div v-if="props.order.inserted_by_name">
             <p style="color: black;" class="py-0 my-1"><b>Vendido por</b></p>
         <Tag style="border-radius: .3rem; background-color: black;" > 
             {{ props.order.inserted_by_name}} ->
         </Tag>
        
-        </div>
+        </div> -->
 
-        <Tag style="border-radius: .3rem ; background-color: var(--primary-color);" v-else >
+        <!-- <Tag style="border-radius: .3rem ; background-color: var(--primary-color);" v-else >
            DIRECTO DE WEB ->
-        </Tag>
+        </Tag> -->
        
 
 
-        <img v-if="props.order.inserted_by_name" class="pr-2"   style="height: 2rem; position: absolute; bottom: 1rem; right: .5rem;" src="/images/WhatsApp.svg.webp"
+        <!-- <img v-if="props.order.inserted_by_name" class="pr-2"   style="height: 2rem; position: absolute; bottom: 1rem; right: .5rem;" src="/images/WhatsApp.svg.webp"
         alt="">
 
         <img v-else class="pr-2"   style="height: 1.5rem; position: absolute; bottom: 1rem; right: .5rem;" src="/images/logo.png"
-        alt="">
+        alt=""> -->
 
     </div>
     
