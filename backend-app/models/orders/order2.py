@@ -101,7 +101,7 @@ class Order2:
             INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized,inserted_by_id)
             VALUES (%s, %s, %s, false,%s) RETURNING id;
             """
-            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, order_data.delivery_person_id, order_data.inserted_by))
+            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, 4, order_data.inserted_by))
             # Verificar resultado
             result = self.cursor.fetchone()
             if result is None:
@@ -115,7 +115,7 @@ class Order2:
             INSERT INTO orders.orders (user_id, site_id, delivery_person_id,inserted_by_id)
             VALUES (%s, %s, %s,%s) RETURNING id;
             """
-            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, order_data.delivery_person_id,order_data.inserted_by))
+            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, 4,order_data.inserted_by))
             result = self.cursor.fetchone()
             if result is None:
                 raise ValueError("La orden no pudo ser creada.")
