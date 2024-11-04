@@ -200,7 +200,8 @@ const handleSubmit = async () => {
       site_id: selecteSite.value || null,
       order_id:orderId.value || null,
       network_id:4,
-      tag_id:selecte_tag.value?.id || 7
+      tag_id:selecte_tag.value?.id || 7,
+      restaurant_id:1
     },
     user: {
       user_name: userName.value || '',
