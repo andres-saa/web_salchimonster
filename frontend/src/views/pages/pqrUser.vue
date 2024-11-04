@@ -44,7 +44,7 @@
         <!-- Selección de Tipo de Requerimiento -->
         <div class="input">
           <h5 class="field">¿Cómo te podemos ayudar?</h5>
-          <Dropdown v-model="selectedType" optionValue="id" style="width: 100%; text-transform: uppercase;" :options="types" optionLabel="name"></Dropdown>
+          <Dropdown v-model="selectedType" optionValue="id" style="width: 100%; text-transform: uppercase;" :options="types.filter(t => t.show_on_web)" optionLabel="name"></Dropdown>
         </div>
 
 
