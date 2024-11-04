@@ -50,7 +50,8 @@ class Pqrs:
             order_id = data.order_id,
             site_id = data.site_id,
             network_id = data.network_id,
-            tag_id= data.tag_id
+            tag_id= data.tag_id,
+            restaurant_id=data.restaurant_id
         )
         
         

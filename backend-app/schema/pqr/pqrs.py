@@ -10,6 +10,7 @@ class PQRRequest(BaseModel):
     network_id:Optional[int] = None
     order_id:Optional[str] = None
     tag_id:Optional[int] = None
+    restaurant_id:int
     
 
 
