@@ -44,7 +44,7 @@
         <!-- Selección de Tipo de Requerimiento -->
         <div class="input">
           <h5 class="field">¿Cómo te podemos ayudar?</h5>
-          <Dropdown v-model="selectedType" optionValue="id" style="width: 100%; text-transform: uppercase;" :options="types" optionLabel="name"></Dropdown>
+          <Dropdown v-model="selectedType" optionValue="id" style="width: 100%; text-transform: uppercase;" :options="types.filter(t => t.show_on_web)" optionLabel="name"></Dropdown>
         </div>
 
 
@@ -200,7 +200,8 @@ const handleSubmit = async () => {
       site_id: selecteSite.value || null,
       order_id:orderId.value || null,
       network_id:4,
-      tag_id:selecte_tag.value?.id || 7
+      tag_id:selecte_tag.value?.id || 7,
+      restaurant_id:1
     },
     user: {
       user_name: userName.value || '',
