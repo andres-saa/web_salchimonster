@@ -163,12 +163,12 @@ const changeCurrentGroupMenu = (grupoMenu) => {
 }
 const menus = [
     { name: 'Atender', to: '/' },
-    // { name: ' Pedido manual', to: '/pedido-manual' },
-    // { name: 'Historial de pedidos', to: '/historial' },
+    { name: ' Pedido manual', to: '/pedido-manual' },
+    { name: 'Historial de pedidos', to: '/historial' },
     { name: ' Cuadre de caja', to: '/cuadre' },
     { name: ' Menu', to: '/tienda-menu/productos/SALCHIPAPAS/3' },
     { name: ' Horarios', to: '/horarios' },
-    // { name: ' Reportes', to: '/reporte-ventas/valor-ventas' }
+    { name: ' Reportes', to: '/reporte-ventas/valor-ventas' }
 
 ]
 
@@ -253,7 +253,7 @@ const cerrar_sesion = () => {
 <template>
 
 
-    <div class="layout-topbar shadow-2 lg:pl-8 lg:pr-8 md:pr-8 " style=" background-color: #cd1f30; ">
+    <div class="layout-topbar shadow-2 lg:pl-8 lg:pr-8 md:pr-8 " style=" background-color: rgb(255, 255, 255); ">
 
 
         <router-link to="/" class="layout-topbar-logo" style="z-index: 99999;">
