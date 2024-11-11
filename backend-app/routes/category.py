@@ -13,6 +13,14 @@ def get_categories(site_id:int,restaurant_id:int):
 
 
 
+
+@category_router.get("/categories-cumples/{site_id}/{restaurant_id}")
+def get_categories(site_id:int,restaurant_id:int):
+    category_instance = Category()
+    categories = category_instance.select_all_categories_reservas(site_id,restaurant_id)
+    category_instance.close_connection()
+    return categories
+
 @category_router.get("/categories_main/{site_id}/{restaurant_id}")
 def get_categories(site_id:int,restaurant_id:int):
     category_instance = Category()

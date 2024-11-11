@@ -36,7 +36,7 @@ class Category:
         SELECT c.*
         FROM inventory.active_product_categories_with_site AS c
         WHERE c.site_id = {site_id}
-        AND C.restaurant_id = {resturant_id}
+        AND C.restaurant_id = {resturant_id} AND  c.category_id != 25
         AND EXISTS (
             SELECT 1
             FROM inventory.complete_product_instances AS p
@@ -45,12 +45,37 @@ class Category:
             AND p.status = TRUE
             AND p.restaurant_id = {resturant_id}
             order by index
-        )
+        ) 
+        """
+        self.cursor.execute(select_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
+
+    def select_all_categories_reservas(self, site_id,resturant_id):
+        # Definimos la consulta que verifica la existencia de instancias activas de productos por cada categoría
+        select_query = f"""
+        SELECT c.*
+        FROM inventory.active_product_categories_with_site AS c
+        WHERE c.site_id = {site_id}
+        AND C.restaurant_id = {resturant_id} AND  c.category_id = 25
+        AND EXISTS (
+            SELECT 1
+            FROM inventory.complete_product_instances AS p
+            WHERE p.site_id = c.site_id
+            AND p.category_id = c.category_id
+            AND p.status = TRUE
+            AND p.restaurant_id = {resturant_id}
+            order by index
+        ) 
         """
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
     
+
+
+   
     
     def select_main_categories(self, site_id,resturant_id):
         # Definimos la consulta que verifica la existencia de instancias activas de productos por cada categoría
