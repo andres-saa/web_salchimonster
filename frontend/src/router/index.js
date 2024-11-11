@@ -66,6 +66,13 @@ const router = createRouter({
           component: () => import('@/views/pages/sedes.vue'),
           meta: { title:'Sedes' },
         },
+        
+        {
+          path: '/reservas',
+          name: 'reservas',
+          component: () => import('@/views/pages/reservas.vue'),
+          meta: { title:'Reservas' },
+        },
 
         {
           path: '/gracias',

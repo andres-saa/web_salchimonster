@@ -82,6 +82,12 @@ const model = ref([
             },
 
             {
+                label: 'Reservas',
+                icon: 'pi pi-fw pi-home',
+                to: '/reservas'
+            },
+
+            {
                 label: 'Sedes',
                 icon: 'pi pi-fw pi-map-marker',
                 to: '/sedes'

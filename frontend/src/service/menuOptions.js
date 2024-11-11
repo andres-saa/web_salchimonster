@@ -151,6 +151,12 @@ const menuOptions = ref(
                     "products": []}]
         },
 
+        {
+            name: 'RESERVAS',
+            to:'reservas',
+          
+        },
+
 
 
         {
