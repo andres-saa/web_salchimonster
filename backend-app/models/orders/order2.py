@@ -72,6 +72,21 @@ class Order2:
             
             
             
+    def traslate_order(self, order_id:str, site_id:int):
+        query = "update orders.orders set site_id = %s where id = %s returning id;"
+        result = self.cursor.execute(query,(site_id,order_id,))
+        
+        order_status_insert_query = """
+                    INSERT INTO orders.order_status (order_id, status, timestamp)
+                    VALUES (%s, %s, CURRENT_TIMESTAMP)
+                    """
+        self.cursor.execute(order_status_insert_query, (order_id, 'generada'))
+                    
+        self.conn.commit()
+        
+        self.create_or_update_event(1, site_id, 1132, '3 minutes', False)
+        return result
+        
             
 
     def create_user(self, user_data):
@@ -86,7 +101,7 @@ class Order2:
             INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized,inserted_by_id)
             VALUES (%s, %s, %s, false,%s) RETURNING id;
             """
-            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, order_data.delivery_person_id, order_data.inserted_by))
+            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, 4, order_data.inserted_by))
             # Verificar resultado
             result = self.cursor.fetchone()
             if result is None:
@@ -100,7 +115,7 @@ class Order2:
             INSERT INTO orders.orders (user_id, site_id, delivery_person_id,inserted_by_id)
             VALUES (%s, %s, %s,%s) RETURNING id;
             """
-            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, order_data.delivery_person_id,order_data.inserted_by))
+            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, 4,order_data.inserted_by))
             result = self.cursor.fetchone()
             if result is None:
                 raise ValueError("La orden no pudo ser creada.")
@@ -382,6 +397,21 @@ class Order2:
             """
             self.cursor.execute(order_status_history_insert_query, (order_id, 'transferencia pendiente',))
 
+    def traslate_order(self, order_id:str, site_id:int):
+        query = "update orders.orders set site_id = %s where id = %s returning id;"
+        result = self.cursor.execute(query,(site_id,order_id,))
+        
+        order_status_insert_query = """
+                    INSERT INTO orders.order_status (order_id, status, timestamp)
+                    VALUES (%s, %s, CURRENT_TIMESTAMP)
+                    """
+        self.cursor.execute(order_status_insert_query, (order_id, 'generada'))
+                    
+        self.conn.commit()
+        
+        self.create_or_update_event(1, site_id, 1132, '3 minutes', False)
+        return result
+        
         
         
 

@@ -4,6 +4,7 @@ from typing import Optional, List
 class EmployerSchemaPost(BaseModel):
     name: str
     dni: str
+    rol_id:int
     address: str
     position: str
     site_id: int

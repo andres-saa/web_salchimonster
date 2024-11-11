@@ -101,7 +101,6 @@ class OrderSchemaPost(BaseModel):
     order_aditionals:list[AdditionalItemMin]
     user_id: Optional[int] = None
     site_id: int
-    delivery_person_id: int
     order_status:Optional[OrderStatus] = None
     status_history: Optional[List[OrderStatus]] = None
     payment_method_id: int

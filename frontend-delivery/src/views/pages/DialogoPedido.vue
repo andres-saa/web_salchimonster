@@ -94,9 +94,15 @@
 
 
           
-              <p style="padding: 0;color: black; margin: auto; margin-bottom: 1rem; width: max-content;min-width: max-content; ">
+              <p style="padding: 0;color: black;text-align: center; margin: auto; margin-bottom: 1rem; width: max-content;min-width: max-content;display: flex;justify-content: center; flex-direction: column ">
                 <b>
                   fecha: {{ store.currentOrder.latest_status_timestamp?.split('T')[0] }}
+                 
+
+                </b>
+
+                <b>
+                  Hora: {{ store.currentOrder.latest_status_timestamp?.split('T')[1]?.split(':')?.slice(0,2)?.join(':') }}
 
                 </b>
               </p>

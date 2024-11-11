@@ -25,7 +25,7 @@ class Role:
         return role_id
     
     def select_all_roles(self):
-        select_query = "SELECT * FROM job_roles order by title;"
+        select_query = "SELECT *, name as title FROM permission.rol order by name;"
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]

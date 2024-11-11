@@ -99,7 +99,7 @@ const isOutsideClicked = (event) => {
         <div class="layout-sidebar">
             <app-sidebar></app-sidebar>
         </div>
-        <div class="layout-main-container  pr-0 pl-0 pt-4 pb-0 " :style="route.path.includes('colaboraciones')? 'background-color: var(--primary-color);':''" style="contain:paint ;">
+        <div class="layout-main-container  pr-0 pl-0 pt-4 pb-5 " :style="route.path.includes('colaboraciones')? 'background-color: var(--primary-color);':''" style="contain:paint ;">
 
             <div class="layout-main" style="min-height: 100vh;">
                
@@ -108,7 +108,7 @@ const isOutsideClicked = (event) => {
                     <router-view  class="p-0"></router-view>
              
             </div>
-            <app-footer></app-footer>
+            <!-- <app-footer></app-footer> -->
         </div>
         <div class="layout-mask"></div>
     </div>

@@ -175,14 +175,14 @@ const menuOptions = ref(
            
             to:'rastrear-pedido'
         },
-        {
-            name: 'COLABORACIONES',
+        // {
+        //     name: 'COLABORACIONES',
            
-            to:'colaboraciones'
-        },
+        //     to:'colaboraciones'
+        // },
 
         {
-            name: 'PQRS',
+            name: 'AYUDA/PQR',
            
             to:'pqrs-user'
         },
