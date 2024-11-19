@@ -15,6 +15,7 @@ const site = useSitesStore();
 const user = useUserStore();
 
 const preparar_orden = () => {
+  user.user.was_reserva = false
   cart.sending_order = true
   const order_products = cart.cart.products.map(p => {
     return { product_instance_id: p.product.id, quantity: p.quantity };
@@ -55,6 +56,44 @@ const preparar_orden = () => {
   return order
 }
 
+
+const preparar_orden_reserva = () => {
+
+  user.user.was_reserva = true
+  cart.sending_order = true
+  const order_products = cart.cart.products.map(p => {
+    return { product_instance_id: p.product.id, quantity: p.quantity };
+  });
+
+
+
+  const order_aditionals = []
+
+  const site_id = site.location.siteReservas.site_id;
+  const payment_method_id = user.user.payment_method_option?.id;
+  const delivery_price = 0
+
+  const order_notes = cart.cart.order_notes;
+  const user_data = {
+    "user_name": user.user.name,
+    "user_phone": user.user.phone_number?.split(' ').join(''),
+    "user_address": `Debe ir a la sede` || ''
+  };
+
+  const order = {
+    "order_products": order_products,
+    "site_id": site_id,
+    // "site_id": 12,
+    "delivery_person_id": 4,
+    "payment_method_id": payment_method_id,
+    "delivery_price": 0,
+    "order_notes": order_notes || 'SIN NOTAS',
+    "user_data": user_data,
+    "order_aditionals":[]
+  };
+
+  return order
+}
 
 
 
@@ -131,6 +170,87 @@ export const orderService = {
 
     }
   },
+
+
+
+
+
+  async sendOrderReserva() {
+
+    const order = preparar_orden_reserva()
+    const cart = usecartStore()
+
+    user.user.was_reserva = true
+
+
+    if (!validateOrder(order)) {
+      cart.sending_order = false
+      return null;
+      
+    }
+
+    try {
+      report.setLoading(true,`enviando tu pedido ${user.user.name}`)
+      const response = await axios.post(`${URI}/order`, order);
+      if (response.status === 200) {
+        cart.sending_order = false
+        cart.last_order = response.data
+        report.setLoading(false,"enviando tu pedido")
+
+
+
+        pixel.sendTrackingEvent('Purchase', {
+          total: cart.cart.total_cost, // Este es el total en COP o convertido a otra moneda
+          currency: 'COP', // O la moneda a la que hayas convertido
+          items: cart.cart.products.map(p => {
+            return { 
+              id: p.product.id,
+              name: p.product.product_name,
+              quantity: p.quantity,
+              price: p.product.price
+            };
+          }),
+          value:cart.cart.total_cost
+        });
+
+      
+        
+
+        // if (order.payment_method_id !== 6) {
+        //   report.visible.show_validate = true
+        // }else{
+          router.push('/gracias')
+        // }
+
+    
+
+
+
+      } else {
+        console.error('An error occurred while sending the order:', response.status);
+        alert('An error occurred while sending the order. Please try again.');
+        report.setLoading(false,"enviando tu pedido" )
+        cart.sending_order = false
+
+    
+        return null;
+        
+      }
+    } catch (error) {
+      console.error('An error occurred while sending the order:', error);
+      report.setLoading(false,"enviando tu pedido")
+      cart.sending_order = false
+
+      alert('An error occurred while sending the order. Please check your internet connection and try again.');
+      cart.sending_order = false
+      return null;
+
+    }
+  },
+
+
+
+  
 };
 
 
@@ -162,5 +282,6 @@ function validateOrder(order) {
 
   return true;
 }
+
 
 

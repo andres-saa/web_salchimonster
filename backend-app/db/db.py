@@ -36,60 +36,6 @@ class Db:
             self.conn.rollback()
             print(f"An error occurred: {e}")
 
-    
-
-
-
-#     def build_bulk_update_query(
-#     table_name: str,
-#     data_list: List[BaseModel],
-#     id_field: str = 'id',
-#     returning: str = ''
-# ) -> (str, Dict[str, Any]):
-#     if not data_list:
-#         raise ValueError("The data list cannot be empty")
-
-#     # Convertir cada modelo a un diccionario
-#     data_dict_list = [model.dict() for model in data_list]
-
-#     # Obtener las columnas de los modelos
-#     first_data_dict = data_dict_list[0]
-#     columns = [key for key in first_data_dict.keys() if key != id_field]
-
-#     # Crear las cláusulas SET y VALUES
-#     set_clauses = ', '.join([f"{col} = updates.{col}" for col in columns])
-#     values_clauses = ', '.join([
-#         f"(%({col}_{i})s, %({id_field}_{i})s)"
-#         for i in range(len(data_list))
-#     ])
-#     update_clauses = ' OR '.join([f"{id_field} = %({id_field}_{i})s" for i in range(len(data_list))])
-
-#     # Construir la consulta
-#     query = f'''
-#     WITH updates AS (
-#         SELECT * FROM (VALUES {values_clauses}) AS v ({', '.join(columns + [id_field])})
-#     )
-#     UPDATE {table_name}
-#     SET {set_clauses}
-#     FROM updates
-#     WHERE {table_name}.{id_field} = updates.{id_field}
-#     '''
-
-#     if returning:
-#         query += f' RETURNING {returning}'
-
-#     # Construir el diccionario de parámetros
-#     parameters = {}
-#     for i, data in enumerate(data_dict_list):
-#         for col in columns:
-#             parameters[f"{col}_{i}"] = data.get(col)
-#         parameters[f"{id_field}_{i}"] = data.get(id_field)
-
-#     return query, parameters
-
-
-
-
 
 
     def execute_bulk_update(self, query: str, params: List[Dict[str, Any]], fetch: bool = False):

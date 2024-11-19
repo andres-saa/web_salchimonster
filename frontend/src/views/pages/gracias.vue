@@ -46,6 +46,8 @@
 
 
       </div>
+
+
     
       <div class=p-1 >
         <p style="text-align: end;font-weight: bold;">
@@ -148,10 +150,12 @@
                 <b >{{ formatoPesosColombianos(store.cart.total_cost) }}</b>
               </p>
             </div>
-            <div class="">
+
+
+            <div class="" v-if="!user.user.was_reserva">
               <span style="font-weight: bold;"><b>Domicilio</b></span>
             </div>
-            <div class="">
+            <div class="" v-if="!user.user.was_reserva">
 
             
               <p style="text-align: end;font-weight: bold;color: black;"> <b>
@@ -160,19 +164,27 @@
                 </b>
               </p>
             </div>
+
+
             <div class="">
               <span  style="font-weight: bold;color: black;" ><b>Total</b></span>
             </div>
             <div class="">
 
-              <p style="text-align: end;color: black;font-weight: bold;"><b>{{ formatoPesosColombianos(site.location?.neigborhood?.delivery_price + store.cart.total_cost)
+              <p v-if="user.user.was_reserva" style="text-align: end;color: black;font-weight: bold;"><b>{{ formatoPesosColombianos(store.cart.total_cost)
               }}</b></p>
 
+
+
+              <p v-else style="text-align: end;color: black;font-weight: bold;"><b>{{ formatoPesosColombianos(site.location?.neigborhood?.delivery_price + store.cart.total_cost)
+              }}</b></p>  
+           
             </div>
             <div class="">
               
             </div>
 
+            
           </div>
 
 
@@ -319,7 +331,7 @@
 
 <script setup>
 
-import { ref, onMounted,onBeforeUnmount,onBeforeMount,computed } from 'vue';
+import { ref, onMounted,onBeforeUnmount,onBeforeMount,computed, onUnmounted } from 'vue';
 import { usecartStore } from '../../store/shoping_cart';
 import {useUserStore} from '../../store/user'
 import { useSitesStore } from "../../store/site";
@@ -388,13 +400,14 @@ const whatsappUrl = computed(() => {
 });
 
 
-onBeforeUnmount( () => {
+onUnmounted( () => {
     user.user = {
           name:'',
           neigborhood:'',
           address:'',
           phone_number:'',
-          payment_method_option:''
+          payment_method_option:'',
+          was_reserva:false
       },
 
       store.cart = {
@@ -404,9 +417,9 @@ onBeforeUnmount( () => {
     }
 })
 
-onBeforeMount(() => {
-    store.cart.products.length <= 0? router.push('/'):''
-})
+// onBeforeMount(() => {
+//     store.cart.products.length <= 0? router.push('/'):''
+// })
 
 </script>
 

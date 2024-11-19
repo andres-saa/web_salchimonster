@@ -22,7 +22,8 @@ export const useSitesStore = defineStore('site', {
 
             location: {
                 site:{},
-                neigborhood:{}
+                neigborhood:{},
+                siteReservas:{}
             },
             visibles: {
                 currentSite: false

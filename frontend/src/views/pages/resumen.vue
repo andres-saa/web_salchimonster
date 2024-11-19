@@ -8,7 +8,7 @@
 
             <div class="grid mb-0 pb-0" v-for="product in store.cart.products">
 
-                <div class="col-6  py-2 mb-1">
+                <div class="col-6  py-2 mb-0">
                     <span>
                         <span style="min-width: 3rem;"><b>{{ product.quantity }} </b> </span>
                         {{ product.product.product_name }}
@@ -92,7 +92,7 @@
                 </div>
                 <div class="col-6 my-0  text-right py-0">
                     <!-- {{ siteStore.location }} -->
-                    <span style="color: var(--primary-color);" v-if="siteStore.location.neigborhood.delivery_price == 0"> <b>Recoger en local</b> </span>
+                    <span style="color: var(--primary-color);" v-if="siteStore.location.neigborhood.delivery_price == 0"> <b>{{route.path.includes('reservas')? 'Ir a la sede' : `Recoger en local`}}</b> </span>
                     <span v-else> <b>{{ formatoPesosColombianos(siteStore.location.neigborhood.delivery_price) }}</b></span>
                 </div>
                 <div class="col-6 my-0 py-0">
@@ -116,7 +116,7 @@
 
             </router-link>
 
-            <router-link to="/cart" v-else>
+            <router-link to="/cart" v-else-if="route.path != '/reservas'">
                 <Button outlined icon="pi pi-arrow-left" label="Volver al carrito" class="mt-4" severity="danger"
                     style="outline: none;width: 100%;font-weight: bold; background-color: rgba(0, 0, 0, 0);"></Button>
 
@@ -124,13 +124,22 @@
 
 
 
-            <Tag  v-if="siteStore.status == 'cerrado'" style="width: 100%;height: 2.5rem;" class="mt-2" severity="danger"> Este Restaurante esta cerrado</Tag>
-            <router-link to="/pay" v-if="route.path.includes('cart') && siteStore.status != 'cerrado'">
+            <Tag  v-if="siteStore.status == 'cerrado' && route.path != '/reservas'" style="width: 100%;height: 2.5rem;" class="mt-2" severity="danger"> Este Restaurante esta cerrado</Tag>
+            <router-link to="/pay" v-if="route.path.includes('cart') && siteStore.status != 'cerrado' ">
                 <Button iconPos="right" icon="pi pi-arrow-right" label="Pedir" class="mt-2" severity="help"
                     style="outline: none;width: 100%; border: none;font-weight: bold; background-color: black;"></Button>
             </router-link>
 
-            <router-link to="/pay" v-else-if="siteStore.status != 'cerrado'">
+            <router-link to="/pay" v-else-if="route.path.includes('reservas')" >
+                <Button  @click=" ()  => {
+                    orderService.sendOrderReserva()
+                    sending = true
+                }" iconPos="right" icon="pi pi-arrow-right" label="Finalizar pedido"
+                    class="mt-2" severity="help"
+                    style="outline: none;width: 100%; border: none;font-weight: bold; background-color: black;"></Button>
+            </router-link>
+
+            <router-link to="/pay" v-else-if="siteStore.status != 'cerrado' " >
                 <Button  :disabled="store.sending_order || siteStore.status == 'cerrado'" @click=" ()  => {
                     orderService.sendOrder()
                     sending = true
@@ -138,6 +147,9 @@
                     class="mt-2" severity="help"
                     style="outline: none;width: 100%; border: none;font-weight: bold; background-color: black;"></Button>
             </router-link>
+
+
+            
 
         </div>
 
@@ -193,7 +205,7 @@ const update = () => {
 onMounted(() => {
     update()
 
-    if (user.user.payment_method_option?.id != 7)
+    if (user.user.payment_method_option?.id != 7 && !route.path.includes('reservas'))
         siteStore.setNeighborhoodPrice()
     else {
         siteStore.setNeighborhoodPriceCero()

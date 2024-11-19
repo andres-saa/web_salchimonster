@@ -11,9 +11,6 @@ def get_categories(site_id:int,restaurant_id:int):
     category_instance.close_connection()
     return categories
 
-
-
-
 @category_router.get("/categories-cumples/{site_id}/{restaurant_id}")
 def get_categories(site_id:int,restaurant_id:int):
     category_instance = Category()

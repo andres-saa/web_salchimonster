@@ -21,7 +21,8 @@
                 additions: []  // Nueva propiedad para manejar las adiciones a nivel del carrito
             },
             last_order:'',
-            sending_order:false
+            sending_order:false,
+            was_reserva:false
         }),
        
             getters: {
