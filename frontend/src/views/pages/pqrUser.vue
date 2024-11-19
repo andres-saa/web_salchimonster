@@ -36,7 +36,7 @@
 
 
     <div class="container mt-8 col-12 p-4 shadow-3" style="max-width: 400px; margin: auto;">
-      <h2 class="mb-0">🔥 <b>MONTER AYUDA</b> 🔥</h2>
+      <h2 class="mb-0">🔥 <b>MONSTER AYUDA</b> 🔥</h2>
       <h2 style="color: var(--primary-color)" class="my-0"><b>Cada dia mejoramos</b></h2>
       <img src="/public/images/characters/5.png">
   
