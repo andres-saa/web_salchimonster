@@ -151,6 +151,29 @@ class Order2:
         return event_id
 
 
+    def create_or_update_event_pqr(self, event_type_id, site_id, employee_id, update_interval, solved=False):
+        # Primero, intentar eliminar cualquier evento existente que coincida con los criterios
+        delete_query = """
+        DELETE FROM events
+        WHERE event_type_id = %s AND site_id = %s AND employee_id = %s;
+        """
+        self.cursor.execute(delete_query, (event_type_id, site_id, employee_id))
+
+        # Después, insertar el nuevo evento
+        event_insert_query = """
+        INSERT INTO events (
+            event_timestamp, 
+            event_type_id, 
+            site_id, 
+            employee_id, 
+            update_interval, 
+            solved
+        ) VALUES (CURRENT_TIMESTAMP, %s, %s, %s, %s, %s) RETURNING id;
+        """
+        self.cursor.execute(event_insert_query, (event_type_id, site_id, employee_id, update_interval, solved))
+        event_id = self.cursor.fetchone()[0]
+        self.conn.commit()
+        return event_id
 
 
 
@@ -589,6 +612,20 @@ class Order2:
         SELECT id
         FROM public.recent_events
         WHERE event_type_id = 2
+        ORDER BY id DESC
+        LIMIT 1;
+        """
+        self.cursor.execute(recent_event_query)
+        result = self.cursor.fetchone()
+        # Devuelve None si no hay resultados o el timestamp del evento si existe un evento reciente de tipo 1
+        return None if result is None else result[0]
+    
+    def is_recent_pqr_generated(self):
+        # Consulta para verificar si existe algún evento de tipo 1 para la sede especificada en la vista 'recent_events'
+        recent_event_query = """
+        SELECT id
+        FROM public.recent_events
+        WHERE event_type_id = 7
         ORDER BY id DESC
         LIMIT 1;
         """

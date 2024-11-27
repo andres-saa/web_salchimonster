@@ -74,6 +74,10 @@ class Pqrs:
         )
         result_status = self.db.execute_query(query=query_status, params=params_status, fetch=True)
         
+        
+        id_pqr_event = order_instance.create_or_update_event_pqr(7, 1, 1132, '1 minutes', False)
+        print(id_pqr_event)
+        
         return {'pqr_id': pqr_id, 'initial_status_id': result_status}
     
     
@@ -81,6 +85,22 @@ class Pqrs:
         query = self.db.build_select_query(table_name='pqr.pqr_details_full_view',fields=["*"])
         pqr_id = self.db.execute_query(query=query,fetch=True)
         return pqr_id
+    
+    
+    def is_recent_pqr_generated(self):
+        # Consulta para verificar si existe algún evento de tipo 1 para la sede especificada en la vista 'recent_events'
+        recent_event_query = """
+        SELECT id
+        FROM public.recent_events
+        WHERE event_type_id = 7
+        ORDER BY id DESC
+        LIMIT 1;
+        """
+        query = self.db.build_select_query(table_name='public.recent_events',fields=["id"],condition='event_type_id = 7',order_by='id desc',limit=1)
+        result = self.db.execute_query(query=query, fetch=True)
+        result = None if not result else result
+        # Devuelve None si no hay resultados o el timestamp del evento si existe un evento reciente de tipo 1
+        return result
     
         
     def get_all_networks(self):

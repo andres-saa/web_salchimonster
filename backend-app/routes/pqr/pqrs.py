@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from models.pqr.pqr import Pqrs
-from schema.pqr import pqrs
+from schema.pqr import pqrs as pqr_schema
 from schema.user import user_schema_post
 from pydantic import BaseModel
 
@@ -9,7 +9,7 @@ pqr_router = APIRouter()
 
 
 @pqr_router.post("/create-pqr",tags=["pqr"])
-def create_pqrs(data:pqrs.PQRRequest,user:user_schema_post):
+def create_pqrs(data:pqr_schema.PQRRequest,user:user_schema_post):
     pqr_instance = Pqrs()
     result = pqr_instance.create_pqr(data,user)
     return result
@@ -21,6 +21,16 @@ def create_pqrs():
     pqr_instance = Pqrs()
     result = pqr_instance.get_all_pqrs()
     return result
+
+
+
+@pqr_router.get('/recent-pqr' ,tags=["pqr"])
+def recent():
+    pqr_instance = Pqrs()
+    result = pqr_instance.is_recent_pqr_generated()
+    return result
+
+
 
 
 
