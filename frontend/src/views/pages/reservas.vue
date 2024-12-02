@@ -1,15 +1,25 @@
 <template>
-    <div class="col-12 px-2 my-8  p-0" style="margin-top: 6rem;">
+    <div class="col-12 px-2 my-8  p-0" style="margin-top: 6rem;display: flex;justify-content: center;flex-direction: column;align-items: center;max-width: 1280px;margin: auto;">
       
 
       
-        <p class="text-center text-2xl my-8"><b>RESERVAS PARA CUMPLEANOS</b> </p>
+        <!-- <p class="text-center text-2xl my-8"><b>RESERVAS PARA CUMPLEANOS</b> </p> -->
        
-        {{ product }}
+        <div class="grid mt-6" style="align-items: start;border-radius: 1rem;">
 
-        <div>
-            <img style="width: 40rem;height: 30rem;" :src="`${URI}/read-photo-product/${product.img_identifier}/600`" alt="">
+            <div class="col-12 md:col-4 md:pr-0" style="display: flex;align-items: center" >
+                <img style=";width: 100%; border-radius: 1rem;" :src="`${URI}/read-photo-product/${product.img_identifier}/600`" alt="">
+            </div>
+
+            <div class="col-12 md:col-8 md:pl-0">
+               <!-- <resumen></resumen> -->
+              <payReservas></payReservas>
+
+            </div>
+
         </div>
+
+    
 
     </div>
    
@@ -28,6 +38,8 @@ import { paymentMethodService } from '../../service/restaurant/paymentMethodServ
 import validate from './validate.vue';
 import { useReportesStore } from '../../store/ventas';
 import { URI } from '../../service/conection';
+import pay from './pay.vue';
+import payReservas from './payReservas.vue';
 const loadinStore = useReportesStore()
 const store = usecartStore()
 const siteStore = useSitesStore()
@@ -38,19 +50,25 @@ const payment_method_options =  ref([])
 const product = ref({})
 
 
+const current_cart = [...store.cart.products]
+
 onMounted( async()=> {
+    siteStore.location.neigborhood.delivery_price = 0
     payment_method_options.value = await paymentMethodService.getPaymentMethods()
 
-    if (user.user.payment_method_option?.id != 7)
-        siteStore.setNeighborhoodPrice()
-    else {
-        siteStore.setNeighborhoodPriceCero()
+    siteStore.setNeighborhoodPriceCero()
 
-    }
-
+    store.cart.products = []
     product.value = await getProducts()
+    store.addProductToCart(product.value)
+    
 
 })
+
+onBeforeUnmount( () => {
+    store.cart.products = current_cart
+})
+
 
 
 
@@ -79,12 +97,8 @@ const getProducts = async () => {
 
 watch(() => user.user.payment_method_option, (new_val) => {
 
-    if(new_val.id == 7){
-        siteStore.current_delivery = siteStore.location.neigborhood.delivery_price
         siteStore.location.neigborhood.delivery_price = 0
-    }else{
-        siteStore.setNeighborhoodPrice()
-    }
+   
 })
 
 

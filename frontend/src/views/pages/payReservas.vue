@@ -1,9 +1,9 @@
 <template>
-    <div class="col-12 px-2 my-8  p-0" style="margin-top: 6rem;">
+    <div class="col-12 px-2   p-0" style="">
       
-        <validate></validate>
+
       
-        <p class="text-center text-2xl my-8"><b>FINALIZAR COMPRA</b> </p>
+        <p class="text-center text-2xl mb-8"><b>RESERVAR</b> </p>
         <div class="grid mx-auto " style="max-width:800px;">
 
 
@@ -12,38 +12,48 @@
             <div class="col-12 md:col-6 p-1 md:px-4" style="display: flex; flex-direction: column; gap:1rem;">
 
 
-<div class="flex flex-wrap align-items-center mb-2 gap-2" style="width: 100%;">
+<div class="flex flex-wrap align-items-center m-0 gap-2" style="width: 100%;">
     <!-- <label for="username" class="p-sr-only">Username</label> -->
-    <InputText style="width: 100%;" id="username" placeholder="NOMBRE" v-model="user.user.name" invalid />
+     <h5 class="m-0">Fecha</h5>
+    <Calendar style="width: 100%;" id="username"  v-model="user.user.name" invalid />
 </div>
 
-<div class="flex flex-wrap align-items-center mb-2 gap-2" style="width: 100%;">
+
+
+<div class="flex flex-wrap align-items-center m-0 gap-2" style="width: 100%;">
     <!-- <label for="username" class="p-sr-only">Username</label> -->
-    <InputText @click="siteStore.setVisible('currentSite',true)" :modelValue="siteStore.location.neigborhood.name" style="width: 100%;" id="username" placeholder="Barrio" invalid readonly />
+    <h5 class="m-0">Nombre</h5>
+    <InputText style="width: 100%;" id="username"  v-model="user.user.name" invalid />
 </div>
+
 
 <!-- {{ siteStore.visibles }} -->
 
-<div class="flex flex-wrap align-items-center mb-2 gap-2" style="width: 100%;">
-    <!-- <label for="username" class="p-sr-only">Username</label> -->
-    <InputText v-model="user.user.address" style="width: 100%;" id="username" placeholder="DIRECCION" invalid />
-</div>
-
-<div class="flex flex-wrap align-items-center mb-2 gap-2" style="width: 100%;">
-    <!-- <label for="username" class="p-sr-only">Username</label> -->
-    <!-- <p>El telefono debe estar disponible en WhatsApp para validar el pedido <img style="width: 1.5rem;" src="/images/WhatsApp.svg.webp" alt=""></p>  -->
-    <InputMask v-model="user.user.phone_number" style="width: 100%;"  id="basic"  mask="999 999 9999" placeholder="TELEFONO" />
-</div>
-
-<div class="flex flex-wrap align-items-center mb-2 gap-2" style="width: 100%;">
+<div class="flex flex-wrap align-items-center m-0 gap-2" style="width: 100%;">
     <!-- <label for="username" class="p-sr-only">Username</label> -->
     <!-- <InputNumber v-model="user.user.payment_method_option" style="width: 100%;" id="username" placeholder="METODO DE PAGO" invalid /> -->
-    <Dropdown v-model="user.user.payment_method_option" style="width: 100%;" id="username" placeholder="METODO DE PAGO" invalid  :options="payment_method_options" optionLabel="name" ></Dropdown>
+    <h5 class="m-0">Sede</h5>
+    <Dropdown v-model="siteStore.location.siteReservas" style="width: 100%;" id="username"  invalid  :options="sites?.filter(s => s.show_on_web)" optionLabel="site_name" ></Dropdown>
 </div>
 
-<Textarea v-model="store.cart.order_notes"  style="height: 8rem;resize: none;" placeholder="NOTAS:"></Textarea>
+
+<div class="flex flex-wrap align-items-center m-0 gap-2" style="width: 100%;">
+    <!-- <label for="username" class="p-sr-only">Username</label> -->
+    <!-- <p>El telefono debe estar disponible en WhatsApp para validar el pedido <img style="width: 1.5rem;" src="/images/WhatsApp.svg.webp" alt=""></p>  -->
+    <h5 class="m-0">Telefono</h5>
+    <InputMask v-model="user.user.phone_number" style="width: 100%;"  id="basic"  mask="999 999 9999"  />
+</div>
+
+<div class="flex flex-wrap align-items-center m-0 gap-2 " style="width: 100%;">
+    <!-- <label for="username" class="p-sr-only">Username</label> -->
+    <!-- <InputNumber v-model="user.user.payment_method_option" style="width: 100%;" id="username" placeholder="METODO DE PAGO" invalid /> -->
+    <h5 class="m-0">Metodo de pago</h5>
+    <Dropdown v-model="user.user.payment_method_option" style="width: 100%;" id="username"  invalid  :options="payment_method_options?.filter(m => m.id != 7)" optionLabel="name" ></Dropdown>
+</div>
 
 
+<h5 class="m-0 p-0">Notas</h5>
+<Textarea v-model="store.cart.order_notes"  style="height: 8rem;resize: none;" placeholder="Dimelo:" class="m-0"></Textarea>
 
 </div>
 
@@ -52,7 +62,8 @@
           
 
 
-        </div>
+</div>
+
     </div>
    
 </template>
@@ -68,33 +79,32 @@ import { useSitesStore } from '../../store/site';
 import {useUserStore} from '../../store/user'
 import { paymentMethodService } from '../../service/restaurant/paymentMethodService';
 import validate from './validate.vue';
+import {fetchService} from '../../service/utils/fetchService.js'
+import { URI } from '../../service/conection';
 const store = usecartStore()
 const siteStore = useSitesStore()
 const use = ref(0)
 const user = useUserStore()
-
+const sites = ref([])
 const payment_method_options =  ref([])
+
 
 onMounted( async()=> {
     payment_method_options.value = await paymentMethodService.getPaymentMethods()
 
-    if (user.user.payment_method_option?.id != 7)
-        siteStore.setNeighborhoodPrice()
-    else {
-        siteStore.setNeighborhoodPriceCero()
 
-    }
+        siteStore.setNeighborhoodPriceCero()
+        sites.value = await fetchService.get(`${URI}/sites`)
+
+    
 })
 
 
 watch(() => user.user.payment_method_option, (new_val) => {
 
-    if(new_val.id == 7){
-        siteStore.current_delivery = siteStore.location.neigborhood.delivery_price
+
         siteStore.location.neigborhood.delivery_price = 0
-    }else{
-        siteStore.setNeighborhoodPrice()
-    }
+  
 })
 
 
