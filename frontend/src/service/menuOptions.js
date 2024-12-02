@@ -140,7 +140,7 @@ const menuOptions = ref(
     [
 
         {
-            name: 'MENU',
+            name: 'Menu',
             to:'',
             menus:[
                 {
@@ -160,29 +160,29 @@ const menuOptions = ref(
 
 
         {
-            name: 'SEDES',
+            name: 'Sedes',
             to:'sedes',
           
         },
         {
-            name: 'CARTA',
+            name: 'Carta',
         
             to:'menu'
         },
 
         {
-            name: 'RASTREAR PEDIDO',
+            name: 'Rastrear pedido',
            
             to:'rastrear-pedido'
         },
-        // {
-        //     name: 'COLABORACIONES',
+        {
+            name: 'Franquicias',
            
-        //     to:'colaboraciones'
-        // },
+            to:'franquicias'
+        },
 
         {
-            name: 'AYUDA/PQR',
+            name: 'Atuda\/PQR',
            
             to:'pqrs-user'
         },

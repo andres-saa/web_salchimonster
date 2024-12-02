@@ -6,6 +6,7 @@
   !route.path.includes('menu') && 
   !route.path.includes('colaboraciones') && 
   !route.path.includes('pqrs-user') && 
+  !route.path.includes('franquicias') && 
   !route.path.includes('gracias')  " 
 
 class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bottom: 0; left: 0; ; justify-content: center">
