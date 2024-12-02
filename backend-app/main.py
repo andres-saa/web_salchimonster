@@ -55,6 +55,7 @@ from routes.app.salchigest import salchigest_router
 from routes.requisitions.requisition import requisition_router
 from routes.pqr.pqrs import pqr_router
 from routes.cachier_money.cachier_money import cachier_money_router
+from routes.Franquicias.franquicias import franquis_router
 app = FastAPI()
 # from routes.area import area_router
 app.add_middleware(
@@ -68,6 +69,7 @@ app.add_middleware(
 
 
 app.include_router(cachier_money_router)
+app.include_router(franquis_router)
 app.include_router(pqr_router)
 app.include_router(requisition_router)
 app.include_router(salchigest_router)
