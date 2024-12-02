@@ -108,11 +108,14 @@ const model = ref([
                 icon: 'pi pi-fw pi-shopping-cart',
                 to: '/cart'
             },
+
             {
-                label: 'Colaboraciones',
+                label: 'Franquicias',
                 icon: 'pi pi-fw pi-info-circle',
-                to: '/colaboraciones'
+                to: '/franquicias'
             },
+            
+            
 
             {
                 label: 'PQRS/AYUDA',
