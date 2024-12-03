@@ -182,7 +182,7 @@ const menuOptions = ref(
         },
 
         {
-            name: 'Atuda\/PQR',
+            name: 'Ayuda\/PQR',
            
             to:'pqrs-user'
         },
