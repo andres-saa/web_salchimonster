@@ -40,15 +40,14 @@
     <div class=""
       style="font-weight: bold;color:white;margin: 0; background-color: black;align-items: center;display: grid; grid-template-columns: auto auto; ">
 
-      <div style="width: 100%;" class="p-1">
+      <!-- <div style="width: 100%;" class="p-1">
 
         <b> PRODUCTOS</b>
 
-
       </div>
+ -->
 
-
-    
+<!--     
       <div class=p-1 >
         <p style="text-align: end;font-weight: bold;">
           <b>
@@ -56,25 +55,21 @@
           </b>
           
         </p>
-      </div>
+      </div> -->
 
     </div>
 
-    <div   v-for="product in store.cart.products">
+    <!-- <div   v-for="product in store.cart.products">
 
       <div style="display: grid; grid-template-columns: auto auto;">
        
         <p class="p-0 m-0">
           {{ product.quantity }}
-          {{ product.product.product_name }}
+          {{ product.product.productogeneral_descripcion }}
         </p>
-    
-    
-      <!-- <div >
-        <p style="text-align: end;color: black;">
-          {{ formatoPesosColombianos(product.price) }}
-        </p>
-      </div> -->
+        
+
+  
       <div >
         <p style="text-align: end;color: black;">
           {{ formatoPesosColombianos(product.total_cost) }}
@@ -83,17 +78,19 @@
 
       </div>
 
+      
+
       <div style="background-color: rgba(0, 0, 0, 0.286); height: 1px;">
 
 </div>  
 
     </div>
-    
+     -->
 
 
 
 
-    <div   v-for="(items, grupo) in {ADICIONES:store.cart.additions.filter(a => a.group == 'ADICIONES'),
+    <!-- <div   v-for="(items, grupo) in {ADICIONES:store.cart.additions.filter(a => a.group == 'ADICIONES'),
                                     SALSAS:store.cart.additions.filter(a => a.group == 'SALSAS'),
                                     CAMBIOS:store.cart.additions.filter(a => a.group == 'CAMBIOS')} " :key="grupo"
       style="position: relative; margin-top: 0.5rem;">
@@ -133,7 +130,7 @@
       </div>
 
     </div>
-
+ -->
 
 
 
@@ -164,6 +161,7 @@
                 </b>
               </p>
             </div>
+
 
 
             <div class="">

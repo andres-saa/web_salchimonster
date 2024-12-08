@@ -76,7 +76,7 @@
     
     <div id="factura" style="width: 100%;">
 
-
+      <!-- {{ store.currentOrder.pe_json }} -->
 
       <Tag style="" class="tag mb-2" severity="success" v-if="store.currentOrder.responsible_id"> <i class="pi pi-whatsapp mr-2"></i>   TRANSFERENCIA APROBADA</Tag> <br> 
       
@@ -97,8 +97,6 @@
               <p style="padding: 0;color: black;text-align: center; margin: auto; margin-bottom: 1rem; width: max-content;min-width: max-content;display: flex;justify-content: center; flex-direction: column ">
                 <b>
                   fecha: {{ store.currentOrder.latest_status_timestamp?.split('T')[0] }}
-                 
-
                 </b>
 
                 <b>
@@ -130,15 +128,19 @@
 
           </div>
 
-          <div  v-for="product in store.currentOrder.products">
+         
+          <div  v-for="product in store.currentOrder.pe_json.listaPedidos">
 
             <div style="display: grid; grid-template-columns: auto auto;">
              
-              <p>
-                {{ product.quantity }}
-                {{ product.name }}
+              <p class="p-0 m-0">
+                {{ product.pedido_cantidad }}
+                {{ product.pedido_nombre_producto }}
+                <br>
               </p>
           
+              
+              
           
             <!-- <div >
               <p style="text-align: end;color: black;">
@@ -148,9 +150,31 @@
             <div >
               <p style="text-align: end;color: black;">
                 <!-- {{ formatoPesosColombianos(product.price) }} -->
-                {{ formatoPesosColombianos(product.total_price) }}
+                {{ formatoPesosColombianos(product.pedido_precio * product.pedido_cantidad) }}
               </p>
             </div>
+
+
+            </div>
+
+            <p v-if="product.lista_productocombo" class="p-0 m-0"><b>COMBO INCLUYE</b></p>
+            <p v-if="product.lista_productocombo" class="p-0 m-0 ml-5" style="" v-for="i in product.lista_productocombo" > -- <b>{{i.pedido_cantidad  }}</b>  {{i.pedido_nombre  }} </p> 
+
+
+            <!-- <p> {{ product.modificadorseleccionList }} </p> -->
+
+
+            <!-- {{ product.modificadorseleccionList.filter(p => p.pedido_productoid == product.pedido_productoid) }} -->
+
+     
+              <div style="display: flex;width: ; justify-content: space-between;" class="p-0 m-0" v-for="i in  product.modificadorseleccionList?.filter(p => p.pedido_productoid == product.pedido_productoid)">
+         
+                <p class="p-0 m-0 ml-5" style="">
+       
+                  -- <b>{{ i.modificadorseleccion_cantidad }}</b> {{ i.modificador_nombre }}
+                </p>
+
+                <p class="p-0 m-0" style="text-align: end;"> {{ formatoPesosColombianos(i.pedido_precio)  }}</p>
 
             </div>
 
@@ -163,7 +187,7 @@
 
 
 
-
+<!-- 
           <div s  v-for="(items, grupo) in store.currentOrder.additional_items" :key="grupo"
             style="position: relative; margin-top: 0.5rem;">
 
@@ -183,15 +207,9 @@
                     {{ aditional.aditional_quantity }}  {{ aditional.aditional_name }}
                   </p>
                 </div>
-<!-- 
+
                 <div >
                   <p style="text-align: end;color: black;">
-                    {{ formatoPesosColombianos(aditional.aditional_price) }}
-                  </p>
-                </div> -->
-                <div >
-                  <p style="text-align: end;color: black;">
-                    <!-- {{ formatoPesosColombianos(product.price) }} -->
                     {{ formatoPesosColombianos(aditional.total_aditional_price) }}
                   </p>
                 </div>
@@ -208,7 +226,7 @@
             </div>
 
           </div>
-
+ -->
 
 
 
@@ -226,7 +244,7 @@
             </div>
             <div class="">
               <p  style="text-align: end;font-weight: bold; color: black;">
-                <b >{{ formatoPesosColombianos(store.currentOrder.total_order_price) }}</b>
+                <b >{{ formatoPesosColombianos(subtotal) }}</b>
               </p>
             </div>
             <div class="">
@@ -246,7 +264,7 @@
             </div>
             <div class="">
 
-              <p style="text-align: end;color: black;font-weight: bold;"><b>{{ formatoPesosColombianos(store.currentOrder.delivery_price + store.currentOrder.total_order_price)
+              <p style="text-align: end;color: black;font-weight: bold;"><b>{{ formatoPesosColombianos(total)
               }}</b></p>
 
             </div>
@@ -397,7 +415,7 @@
 
 <script setup>
 import { formatoPesosColombianos } from '../../service/formatoPesos';
-import { onMounted, ref } from 'vue'
+import { onMounted,computed, ref } from 'vue'
 import { useOrderStore } from '../../store/order'
 import { orderService } from '../../service/orderService';
 import printJS from 'print-js';
@@ -421,8 +439,36 @@ const sendRequest = async() => {
   store.Notification.currentTime = 0
 }
 
+const subtotal = computed(() => {
+  return store.currentOrder.pe_json.listaPedidos.reduce((acc, product) => {
+    // Calcula el total del producto base
+    let productTotal = product.pedido_cantidad * product.pedido_precio;
+
+    // Verifica si el producto tiene modificadores
+    if (product.modificadorseleccionList && product.modificadorseleccionList.length > 0) {
+      // Filtra los modificadores asociados a este producto
+      const productModifiers = product.modificadorseleccionList?.filter(
+        mod => mod.pedido_productoid == product.pedido_productoid
+      );
+
+      // Calcula el total de los modificadores
+      const modifiersTotal = productModifiers.reduce((modAcc, modifier) => {
+        return modAcc + modifier.modificadorseleccion_cantidad * modifier.pedido_precio;
+      }, 0);
+
+      // Agrega el total de los modificadores al total del producto
+      productTotal += modifiersTotal;
+    }
+
+    // Agrega el total del producto al acumulador
+    return acc + productTotal;
+  }, 0);
+});
 
 
+const total = computed(() => {
+  return subtotal.value + store.currentOrder.delivery_price;
+});
 
 const showDeleteDeliveryPrice = ref(false)
 

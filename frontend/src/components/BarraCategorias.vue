@@ -1,6 +1,6 @@
 <template>
 
-    <div style="position: sticky; top: 3.5rem; z-index: 999; background-color: var(--primary-color);overflow-x: auto;" class="col-12 nav_bar shadow-3 d-flex  lg:justify-content-center align-items-center mb-5 p-0 md:p-0">
+    <div style="position: sticky; top: 3.5rem; z-index: 999; background-color: var(--primary-color);overflow-x: auto;" class="col-12 nav_bar shadow-3 d-flex  lg:justify-content-start align-items-center mb-5 p-0 md:p-0">
        
        
         <!-- <Button class="px-0" style="position: absolute;border: none;background-color: white;color: black; left: -0.5rem;z-index: 99;height: 100%;width: 1.7rem; border-radius: 0;" severity="help"  icon="pi pi-angle-left text-2xl"></Button>
@@ -11,13 +11,33 @@
         <div class=" d-flex text-white p lg:justify-content-center align-items-center  p-0 m-0"
         style="gap: 0;">
 
-        <div v-for="(section,index) in categories" :key="section.id" class="p-0"  style="display: flex; align-items: center;">
+        <!-- <div v-for="(section,index) in categories" :key="section.id" class="p-0"  style="display: flex; align-items: center;">
             <Button    size="small" @click="navigateToCategory(section.category_name,section.category_id)" :label="section.category_name "
                 :class="checkSelected(section.category_id) ? 'selected menu-button' : 'menu-button'"
                 class="py-3 px-3 mx-0  text-lg titulo" style=" text-transform: capitalize;width:max-content; color:white; border-radius: 0;outline: none;box-shadow: none;font-weight: bold;">
                
             </Button>
             <span v-if="index < categories.length-1"> <b>| </b></span>
+
+        </div> -->
+        
+
+        <div v-for="(section,index) in cart?.menu?.listaCategorias?.filter(c => codigos.includes(parseInt(c.categoria_id)))
+                    ?.sort((a, b) => codigos.indexOf(parseInt(a.categoria_id)) - codigos.indexOf(parseInt(b.categoria_id)))" :key="section.categoria_id" class="p-0"  style="display: flex; align-items: center;">
+
+            <Button    
+                    size="small" 
+                    @click="navigateToCategory(section.categoria_descripcion, section.categoria_id)" 
+                    :label="section.categoria_descripcion"
+                    :class="checkSelected(section.categoria_id) ? 'selected menu-button' : 'menu-button'"
+                    class="py-3 px-3 mx-0 text-lg titulo" 
+                    style="text-transform: capitalize;width:max-content;text-transform: uppercase; color:white; border-radius: 0;outline: none;box-shadow: none;font-weight: bold;">
+                </Button>
+                <span 
+                    v-if="index < cart?.menu?.listaCategorias?.filter(c => codigos.includes(parseInt(c.categoria_id)))
+                    ?.sort((a, b) => codigos.indexOf(parseInt(a.categoria_id)) - codigos.indexOf(parseInt(b.categoria_id))).length - 1">
+                    <b>|</b>
+                </span>
         </div>
     </div>
     </div>
@@ -34,7 +54,9 @@ import { ref, onMounted } from 'vue';
 import router from '@/router/index.js';
 import { useRoute } from 'vue-router';
 import { categoriesService } from '../service/restaurant/categoriesService'
+import { usecartStore } from '../store/shoping_cart';
 
+const cart = usecartStore()
 
 
 const categories = ref([]);
@@ -45,8 +67,6 @@ const navigateToCategory = (categoryName,category_id) => {
 };
 
 
-onMounted(async () => {
-    categories.value = await categoriesService.getCategories()});
 
 
 const checkSelected = (section) => {
@@ -55,6 +75,19 @@ const checkSelected = (section) => {
 };
 
 
+const codigos = [
+    10, //COMBOS 2 PERSONAS
+    26, //COMBOS PERSONALES
+    // 25, //COMBOS 2X1 BURGER + PAPAS
+    8, //SALCHIPAPAS 2 PERSONAS
+    9, //SALCHIPAPAS PERSONALES
+    13, //PRODUCTO NUEVO
+    27, //POLLO
+   11,   //SHOWW
+    4, //BEBIDAS
+    5, //CERVEZAS
+    // 14,//ADICIONES SALCHIPAPAS
+]
 
 </script>
 

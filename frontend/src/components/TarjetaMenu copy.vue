@@ -13,13 +13,13 @@
 
       
                 <img  
-                    style="width: 100%; aspect-ratio: 1 / 1 ; border-radius: 1rem; background-color: rgb(255, 255, 255);object-fit: cover; border-radius: 0.5rem;"
-                     :src="`https://img.restpe.com/${props.product.productogeneral_urlimagen}`"
-               
+                    style="width: 100%; aspect-ratio: 1 / 1 ; border-radius: 1rem; background-color: rgb(255, 255, 255);object-fit: contain; border-radius: 0.5rem;"
+                     :src="currentImage(props.product.img_identifier)"
+                    @load="loadHighResImage(props.product.img_identifier)"
                     alt="">
    
 
-            <!-- {{ props.product }} -->
+          
 
         </div>
 
@@ -29,10 +29,11 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span>
                         <b style="text-transform: uppercase;">
-                            {{ props.product.productogeneral_descripcion }}
+                            {{ props.product.product_name }}
                         </b>
                     </span>
-                    <!-- <img class="character" style="width:4rem;" :src="`/images/characters/${props.index}.png`" alt=""> -->
+                    <!-- <Button text style="color: black;" icon="pi pi-ellipsis-v p-0 text-xl" /> -->
+                    <img class="character" style="width:4rem;" :src="`/images/characters/${props.index}.png`" alt="">
 
 
 
@@ -41,7 +42,7 @@
                 </div>
 
                 <span>
-                    {{ truncatedDescription }}
+                    {{ truncatedDescription?.toLocaleLowerCase() }}
                 </span>
 
                 <div style="display: flex;justify-content: space-between; align-items: center;">
@@ -52,8 +53,9 @@
                     <div>
                         
                         <div style="display: flex; align-items: center;gap: 1rem;display: flex;align-items: center;">
-                     
-                            <h5 cal class="text-xl p-0 m-0"><b>{{ formatoPesosColombianos(props.product.productogeneral_precio || props.product.lista_presentacion[0].producto_precio) }}</b>
+                            <h6 v-if="props.product?.last_price" class="text-xl p-0 m-0"
+                            style="text-decoration:line-through;opacity: .5;"> {{ props?.product?.last_price }}</h6>
+                            <h5 cal class="text-xl p-0 m-0"><b>{{ formatoPesosColombianos(props.product.price) }}</b>
                             </h5>
 
 
@@ -126,20 +128,29 @@ const see = () => {
 }
 
 const open = (product) => {
-    store.setCurrentProduct(product);
-    store.setVisible('currentProduct', true);
 
-    if (route.path != '/') {
-        const category_name = route.params.menu_name;
-        const category_id = route.params.category_id;
 
-        // Sanitizar el nombre del producto
-        const sanitizedProductName = encodeURIComponent(product.productogeneral_descripcion);
 
-        const ruta = `/${category_name}/${category_id}/${sanitizedProductName}/${product.productogeneral_id}/`;
-        router.push(ruta);
+    store.setCurrentProduct(product)
+    store.setVisible('currentProduct', true)
+
+    
+    if(route.path != '/'){
+       
+
+    const category_name = route.params.menu_name
+    const category_id = route.params.category_id
+
+    const ruta = `/${category_name}/${category_id}/${product.product_name}/${product.id}`
+    router.push(ruta)
+
+
+
     }
-};
+
+  
+    
+}
 
 
 
@@ -212,8 +223,8 @@ onMounted(() => {
 
 
 const truncatedDescription = computed(() => {
-    const description = props.product?.productogeneral_descripcionweb || '';
-    return description.length > 100 ? description.substring(0, 100) + '...' : description || '...';
+    const description = props.product.product_description;
+    return description.substring(0, 100) + '...'
 });
 
 

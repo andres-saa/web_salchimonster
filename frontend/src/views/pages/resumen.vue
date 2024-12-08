@@ -8,16 +8,27 @@
 
             <div class="grid mb-0 pb-0" v-for="product in store.cart.products">
 
-                <div class="col-6  py-2 mb-0">
-                    <span>
-                        <span style="min-width: 3rem;"><b>{{ product.quantity }} </b> </span>
-                        {{ product.product.product_name }}
-                    </span>
+                <div class="col-6  py-2 mb-0 m-0">
+                    <h6 class="m-0">
+                        <span style="min-width: 3rem;width:100%1"><b>{{ product.quantity }} </b> </span>
+                        {{ product.product.productogeneral_descripcion }}
+                    </h6>
+
+
+
+                
+                   
+
+                    <h6 class="m-0 ml-3 " style="width:340px;" v-for="i in product.product.lista_productobase">
+                      -- <b>{{ parseInt( i.productocombo_cantidad * product.quantity) }}</b> <span style="font-weight: 400;">{{ i.producto_descripcion }}</span> 
+                        
+                        
+                    </h6>
                 </div>
                 <div class="col-6 my-0  text-right py-2">
-                    <span>
+                    <h6>
                         {{ formatoPesosColombianos(product.total_cost) }}
-                    </span>
+                    </h6>
                 </div>
 
             </div>
@@ -110,7 +121,7 @@
 
 
 
-            <router-link to="/SALCHIPAPAS/3" v-if="route.path.includes('cart')">
+            <router-link to="/" v-if="route.path.includes('cart')">
                 <Button outlined icon="pi pi-shopping-cart" label="Seguir comprando" class="mt-4" severity="danger"
                     style="outline: none;width: 100%;font-weight: bold; background-color: rgba(0, 0, 0, 0);"></Button>
 

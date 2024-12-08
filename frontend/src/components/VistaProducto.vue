@@ -1,6 +1,25 @@
 <template>
-  <Dialog :close=" reset() "  v-model:visible="store.visibles.currentProduct" :style="{ width: '500px', }" header="Seleccion de sede"
-    :modal="true" class="p-fluid pt-8 m-3"
+
+
+<Dialog v-model:visible="showChangeDialog" :modal="true" class="p-3" style="background-color: var(--primary-color);max-width: 20rem;max-height: 30rem;border-radius: 1rem;" >
+  <template #header>
+      
+        <h6>Elige una alternativa para  {{productBaseToChange.producto_descripcion}}</h6>
+    </template>
+  
+  <div v-if="productBaseToChange" style="display: flex;flex-direction: column;gap: 1rem;align-items: center;"  >
+
+    <div class="shadow-4 p-2" v-for="option in productBaseToChange.lista_productoCambio" :key="option.producto_cambio_id" style="cursor: pointer;background-color: white;color: black; width: 100%; display: flex;flex-direction: column;align-items: center;" @click="selectAlternative(option)">
+      <img :src="`https://img.restpe.com/${option.producto_urlimagen}`" alt="" style="width: 100px; height: 100px; object-fit: contain;">
+      <p><strong>{{ option.producto_descripcion }}</strong> </p>
+      <!-- <p>{{ formatoPesosColombianos(option.producto_precio) }}</p> -->
+    </div>
+  </div>
+</Dialog>
+
+
+  <Dialog :close="reset()" v-model:visible="store.visibles.currentProduct" :style="{ width: '500px', }"
+    header="Seleccion de sede" :modal="true" class="p-fluid pt-8 m-3"
     style="justify-content: center; background-color: white;position: relative ; border-radius: 1rem;padding-top: 2rem;">
 
 
@@ -8,10 +27,12 @@
 
     <div class="header col-12    "
       style=" display: flex;justify-content: space-between; ; background-color: rgb(255, 255, 255);z-index:99; position:absolute;top:0rem;left: 0;height: min-content;">
-      <p class=" mayuscula md:pl-4 nombre col-9 text-l lg:text-xl p-0 text-left" style="color:black;font-weight: bold"> {{
-        store.currentProduct.product_name }}</p>
+      <p class=" mayuscula md:pl-4 nombre col-9 text-l lg:text-xl p-0 text-left" style="color:black;font-weight: bold">
+        {{
+          store.currentProduct.productogeneral_descripcion }}</p>
       <p class="md:pr-4 precio col-3 text-l lg:text-xl p-0 text-right " style="color:black;font-weight: bold">
-        {{ formatoPesosColombianos(store.currentProduct.price) }}</p>
+        {{ formatoPesosColombianos(store.currentProduct.productogeneral_precio ||
+          store.currentProduct.lista_presentacion[0].producto_precio) }}</p>
     </div>
 
 
@@ -48,26 +69,29 @@
         style="display: flex;align-items: center; max-height: 45rem; background-color:white;border-radius: 0.5rem; ">
 
 
-       
 
 
-          <img 
-                    style="width: 100%; aspect-ratio: 1 / 1 ; border-radius: 1rem; background-color: rgb(255, 255, 255);object-fit: contain; border-radius: 0.5rem;"
-                     :src="`${URI}/read-photo-product/${store.currentProduct.img_identifier}/600`"
-                   
-                    alt="">
-   
+
+        <img
+          style="width: 100%; aspect-ratio: 1 / 1 ; border-radius: 1rem; background-color: rgb(255, 255, 255);object-fit: cover; border-radius: 0.5rem;"
+          :src="`https://img.restpe.com/${store.currentProduct.productogeneral_urlimagen}`" alt="">
+
       </div>
 
 
+
+
+      <!-- <h6>  {{ store.currentProduct }}</h6>
+
+     -->
 
 
       <div v-show="!see" class="col-12  p-0 mt-0 shadow-5"
         style="display: flex;align-items: center; max-height: 45rem; background-color:white;border-radius: 0.5rem; ">
 
 
-       
-      
+
+
       </div>
 
 
@@ -83,7 +107,6 @@
 
 
 
-      <!-- <p style="color: black;">{{ store.cart.additions }} {{ selectedAdditions }}</p> -->
 
 
       <div class="   col-12 p-0 my-5" style="  " :class="!isSmallScreen ? 'scroll' : 'static'">
@@ -94,15 +117,12 @@
 
 
         <p class="col-12 text-l p-0" style="color: black;text-transform:capitalize">
-          {{ store.currentProduct.product_description.toLowerCase() }}
+          {{ store.currentProduct.productogeneral_descripcionweb?.toLowerCase() }}
 
         </p>
 
-
+        <!-- 
         <div style="color: black;">
-          <!-- {{ adicionales }}
-          
-          -->
 
           <div v-for="grupo in adicionales" :key="grupo.category">
             <div class="mb-2">
@@ -151,6 +171,114 @@
               </div>
             </div>
           </div>
+        </div> -->
+
+
+
+        <div v-for="i in store.currentProduct.lista_agrupadores">
+
+
+          <h6 class="m-0 my-3"> <strong> {{ i.modificador_nombre }} </strong></h6>
+        
+
+
+          <div style="color: black;">
+
+          <div v-for="modificador in i.listaModificadores" style="display: flex; gap: 1rem;" >
+
+
+
+            <!-- {{ modificador.productogeneralmodificador_cantidadmaxima}} 
+
+            {{ i.modificador_esmultiple }} -->
+
+ 
+ 
+              <Checkbox v-if="modificador.modificadorseleccion_precio > 0"  @change="() => handleAdditionChange(modificador, i)"  binary v-model="checkedAdition[modificador.modificadorseleccion_nombre]" class="my-1" :binary="true" 
+              />
+
+
+           
+              <div v-if="modificador.modificadorseleccion_precio > 0" style="display: flex; width: 100%; gap: 1rem; justify-content: space-between;">
+                <span class="text-sm adicion" style="text-transform: lowercase;">{{ modificador.modificadorseleccion_nombre }}</span>
+              
+
+
+
+
+                <div  >
+                  <span v-if="modificador.modificadorseleccion_precio > 0" class="pl-2 py-1 text-sm">
+                    <b v-if="selectedAdditions[modificador.modificadorseleccion_id]?.quantity > 0">
+                    {{ formatoPesosColombianos(modificador.modificadorseleccion_precio * parseInt(selectedAdditions[modificador.modificadorseleccion_id]?.quantity)) }}
+                  </b>        
+
+                  
+                  <b v-else>  {{ formatoPesosColombianos(modificador.modificadorseleccion_precio) }}</b>
+                
+                
+                
+                
+                </span>
+
+           
+                  <Button v-if="checkedAdition[modificador.modificadorseleccion_nombre] && modificador.modificadorseleccion_precio > 0 && i.modificador_esmultiple > 0" @click="decrement(modificador)" class="ml-2" severity="danger"
+                    style="width: 2rem; height: 1.5rem;border: none;" icon="pi pi-minus"></Button>
+                  <InputText v-if="checkedAdition[modificador.modificadorseleccion_nombre] && modificador.modificadorseleccion_precio > 0 && i.modificador_esmultiple > 0" :modelValue="selectedAdditions[modificador.modificadorseleccion_id]?.quantity || 1"  readonly moce
+                    style="width: 2rem;border: none; height: 1.5rem;" class="p-0 text-center" />
+                  <Button v-if="checkedAdition[modificador.modificadorseleccion_nombre] && modificador.modificadorseleccion_precio > 0 && i.modificador_esmultiple > 0" @click="increment(modificador)" severity="danger" style="width: 2rem;height: 1.5rem; border: none;"
+                    icon="pi pi-plus"></Button>
+                </div>
+
+                
+          
+
+
+
+               
+
+         
+
+            </div>
+
+
+          </div>
+
+
+          </div>
+
+
+
+        </div>
+        <h4 v-if="store.currentProduct?.lista_productobase?.length > 0"> <strong>Incluye</strong> </h4>
+
+        <div
+          style="display: grid;gap: 1rem;grid-template-columns: repeat(1,1fr);border-radius: .5rem;overflow: hidden; ">
+          
+          
+          <div class="p-3" style="border: 2px solid var(--primary-color);display: flex;border-radius: .5rem;background-color: 
+          ;flex-direction: column;box-shadow: 0 0 1rem rgba(0, 0 , 0, .1 ); gap: .5rem;" v-for="product_base in store.currentProduct.lista_productobase"
+           >
+
+<div  style="
+          display: flex; align-items: start;border-radius: 50%; gap: 1rem;align-items: center; justify-content:start; padding: 1rem;overflow: hidden;border-radius:.5rem;position: relative;">
+  <h6 class="m-0 p-0 text-2xl" style="max-width: 100%;min-width: max-content;">  {{Math.round(product_base.productocombo_cantidad)  }} x </h6>
+
+
+<img class="" style="width: 3rem; aspect-ratio: 1/1; object-fit: cover;border-radius: .5rem;"
+  :src="`https://img.restpe.com/${product_base.producto_urlimagen}`" alt="d">
+
+<!-- <h6 class="m-0"> {{  product_base.producto_id  }} </h6><br> -->
+<h6 class="m-0 p-0" style="max-width: 100%;"> x {{ product_base.producto_descripcion }} </h6>
+<!-- <h6 class="m-0"> {{ product_base.productocombo_precio }} </h6><br> -->
+
+</div>
+      
+<div style="display: flex;justify-content: end;width: 100%;">
+  <Button style="background-color: black;max-width: min-content; border: none;" label="Cambiar" v-if="product_base.lista_productoCambio && product_base.lista_productoCambio.length > 0" @click="changeProduct(product_base)"></Button>
+            
+</div>
+           
+          </div>
         </div>
 
 
@@ -173,9 +301,9 @@
 
 
 
-    <img :onLoad="seeImageLeftHand" v-show="see" :class="see? 'cargado-left-hand': 'sin-cargar'" style="     pointer-events: none;
+    <img :onLoad="seeImageLeftHand" v-show="see" :class="see ? 'cargado-left-hand' : 'sin-cargar'" style="     pointer-events: none;
    ; position: absolute;right: 95%; top: 20%;" :src="'/images/garra-sm-hor.png'" alt="">
-    <img :onLoad="seeImageRightHand" v-show="see"  :class="see? 'cargado-right-hand': 'sin-cargar'"  style="     pointer-events: none;
+    <img :onLoad="seeImageRightHand" v-show="see" :class="see ? 'cargado-right-hand' : 'sin-cargar'" style="     pointer-events: none;
    ; position: absolute;left: 95%; top: 20%;" :src="'/images/garra-sm-izq.png'" alt="">
 
 
@@ -223,27 +351,86 @@ import { adicionalesService } from '../service/restaurant/aditionalService';
 import { useSitesStore } from '../store/site';
 
 
+const selectAlternative = (option) => {
+  // Crear un objeto con los detalles del producto actual
+  const currentProduct = {
+    producto_cambio_id: productBaseToChange.value.producto_id,
+    producto_descripcion: productBaseToChange.value.producto_descripcion,
+    producto_precio: productBaseToChange.value.producto_precio,
+    producto_urlimagen: productBaseToChange.value.producto_urlimagen,
+    // Incluye otras propiedades si es necesario
+  };
+
+  // Encontrar el índice de la opción seleccionada en lista_productoCambio
+  const optionIndex = productBaseToChange.value.lista_productoCambio.findIndex(
+    (item) => item.producto_cambio_id === option.producto_cambio_id
+  );
+
+  // Reemplazar la opción seleccionada con el producto actual
+  if (optionIndex !== -1) {
+    productBaseToChange.value.lista_productoCambio.splice(optionIndex, 1, currentProduct);
+  }
+
+  // Actualizar productBaseToChange con los detalles de la opción seleccionada
+  productBaseToChange.value.producto_id = option.producto_id;
+  productBaseToChange.value.producto_descripcion = option.producto_descripcion;
+  productBaseToChange.value.producto_precio = option.producto_precio;
+  productBaseToChange.value.producto_urlimagen = option.producto_urlimagen;
+
+  // Cerrar el diálogo
+  showChangeDialog.value = false;
+
+  // Recalcular el precio total si es necesario
+  recalculateTotalPrice();
+};
+
+
+const recalculateTotalPrice = () => {
+  let totalPrice = 0;
+
+  // Sumar precios de los productos base
+  store.currentProduct.lista_productobase.forEach((product) => {
+    totalPrice += parseFloat(product.producto_precio) * parseInt(product.productocombo_cantidad);
+  });
+
+  // Agregar precio del producto general si es necesario
+  if (store.currentProduct.productogeneral_precio) {
+    totalPrice += parseFloat(store.currentProduct.productogeneral_precio);
+  }
+
+  // Actualizar el precio total en el store
+  store.currentProduct.totalPrice = totalPrice;
+};
+
+
+const productBaseToChange = ref(null);
+const showChangeDialog = ref(false);
+
+const changeProduct = (product_base) => {
+  productBaseToChange.value = product_base;
+  showChangeDialog.value = true;
+};
 
 
 const highResLoaded = ref({});
-    const currentImageSrc = ref({}); // Objeto para mantener la imagen actual de cada sede
+const currentImageSrc = ref({}); // Objeto para mantener la imagen actual de cada sede
 
-    const lowResImage = (product_name) => `${URI}/read-photo-product/${product_name}/96`;
-    const highResImage = (product_name) => `${URI}/read-photo-product/${product_name}/600`;
+const lowResImage = (product_name) => `${URI}/read-photo-product/${product_name}/96`;
+const highResImage = (product_name) => `${URI}/read-photo-product/${product_name}/600`;
 
 
-    const currentImage = (site_id) => {
-      return currentImageSrc.value[site_id] || lowResImage(site_id);
-    };
+const currentImage = (site_id) => {
+  return currentImageSrc.value[site_id] || lowResImage(site_id);
+};
 
-    const loadHighResImage = (site_id) => {
-      const img = new Image();
-      img.src = highResImage(site_id);
-      img.onload = () => {
-        currentImageSrc.value[site_id] = highResImage(site_id); // Reemplaza el src de la imagen cuando está completamente cargada
-        highResLoaded.value[site_id] = true;
-      };
-    };
+const loadHighResImage = (site_id) => {
+  const img = new Image();
+  img.src = highResImage(site_id);
+  img.onload = () => {
+    currentImageSrc.value[site_id] = highResImage(site_id); // Reemplaza el src de la imagen cuando está completamente cargada
+    highResLoaded.value[site_id] = true;
+  };
+};
 
 
 
@@ -256,30 +443,32 @@ const store = usecartStore()
 const see = ref(false)
 
 const seeImage = () => {
-  
+
   see.value = true
 }
 
 
 const reset = () => {
   see.value = seeLeftHand.value = seeRightHand.value = false
-  
+
 }
 
 
 watch(() => store.visibles.currentProduct, (newval) => {
 
 
-  if (newval){
+  if (newval) {
     return
   }
 
   const new_route = `/${route.params.menu_name}/${route.params.category_id}`
 
 
-  if(route.path != '/'){
+  if (route.path != '/') {
     router.push(new_route)
   }
+
+
 
 
 
@@ -304,31 +493,37 @@ const seeImageRightHand = () => {
 
 
 const handleAdditionChange = (item, group) => {
-  if (item.checked) {
+
+  if (checkedAdition.value?.[item?.modificadorseleccion_nombre]) {
 
     const new_item = {
-      id: item.aditional_item_instance_id,
-      name: item.aditional_item_name,
-      price: item.aditional_item_price,
-      group: group
+      id: item.modificadorseleccion_id,
+      name: item.modificadorseleccion_nombre,
+      price: item.modificadorseleccion_precio,
+      group: group.modificador_nombre,
+      group_id:group.modificador_id,
+      parent_id: store.currentProduct.producto_id || store.currentProduct.lista_presentacion[0].producto_id
     }
 
     selectedAdditions.value[new_item.id] = {
       ...new_item,
       quantity: item.quantity || 1
     };
+
+    console.log(selectedAdditions.value)
+    
   } else {
-    delete selectedAdditions.value[item.aditional_item_instance_id];
+    delete selectedAdditions.value[item.modificadorseleccion_id];
   }
 };
 
 const increment = (item) => {
-  if (item.checked) {
+  if (checkedAdition.value?.[item?.modificadorseleccion_nombre]) {
 
     const new_item = {
-      id: item.aditional_item_instance_id,
-      name: item.aditional_item_name,
-      price: item.aditional_item_price,
+      id: item.modificadorseleccion_id,
+      name: item.modificadorseleccion_nombre,
+      price: item.modificadorseleccion_precio,
       // quantity:item.quantity
     }
 
@@ -339,23 +534,24 @@ const increment = (item) => {
 
 const decrement = (item) => {
 
-  if (selectedAdditions.value[item.aditional_item_instance_id].quantity > 1 && selectedAdditions.value[item.aditional_item_instance_id]) {
-    selectedAdditions.value[item.aditional_item_instance_id].quantity--
+  if (selectedAdditions.value[item.modificadorseleccion_id].quantity > 1 && selectedAdditions.value[item.modificadorseleccion_id]) {
+    selectedAdditions.value[item.modificadorseleccion_id].quantity--
   }
 
 };
 
 
 const addToCart = (product) => {
-  // Convertir las adiciones seleccionadas de un objeto a un array
 
 
   const additionsArray = Object.values(selectedAdditions.value);
+
   store.addProductToCart(product);
 
   additionsArray.forEach(adition => {
     store.addAdditionToCart(adition)
-    //console.log(adition)
+    console.log(adition)
+    
   })
 
   selectedAdditions.value = {}; // Resetear las adiciones seleccionadas
@@ -379,14 +575,14 @@ const toppings = ref()
 const acompanantes = ref()
 
 
-onMounted(async () => {
-  const product_id = await store.currentProduct.id
+// onMounted(async () => {
+//   const product_id = await store.currentProduct.id
 
 
-  if (product_id) {
-    adicionales.value = await adicionalesService.getAditional(product_id)
-  }
-})
+//   if (product_id) {
+//     adicionales.value = await adicionalesService.getAditional(product_id)
+//   }
+// })
 
 
 watch(() => store.currentProduct, async () => {
@@ -512,7 +708,249 @@ const getCambios = async () => {
 }
 
 
-
+const rr = {
+  "productogeneral_id": "40",
+  "productogeneral_descripcionweb": null,
+  "productogeneral_descripcion": "SALCHIMONSTER PARA 6 PERSONAS",
+  "productogeneral_marca": "",
+  "productogeneral_escombo": "0",
+  "productogeneral_preciofijo": "1",
+  "productogeneral_noalteratotalcambio": "0",
+  "productogeneral_totalpreciomayor": "0",
+  "productogeneral_leysunat": "0",
+  "categoria_id": "8",
+  "productogeneral_urlimagen": "salchimonsterrestaurantpe/productogeneral/580aae1e-84e8-47fa-8c09-b9cefb852b7e.png",
+  "productogeneral_estado": "Activo",
+  "notas": [],
+  "lista_presentacion": [
+    {
+      "producto_id": "42",
+      "producto_presentacion": "",
+      "producto_precio": "125900.00",
+      "producto_delivery": "1",
+      "producto_urlimagen": "salchimonsterrestaurantpe/productos/7c39dc25-cb1a-461b-b95a-c9e2295888a2.png",
+      "producto_codigo": "",
+      "producto_codigointerno": "156",
+      "producto_estado": "Activo"
+    }
+  ],
+  "lista_agrupadores": [
+    {
+      "modificador_id": "14",
+      "modificador_nombre": "TIPO DE SALCHICHA SALCHIMONSTER",
+      "modificador_esmultiple": "0",
+      "modificador_cantidadminima": "0",
+      "listaModificadores": [
+        {
+          "modificadorseleccion_id": "22",
+          "modificadorseleccion_nombre": "CAMBIO RANCHERA SALCHIMONSTER",
+          "modificadorseleccion_tipo": "0",
+          "modificadorseleccion_precio": "24000.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "1",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "23",
+          "modificadorseleccion_nombre": "CON SALCHICHA PREMIUM SALCHIMONSTER",
+          "modificadorseleccion_tipo": "0",
+          "modificadorseleccion_precio": "0.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "1",
+          "productogeneralmodificador_orden": "1"
+        }
+      ]
+    },
+    {
+      "modificador_id": "15",
+      "modificador_nombre": "TIPO DE PAPAS SALCHIMONSTER",
+      "modificador_esmultiple": "0",
+      "modificador_cantidadminima": "0",
+      "listaModificadores": [
+        {
+          "modificadorseleccion_id": "20",
+          "modificadorseleccion_nombre": "CAMBIO FRANCESA EN SALCHIMONSTER",
+          "modificadorseleccion_tipo": "0",
+          "modificadorseleccion_precio": "8000.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "1",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "21",
+          "modificadorseleccion_nombre": "CON PAPA CRIOLLA SALCHIMONSTER",
+          "modificadorseleccion_tipo": "0",
+          "modificadorseleccion_precio": "0.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "1",
+          "productogeneralmodificador_orden": "1"
+        }
+      ]
+    },
+    {
+      "modificador_id": "16",
+      "modificador_nombre": "ADICIONES DE SALCHIPAPAS",
+      "modificador_esmultiple": "1",
+      "modificador_cantidadminima": "0",
+      "listaModificadores": [
+        {
+          "modificadorseleccion_id": "24",
+          "modificadorseleccion_nombre": "ADICION SALCHICHA RANCHERA",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "20000.00",
+          "modificadorseleccion_urlimagen": "salchimonsterrestaurantpe/seleccion/7384ceab-7b29-4d50-95ad-93e08e067fed.jpg",
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "25",
+          "modificadorseleccion_nombre": "ADICION SALCHICHA PREMIUM",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "8900.00",
+          "modificadorseleccion_urlimagen": "salchimonsterrestaurantpe/seleccion/306e75c5-03b3-46be-b7fe-3d337e90b1e2.jpg",
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "26",
+          "modificadorseleccion_nombre": "ADICION RIPIO",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "3500.00",
+          "modificadorseleccion_urlimagen": "salchimonsterrestaurantpe/seleccion/08d357c0-68b4-4163-88f2-8317a2333eac.jpg",
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "27",
+          "modificadorseleccion_nombre": "ADICION QUESO MOZARELLA",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "6600.00",
+          "modificadorseleccion_urlimagen": "salchimonsterrestaurantpe/seleccion/5d42062d-8447-4f13-a214-179bba158829.jpg",
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "28",
+          "modificadorseleccion_nombre": "ADICION POLLO DESMECHADO",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "16500.00",
+          "modificadorseleccion_urlimagen": "salchimonsterrestaurantpe/seleccion/57ea1dbc-4d2b-4295-b08e-ab542bcb45b7.jpg",
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "29",
+          "modificadorseleccion_nombre": "ADICION POLLO APANADO",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "15500.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "30",
+          "modificadorseleccion_nombre": "ADICION PICO E GALLO",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "3500.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "31",
+          "modificadorseleccion_nombre": "ADICION PAPA FRANCESA",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "7700.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "32",
+          "modificadorseleccion_nombre": "ADICION PAPA AMARILLA",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "6600.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "33",
+          "modificadorseleccion_nombre": "ADICION MAIZ",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "5500.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "34",
+          "modificadorseleccion_nombre": "ADICION MADURO GUAYABO",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "5500.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "35",
+          "modificadorseleccion_nombre": "ADICION GUACAMOLE",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "6600.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "36",
+          "modificadorseleccion_nombre": "ADICION COSTILLA AHUMADA",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "17900.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "37",
+          "modificadorseleccion_nombre": "ADICION CHORIZO",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "14000.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "38",
+          "modificadorseleccion_nombre": "ADICION CHICHARRON",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "19500.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "39",
+          "modificadorseleccion_nombre": "ADICION CARNE PREMIUM (DESMECHADA)",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "16500.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        },
+        {
+          "modificadorseleccion_id": "40",
+          "modificadorseleccion_nombre": "ADICION BACON PREMIUM",
+          "modificadorseleccion_tipo": "1",
+          "modificadorseleccion_precio": "8800.00",
+          "modificadorseleccion_urlimagen": null,
+          "productogeneralmodificador_cantidadmaxima": "17",
+          "productogeneralmodificador_orden": "1"
+        }
+      ]
+    }
+  ],
+  "categoria_descripcion": "SALCHIPAPAS 2 PERSONAS"
+}
 
 const getToppings = async () => {
   if (!productDialog.value.grupo_topping_id) {
@@ -979,25 +1417,27 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 
 <style scoped>
-
 @keyframes fadeIn {
-    from {
-       opacity: 0;
-        transform: translateX(-100px);
-        /* transform: scale(.5); */
-        /* background-color: rgb(255, 255, 0); */
-        /* filter: blur(1px); */
-    }
-    to {
-        opacity: 1;
-        /* filter: blur(1px); */
+  from {
+    opacity: 0;
+    transform: translateX(-100px);
+    /* transform: scale(.5); */
+    /* background-color: rgb(255, 255, 0); */
+    /* filter: blur(1px); */
+  }
 
-    }
+  to {
+    opacity: 1;
+    /* filter: blur(1px); */
+
+  }
 }
 
 .cargado {
-    opacity: 0; /* Inicialmente invisible */
-    animation: fadeIn .1s ease-out forwards; /* Duración de 1 segundo, 'ease-out' para desacelerar hacia el final, y 'forwards' para mantener el estado final visible */
+  opacity: 0;
+  /* Inicialmente invisible */
+  animation: fadeIn .1s ease-out forwards;
+  /* Duración de 1 segundo, 'ease-out' para desacelerar hacia el final, y 'forwards' para mantener el estado final visible */
 }
 
 
@@ -1005,63 +1445,70 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 
 @keyframes fadeIn {
-    from {
-       opacity: 0;
-        transform: translateY(-100px);
-        /* transform: scale(.5); */
-        /* background-color: rgb(255, 255, 0); */
-        /* filter: blur(1px); */
-    }
-    to {
-        opacity: 1;
-        /* filter: blur(1px); */
+  from {
+    opacity: 0;
+    transform: translateY(-100px);
+    /* transform: scale(.5); */
+    /* background-color: rgb(255, 255, 0); */
+    /* filter: blur(1px); */
+  }
 
-    }
+  to {
+    opacity: 1;
+    /* filter: blur(1px); */
+
+  }
 }
 
 
 
 @keyframes fadeInLeftHand {
-    from {
-       opacity: 0;
-        transform: translateX(-1000px);
-        /* transform: scale(.5); */
-        /* background-color: rgb(255, 255, 0); */
-        /* filter: blur(1px); */
-    }
-    to {
-        opacity: 1;
-        /* filter: blur(1px); */
+  from {
+    opacity: 0;
+    transform: translateX(-1000px);
+    /* transform: scale(.5); */
+    /* background-color: rgb(255, 255, 0); */
+    /* filter: blur(1px); */
+  }
 
-    }
+  to {
+    opacity: 1;
+    /* filter: blur(1px); */
+
+  }
 }
 
 .cargado-left-hand {
-    opacity: 0; /* Inicialmente invisible */
-    animation: fadeInLeftHand .1s ease-out forwards; /* Duración de 1 segundo, 'ease-out' para desacelerar hacia el final, y 'forwards' para mantener el estado final visible */
+  opacity: 0;
+  /* Inicialmente invisible */
+  animation: fadeInLeftHand .1s ease-out forwards;
+  /* Duración de 1 segundo, 'ease-out' para desacelerar hacia el final, y 'forwards' para mantener el estado final visible */
 }
 
 
 
 
 @keyframes fadeInRightHand {
-    from {
-       opacity: 0;
-        transform: translateX(1000px);
-        /* transform: scale(.5); */
-        /* background-color: rgb(255, 255, 0); */
-        /* filter: blur(1px); */
-    }
-    to {
-        opacity: 1;
-        /* filter: blur(1px); */
+  from {
+    opacity: 0;
+    transform: translateX(1000px);
+    /* transform: scale(.5); */
+    /* background-color: rgb(255, 255, 0); */
+    /* filter: blur(1px); */
+  }
 
-    }
+  to {
+    opacity: 1;
+    /* filter: blur(1px); */
+
+  }
 }
 
 .cargado-right-hand {
-    opacity: 0; /* Inicialmente invisible */
-    animation: fadeInRightHand .1s ease-out forwards; /* Duración de 1 segundo, 'ease-out' para desacelerar hacia el final, y 'forwards' para mantener el estado final visible */
+  opacity: 0;
+  /* Inicialmente invisible */
+  animation: fadeInRightHand .1s ease-out forwards;
+  /* Duración de 1 segundo, 'ease-out' para desacelerar hacia el final, y 'forwards' para mantener el estado final visible */
 }
 
 
@@ -1088,4 +1535,5 @@ const hay_barrio = ref(JSON.parse(localStorage.getItem('currentNeigborhood')))
 
 .mayuscula {
   text-transform: uppercase;
-}</style>
+}
+</style>

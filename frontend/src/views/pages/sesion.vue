@@ -3,6 +3,24 @@
 
 
 
+
+
+<!-- 
+<div class="mt-8" v-for="product in store2.menu.data?.filter(d => d.categoria_id == route.params.category_id)"  >
+
+    <div style="display: flex;justify-content: start;align-items: center;">
+
+        <TarjetaMenu style="width: 100%; max-width: 20rem;" :id="`tarjeta-${index}`" :index="index+1" :product="product"></TarjetaMenu>
+
+    </div>
+
+
+    <div style="border-bottom: 1px solid;height: 2px;">
+
+</div>
+</div> -->
+
+
 <div class="grid px-3 pb-8" style="max-width: 1024px;margin: auto; position:relative" >
 
 
@@ -44,10 +62,13 @@
 </p>
 
 
-    <div v-for="(product, index) in products" :key="product.id" class=" col-12   md:col-4 lg:col-3 sm:col-6">
 
-            <TarjetaMenu style="width: 100%;" :id="`tarjeta-${index}`" :index="index+1" :product="product"></TarjetaMenu>
-    </div>
+    <div v-for="(product, index) in products?.filter(d => d.categoria_id == route.params.category_id)" :key="product.id" class=" col-12   md:col-4 lg:col-3 sm:col-6">
+
+<TarjetaMenu style="width: 100%;" :id="`tarjeta-${index}`" :index="index+1" :product="product"></TarjetaMenu>
+</div>
+
+
 
 
 
@@ -72,82 +93,44 @@ import { useSitesStore } from '../../store/site';
 const store2 = usecartStore()
 const siteStore = useSitesStore()
 
+
+
 import { useReportesStore } from '../../store/ventas';
 const store = useReportesStore()
-const products = ref([]); // Definiendo la variable reactiva para almacenar los productos
+const products = ref(store2.menu.data); // Definiendo la variable reactiva para almacenar los productos
 const route = useRoute(); // Usando useRoute para acceder a los parámetros de la route
 
 
 
 
-onMounted(async () => {
-
-
-
-
-
-    getProducts();
-    await nextTick();
-
-
-
-
-
-    const product_id = route.params.product_id
-
+watch(
+  () => route.params.categoria_id,
+  async () => {
+    // Limpia los productos actuales
+    products.value = [];
     
-
-    if (product_id) {
-        const product = await getProductById(product_id)
-
-
-        // {
-        //     "product_instance_id": 780,
-        //     "product_id": 85,
-        //     "product_name": "BACONMONSTER",
-        //     "product_description": "PAPA AMARILLA, SALCHICHA PREMIUM SM, QUESO GRATINADO, BACON, QUESO CHEDDAR Y SALSAS.",
-        //     "category_id": 3,
-        //     "category_name": "SALCHIPAPAS",
-        //     "site_id": 3,
-        //     "site_name": "CANEY",
-        //     "product_instance_status": true,
-        //     "product_instance_price": 40500
-        // }
+    // Espera un segundo antes de asignar los nuevos productos
+    setTimeout(() => {
+      products.value = store2.menu.data;
+    }, 1); // 1000ms = 1 segundo
+  },
+  { deep: true }
+);
 
 
-        const new_product =   {
-            "id": product.product_instance_id,
-            "product_id": product.product_id,
-            "site_id": product.site_id,
-            "status": true,
-            "price": product.product_instance_price,
-            "product_name":product.product_name,
-            "product_description": product.product_description,
-            "category_id": product.category_id,
-            "category_name":product.category_name,
-            "last_price": null
-        }
+watch(
+  () => store2.menu.data,
+  async () => {
+    // Limpia los productos actuales
+    products.value = [];
     
-        store2.setCurrentProduct({...new_product})
-        store2.setVisible('currentProduct', true)
-
-    }
-
-
-
-
-
-
-});
-
-watch(() => route.params.category_id, async () => {
-    if(route.params.category_id){
-        getProducts();
-    await nextTick(); 
-    }
-},{deep:true});
-
-
+    // Espera un segundo antes de asignar los nuevos productos
+    setTimeout(() => {
+      products.value = store2.menu.data;
+    }, 1); // 1000ms = 1 segundo
+  },
+  { deep: true }
+);
 
 
 
@@ -156,7 +139,6 @@ watch(() => route.params.category_id, async () => {
 
 const getProductById = async (id) => {
 
-   
         store.setLoading(true, 'cargando productos')
         try {
         let response = await fetch(`${URI}/product/${id}`);
@@ -185,37 +167,38 @@ const getProductById = async (id) => {
 
 
 
-const getProducts = async (category_name) => {
-    const site_id = siteStore.location.site.site_id
-    const category_id = route.params.category_id
-    if(category_id && site_id){
-        store.setLoading(true, 'cargando productos')
-        try {
-        let response = await fetch(`${URI}/products-active/category-id/${category_id}/site/${site_id}/1`);
-        if (!response.ok) {
-            store.setLoading(false, 'cargando productos')
+// const getProducts = async (category_name) => {
+//     const site_id = siteStore.location.site.site_id
+//     const category_id = route.params.category_id
+//     if(category_id && site_id){
+//         store.setLoading(true, 'cargando productos')
+//         try {
+//         let response = await fetch(`${URI}/get-product-integration/6149/3`);
+//         if (!response.ok) {
+//             store.setLoading(false, 'cargando productos')
 
-            throw new Error(`HTTP error! status: ${response.status}`);
+//             throw new Error(`HTTP error! status: ${response.status}`);
 
-        }
-        store.setLoading(false, 'cargando productos')
+//         }
+//         store.setLoading(false, 'cargando productos')
 
-        let data = await response.json();
-        products.value = data;
-    } catch (error) {
-        store.setLoading(false, 'cargando productos')
+//         let data = await response.json();
+//         products.value = data.data;
+//     } catch (error) {
+//         store.setLoading(false, 'cargando productos')
 
-        console.error('Error fetching data: ', error);
-    }
-    }
-}
+//         console.error('Error fetching data: ', error);
+//     }
+//     }
+// }
    
 
-
-
-// Opcional: Observar cambios en el parámetro de la rou
 
 
 const currentCity = ref(JSON.parse(localStorage.getItem('currentNeigborhood')));
 </script>
 
+<style scoped>
+
+
+</style>

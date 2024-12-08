@@ -140,6 +140,7 @@ import { URI } from '@/service/conection'
 import {sitesService } from '../service/site/sitesService'
 import {useSitesStore} from '../store/site'
 import { usecartStore } from '../store/shoping_cart';
+import router from '../router';
 
 const store = useSitesStore()
 const cart = usecartStore()
@@ -202,6 +203,7 @@ const setNeigborhood = async() => {
     store.setLocation(newLocation)
     store.setVisible('currentSite',false)
     showSiteDialog.value = false
+    router.push('/')
 
 }
 

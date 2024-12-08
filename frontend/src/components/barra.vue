@@ -8,8 +8,10 @@
   !route.path.includes('pqrs-user') && 
   !route.path.includes('gracias')  " 
 
+  
+
 class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bottom: 0; left: 0; ; justify-content: center">
-  <div v-if=" store.cart.products.length > 0 " :style="!showElement? 'transform: translateY(5rem);opacity:0': ''"  class="barra-carrito  px-5 " style=" 
+  <div v-if=" store.cart.products.length > 0  " @click="enviarAlCarro" :style="!showElement? 'transform: translateY(5rem);opacity:0': ''"  class="barra-carrito  px-5 " style="  
                           
   /* width: auto; */
   display: flex;
@@ -35,7 +37,7 @@ class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bott
      
 
 
-      <div   @click="enviarAlCarro" style="">
+      <div    style="">
         <button class="    carro  " style="  
                             display: flex; 
                             background-color: ; 
@@ -57,7 +59,7 @@ class="col-12 py-0 px-4 background"   style="display: flex;position: fixed; bott
           <div  style="position: relative;" :key="product.id" v-for="product in store.cart.products.slice(0, 4)">
             <Button class="p-0" :label="`${product.quantity}`" severity="danger" rounded style="width: 1.2rem;font-size: 0.8rem; height: 1.2rem;top: -.3rem; right: -.5rem; position: absolute;"/>
             <img class="img-cart" @mouseover="() => vueMenu = true" style="height: 2rem; object-fit: contain;"
-              :src="`https://backend.salchimonster.com/read-photo-product/${product.product.img_identifier}/600`" alt="">
+            :src="`https://img.restpe.com/${product.product.productogeneral_urlimagen}`" alt="">
             
           </div>
 

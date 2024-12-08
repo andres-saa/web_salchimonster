@@ -18,10 +18,63 @@ const preparar_orden = () => {
   user.user.was_reserva = false
   cart.sending_order = true
   const order_products = cart.cart.products.map(p => {
-    return { product_instance_id: p.product.id, quantity: p.quantity };
+
+    const generalPrice = p.product.productogeneral_precio;
+                const presentationPrice = p.product.lista_presentacion?.[0]?.producto_precio;
+    return { 
+
+
+      pedido_productoid: p.product.producto_id, 
+      pedido_cantidad: p.quantity,
+      pedido_precio:generalPrice !== undefined ? generalPrice : presentationPrice || 0,
+      pedido_escombo:p.product.productogeneral_escombo,
+      pedido_nombre_producto:p.product.productogeneral_descripcion,
+      lista_productocombo: p.product.lista_productobase?.map(p => 
+          {
+            return {
+              "pedido_productoid":parseInt(p.producto_id)  ,
+              "pedido_cantidad": parseInt(p.productocombo_cantidad),
+              "pedido_precio": parseInt(p.productocombo_precio),
+              "pedido_nombre":p.producto_descripcion
+            }
+           
+          }
+        
+      ),
+      modificadorseleccionList:cart.cart.additions.filter( add => add.parent_id == p.product.producto_id)?.map( ad => {
+        return {
+          "modificadorseleccion_cantidad": ad.quantity,
+          "pedido_precio": ad.price,
+          "modificador_id": ad.group_id,
+          "modificadorseleccion_id": ad.id,
+          "modificador_nombre":ad.name,
+          "pedido_productoid":ad.parent_id
+      }
+      })  
+    }
   });
 
 
+//   {
+//     "pedido_productoid": 1,
+//     "pedido_cantidad": 1,
+//     "pedido_precio": 4,
+//     "pedido_descuento": 0,
+//     "pedido_nota": "Bien frio",
+//     "pedido_escombo": "0",
+//     // "modificadorseleccionList": [
+//     // {
+//     //     "modificador_id": 1,
+//     //     "modificadorseleccion_id": 7,
+//     //     "pedido_precio": 0.5,
+//     //     "modificadorseleccion_cantidad": 1
+//     // }
+//     // ],
+//     "lista_productocombo": [],
+//     "adicionalListAdded": []
+// }
+
+  console.log(order_products)
 
   const order_aditionals = cart.cart.additions.map(a => {
     return {
@@ -31,6 +84,7 @@ const preparar_orden = () => {
   })
 
   const site_id = site.location.site.site_id;
+  const pe_site_id = site.location.site.pe_site_id;
   const payment_method_id = user.user.payment_method_option?.id;
   const delivery_price = payment_method_id === 7 ? 0 : site.location.neigborhood.delivery_price;
 
@@ -42,15 +96,18 @@ const preparar_orden = () => {
   };
 
   const order = {
-    "order_products": order_products,
-    "site_id": site_id,
-    // "site_id": 12,
+    "order_products": [],
+    // "site_id": site_id,
+    "site_id": 12,
+    // "pe_site_id":12,
+    "pe_site_id":pe_site_id,
     "delivery_person_id": 4,
     "payment_method_id": payment_method_id,
     "delivery_price": delivery_price,
     "order_notes": order_notes || 'SIN NOTAS',
     "user_data": user_data,
-    "order_aditionals":order_aditionals
+    "order_aditionals":order_aditionals,
+    "pe_json": order_products
   };
 
   return order
@@ -172,7 +229,9 @@ export const orderService = {
   },
 
 
-
+  preparar_orden(){
+    preparar_orden()
+  },
 
 
   async sendOrderReserva() {
@@ -255,13 +314,13 @@ export const orderService = {
 
 
 function validateOrder(order) {
-  const cart = usecartStore()
-  if (!order.order_products.every(p => p.product_instance_id && p.quantity)) {
-    alert('Some products in your cart are missing details.');
-    cart.sending_order = false
+  // const cart = usecartStore()
+  // if (!order.order_products.every(p => p.product_instance_id && p.quantity)) {
+  //   alert('Some products in your cart are missing details.');
+  //   cart.sending_order = false
 
-    return false;
-  }
+  //   return false;
+  // }
 
   if (!order.user_data.user_name || order.user_data.user_name.trim() == '' ||
     !order.user_data.user_phone || order.user_data.user_phone.trim() == '' ||

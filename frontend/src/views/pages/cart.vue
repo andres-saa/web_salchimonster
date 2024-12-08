@@ -14,21 +14,23 @@
                 <div class=" col-12 py-3 p-shadow"
                     style=" display: flex;align-items:end;position: relative; gap:1rem;border-radius: 0.3rem;"
                     v-for="product in store.cart.products">
+                    <!-- {{ product }} -->
+                    <img class="p-1" style="width:5rem;object-fit:cover; height:5remh;aspect-ratio: 1 / 1;border: 3px solid var(--primary-color);"
+                        :src="`https://img.restpe.com/${product.product.productogeneral_urlimagen}`" alt="">
 
-                    <img style="width:5rem;object-fit:cover; height:5rem"
-                        :src="`https://backend.salchimonster.com/read-photo-product/${product.product.img_identifier}/600`" alt="">
-
-                    <Button class="ml-2" @click="store.removeProductFromCart(product.product.id)" icon="pi pi-trash"
+                    <Button class="ml-2" @click="store.removeProductFromCart(product.product.productogeneral_id)" icon="pi pi-trash"
                         severity="danger" rounded
                         style="border:none;right: -.5rem;top: -.5rem; position: absolute; outline:none;width:2rem; height:2rem" />
 
+                        
                     <div style="display: flex; flex-direction:column;gap:0.4rem; width:100%">
 
                         <div style="display: flex; flex-direction:column;gap:0.3rem; width:100%">
                             <div style="display:flex;justify-content:space-between;align-items: center; width:100%;gap:1rem">
-                                <span class="p-0 m-0"> {{ product.product.product_name }} </span>
+                                <span class="p-0 m-0"> {{ product.product.productogeneral_descripcion }} </span>
                             </div>
-                           <span style="text-transform: uppercase;font-weight: bold;">{{ product.product.category_name }}</span> 
+                           <!-- <span style="text-transform: uppercase;font-weight: bold;">{{ product.product.category_name }}</span>  -->
+
 
                            
                             <div style="display:flex">
@@ -38,7 +40,7 @@
 
                                 <div class="p-0 "
                                     style="box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.2); background-color:#ff620000; border-radius: 5rem;display: flex;">
-                                    <Button @click="store.removeProductInstance(product.product.id)" icon="pi pi-minus"
+                                    <Button @click="store.removeProductInstance(product.product.productogeneral_id)" icon="pi pi-minus"
                                         severity="danger"
                                         style="border:none;outline:none;width:2rem; height:1.5rem;border-radius: 0.4rem 0 0 0.4rem;">
                                     </Button>
@@ -50,7 +52,7 @@
                                         :modelValue="product.quantity" readonly></InputText>
 
 
-
+                                        
 
 
                                     <Button @click="store.addProductToCart(product.product)" icon="pi pi-plus "
@@ -85,6 +87,9 @@
                         <div class="mb-2">
                             <span class="mb-2 text-center">
                                 <b>{{ grupo }}</b>
+                                
+
+                               
 
                             </span>
                             
@@ -93,7 +98,7 @@
                                     style="display: flex; gap: 1rem; align-items: center;">
                                     <Button text rounded @click="deleteAd(item)" class="p-0 m-0" severity="danger"
                                         style="width: 2rem;  height: 2rem;border: none;" icon="pi pi-trash m-0"></Button>
-                                        
+                                    
 
                                     <div style="display: flex; width: 100%; gap: 1rem; justify-content: space-between;">
                                         <span class="text adicion" style="text-transform: capitalize;">{{ item.name
@@ -135,10 +140,10 @@
                         </div>
                         
                     </div>
-                    <div  @click="store.setVisible('addAdditionToCart',true)" class="col-12 p-0 m-0" style="display: flex; justify-content: end;">
+                    <!-- <div  @click="store.setVisible('addAdditionToCart',true)" class="col-12 p-0 m-0" style="display: flex; justify-content: end;">
                         <Button style="width: 2rem;left: .3rem; height: 2rem;" rounded severity="danger" icon="pi pi-plus"></Button>
 
-                    </div>
+                    </div> -->
 
                 </div>
 
@@ -174,6 +179,8 @@ import { orderService } from '../../service/order/orderService'
 import { adicionalesService } from '../../service/restaurant/aditionalService';
 import dialogAddAditions from './dialogAddAditions.vue'
 import { useUserStore } from '../../store/user';
+
+
 const store = usecartStore()
 const siteStore = useSitesStore()
 const selectedAdditions = ref({})
@@ -200,6 +207,8 @@ watch(() => store.cart.additions, () => {
     update()
 },{deep:true})
 
+
+orderService.preparar_orden()
 
 const increment = (adition) => {
     const new_adition = { ...adition }
@@ -235,7 +244,7 @@ const adicionales = ref([])
 onMounted(async () => {
 
 
-    if (user.user.payment_method_option?.id != 7)
+    if (user.user.payment_method_option?.productogeneral_id != 7)
         siteStore.setNeighborhoodPrice()
     else {
         siteStore.setNeighborhoodPriceCero()
@@ -264,6 +273,18 @@ onMounted(async () => {
 
 
 })
+
+const getAditional = () => {
+
+    const ids = store.cart.products.map( p => p.product.producto_id)
+    console.log(ids)
+
+    const menu = store.menu.data.map(p => p.lista_agrupadores)
+
+    console.log(menu)
+}
+
+getAditional()
 
 
 </script>

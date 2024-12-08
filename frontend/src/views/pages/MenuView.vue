@@ -45,6 +45,12 @@ import sesion from './sesion.vue';
 import BarraCategorias from '../../components/BarraCategorias.vue';
 import Loading from '../../components/Loading.vue';
 import { useRoute } from 'vue-router';
+import { URI } from '../../service/conection';
+
+import { usecartStore } from '@/store/shoping_cart';
+import { useReportesStore } from '@/store/ventas';
+const store2 = usecartStore()
+const store = useReportesStore()
 
 const route = useRoute()
 
@@ -71,9 +77,10 @@ const updateScreenWidth = () => {
   screenWidth.value = window.innerWidth;
 };
 
-onMounted(() => {
+onMounted(async() => {
   window.addEventListener('resize', updateScreenWidth);
   comprobar_sede()
+  await getProducts()
 });
 
 onBeforeUnmount(() => {
@@ -99,8 +106,36 @@ const setSection = () => {
 watch(menuOptions, setSection);
 
 
+const getProducts = async (category_name) => {
+  
+    const site_id = siteStore.location.site?.pe_site_id
+    const category_id = route.params.category_id
+    if(site_id){
 
+        if(store2.menu?.data?.length < 1 || !store2.menu?.data ){
+          store.setLoading(true, 'cargando productos')
+        }
+        try {
+        let response = await fetch(`${URI}/get-product-integration/6149/${site_id}`);
+    
+        if (!response.ok) {
+            store.setLoading(false, 'cargando productos')
 
+            throw new Error(`HTTP error! status: ${response.status}`);
+
+        }
+        store.setLoading(false, 'cargando productos')
+
+        let data = await response.json();
+        store2.menu = data.data;
+    } catch (error) {
+        store.setLoading(false, 'cargando productos')
+
+        console.error('Error fetching data: ', error);
+    }
+    }
+}
+  
 
 
 onMounted(async () => {

@@ -24,22 +24,25 @@ export const adicionalesService = {
             instance_product_ids: product_instance_ids,
             site_id:site_id
         };
+
+
+
     
-        try {
-            // Make a POST request with the correctly formatted data
-            const response = await axios.post(`${URI}/adicionales-new-group-active/`, requestBody);
-            if (response.status === 200) {
-                return response.data;  // Return the received data
-            } else {
-                // Log and handle non-200 status responses
-                console.error('An error occurred while fetching the ingredients:', response.status);
-                return null;
-            }
-        } catch (error) {
-            // Handle exceptions from the request, such as network errors
-            console.error('An error occurred while fetching the ingredients:', error);
-            return null;
-        }
+        // try {
+        //     // Make a POST request with the correctly formatted data
+        //     const response = await axios.post(`${URI}/adicionales-new-group-active/`, requestBody);
+        //     if (response.status === 200) {
+        //         return response.data;  // Return the received data
+        //     } else {
+        //         // Log and handle non-200 status responses
+        //         console.error('An error occurred while fetching the ingredients:', response.status);
+        //         return null;
+        //     }
+        // } catch (error) {
+        //     // Handle exceptions from the request, such as network errors
+        //     console.error('An error occurred while fetching the ingredients:', error);
+        //     return null;
+        // }
     },
 
 

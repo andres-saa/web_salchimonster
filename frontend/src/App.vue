@@ -9,7 +9,24 @@ import { onMounted, watch } from 'vue';
 import { useSitesStore } from './store/site';
 import { URI } from './service/conection';
 import validate from './views/pages/validate.vue';
+import { useRoute } from 'vue-router';
+import { usecartStore } from './store/shoping_cart';
+import { useReportesStore } from './store/ventas';
+const store2 = usecartStore()
+const store = useReportesStore()
+const route = useRoute()
 const siteStore  = useSitesStore()
+
+
+onMounted(async() => {
+  await getProducts()
+  await obtenerstatus()
+  if (siteStore.status == 'cerrado') {
+      verCerrado.value = true
+    }
+
+
+})
 
 
 const obtenerstatus = async () => {
@@ -42,12 +59,37 @@ watch(() => siteStore.location.site.site_id , async() => {
     }
 })
 
-onMounted(async() => {
-  await obtenerstatus()
-  if (siteStore.status == 'cerrado') {
-      verCerrado.value = true
+
+
+const getProducts = async (category_name) => {
+
+    const site_id = siteStore.location.site.pe_site_id
+    const category_id = route.params.category_id
+    if(category_id && site_id){
+
+        if(store2.menu?.data?.length < 1 || !store2.menu?.data ){
+          store.setLoading(true, 'cargando productos')
+        }
+        try {
+        let response = await fetch(`${URI}/get-product-integration/6149/${site_id}`);
+        if (!response.ok) {
+            store.setLoading(false, 'cargando productos')
+
+            throw new Error(`HTTP error! status: ${response.status}`);
+
+        }
+        store.setLoading(false, 'cargando productos')
+
+        let data = await response.json();
+        store2.menu = data.data;
+    } catch (error) {
+        store.setLoading(false, 'cargando productos')
+
+        console.error('Error fetching data: ', error);
     }
-})
+    }
+}
+   
 
 </script>
 <template>

@@ -11,13 +11,16 @@
 
         <!-- <input style="border-radius: 20px; " class="col-12 " type="text" name="" id=""> -->
 
+
+      
+
         <div class="productos p-0 m-0">
             <div class="producto p-0 m-0" v-for="(product, index) in contarObjetosRepetidos(pedido.order_products)"
                 style="display: flex; justify-content: space-between; align-items:center ; flex-direction: column;">
 
 
 
-
+            
 
                 <div class="col-12 p-0 grid m-0 " style=" justify-content: space-between; align-items:center ;dis">
                     <p class="col p-0 m-0" style="font-weight: bold;display: flex;; min-width: 80%;margin: 0; gap:0.5rem">
