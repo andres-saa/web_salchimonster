@@ -101,10 +101,12 @@ class OrderSchemaPost(BaseModel):
     order_aditionals:list[AdditionalItemMin]
     user_id: Optional[int] = None
     site_id: int
+    pe_site_id:int
     order_status:Optional[OrderStatus] = None
     status_history: Optional[List[OrderStatus]] = None
     payment_method_id: int
-    delivery_price: Decimal
+    delivery_price: int
     order_notes: str
     user_data: user_schema_post
     inserted_by:Optional[int] = None
+    pe_json:Optional[object] = {}

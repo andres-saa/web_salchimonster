@@ -13,6 +13,8 @@ from datetime import datetime, timedelta
 from datetime import datetime, time
 from config.wsp import enviar_mensaje_whatsapp
 import pytz
+from psycopg2.extras import Json
+
 import random
 
 import requests
@@ -51,8 +53,8 @@ class Order2:
             #     self.generate_order_code(order_data.user_data.user_phone,order_id)
 
             self.insert_order_details(order_id, order_data)
-            self.insert_order_products(order_id, order_data)
-            self.insert_order_aditionals(order_id, order_data)
+            # self.insert_order_products(order_id, order_data)
+            # self.insert_order_aditionals(order_id, order_data)
             self.update_order_status(order_id, order_data.payment_method_id,order_data.inserted_by)
             self.insert_order_notes(order_id,order_data.order_notes)
             # Actualizar la última hora de compra
@@ -94,14 +96,41 @@ class Order2:
         return user_id
 
     def create_order_entry(self, user_id, order_data):
+        
+        
+        
+        
+        print(order_data)
+        
+        
+        
+        pe_json = {
+                    "delivery": {
+                        "local_id": order_data.pe_site_id,
+                        "delivery_costoenvio": order_data.delivery_price,
+                        "delivery_direccionenvio": order_data.user_data.user_address,
+                        "delivery_notageneral": order_data.order_notes,
+                        "delivery_horaentrega": "2020-12-06 10:00:00",
+                        "delivery_pagocon":1000
+                    },
+                    "cliente": {
+                        "cliente_nombres": order_data.user_data.user_name,
+                        "cliente_apellidos":order_data.user_data.user_name,
+                        "delivery_direccionfacturacion": order_data.user_data.user_address,
+                        "cliente_telefono": order_data.user_data.user_phone
+                    },
+                    "listaPedidos": order_data.pe_json
+                    }
+
+        
         if order_data.payment_method_id == 6:
 
 
             order_insert_query = """
-            INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized,inserted_by_id)
-            VALUES (%s, %s, %s, false,%s) RETURNING id;
+            INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized,inserted_by_id,pe_json)
+            VALUES (%s, %s, %s, false, %s, %s ) RETURNING id;
             """
-            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, 4, order_data.inserted_by))
+            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, 4, order_data.inserted_by,  Json(pe_json)))
             # Verificar resultado
             result = self.cursor.fetchone()
             if result is None:
@@ -111,11 +140,20 @@ class Order2:
             self.create_or_update_event(3, 12, 1132, '3 minutes', False)
 
         else:
+            
+            
             order_insert_query = """
-            INSERT INTO orders.orders (user_id, site_id, delivery_person_id,inserted_by_id)
-            VALUES (%s, %s, %s,%s) RETURNING id;
+                INSERT INTO orders.orders (user_id, site_id, delivery_person_id, inserted_by_id, pe_json)
+                VALUES (%s, %s, %s, %s, %s) RETURNING id;
             """
-            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, 4,order_data.inserted_by))
+            # Utilizamos psycopg2.extras.Json para manejar correctamente el campo JSON
+            self.cursor.execute(order_insert_query, (
+                user_id,
+                order_data.site_id,
+                4,
+                order_data.inserted_by,
+                Json(pe_json)
+            ))
             result = self.cursor.fetchone()
             if result is None:
                 raise ValueError("La orden no pudo ser creada.")
@@ -673,7 +711,7 @@ class Order2:
 
         # Fetch only today's orders from the combined order view
         combined_order_query = f"""
-            SELECT DISTINCT ON (order_id) order_id,inserted_by_id,inserted_by_name, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation,authorized,responsible_id,name
+            SELECT DISTINCT ON (order_id) order_id,inserted_by_id,inserted_by_name, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation,authorized,responsible_id,name,pe_json
             FROM orders.combined_order_view
             WHERE site_id = %s AND latest_status_timestamp >= %s AND latest_status_timestamp < %s AND authorized = true
             ORDER BY order_id, latest_status_timestamp DESC;
@@ -1004,6 +1042,13 @@ class Order2:
         self.conn.commit()
             
     def send_order(self, order_id):
+        """
+        Actualiza el estado de una orden a 'enviada', registra el historial,
+        y envía los datos de la orden como delivery.
+        
+        Args:
+            order_id (int): ID de la orden a procesar.
+        """
         # Actualiza el estado de la orden a 'enviada'
         send_order_query = """
         INSERT INTO orders.order_status (order_id, status, timestamp)
@@ -1017,7 +1062,31 @@ class Order2:
         VALUES (%s, 'enviada', CURRENT_TIMESTAMP);
         """
         self.cursor.execute(order_status_history_insert_query, (order_id,))
+
+        # Selecciona el JSON de la orden
+        select_order_query = """
+        SELECT pe_json
+        FROM orders.orders
+        WHERE id = %s;
+        """
+        self.cursor.execute(select_order_query, (order_id,))
+        order_json = self.cursor.fetchone()
+
+        if not order_json:
+            raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
+
+   # Reemplazar con el local real
+        delivery_response = self.registrar_delivery(order_json[0])
+
+        print(delivery_response)
+        if isinstance(delivery_response, dict):
+            print("Delivery enviado con éxito:", delivery_response)
+        else:
+            print("Error al enviar el delivery:", delivery_response)
+
+        # Confirma las operaciones en la base de datos
         self.conn.commit()
+
   
     def update_product_instance_status(self, product_instance_id, new_status):
         """
@@ -1035,6 +1104,40 @@ class Order2:
         self.conn.commit()
 
 
+    def registrar_delivery(self, data):
+        """
+        Realiza una solicitud POST para registrar un delivery.
+
+        Args:
+            dominio_id (int): ID del dominio.
+            local_id (int): ID del local.
+            data (dict): Datos a enviar en el cuerpo de la solicitud.
+
+        Returns:
+            dict: La respuesta del servidor si es exitosa.
+            str: Mensaje de error si ocurre algún problema.
+        """
+        # Construcción de la URL con los parámetros
+        url = f"https://api.restaurant.pe/restaurant/public/v2/rest/delivery/registrarDelivery/6149"
+
+        # Encabezados
+        headers = {
+            "Authorization": 'Token token="898f626c749eea07442da4fccffe2e86"',
+            "Content-Type": "application/json"
+        }
+
+        try:
+            # Enviar la solicitud POST
+            response = requests.post(url, headers=headers, json=data)
+
+            # Manejo de la respuesta
+            if response.status_code == 200:
+                print(response.json)
+                return response.json()
+            else:
+                return f"Error {response.status_code}: {response.text}"
+        except Exception as e:
+            return f"Excepción durante la solicitud: {str(e)}"
 
 
     def authorize_order(self, order_id, responsible_id):
@@ -1102,10 +1205,7 @@ class Order2:
             # Si no hay registro previo, el usuario puede realizar una orden
             return True
         
-    
-    
-    
-    
+ 
     def update_last_order_time(self, user_id):
         # Define la zona horaria de Colombia
         colombia_tz = pytz.timezone('America/Bogota')
@@ -1124,12 +1224,6 @@ class Order2:
             """
             self.cursor.execute(insert_query, (user_id, now_colombia))
 
-            
-            
-            
-        
-        
-        
         
     def close_connection(self):
         self.conn.close()

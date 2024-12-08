@@ -33,12 +33,61 @@ def get_inventory_report(dominio_id: int, local_id: int, quipupos: int = 0):
 
 
 
-from pydantic import BaseModel
-from typing import List
+@integration_router.get('/get-categorized-products/{dominio_id}/{local_id}')
+def get_categorized_products(dominio_id: int, local_id: int, quipupos: int = 0):
+    # Construir la URL dinámica
+    url = f"https://api.restaurant.pe/restaurant/readonly/rest/delivery/obtenerCartaPorLocal/{dominio_id}/{local_id}"
+    
+    # Encabezados necesarios
+    token = '898f626c749eea07442da4fccffe2e86'  # Reemplaza con el token correcto
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f'Token token="{token}"'
+    }
+    
+    # Parámetros de consulta
+    params = {
+        "quipupos": quipupos
+    }
 
-class PolygonData(BaseModel):
-    name: str
-    coordinates: List[List[float]]  # Lista de coordenadas [[lat, lng], ...]
-    delivery_price: float
+    # Hacer la solicitud HTTP GET
+    try:
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()  # Lanza una excepción si hay un error HTTP
+        api_response = response.json()  # Convertir la respuesta en JSON
+    except requests.RequestException as e:
+        return {"error": str(e)}
+
+    # Extraer categorías y productos
+    categorias_raw = api_response['data']['listaCategorias']
+    productos_raw = api_response['data']['data']
+    # return( productos_raw)
     
-    
+    print(productos_raw)
+
+    # Preparar categorías base
+    categorias = {cat["categoria_id"]: {
+        "categoria_id": cat["categoria_id"],
+        "local_id": cat["local_id"],
+        "categoria_descripcion": cat["categoria_descripcion"],
+        "categoria_estado": cat["categoria_estado"],
+        "categoria_padreid": cat["categoria_padreid"],
+        "categoria_color": cat["categoria_color"],
+        "categoria_delivery": cat["categoria_delivery"],
+        "products": []
+    } for cat in categorias_raw}
+
+    # Asociar productos completos con categorías
+    for producto in productos_raw:
+        # Validar que producto sea un diccionario
+        if isinstance(producto, dict):
+            categoria_id = producto.get("categoria_id")
+            if categoria_id in categorias:
+                categorias[categoria_id]["products"].append(producto)  # Agregar producto completo
+        else:
+            # Si no es un diccionario, lo ignoramos o manejamos el error
+            continue
+
+    # Convertir categorías a lista
+    resultado = list(categorias.values())
+    return resultado
