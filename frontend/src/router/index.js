@@ -75,6 +75,13 @@ const router = createRouter({
         },
 
         {
+          path: '/franquicias',
+          name: 'franquicias',
+          component: () => import('@/views/pages/Franquicias.vue'),
+          meta: { title:'Franquicias' },
+        },
+
+        {
           path: '/gracias',
           name: 'gracias',
           component: () => import('@/views/pages/gracias.vue'),

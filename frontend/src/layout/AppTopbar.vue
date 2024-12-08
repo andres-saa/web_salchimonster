@@ -340,7 +340,7 @@ const fondoVisible = ref(false)
                 style="display: flex; ">
 
 
-                <router-link :to="`/${menuTopbar.to}`" @click="handleDropDownMenu(false)" class="">
+                <router-link :to="`/${menuTopbar.to}`" @click="handleDropDownMenu(false)" class="" style="text-transform: lowercase;"> 
                     <Button severity="secondary" text size="small"  :label="menuTopbar.name" class="p-link boton-menu text-xl py-2 px-3" style="font-weight: 500; box-shadow: none; color: var(--text-color);"
                         :class="curentMenu.name == menuTopbar.name || router.currentRoute.value.path == `/${menuTopbar.to}` ? 'selected' : 'boton-menu'">
                         

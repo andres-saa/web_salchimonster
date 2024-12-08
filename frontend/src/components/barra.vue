@@ -6,6 +6,7 @@
   !route.path.includes('menu') && 
   !route.path.includes('colaboraciones') && 
   !route.path.includes('pqrs-user') && 
+  !route.path.includes('franquicias') && 
   !route.path.includes('gracias')  " 
 
   
