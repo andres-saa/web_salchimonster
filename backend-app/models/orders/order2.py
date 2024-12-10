@@ -101,7 +101,7 @@ class Order2:
 
 
 
-    def calculate_total_order(order_products):
+    def calculate_total_order(self,order_products):
         """
         Calcula el total de un pedido basado en la lista de productos y sus atributos,
         asegurando siempre devolver un total válido.
