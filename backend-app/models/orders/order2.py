@@ -16,8 +16,12 @@ import pytz
 from psycopg2.extras import Json
 
 import random
-
 import requests
+
+
+
+
+
 load_dotenv()
 
 DB_USER = os.getenv('DB_USER')
@@ -25,7 +29,7 @@ DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
 DB_NAME = os.getenv('DB_NAME')
-
+TOKEN = os.getenv("API_TOKEN")
 
 
 api_key = 'obg0iystmnq4v0ln4r5fnjcvankhtjp0'
@@ -1076,7 +1080,8 @@ class Order2:
             raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
 
    # Reemplazar con el local real
-        delivery_response = self.registrar_delivery(order_json[0])
+#    self.registrar_delivery(order_json[0])
+        delivery_response = 3
 
         print(delivery_response)
         if isinstance(delivery_response, dict):
@@ -1122,7 +1127,7 @@ class Order2:
 
         # Encabezados
         headers = {
-            "Authorization": 'Token token="898f626c749eea07442da4fccffe2e86"',
+            "Authorization": f'Token token="{TOKEN}"',
             "Content-Type": "application/json"
         }
 

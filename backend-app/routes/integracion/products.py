@@ -1,18 +1,26 @@
 from fastapi import APIRouter
 import requests
+from dotenv import load_dotenv
+import os
+
+
+load_dotenv()
+
+
 
 integration_router = APIRouter()
 
+TOKEN = os.getenv("API_TOKEN")
+
 @integration_router.get('/get-product-integration/{dominio_id}/{local_id}')
-def get_inventory_report(dominio_id: int, local_id: int, quipupos: int = 0):
+def get_product_integration(dominio_id: int, local_id: int, quipupos: int = 0):
     # Construir la URL dinámica
     url = f"https://api.restaurant.pe/restaurant/readonly/rest/delivery/obtenerCartaPorLocal/{dominio_id}/{local_id}"
     
-    # Encabezados necesarios
-    token = '898f626c749eea07442da4fccffe2e86'  # Reemplaza con el token correcto
+ # Reemplaza con el token correcto
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f'Token token="{token}"'
+        "Authorization": f'Token token="{TOKEN}"'
     }
     
     # Parámetros de consulta
@@ -38,10 +46,10 @@ def get_categorized_products(dominio_id: int, local_id: int, quipupos: int = 0):
     url = f"https://api.restaurant.pe/restaurant/readonly/rest/delivery/obtenerCartaPorLocal/{dominio_id}/{local_id}"
     
     # Encabezados necesarios
-    token = '898f626c749eea07442da4fccffe2e86'  # Reemplaza con el token correcto
+ # Reemplaza con el token correcto
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f'Token token="{token}"'
+        "Authorization": f'Token token="{TOKEN}"'
     }
     
     # Parámetros de consulta
