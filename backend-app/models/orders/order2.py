@@ -99,63 +99,15 @@ class Order2:
         user_id = User().insert_user(user_data)
         return user_id
 
-
-
-    def calculate_total_order(self,order_products):
-        """
-        Calcula el total de un pedido basado en la lista de productos y sus atributos,
-        asegurando siempre devolver un total válido.
-        
-        Args:
-            order_products (list): Lista de productos en el pedido.
-        
-        Returns:
-            float: Total calculado del pedido.
-        """
-        if not isinstance(order_products, list):
-            return 0  # Si el pedido no es una lista, el total es 0.
-        
-        total = 0
-
-        for product in order_products:
-            try:
-                # Obtener precio y cantidad del producto principal
-                precio = product.get("pedido_precio", 0)
-                cantidad = product.get("pedido_cantidad", 0)
-
-                # Validar precio y cantidad
-                if isinstance(precio, (int, float)) and precio >= 0 and isinstance(cantidad, int) and cantidad >= 0:
-                    total += precio * cantidad
-
-                # Procesar productos en combo
-                if "lista_productocombo" in product and isinstance(product["lista_productocombo"], list):
-                    for combo in product["lista_productocombo"]:
-                        combo_precio = combo.get("pedido_precio", 0)
-                        combo_cantidad = combo.get("pedido_cantidad", 0)
-
-                        if isinstance(combo_precio, (int, float)) and combo_precio >= 0 and isinstance(combo_cantidad, int) and combo_cantidad >= 0:
-                            total += combo_precio * combo_cantidad
-
-                # Procesar modificaciones
-                if "modificadorseleccionList" in product and isinstance(product["modificadorseleccionList"], list):
-                    for modificador in product["modificadorseleccionList"]:
-                        mod_precio = modificador.get("pedido_precio", 0)
-                        mod_cantidad = modificador.get("modificadorseleccion_cantidad", 0)
-
-                        if isinstance(mod_precio, (int, float)) and mod_precio >= 0 and isinstance(mod_cantidad, int) and mod_cantidad >= 0:
-                            total += mod_precio * mod_cantidad
-
-            except Exception:
-                # Ignorar cualquier error y continuar
-                continue
-
-        return total
-
-
-
     def create_order_entry(self, user_id, order_data):
-
+        
+        
+        
+        
         print(order_data)
+        
+        
+        
         pe_json = {
                     "delivery": {
                         "local_id": order_data.pe_site_id,
@@ -163,7 +115,7 @@ class Order2:
                         "delivery_direccionenvio": order_data.user_data.user_address,
                         "delivery_notageneral": order_data.order_notes,
                         "delivery_horaentrega": "2020-12-06 10:00:00",
-                        "delivery_pagocon":self.calculate_total_order(order_data.pe_json)
+                        "delivery_pagocon":order_data.total
                     },
                     "cliente": {
                         "cliente_nombres": order_data.user_data.user_name,

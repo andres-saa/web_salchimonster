@@ -110,3 +110,4 @@ class OrderSchemaPost(BaseModel):
     user_data: user_schema_post
     inserted_by:Optional[int] = None
     pe_json:Optional[object] = {}
+    total:int
