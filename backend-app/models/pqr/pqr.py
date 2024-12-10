@@ -110,7 +110,7 @@ class Pqrs:
     
             
     def get_all_tags(self):
-        query = self.db.build_select_query(table_name='pqr.pqr_tag',fields=["*"])
+        query = self.db.build_select_query(table_name='pqr.pqr_tag',fields=["*"],condition='exist = true')
         pqr_id = self.db.execute_query(query=query,fetch=True)
         return pqr_id
     
