@@ -97,8 +97,8 @@ const preparar_orden = () => {
 
   const order = {
     "order_products": [],
-    // "site_id": site_id,
-    "site_id": 12,
+    "site_id": site_id,
+    // "site_id": 12,
     // "pe_site_id":12,
     "pe_site_id":pe_site_id,
     "delivery_person_id": 4,

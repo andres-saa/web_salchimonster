@@ -151,7 +151,7 @@
             </router-link>
 
             <router-link to="/pay" v-else-if="siteStore.status != 'cerrado' " >
-                <Button  :disabled="store.sending_order || siteStore.status == 'cerrado'" @click=" ()  => {
+                <Button  @click=" ()  => {
                     orderService.sendOrder()
                     sending = true
                 }" iconPos="right" icon="pi pi-arrow-right" label="Finalizar pedido"
