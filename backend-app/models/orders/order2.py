@@ -1080,8 +1080,8 @@ class Order2:
             raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
 
    # Reemplazar con el local real
-#    self.registrar_delivery(order_json[0])
-        delivery_response = 3
+#    
+        delivery_response = self.registrar_delivery(order_json[0])
 
         print(delivery_response)
         if isinstance(delivery_response, dict):
