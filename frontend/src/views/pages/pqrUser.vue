@@ -233,7 +233,7 @@ onMounted(async () => {
   types.value = await fetchService.get(`${URI}/get-all-pqrs-types`);
   sites.value = await fetchService.get(`${URI}/sites`);
   tags.value = await fetchService.get(`${URI}/get-all-pqr-tags`);
-  selectedType.value = 8;
+  selectedType.value = 9;
 });
 
 

@@ -32,7 +32,6 @@ def get_inventory_report(dominio_id: int, local_id: int, quipupos: int = 0):
     return data
 
 
-
 @integration_router.get('/get-categorized-products/{dominio_id}/{local_id}')
 def get_categorized_products(dominio_id: int, local_id: int, quipupos: int = 0):
     # Construir la URL dinámica
