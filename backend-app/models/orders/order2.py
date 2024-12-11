@@ -1012,7 +1012,6 @@ class Order2:
         """
         self.cursor.execute(history_query, (order_id,))
 
-
         get_site_id_query = """
         SELECT site_id FROM orders.orders
         WHERE id = %s;
@@ -1023,6 +1022,27 @@ class Order2:
 
         self.mark_events_as_solved_by_site_id(site_id)
         
+         # Selecciona el JSON de la orden
+        select_order_query = """
+        SELECT pe_json
+        FROM orders.orders
+        WHERE id = %s;
+        """
+        self.cursor.execute(select_order_query, (order_id,))
+        order_json = self.cursor.fetchone()
+
+        if not order_json:
+            raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
+
+ 
+        delivery_response = self.registrar_delivery(order_json[0])
+
+        print(delivery_response)
+        if isinstance(delivery_response, dict):
+            print("Delivery enviado con éxito:", delivery_response)
+        else:
+            print("Error al enviar el delivery:", delivery_response)
+
 
 
         self.conn.commit()
@@ -1077,8 +1097,7 @@ class Order2:
         if not order_json:
             raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
 
-   # Reemplazar con el local real
-#    
+ 
         delivery_response = self.registrar_delivery(order_json[0])
 
         print(delivery_response)
@@ -1089,7 +1108,7 @@ class Order2:
 
         # Confirma las operaciones en la base de datos
         self.conn.commit()
-
+  
   
     def update_product_instance_status(self, product_instance_id, new_status):
         """
