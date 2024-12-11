@@ -108,7 +108,7 @@ class Order2:
                 "delivery_costoenvio": order_data.delivery_price,
                 "delivery_direccionenvio": order_data.user_data.user_address,
                 "delivery_notageneral": order_data.order_notes,
-                # "delivery_horaentrega": "2020-12-06 10:00:00",
+                "delivery_horaentrega": "2020-12-06 10:00:00",
                 "delivery_pagocon": order_data.total + order_data.delivery_price,
                 "delivery_codigointegracion": None,
                 "canaldelivery_id":525
@@ -1085,28 +1085,7 @@ class Order2:
         """
         self.cursor.execute(order_status_history_insert_query, (order_id,))
 
-        # Selecciona el JSON de la orden
-        select_order_query = """
-        SELECT pe_json
-        FROM orders.orders
-        WHERE id = %s;
-        """
-        self.cursor.execute(select_order_query, (order_id,))
-        order_json = self.cursor.fetchone()
-
-        if not order_json:
-            raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
-
- 
-        delivery_response = self.registrar_delivery(order_json[0])
-
-        print(delivery_response)
-        if isinstance(delivery_response, dict):
-            print("Delivery enviado con éxito:", delivery_response)
-        else:
-            print("Error al enviar el delivery:", delivery_response)
-
-        # Confirma las operaciones en la base de datos
+        
         self.conn.commit()
   
   
