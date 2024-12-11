@@ -55,25 +55,6 @@ const preparar_orden = () => {
   });
 
 
-//   {
-//     "pedido_productoid": 1,
-//     "pedido_cantidad": 1,
-//     "pedido_precio": 4,
-//     "pedido_descuento": 0,
-//     "pedido_nota": "Bien frio",
-//     "pedido_escombo": "0",
-//     // "modificadorseleccionList": [
-//     // {
-//     //     "modificador_id": 1,
-//     //     "modificadorseleccion_id": 7,
-//     //     "pedido_precio": 0.5,
-//     //     "modificadorseleccion_cantidad": 1
-//     // }
-//     // ],
-//     "lista_productocombo": [],
-//     "adicionalListAdded": []
-// }
-
   console.log(order_products)
 
   const order_aditionals = cart.cart.additions.map(a => {
@@ -107,7 +88,8 @@ const preparar_orden = () => {
     "order_notes": order_notes || 'SIN NOTAS',
     "user_data": user_data,
     "order_aditionals":order_aditionals,
-    "pe_json": order_products
+    "pe_json": order_products,
+    "total":cart.cart.total_cost
   };
 
   return order
