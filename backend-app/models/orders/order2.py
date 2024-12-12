@@ -99,71 +99,69 @@ class Order2:
         user_id = User().insert_user(user_data)
         return user_id
 
+
     def create_order_entry(self, user_id, order_data):
-        
-        
-        
-        
-        print(order_data)
-        
-        
-        
+        # Crear el JSON inicial sin "delivery_codigointegracion"
         pe_json = {
-                    "delivery": {
-                        "local_id": order_data.pe_site_id,
-                        "delivery_costoenvio": order_data.delivery_price,
-                        "delivery_direccionenvio": order_data.user_data.user_address,
-                        "delivery_notageneral": order_data.order_notes,
-                        "delivery_horaentrega": "2020-12-06 10:00:00",
-                        "delivery_pagocon":order_data.total
-                    },
-                    "cliente": {
-                        "cliente_nombres": order_data.user_data.user_name,
-                        "cliente_apellidos":order_data.user_data.user_name,
-                        "delivery_direccionfacturacion": order_data.user_data.user_address,
-                        "cliente_telefono": order_data.user_data.user_phone
-                    },
-                    "listaPedidos": order_data.pe_json
-                    }
+            "delivery": {
+                "local_id": order_data.pe_site_id,
+                "delivery_costoenvio": order_data.delivery_price,
+                "delivery_direccionenvio": order_data.user_data.user_address,
+                "delivery_notageneral": order_data.order_notes,
+                "delivery_horaentrega": "2020-12-06 10:00:00",
+                "delivery_pagocon": order_data.total + order_data.delivery_price,
+                "delivery_codigointegracion": None,
+                # "canaldelivery_id":3 # Este se actualizará después
+            },
+            "cliente": {
+                "cliente_nombres": order_data.user_data.user_name,
+                "cliente_apellidos": '',
+                "cliente_direccion": order_data.user_data.user_address,
+                "cliente_telefono": order_data.user_data.user_phone
+            },
+            "listaPedidos": order_data.pe_json
+        }
 
-        
+        # Definir consulta de inserción
         if order_data.payment_method_id == 6:
-
-
             order_insert_query = """
-            INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized,inserted_by_id,pe_json)
-            VALUES (%s, %s, %s, false, %s, %s ) RETURNING id;
+            INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized, inserted_by_id, pe_json)
+            VALUES (%s, %s, %s, false, %s, %s) RETURNING id;
             """
-            self.cursor.execute(order_insert_query, (user_id, order_data.site_id, 4, order_data.inserted_by,  Json(pe_json)))
-            # Verificar resultado
-            result = self.cursor.fetchone()
-            if result is None:
-                raise ValueError("La orden no pudo ser creada.")
-            order_id = result[0]
-            
-            self.create_or_update_event(3, 12, 1132, '3 minutes', False)
-
         else:
-            
-            
             order_insert_query = """
-                INSERT INTO orders.orders (user_id, site_id, delivery_person_id, inserted_by_id, pe_json)
-                VALUES (%s, %s, %s, %s, %s) RETURNING id;
+            INSERT INTO orders.orders (user_id, site_id, delivery_person_id, inserted_by_id, pe_json)
+            VALUES (%s, %s, %s, %s, %s) RETURNING id;
             """
-            # Utilizamos psycopg2.extras.Json para manejar correctamente el campo JSON
-            self.cursor.execute(order_insert_query, (
-                user_id,
-                order_data.site_id,
-                4,
-                order_data.inserted_by,
-                Json(pe_json)
-            ))
-            result = self.cursor.fetchone()
-            if result is None:
-                raise ValueError("La orden no pudo ser creada.")
-            order_id = result[0]
 
-           
+        # Insertar la orden y obtener el ID
+        self.cursor.execute(order_insert_query, (
+            user_id,
+            order_data.site_id,
+            4,  # delivery_person_id
+            order_data.inserted_by,
+            Json(pe_json)
+        ))
+        result = self.cursor.fetchone()
+        if result is None:
+            raise ValueError("La orden no pudo ser creada.")
+        order_id = result[0]
+
+        # Actualizar "delivery_codigointegracion" en el JSON
+        pe_json["delivery"]["delivery_codigointegracion"] = order_id
+
+        # Actualizar el registro en la base de datos con el JSON actualizado
+        update_query = """
+        UPDATE orders.orders
+        SET pe_json = %s
+        WHERE id = %s;
+        """
+        self.cursor.execute(update_query, (Json(pe_json), order_id))
+
+        # Crear o actualizar el evento
+        if order_data.payment_method_id == 6:
+            self.create_or_update_event(3, 12, 1132, '3 minutes', False)
+        else:
             self.create_or_update_event(1, order_data.site_id, 1132, '3 minutes', False)
 
         return order_id
