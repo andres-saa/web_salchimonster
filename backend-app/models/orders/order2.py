@@ -108,11 +108,12 @@ class Order2:
                 "delivery_costoenvio": order_data.delivery_price,
                 "delivery_direccionenvio": order_data.user_data.user_address,
                 "delivery_notageneral": order_data.order_notes,
-                "delivery_horaentrega": "2020-12-06 10:00:00",
+                # "delivery_horaentrega": "2020-12-06 10:00:00",
                 "delivery_pagocon": order_data.total + order_data.delivery_price,
                 "delivery_codigointegracion": None,
-                # "canaldelivery_id":3 # Este se actualizará después
+                "canaldelivery_id":525
             },
+            
             "cliente": {
                 "cliente_nombres": order_data.user_data.user_name,
                 "cliente_apellidos": '',
@@ -122,7 +123,7 @@ class Order2:
             "listaPedidos": order_data.pe_json
         }
 
-        # Definir consulta de inserción
+        
         if order_data.payment_method_id == 6:
             order_insert_query = """
             INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized, inserted_by_id, pe_json)
@@ -134,7 +135,6 @@ class Order2:
             VALUES (%s, %s, %s, %s, %s) RETURNING id;
             """
 
-        # Insertar la orden y obtener el ID
         self.cursor.execute(order_insert_query, (
             user_id,
             order_data.site_id,
