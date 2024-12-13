@@ -865,7 +865,7 @@ class Order2:
 
         # Fetch the specific order from the combined order view
         order_query = f"""
-        SELECT DISTINCT ON (order_id) order_id,site_id,responsible,reason, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, responsible_observation, responsible_id,name
+        SELECT DISTINCT ON (order_id) order_id,site_id,responsible,reason, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, responsible_observation, responsible_id,name,pe_json
         FROM orders.combined_order_view
         WHERE LOWER(REPLACE(order_id, '#', '')) = %s
         ORDER BY order_id, latest_status_timestamp DESC
