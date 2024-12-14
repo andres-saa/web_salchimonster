@@ -110,7 +110,7 @@ const getProducts = async (category_name) => {
   
     const site_id = siteStore.location.site?.pe_site_id
     const category_id = route.params.category_id
-    if(site_id){
+    if(true){
 
         if(store2.menu?.data?.length < 1 || !store2.menu?.data ){
           store.setLoading(true, 'cargando productos')
@@ -128,6 +128,21 @@ const getProducts = async (category_name) => {
 
         let data = await response.json();
         store2.menu = data.data;
+
+        const final_data = data.data.data.map(product => {
+          const foundProduct = lista.find(p => p.id === product.productogeneral_id);
+          return {
+              ...product,
+              last_price: foundProduct ? foundProduct.last_price : null // Verifica si se encontró el producto
+          };
+      });
+
+      store2.menu.data = final_data;
+
+      console.log(final_data,"hola");
+
+
+
     } catch (error) {
         store.setLoading(false, 'cargando productos')
 
@@ -150,7 +165,7 @@ const lista = [
     {
         "id": "147",
         "name": "2X1 BURGER MONSTER + 2 PAPAS",
-        "last_price": null
+        "last_price": 61800
     },
     {
         "id": "96",
@@ -375,57 +390,57 @@ const lista = [
     {
         "id": "152",
         "name": "COMBO BACONMONSTER 2P + 2 BEBIDAS",
-        "last_price": null
+        "last_price": 53700
     },
     {
         "id": "98",
         "name": "COMBO BACONMONSTER PERSONAL + BEBIDA",
-        "last_price": null
+        "last_price": 35400
     },
     {
         "id": "132",
         "name": "COMBO BURGER MONSTER  +PAPAS+BEBIDA",
-        "last_price": null
+        "last_price": 36800
     },
     {
         "id": "101",
         "name": "COMBO BURGERMONSTER + PAPAS + BEBIDA",
-        "last_price": null
+        "last_price": 36800
     },
     {
         "id": "153",
         "name": "COMBO CLASICMONSTER 2P +  2 BEBIDAS",
-        "last_price": null
+        "last_price": 42700
     },
     {
         "id": "100",
         "name": "COMBO CLASICMONSTER PERSONAL + BEBIDA",
-        "last_price": null
+        "last_price": 28800
     },
     {
         "id": "154",
         "name": "COMBO COSTIMONSTER 2P  +  2 BEBIDAS",
-        "last_price": null
+        "last_price": 64300
     },
     {
         "id": "99",
         "name": "COMBO COSTIMONSTER PERSONAL + BEBIDA",
-        "last_price": null
+        "last_price": 41800
     },
     {
         "id": "155",
         "name": "COMBO LA DE SIEMPRE 2P + 2 BEBIDAS",
-        "last_price": null
+        "last_price": 72700
     },
     {
         "id": "92",
         "name": "COMBO LA MATAHAMBRE 2P + 2 BEBIDAS",
-        "last_price": null
+        "last_price": 67100
     },
     {
         "id": "53",
         "name": "COMBO LA MIXTICA 2P + 2 BEBIDAS",
-        "last_price": null
+        "last_price": 81700
     },
     {
         "id": "131",
@@ -465,7 +480,7 @@ const lista = [
     {
         "id": "91",
         "name": "COMBO NACHIMONSTER 2P + 2 BEBIDAS",
-        "last_price": null
+        "last_price": 67100
     },
     {
         "id": "220",

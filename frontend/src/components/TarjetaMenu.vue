@@ -53,6 +53,12 @@
                         
                         <div style="display: flex; align-items: center;gap: 1rem;display: flex;align-items: center;">
                      
+
+
+                             
+                            <h5  style="text-decoration: line-through;opacity: .5   ;" v-if="props.product.last_price" cal class="text-md    p-0 m-0 "><b>  {{ formatoPesosColombianos(props.product.last_price) }}  </b>
+                            </h5>
+                            
                             <h5 cal class="text-xl p-0 m-0"><b>{{ formatoPesosColombianos(props.product.productogeneral_precio || props.product.lista_presentacion[0].producto_precio) }}</b>
                             </h5>
 
