@@ -1,0 +1,1 @@
+import{J as r,U as t}from"./index-12be47e6.js";const o={async getPaymentMethods(){try{const e=await r.get(`${t}/payment_methods/`);return e.status===200?e.data:(console.error("An error occurred while fetching the ingredients:",e.status),null)}catch(e){return console.error("An error occurred while fetching the ingredients:",e),null}}};export{o as p};
