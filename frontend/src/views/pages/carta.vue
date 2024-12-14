@@ -2,12 +2,12 @@
   <div class="mt-5 mb-0 pb-0">
     <div class="col-12  mr-auto ml-auto m-0 p-0" v-for="i in [1,2,3,4,5,6,7,8,9]" style="max-width: 1920px;">
      <!-- Muestra las imágenes horizontales cuando no es un dispositivo móvil -->
-     <img v-if="!isMobile" style="width: 100%;" :src="`/images/carta/carta${i}.jpeg`" alt="">
+     <img v-if="!isMobile" style="width: 100%;" :src="`/images/carta/menucito${i}.jpeg`" alt="">
    </div>
  
    <div class="col-12  mr-auto ml-auto my-0 p-0" v-for="i in [1,2,3,4,5,6,7,8,9]" style="max-width: 1920px;">
      <!-- Muestra las imágenes verticales solo en dispositivos móviles -->
-     <img v-if="isMobile" style="width: 100%;" :src="`/images/carta/carta${i}.jpeg`" alt="">
+     <img v-if="isMobile" style="width: 100%;" :src="`/images/carta/menucito${i}.jpeg`" alt="">
    </div>
   </div>
    
