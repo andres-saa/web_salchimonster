@@ -1014,7 +1014,15 @@ const getAdiciones = async () => {
 
 
 
-
+onMounted(() => {
+  setTimeout(() => {
+    if (route.params.product_id) {
+      // alert(route.params.product_id);
+      store.currentProduct = store.menu.data.find(p => p.productogeneral_id == route.params.product_id);
+      store.visibles.currentProduct = true;
+    }
+  }, 1000); // Espera 1 segundo (1000 ms)
+});
 
 
 
