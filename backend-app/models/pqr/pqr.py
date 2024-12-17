@@ -108,7 +108,135 @@ class Pqrs:
         pqr_id = self.db.execute_query(query=query,fetch=True)
         return pqr_id
     
-            
+    
+    def get_pqrs_by_date_range(self, fecha_inicio: str, fecha_fin: str):
+        """
+        Obtiene las PQRs por sede y estado en un rango de fechas, incluyendo estados sin registros (con valor 0),
+        y agrega una fila "total" con la suma de los valores por estado.
+        :param fecha_inicio: Fecha de inicio (formato: YYYY-MM-DD)
+        :param fecha_fin: Fecha de fin (formato: YYYY-MM-DD)
+        :return: Lista de JSON planos agrupados por sede, incluyendo un total general.
+        """
+        query = """
+        WITH all_states AS (
+            SELECT DISTINCT name AS state_name
+            FROM pqr.pqr_status
+        ),
+        all_sites AS (
+            SELECT DISTINCT site_name
+            FROM pqr.pqr_details_full_view
+        ),
+        state_counts AS (
+            SELECT 
+                s.site_name AS sede,
+                st.state_name AS estado,
+                COUNT(pqr.pqr_request_id) AS cantidad
+            FROM all_sites s
+            CROSS JOIN all_states st
+            LEFT JOIN pqr.pqr_details_full_view pqr
+                ON pqr.site_name = s.site_name
+                AND (pqr.current_status->>'status') = st.state_name
+                AND TO_TIMESTAMP(pqr.current_status->>'timestamp', 'DD-MM-YYYY HH12:MI am')
+                    BETWEEN %(fecha_inicio)s AND %(fecha_fin)s
+            GROUP BY s.site_name, st.state_name
+        )
+        SELECT 
+            jsonb_object_agg(estado, cantidad) || jsonb_build_object('sede', sede) AS result
+        FROM state_counts
+        GROUP BY sede
+        ORDER BY sede;
+        """
+        params = {"fecha_inicio": f"{fecha_inicio} 00:00:00", "fecha_fin": f"{fecha_fin} 23:59:59"}
+        result = self.db.execute_query(query=query, params=params, fetch=True)
+
+        # Convertir el resultado SQL en una lista de Python
+        data = [row['result'] for row in result]
+
+        # Calcular totales
+        total_entry = {"sede": "total"}
+        for entry in data:
+            for key, value in entry.items():
+                if key != "sede":  # Saltar la clave 'sede'
+                    total_entry[key] = total_entry.get(key, 0) + value
+
+        # Agregar el total al final de la lista
+        data.append(total_entry)
+
+        return data
+
+
+
+
+
+
+
+
+    def get_pqrs_by_date_range_and_type(self, fecha_inicio: str, fecha_fin: str):
+        """
+        Obtiene las PQRs por sede y etiqueta (tag) en un rango de fechas, incluyendo etiquetas sin registros (con valor 0),
+        y agrega una fila "total" con la suma de los valores por etiqueta.
+        :param fecha_inicio: Fecha de inicio (formato: YYYY-MM-DD)
+        :param fecha_fin: Fecha de fin (formato: YYYY-MM-DD)
+        :return: Lista de JSON planos agrupados por sede, incluyendo un total general.
+        """
+        query = """
+        WITH all_tags AS (
+            SELECT DISTINCT name AS tag_name
+            FROM pqr.pqr_tag
+        ),
+        all_sites AS (
+            SELECT DISTINCT site_name
+            FROM pqr.pqr_details_full_view
+        ),
+        tag_counts AS (
+            SELECT 
+                s.site_name AS sede,
+                t.tag_name AS tipo,
+                COUNT(pqr.pqr_request_id) AS cantidad
+            FROM all_sites s
+            CROSS JOIN all_tags t
+            LEFT JOIN pqr.pqr_details_full_view pqr
+                ON pqr.site_name = s.site_name
+                AND pqr.tag_name = t.tag_name
+                AND TO_TIMESTAMP(pqr.current_status->>'timestamp', 'DD-MM-YYYY HH12:MI am')
+                    BETWEEN %(fecha_inicio)s AND %(fecha_fin)s
+            GROUP BY s.site_name, t.tag_name
+        )
+        SELECT 
+            sede,
+            jsonb_object_agg(tipo, cantidad) AS tags
+        FROM tag_counts
+        GROUP BY sede
+        ORDER BY sede;
+        """
+        params = {"fecha_inicio": f"{fecha_inicio} 00:00:00", "fecha_fin": f"{fecha_fin} 23:59:59"}
+        result = self.db.execute_query(query=query, params=params, fetch=True)
+
+        # Convertir el resultado SQL en una lista de Python
+        data = []
+        for row in result:
+            sede = row['sede']
+            tags = row['tags']
+            # Crear un diccionario con 'sede' como primer elemento
+            ordered_entry = {"sede": sede}
+            ordered_entry.update(tags)  # Agregar las demás claves
+            data.append(ordered_entry)
+
+        # Calcular totales
+        total_entry = {"sede": "TOTAL"}
+        for entry in data:
+            for key, value in entry.items():
+                if key != "sede":  # Saltar la clave 'sede'
+                    total_entry[key] = total_entry.get(key, 0) + value
+
+        # Agregar el total al final de la lista
+        data.append(total_entry)
+
+        return data
+
+
+
+    
     def get_all_tags(self):
         query = self.db.build_select_query(table_name='pqr.pqr_tag',fields=["*"],condition='exist = true')
         pqr_id = self.db.execute_query(query=query,fetch=True)

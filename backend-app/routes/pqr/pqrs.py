@@ -3,6 +3,7 @@ from models.pqr.pqr import Pqrs
 from schema.pqr import pqrs as pqr_schema
 from schema.user import user_schema_post
 from pydantic import BaseModel
+from fastapi import Query
 
 pqr_router = APIRouter()
 
@@ -49,6 +50,32 @@ def create_pqrs():
     result = pqr_instance.get_all_tags()
     return result
 
+@pqr_router.get("/get-pqrs-by-date-range/{fecha_inicio}/{fecha_fin}", tags=["pqr"])
+def get_pqrs_by_date_range(fecha_inicio:str, fecha_fin:str):
+    """
+    Obtiene las PQRs cuyo estado actual esté entre las fechas proporcionadas.
+    :param fecha_inicio: Fecha de inicio (formato: YYYY-MM-DD)
+    :param fecha_fin: Fecha de fin (formato: YYYY-MM-DD)
+    :return: Lista de PQRs agrupadas por sede y estados en JSON.
+    """
+    pqr_instance = Pqrs()
+    result = pqr_instance.get_pqrs_by_date_range(fecha_inicio, fecha_fin)
+    return result
+
+
+
+
+@pqr_router.get("/get-pqrs-by-date-range-types/{fecha_inicio}/{fecha_fin}", tags=["pqr"])
+def get_pqrs_by_date_range(fecha_inicio:str, fecha_fin:str):
+    """
+    Obtiene las PQRs cuyo estado actual esté entre las fechas proporcionadas.
+    :param fecha_inicio: Fecha de inicio (formato: YYYY-MM-DD)
+    :param fecha_fin: Fecha de fin (formato: YYYY-MM-DD)
+    :return: Lista de PQRs agrupadas por sede y estados en JSON.
+    """
+    pqr_instance = Pqrs()
+    result = pqr_instance.get_pqrs_by_date_range_and_type(fecha_inicio, fecha_fin)
+    return result
 
 
 @pqr_router.get("/get-all-pqr-channel",tags=["pqr"])
