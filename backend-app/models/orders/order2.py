@@ -111,7 +111,7 @@ class Order2:
                 "delivery_horaentrega": "2020-12-06 10:00:00",
                 "delivery_pagocon": order_data.total + order_data.delivery_price,
                 "delivery_codigointegracion": None,
-                # "canaldelivery_id":525
+                "canaldelivery_id":500
             },
             
             "cliente": {
