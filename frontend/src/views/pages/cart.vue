@@ -11,7 +11,7 @@
 
             <div class="col-12 text-sm md:col-6 p-3 md:px-4" style="display: flex; flex-direction: column; gap:1rem;justify-content: center;">
 
-                <div class=" col-12 py-3 p-shadow"
+                <div class=" col-12 py-3 p-shadow shadow-6"
                     style=" display: flex;align-items:end;position: relative; gap:1rem;border-radius: 0.3rem;"
                     v-for="product in store.cart.products">
                     <!-- {{ product }} -->
@@ -118,12 +118,12 @@
                                             <div v-if="grupo != 'SALSAS'" style="box-shadow: 0 0 5px rgba(0, 0, 0, 0.411);display: flex; border-radius: 0.3rem; " class="ml-2">
 
                                            
-                                            <Button @click="decrement(item)"  severity="danger"
+                                            <Button v-if="item.multiple > 0"  @click="decrement(item)"  severity="danger"
                                                 style="width: 2rem; height: 1.5rem;border: none; border-radius: 0.3rem 0 0 0.3rem;"
                                                 icon="pi pi-minus"></Button>
-                                            <InputText :modelValue="item.quantity" readonly
+                                            <InputText v-if="item.multiple > 0" :modelValue="item.quantity" readonly
                                                 style="width: 2rem;border: none; height: 1.5rem;" class="p-0 text-center" />
-                                            <Button @click="increment(item)" severity="danger"
+                                            <Button v-if="item.multiple > 0" @click="increment(item)" severity="danger"
                                                 style="width: 2rem;height: 1.5rem; border: none;border-radius:0 0.3rem 0.3rem 0;"
                                                 icon="pi pi-plus"></Button>
                                             </div>
@@ -151,7 +151,7 @@
             </div>
 
 
-            <resumen class="md:col-6"></resumen>
+            <resumen class="md:col-6 shadow-6"></resumen>
 
 
         </div>

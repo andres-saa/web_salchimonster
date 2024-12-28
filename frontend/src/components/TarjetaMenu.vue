@@ -1,7 +1,7 @@
 <template>
 
 
-    <div class="container shadow-3 col-12" style="border-radius: 0.5rem; height: 100%;position: relative;">
+    <div class="container shadow-7 col-12" style="border-radius: 0.5rem; height: 100%;position: relative;">
 
 
 

@@ -1,7 +1,8 @@
 <template>
 
 
-<Dialog v-model:visible="showChangeDialog" :modal="true" class="p-3" style="background-color: var(--primary-color);max-width: 20rem;max-height: 30rem;border-radius: 1rem;" >
+<Dialog v-model:visible="showChangeDialog" :modal="true" class="p-3" style="background-color:white;width: max-content
+; max-width: 20rem;max-height: 30rem;border-radius: 1rem;" >
   <template #header>
       
         <h6>Elige una alternativa para  {{productBaseToChange.producto_descripcion}}</h6>
@@ -14,7 +15,16 @@
       <p><strong>{{ option.producto_descripcion }}</strong> </p>
       <!-- <p>{{ formatoPesosColombianos(option.producto_precio) }}</p> -->
     </div>
+
+
+
+  <Button @click="showChangeDialog = false;" severity="danger" icon="pi pi-times"
+      style=" width: 2.5rem;height: 2.5rem; border: none; position: absolute; right: -1rem; top: -1rem; border-radius: 50%; display: flex; align-items: center;justify-content: center; z-index: 99;">
+    </Button>
   </div>
+
+
+
 </Dialog>
 
 
@@ -184,7 +194,7 @@
 
           <div style="color: black;">
 
-          <div v-for="modificador in i.listaModificadores" style="display: flex; gap: 1rem;" >
+          <div v-for="modificador in i.listaModificadores" style="display: flex; gap: 1rem;align-items: center;" >
 
 
 
@@ -502,6 +512,7 @@ const handleAdditionChange = (item, group) => {
       price: item.modificadorseleccion_precio,
       group: group.modificador_nombre,
       group_id:group.modificador_id,
+      multiple:group.modificador_esmultiple,
       parent_id: store.currentProduct.producto_id || store.currentProduct.lista_presentacion[0].producto_id
     }
 
