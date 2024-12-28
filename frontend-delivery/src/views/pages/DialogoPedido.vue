@@ -174,7 +174,7 @@
                   -- <b>{{ i.modificadorseleccion_cantidad }}</b> {{ i.modificador_nombre }}
                 </p>
 
-                <p class="p-0 m-0" style="text-align: end;"> {{ formatoPesosColombianos(i.pedido_precio)  }}</p>
+                <p class="p-0 m-0" style="text-align: end;"> {{ formatoPesosColombianos(i.pedido_precio * i.modificadorseleccion_cantidad)  }} </p>
 
             </div>
 
@@ -244,7 +244,8 @@
             </div>
             <div class="">
               <p  style="text-align: end;font-weight: bold; color: black;">
-                <b >{{ formatoPesosColombianos(subtotal) }}</b>
+                <b >{{ formatoPesosColombianos(store.currentOrder.pe_json.delivery.delivery_pagocon -  store.currentOrder.delivery_price) }}</b>
+               
               </p>
             </div>
             <div class="">
@@ -264,7 +265,7 @@
             </div>
             <div class="">
 
-              <p style="text-align: end;color: black;font-weight: bold;"><b>{{ formatoPesosColombianos(total)
+              <p style="text-align: end;color: black;font-weight: bold;"><b>{{ formatoPesosColombianos(store.currentOrder.pe_json.delivery.delivery_pagocon)
               }}</b></p>
 
             </div>
@@ -445,20 +446,20 @@ const subtotal = computed(() => {
     let productTotal = product.pedido_cantidad * product.pedido_precio;
 
     // Verifica si el producto tiene modificadores
-    if (product.modificadorseleccionList && product.modificadorseleccionList.length > 0) {
-      // Filtra los modificadores asociados a este producto
-      const productModifiers = product.modificadorseleccionList?.filter(
-        mod => mod.pedido_productoid == product.pedido_productoid
-      );
+    // if (product.modificadorseleccionList && product.modificadorseleccionList.length > 0) {
+    //   // Filtra los modificadores asociados a este producto
+    //   const productModifiers = product.modificadorseleccionList?.filter(
+    //     mod => mod.pedido_productoid == product.pedido_productoid
+    //   );
 
-      // Calcula el total de los modificadores
-      const modifiersTotal = productModifiers.reduce((modAcc, modifier) => {
-        return modAcc + modifier.modificadorseleccion_cantidad * modifier.pedido_precio;
-      }, 0);
+    //   // Calcula el total de los modificadores
+    //   const modifiersTotal = productModifiers.reduce((modAcc, modifier) => {
+    //     return modAcc + modifier.modificadorseleccion_cantidad * modifier.pedido_precio;
+    //   }, 0);
 
-      // Agrega el total de los modificadores al total del producto
-      productTotal += modifiersTotal;
-    }
+    //   // Agrega el total de los modificadores al total del producto
+    //   productTotal += modifiersTotal;
+    // }
 
     // Agrega el total del producto al acumulador
     return acc + productTotal;
