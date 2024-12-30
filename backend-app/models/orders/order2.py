@@ -149,6 +149,7 @@ class Order2:
 
         # Actualizar "delivery_codigointegracion" en el JSON
         pe_json["delivery"]["delivery_codigointegracion"] = order_id
+        pe_json["delivery"]["delivery_codigolimadelivery"] = order_id
 
         # Actualizar el registro en la base de datos con el JSON actualizado
         update_query = """
