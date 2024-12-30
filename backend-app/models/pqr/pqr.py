@@ -350,7 +350,503 @@ class Pqrs:
             "labels": labels,
             "datasets": final_datasets
         }
+        
+        
+    def get_daily_sales_report(self, site_ids: list, start_date: str, end_date: str):
+        """
+        Obtiene las ventas diarias por canal (web, chatbot, callcenter) en un rango de fechas,
+        incluyendo un dataset con el total vendido.
 
+        :param site_ids: Lista de IDs de sitios a filtrar.
+        :param start_date: Fecha de inicio (formato: YYYY-MM-DD).
+        :param end_date: Fecha de fin (formato: YYYY-MM-DD).
+        :return: JSON para graficar (labels y datasets).
+        """
+
+        # -- 1) Preparar la consulta SQL que genera un rango de fechas y suma ventas diarias por canal.
+        query = """
+        WITH date_range AS (
+            SELECT generate_series(
+                %(start_date)s::date,
+                %(end_date)s::date,
+                '1 day'::interval
+            )::date AS fecha
+        ),
+        daily_sales AS (
+            SELECT
+                (order_date at time zone 'America/Bogota')::date AS day,
+                SUM(CASE WHEN inserted_by = 1082 AND current_status = 'enviada' THEN total_sales ELSE 0 END) AS sales_chatbot,
+                SUM(CASE WHEN inserted_by != 1082 AND inserted_by IS NOT NULL AND current_status = 'enviada' THEN total_sales ELSE 0 END) AS sales_callcenter,
+                SUM(CASE WHEN inserted_by IS NULL AND current_status = 'enviada' THEN total_sales ELSE 0 END) AS sales_web
+            FROM orders.daily_order_sales_view
+            WHERE
+                (order_date at time zone 'America/Bogota') BETWEEN %(start_date)s AND %(end_date)s
+                AND site_id = ANY(%(site_ids)s)
+            GROUP BY 1
+        )
+        SELECT
+            d.fecha,
+            COALESCE(s.sales_chatbot, 0) AS chatbot,
+            COALESCE(s.sales_callcenter, 0) AS callcenter,
+            COALESCE(s.sales_web, 0) AS web
+        FROM date_range d
+        LEFT JOIN daily_sales s ON d.fecha = s.day
+        ORDER BY d.fecha;
+        """
+
+        params = {
+            "site_ids": site_ids,
+            "start_date": start_date,
+            "end_date": end_date
+        }
+
+        # -- 2) Ejecutar la consulta y obtener resultados
+        result = self.db.execute_query(query=query, params=params, fetch=True)
+
+        # -- 3) Construir estructuras para labels y datasets
+        labels = []
+        data_chatbot = []
+        data_callcenter = []
+        data_web = []
+        data_total = []
+
+        for row in result:
+            # Formatear la fecha con la misma lógica (dd-mmm) y en español
+            fecha_str = row['fecha'].strftime('%d-%b').lower()
+            fecha_str = (fecha_str
+                        .replace('jan', 'ene')
+                        .replace('feb', 'feb')
+                        .replace('mar', 'mar')
+                        .replace('apr', 'abr')
+                        .replace('may', 'may')
+                        .replace('jun', 'jun')
+                        .replace('jul', 'jul')
+                        .replace('aug', 'ago')
+                        .replace('sep', 'sept')
+                        .replace('oct', 'oct')
+                        .replace('nov', 'nov')
+                        .replace('dec', 'dic'))
+            labels.append(fecha_str)
+
+            chatbot = row['chatbot'] or 0
+            callcenter = row['callcenter'] or 0
+            web = row['web'] or 0
+            total = chatbot + callcenter + web
+
+            data_chatbot.append(chatbot)
+            data_callcenter.append(callcenter)
+            data_web.append(web)
+            data_total.append(total)
+
+        # -- 4) Definir colores (hex) para cada dataset
+        # (Ejemplos, ajusta a tu gusto)
+        color_chatbot = "#36a2eb"
+        color_callcenter = "#ff6384"
+        color_web = "#ffce56"
+        color_total = "#4bc0c0"
+
+        # -- 5) Preparar los datasets en el formato requerido
+        datasets = [
+            {
+                "label": "web",
+                "backgroundColor": color_web,
+                "borderColor": color_web,
+                "data": data_web,
+                "tension": 0.4
+            },
+            {
+                "label": "chatbot",
+                "backgroundColor": color_chatbot,
+                "borderColor": color_chatbot,
+                "data": data_chatbot,
+                "tension": 0.4
+            },
+            {
+                "label": "callcenter",
+                "backgroundColor": color_callcenter,
+                "borderColor": color_callcenter,
+                "data": data_callcenter,
+                "tension": 0.4
+            },
+            {
+                "label": "total",
+                "backgroundColor": color_total,
+                "borderColor": color_total,
+                "data": data_total,
+                "tension": 0.4
+            }
+        ]
+
+        # -- 6) Devolver la estructura final
+        return {
+            "labels": labels,
+            "datasets": datasets
+        }
+
+
+    def get_daily_average_ticket_report(self, site_ids: list, start_date: str, end_date: str):
+        """
+        Obtiene el ticket promedio diario por canal (web, chatbot, callcenter) en un rango de fechas,
+        incluyendo un dataset con el ticket promedio total.
+
+        :param site_ids: Lista de IDs de sitios a filtrar.
+        :param start_date: Fecha de inicio (formato: YYYY-MM-DD).
+        :param end_date: Fecha de fin (formato: YYYY-MM-DD).
+        :return: JSON para graficar (labels y datasets).
+        """
+
+        # -- 1) Consulta que genera el rango de fechas y calcula el ticket promedio diario por canal.
+        #    Para cada canal se hace:
+        #    SUM(ventas) / COUNT(órdenes)  => ticket promedio
+        query = """
+        WITH date_range AS (
+            SELECT generate_series(
+                %(start_date)s::date,
+                %(end_date)s::date,
+                '1 day'::interval
+            )::date AS fecha
+        ),
+        daily_ticket AS (
+            SELECT
+                (order_date at time zone 'America/Bogota')::date AS day,
+                SUM(
+                    CASE 
+                        WHEN inserted_by = 1082 
+                            AND current_status = 'enviada' 
+                        THEN total_sales 
+                        ELSE 0 
+                    END
+                ) 
+                / NULLIF(SUM(
+                    CASE 
+                        WHEN inserted_by = 1082 
+                            AND current_status = 'enviada' 
+                        THEN 1 
+                        ELSE 0 
+                    END
+                ), 0)::numeric(18,2) AS avg_chatbot,
+
+                SUM(
+                    CASE 
+                        WHEN inserted_by != 1082 
+                            AND inserted_by IS NOT NULL 
+                            AND current_status = 'enviada' 
+                        THEN total_sales 
+                        ELSE 0 
+                    END
+                )
+                / NULLIF(SUM(
+                    CASE 
+                        WHEN inserted_by != 1082 
+                            AND inserted_by IS NOT NULL 
+                            AND current_status = 'enviada'
+                        THEN 1 
+                        ELSE 0 
+                    END
+                ), 0)::numeric(18,2) AS avg_callcenter,
+
+                SUM(
+                    CASE 
+                        WHEN inserted_by IS NULL 
+                            AND current_status = 'enviada' 
+                        THEN total_sales 
+                        ELSE 0 
+                    END
+                )
+                / NULLIF(SUM(
+                    CASE 
+                        WHEN inserted_by IS NULL 
+                            AND current_status = 'enviada' 
+                        THEN 1 
+                        ELSE 0 
+                    END
+                ), 0)::numeric(18,2) AS avg_web,
+
+                -- Ticket promedio total del día (todas las órdenes enviadas)
+                SUM(
+                    CASE 
+                        WHEN current_status = 'enviada' 
+                        THEN total_sales 
+                        ELSE 0 
+                    END
+                )
+                / NULLIF(SUM(
+                    CASE 
+                        WHEN current_status = 'enviada' 
+                        THEN 1 
+                        ELSE 0 
+                    END
+                ), 0)::numeric(18,2) AS avg_total
+            FROM orders.daily_order_sales_view
+            WHERE
+                (order_date at time zone 'America/Bogota') BETWEEN %(start_date)s AND %(end_date)s
+                AND site_id = ANY(%(site_ids)s)
+            GROUP BY 1
+        )
+        SELECT
+            d.fecha,
+            COALESCE(s.avg_chatbot, 0) AS chatbot,
+            COALESCE(s.avg_callcenter, 0) AS callcenter,
+            COALESCE(s.avg_web, 0) AS web,
+            COALESCE(s.avg_total, 0) AS total
+        FROM date_range d
+        LEFT JOIN daily_ticket s ON d.fecha = s.day
+        ORDER BY d.fecha;
+        """
+
+        params = {
+            "site_ids": site_ids,
+            "start_date": start_date,
+            "end_date": end_date
+        }
+
+        # -- 2) Ejecutar la consulta
+        result = self.db.execute_query(query=query, params=params, fetch=True)
+
+        # -- 3) Construir arrays para labels y datasets
+        labels = []
+        data_chatbot = []
+        data_callcenter = []
+        data_web = []
+        data_total = []
+
+        for row in result:
+            # Formatear fecha en formato "dd-mmm" en español
+            fecha_str = row['fecha'].strftime('%d-%b').lower()
+            fecha_str = (fecha_str
+                        .replace('jan', 'ene')
+                        .replace('feb', 'feb')
+                        .replace('mar', 'mar')
+                        .replace('apr', 'abr')
+                        .replace('may', 'may')
+                        .replace('jun', 'jun')
+                        .replace('jul', 'jul')
+                        .replace('aug', 'ago')
+                        .replace('sep', 'sept')
+                        .replace('oct', 'oct')
+                        .replace('nov', 'nov')
+                        .replace('dec', 'dic'))
+            labels.append(fecha_str)
+
+            chatbot = float(row['chatbot'] or 0)
+            callcenter = float(row['callcenter'] or 0)
+            web = float(row['web'] or 0)
+            total = float(row['total'] or 0)
+
+            data_chatbot.append(chatbot)
+            data_callcenter.append(callcenter)
+            data_web.append(web)
+            data_total.append(total)
+
+        # -- 4) Definir colores
+        color_chatbot = "#36a2eb"
+        color_callcenter = "#ff6384"
+        color_web = "#ffce56"
+        color_total = "#4bc0c0"
+
+        # -- 5) Preparar los datasets
+        datasets = [
+            {
+                "label": "web",
+                "backgroundColor": color_web,
+                "borderColor": color_web,
+                "data": data_web,
+                "tension": 0.4
+            },
+            {
+                "label": "chatbot",
+                "backgroundColor": color_chatbot,
+                "borderColor": color_chatbot,
+                "data": data_chatbot,
+                "tension": 0.4
+            },
+            {
+                "label": "callcenter",
+                "backgroundColor": color_callcenter,
+                "borderColor": color_callcenter,
+                "data": data_callcenter,
+                "tension": 0.4
+            },
+            {
+                "label": "total",
+                "backgroundColor": color_total,
+                "borderColor": color_total,
+                "data": data_total,
+                "tension": 0.4
+            }
+        ]
+
+        # -- 6) Retornar el resultado final
+        return {
+            "labels": labels,
+            "datasets": datasets
+        }
+
+
+    
+    def get_daily_orders_report(self, site_ids: list, start_date: str, end_date: str):
+        """
+        Obtiene el número de órdenes diarias por canal (web, chatbot, callcenter) en un rango de fechas,
+        incluyendo un dataset con el total de órdenes.
+
+        :param site_ids: Lista de IDs de sitios a filtrar.
+        :param start_date: Fecha de inicio (formato: YYYY-MM-DD).
+        :param end_date: Fecha de fin (formato: YYYY-MM-DD).
+        :return: JSON para graficar (labels y datasets).
+        """
+
+        # -- 1) Consulta que genera el rango de fechas y cuenta el número de órdenes diarias por canal.
+        query = """
+        WITH date_range AS (
+            SELECT generate_series(
+                %(start_date)s::date,
+                %(end_date)s::date,
+                '1 day'::interval
+            )::date AS fecha
+        ),
+        daily_orders AS (
+            SELECT
+                (order_date at time zone 'America/Bogota')::date AS day,
+                SUM(
+                    CASE 
+                        WHEN inserted_by = 1082 
+                            AND current_status = 'enviada'
+                        THEN 1 
+                        ELSE 0 
+                    END
+                ) AS orders_chatbot,
+
+                SUM(
+                    CASE 
+                        WHEN inserted_by != 1082 
+                            AND inserted_by IS NOT NULL 
+                            AND current_status = 'enviada' 
+                        THEN 1 
+                        ELSE 0 
+                    END
+                ) AS orders_callcenter,
+
+                SUM(
+                    CASE 
+                        WHEN inserted_by IS NULL 
+                            AND current_status = 'enviada' 
+                        THEN 1 
+                        ELSE 0 
+                    END
+                ) AS orders_web,
+
+                -- Total de órdenes (todas las enviadas)
+                SUM(
+                    CASE 
+                        WHEN current_status = 'enviada' 
+                        THEN 1 
+                        ELSE 0 
+                    END
+                ) AS orders_total
+            FROM orders.daily_order_sales_view
+            WHERE
+                (order_date at time zone 'America/Bogota') BETWEEN %(start_date)s AND %(end_date)s
+                AND site_id = ANY(%(site_ids)s)
+            GROUP BY 1
+        )
+        SELECT
+            d.fecha,
+            COALESCE(s.orders_chatbot, 0) AS chatbot,
+            COALESCE(s.orders_callcenter, 0) AS callcenter,
+            COALESCE(s.orders_web, 0) AS web,
+            COALESCE(s.orders_total, 0) AS total
+        FROM date_range d
+        LEFT JOIN daily_orders s ON d.fecha = s.day
+        ORDER BY d.fecha;
+        """
+
+        params = {
+            "site_ids": site_ids,
+            "start_date": start_date,
+            "end_date": end_date
+        }
+
+        # -- 2) Ejecutar la consulta
+        result = self.db.execute_query(query=query, params=params, fetch=True)
+
+        # -- 3) Construir arrays para labels y datasets
+        labels = []
+        data_chatbot = []
+        data_callcenter = []
+        data_web = []
+        data_total = []
+
+        for row in result:
+            # Formatear fecha en formato "dd-mmm" en español
+            fecha_str = row['fecha'].strftime('%d-%b').lower()
+            fecha_str = (fecha_str
+                        .replace('jan', 'ene')
+                        .replace('feb', 'feb')
+                        .replace('mar', 'mar')
+                        .replace('apr', 'abr')
+                        .replace('may', 'may')
+                        .replace('jun', 'jun')
+                        .replace('jul', 'jul')
+                        .replace('aug', 'ago')
+                        .replace('sep', 'sept')
+                        .replace('oct', 'oct')
+                        .replace('nov', 'nov')
+                        .replace('dec', 'dic'))
+            labels.append(fecha_str)
+
+            chatbot = row['chatbot'] or 0
+            callcenter = row['callcenter'] or 0
+            web = row['web'] or 0
+            total = row['total'] or 0
+
+            data_chatbot.append(chatbot)
+            data_callcenter.append(callcenter)
+            data_web.append(web)
+            data_total.append(total)
+
+        # -- 4) Definir colores
+        color_chatbot = "#36a2eb"
+        color_callcenter = "#ff6384"
+        color_web = "#ffce56"
+        color_total = "#4bc0c0"
+
+        # -- 5) Preparar los datasets
+        datasets = [
+            {
+                "label": "web",
+                "backgroundColor": color_web,
+                "borderColor": color_web,
+                "data": data_web,
+                "tension": 0.4
+            },
+            {
+                "label": "chatbot",
+                "backgroundColor": color_chatbot,
+                "borderColor": color_chatbot,
+                "data": data_chatbot,
+                "tension": 0.4
+            },
+            {
+                "label": "callcenter",
+                "backgroundColor": color_callcenter,
+                "borderColor": color_callcenter,
+                "data": data_callcenter,
+                "tension": 0.4
+            },
+            {
+                "label": "total",
+                "backgroundColor": color_total,
+                "borderColor": color_total,
+                "data": data_total,
+                "tension": 0.4
+            }
+        ]
+
+        # -- 6) Retornar el resultado final
+        return {
+            "labels": labels,
+            "datasets": datasets
+        }
 
 
             
