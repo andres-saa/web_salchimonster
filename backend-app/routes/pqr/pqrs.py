@@ -112,10 +112,15 @@ def get_pqrs_by_date_range(fecha_inicio:str, fecha_fin:str, site_ids:sites):
 
 
 
+class report(BaseModel):
+    start_date:str
+    end_date:str
+    sites:list[int]
 
 
-@pqr_router.post("/get_daily_sales_report/{fecha_inicio}/{fecha_fin}", tags=["pqr"])
-def get_pqrs_by_date_range(fecha_inicio:str, fecha_fin:str, site_ids:sites):
+
+@pqr_router.post("/get_daily_sales_report/", tags=["pqr"])
+def get_pqrs_by_date_range(data:report):
     """
     Obtiene las PQRs cuyo estado actual esté entre las fechas proporcionadas.
     :param fecha_inicio: Fecha de inicio (formato: YYYY-MM-DD)
@@ -123,12 +128,12 @@ def get_pqrs_by_date_range(fecha_inicio:str, fecha_fin:str, site_ids:sites):
     :return: Lista de PQRs agrupadas por sede y estados en JSON.
     """
     pqr_instance = Pqrs()
-    result = pqr_instance.get_daily_sales_report( site_ids.ids,fecha_inicio, fecha_fin )
+    result = pqr_instance.get_daily_sales_report(data.sites,data.start_date, data.end_date )
     return result
 
 
-@pqr_router.post("/get_daily_average_ticket_report/{fecha_inicio}/{fecha_fin}", tags=["pqr"])
-def get_pqrs_by_date_range(fecha_inicio:str, fecha_fin:str, site_ids:sites):
+@pqr_router.post("/get_daily_average_ticket_report/", tags=["pqr"])
+def get_pqrs_by_date_range(data:report):
     """
     Obtiene las PQRs cuyo estado actual esté entre las fechas proporcionadas.
     :param fecha_inicio: Fecha de inicio (formato: YYYY-MM-DD)
@@ -136,12 +141,12 @@ def get_pqrs_by_date_range(fecha_inicio:str, fecha_fin:str, site_ids:sites):
     :return: Lista de PQRs agrupadas por sede y estados en JSON.
     """
     pqr_instance = Pqrs()
-    result = pqr_instance.get_daily_average_ticket_report( site_ids.ids,fecha_inicio, fecha_fin )
+    result = pqr_instance.get_daily_average_ticket_report(data.sites,data.start_date, data.end_date )
     return result
 
 
-@pqr_router.post("/get_daily_orders_report/{fecha_inicio}/{fecha_fin}", tags=["pqr"])
-def get_pqrs_by_date_range(fecha_inicio:str, fecha_fin:str, site_ids:sites):
+@pqr_router.post("/get_daily_orders_report/", tags=["pqr"])
+def get_pqrs_by_date_range(data:report):
     """
     Obtiene las PQRs cuyo estado actual esté entre las fechas proporcionadas.
     :param fecha_inicio: Fecha de inicio (formato: YYYY-MM-DD)
@@ -149,8 +154,9 @@ def get_pqrs_by_date_range(fecha_inicio:str, fecha_fin:str, site_ids:sites):
     :return: Lista de PQRs agrupadas por sede y estados en JSON.
     """
     pqr_instance = Pqrs()
-    result = pqr_instance.get_daily_orders_report( site_ids.ids,fecha_inicio, fecha_fin )
+    result = pqr_instance.get_daily_orders_report(data.sites,data.start_date, data.end_date )
     return result
+
 
 
 @pqr_router.get("/get-all-pqr-channel",tags=["pqr"])

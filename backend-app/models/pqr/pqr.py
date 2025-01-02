@@ -187,8 +187,6 @@ class Pqrs:
 
 
 
-
-
     def get_pqrs_by_date_range_and_type(self, fecha_inicio: str, fecha_fin: str):
         """
         Obtiene las PQRs por sede y etiqueta (tag) en un rango de fechas, incluyendo etiquetas sin registros (con valor 0),
@@ -351,11 +349,11 @@ class Pqrs:
             "datasets": final_datasets
         }
         
-        
+
     def get_daily_sales_report(self, site_ids: list, start_date: str, end_date: str):
         """
         Obtiene las ventas diarias por canal (web, chatbot, callcenter) en un rango de fechas,
-        incluyendo un dataset con el total vendido.
+        considerando un día desde las 4:00 am hasta las 3:59 am del siguiente día.
 
         :param site_ids: Lista de IDs de sitios a filtrar.
         :param start_date: Fecha de inicio (formato: YYYY-MM-DD).
@@ -374,13 +372,13 @@ class Pqrs:
         ),
         daily_sales AS (
             SELECT
-                (order_date at time zone 'America/Bogota')::date AS day,
+                (order_date - INTERVAL '4 hours')::date AS day,
                 SUM(CASE WHEN inserted_by = 1082 AND current_status = 'enviada' THEN total_sales ELSE 0 END) AS sales_chatbot,
                 SUM(CASE WHEN inserted_by != 1082 AND inserted_by IS NOT NULL AND current_status = 'enviada' THEN total_sales ELSE 0 END) AS sales_callcenter,
                 SUM(CASE WHEN inserted_by IS NULL AND current_status = 'enviada' THEN total_sales ELSE 0 END) AS sales_web
             FROM orders.daily_order_sales_view
             WHERE
-                (order_date at time zone 'America/Bogota') BETWEEN %(start_date)s AND %(end_date)s
+                (order_date - INTERVAL '4 hours')::date BETWEEN %(start_date)s AND %(end_date)s
                 AND site_id = ANY(%(site_ids)s)
             GROUP BY 1
         )
@@ -411,21 +409,25 @@ class Pqrs:
         data_total = []
 
         for row in result:
-            # Formatear la fecha con la misma lógica (dd-mmm) y en español
-            fecha_str = row['fecha'].strftime('%d-%b').lower()
-            fecha_str = (fecha_str
-                        .replace('jan', 'ene')
-                        .replace('feb', 'feb')
-                        .replace('mar', 'mar')
-                        .replace('apr', 'abr')
-                        .replace('may', 'may')
-                        .replace('jun', 'jun')
-                        .replace('jul', 'jul')
-                        .replace('aug', 'ago')
-                        .replace('sep', 'sept')
-                        .replace('oct', 'oct')
-                        .replace('nov', 'nov')
-                        .replace('dec', 'dic'))
+            # Verificar formato correcto de fecha
+            try:
+                fecha_str = row['fecha'].strftime('%d-%b').lower()
+                fecha_str = (fecha_str
+                            .replace('jan', 'ene')
+                            .replace('feb', 'feb')
+                            .replace('mar', 'mar')
+                            .replace('apr', 'abr')
+                            .replace('may', 'may')
+                            .replace('jun', 'jun')
+                            .replace('jul', 'jul')
+                            .replace('aug', 'ago')
+                            .replace('sep', 'sept')
+                            .replace('oct', 'oct')
+                            .replace('nov', 'nov')
+                            .replace('dec', 'dic'))
+            except Exception as e:
+                raise ValueError(f"Error procesando la fecha {row['fecha']}: {e}")
+
             labels.append(fecha_str)
 
             chatbot = row['chatbot'] or 0
@@ -439,7 +441,6 @@ class Pqrs:
             data_total.append(total)
 
         # -- 4) Definir colores (hex) para cada dataset
-        # (Ejemplos, ajusta a tu gusto)
         color_chatbot = "#36a2eb"
         color_callcenter = "#ff6384"
         color_web = "#ffce56"
@@ -486,8 +487,9 @@ class Pqrs:
 
     def get_daily_average_ticket_report(self, site_ids: list, start_date: str, end_date: str):
         """
-        Obtiene el ticket promedio diario por canal (web, chatbot, callcenter) en un rango de fechas,
-        incluyendo un dataset con el ticket promedio total.
+        Obtiene el ticket promedio diario por canal (web, chatbot, callcenter) 
+        en un rango de fechas, considerando el día desde las 4:00 am hasta las 3:59 am 
+        del siguiente día.
 
         :param site_ids: Lista de IDs de sitios a filtrar.
         :param start_date: Fecha de inicio (formato: YYYY-MM-DD).
@@ -495,9 +497,6 @@ class Pqrs:
         :return: JSON para graficar (labels y datasets).
         """
 
-        # -- 1) Consulta que genera el rango de fechas y calcula el ticket promedio diario por canal.
-        #    Para cada canal se hace:
-        #    SUM(ventas) / COUNT(órdenes)  => ticket promedio
         query = """
         WITH date_range AS (
             SELECT generate_series(
@@ -506,91 +505,71 @@ class Pqrs:
                 '1 day'::interval
             )::date AS fecha
         ),
-        daily_ticket AS (
+        daily_data AS (
             SELECT
-                (order_date at time zone 'America/Bogota')::date AS day,
+                (order_date - INTERVAL '4 hours')::date AS day,
+                -- Ventas por canal
                 SUM(
                     CASE 
-                        WHEN inserted_by = 1082 
-                            AND current_status = 'enviada' 
+                        WHEN inserted_by = 1082 AND current_status = 'enviada' 
                         THEN total_sales 
                         ELSE 0 
                     END
-                ) 
-                / NULLIF(SUM(
+                ) AS sales_chatbot,
+                SUM(
                     CASE 
-                        WHEN inserted_by = 1082 
-                            AND current_status = 'enviada' 
-                        THEN 1 
+                        WHEN inserted_by != 1082 AND inserted_by IS NOT NULL AND current_status = 'enviada' 
+                        THEN total_sales 
                         ELSE 0 
                     END
-                ), 0)::numeric(18,2) AS avg_chatbot,
+                ) AS sales_callcenter,
+                SUM(
+                    CASE 
+                        WHEN inserted_by IS NULL AND current_status = 'enviada' 
+                        THEN total_sales 
+                        ELSE 0 
+                    END
+                ) AS sales_web,
 
+                -- Órdenes por canal
                 SUM(
                     CASE 
-                        WHEN inserted_by != 1082 
-                            AND inserted_by IS NOT NULL 
-                            AND current_status = 'enviada' 
-                        THEN total_sales 
-                        ELSE 0 
-                    END
-                )
-                / NULLIF(SUM(
-                    CASE 
-                        WHEN inserted_by != 1082 
-                            AND inserted_by IS NOT NULL 
-                            AND current_status = 'enviada'
+                        WHEN inserted_by = 1082 AND current_status = 'enviada' 
                         THEN 1 
                         ELSE 0 
                     END
-                ), 0)::numeric(18,2) AS avg_callcenter,
-
+                ) AS orders_chatbot,
                 SUM(
                     CASE 
-                        WHEN inserted_by IS NULL 
-                            AND current_status = 'enviada' 
-                        THEN total_sales 
-                        ELSE 0 
-                    END
-                )
-                / NULLIF(SUM(
-                    CASE 
-                        WHEN inserted_by IS NULL 
-                            AND current_status = 'enviada' 
+                        WHEN inserted_by != 1082 AND inserted_by IS NOT NULL AND current_status = 'enviada' 
                         THEN 1 
                         ELSE 0 
                     END
-                ), 0)::numeric(18,2) AS avg_web,
-
-                -- Ticket promedio total del día (todas las órdenes enviadas)
+                ) AS orders_callcenter,
                 SUM(
                     CASE 
-                        WHEN current_status = 'enviada' 
-                        THEN total_sales 
-                        ELSE 0 
-                    END
-                )
-                / NULLIF(SUM(
-                    CASE 
-                        WHEN current_status = 'enviada' 
+                        WHEN inserted_by IS NULL AND current_status = 'enviada' 
                         THEN 1 
                         ELSE 0 
                     END
-                ), 0)::numeric(18,2) AS avg_total
+                ) AS orders_web
             FROM orders.daily_order_sales_view
             WHERE
-                (order_date at time zone 'America/Bogota') BETWEEN %(start_date)s AND %(end_date)s
+                (order_date - INTERVAL '4 hours')::date BETWEEN %(start_date)s AND %(end_date)s
                 AND site_id = ANY(%(site_ids)s)
             GROUP BY 1
         )
         SELECT
             d.fecha,
-            COALESCE(s.avg_chatbot, 0) AS chatbot,
-            COALESCE(s.avg_callcenter, 0) AS callcenter,
-            COALESCE(s.avg_web, 0) AS web,
-            COALESCE(s.avg_total, 0) AS total
+            COALESCE(dd.sales_chatbot, 0) AS sales_chatbot,
+            COALESCE(dd.sales_callcenter, 0) AS sales_callcenter,
+            COALESCE(dd.sales_web, 0) AS sales_web,
+
+            COALESCE(dd.orders_chatbot, 0) AS orders_chatbot,
+            COALESCE(dd.orders_callcenter, 0) AS orders_callcenter,
+            COALESCE(dd.orders_web, 0) AS orders_web
         FROM date_range d
-        LEFT JOIN daily_ticket s ON d.fecha = s.day
+        LEFT JOIN daily_data dd ON d.fecha = dd.day
         ORDER BY d.fecha;
         """
 
@@ -600,10 +579,10 @@ class Pqrs:
             "end_date": end_date
         }
 
-        # -- 2) Ejecutar la consulta
+        # -- Ejecutar la consulta
         result = self.db.execute_query(query=query, params=params, fetch=True)
 
-        # -- 3) Construir arrays para labels y datasets
+        # -- Construir estructuras para labels y datasets
         labels = []
         data_chatbot = []
         data_callcenter = []
@@ -611,40 +590,59 @@ class Pqrs:
         data_total = []
 
         for row in result:
-            # Formatear fecha en formato "dd-mmm" en español
-            fecha_str = row['fecha'].strftime('%d-%b').lower()
-            fecha_str = (fecha_str
-                        .replace('jan', 'ene')
-                        .replace('feb', 'feb')
-                        .replace('mar', 'mar')
-                        .replace('apr', 'abr')
-                        .replace('may', 'may')
-                        .replace('jun', 'jun')
-                        .replace('jul', 'jul')
-                        .replace('aug', 'ago')
-                        .replace('sep', 'sept')
-                        .replace('oct', 'oct')
-                        .replace('nov', 'nov')
-                        .replace('dec', 'dic'))
+            # Formato de fecha
+            try:
+                fecha_str = row['fecha'].strftime('%d-%b').lower()
+                fecha_str = (fecha_str
+                            .replace('jan', 'ene')
+                            .replace('feb', 'feb')
+                            .replace('mar', 'mar')
+                            .replace('apr', 'abr')
+                            .replace('may', 'may')
+                            .replace('jun', 'jun')
+                            .replace('jul', 'jul')
+                            .replace('aug', 'ago')
+                            .replace('sep', 'sept')
+                            .replace('oct', 'oct')
+                            .replace('nov', 'nov')
+                            .replace('dec', 'dic'))
+            except Exception as e:
+                raise ValueError(f"Error procesando la fecha {row['fecha']}: {e}")
+
             labels.append(fecha_str)
 
-            chatbot = float(row['chatbot'] or 0)
-            callcenter = float(row['callcenter'] or 0)
-            web = float(row['web'] or 0)
-            total = float(row['total'] or 0)
+            # -- Obtener datos de ventas y órdenes por canal
+            sales_chatbot = row['sales_chatbot'] or 0
+            orders_chatbot = row['orders_chatbot'] or 0
 
-            data_chatbot.append(chatbot)
-            data_callcenter.append(callcenter)
-            data_web.append(web)
-            data_total.append(total)
+            sales_callcenter = row['sales_callcenter'] or 0
+            orders_callcenter = row['orders_callcenter'] or 0
 
-        # -- 4) Definir colores
+            sales_web = row['sales_web'] or 0
+            orders_web = row['orders_web'] or 0
+
+            # -- Calcular ticket promedio por canal
+            avg_chatbot = sales_chatbot / orders_chatbot if orders_chatbot > 0 else 0
+            avg_callcenter = sales_callcenter / orders_callcenter if orders_callcenter > 0 else 0
+            avg_web = sales_web / orders_web if orders_web > 0 else 0
+
+            # -- Calcular ticket promedio total (suma de todos los canales / total órdenes)
+            total_sales = sales_chatbot + sales_callcenter + sales_web
+            total_orders = orders_chatbot + orders_callcenter + orders_web
+            avg_total = total_sales / total_orders if total_orders > 0 else 0
+
+            data_chatbot.append(round(avg_chatbot, 2))
+            data_callcenter.append(round(avg_callcenter, 2))
+            data_web.append(round(avg_web, 2))
+            data_total.append(round(avg_total, 2))
+
+        # -- Definir colores
         color_chatbot = "#36a2eb"
         color_callcenter = "#ff6384"
         color_web = "#ffce56"
         color_total = "#4bc0c0"
 
-        # -- 5) Preparar los datasets
+        # -- Preparar los datasets
         datasets = [
             {
                 "label": "web",
@@ -676,18 +674,18 @@ class Pqrs:
             }
         ]
 
-        # -- 6) Retornar el resultado final
+        # -- Retornar la estructura final
         return {
             "labels": labels,
             "datasets": datasets
         }
 
 
-    
     def get_daily_orders_report(self, site_ids: list, start_date: str, end_date: str):
         """
-        Obtiene el número de órdenes diarias por canal (web, chatbot, callcenter) en un rango de fechas,
-        incluyendo un dataset con el total de órdenes.
+        Obtiene la cantidad de órdenes diarias por canal (web, chatbot, callcenter) 
+        en un rango de fechas, considerando el día desde las 4:00 am hasta las 3:59 am 
+        del siguiente día.
 
         :param site_ids: Lista de IDs de sitios a filtrar.
         :param start_date: Fecha de inicio (formato: YYYY-MM-DD).
@@ -695,7 +693,6 @@ class Pqrs:
         :return: JSON para graficar (labels y datasets).
         """
 
-        # -- 1) Consulta que genera el rango de fechas y cuenta el número de órdenes diarias por canal.
         query = """
         WITH date_range AS (
             SELECT generate_series(
@@ -706,16 +703,15 @@ class Pqrs:
         ),
         daily_orders AS (
             SELECT
-                (order_date at time zone 'America/Bogota')::date AS day,
+                (order_date - INTERVAL '4 hours')::date AS day,
                 SUM(
                     CASE 
                         WHEN inserted_by = 1082 
-                            AND current_status = 'enviada'
+                            AND current_status = 'enviada' 
                         THEN 1 
                         ELSE 0 
                     END
                 ) AS orders_chatbot,
-
                 SUM(
                     CASE 
                         WHEN inserted_by != 1082 
@@ -725,7 +721,6 @@ class Pqrs:
                         ELSE 0 
                     END
                 ) AS orders_callcenter,
-
                 SUM(
                     CASE 
                         WHEN inserted_by IS NULL 
@@ -733,30 +728,20 @@ class Pqrs:
                         THEN 1 
                         ELSE 0 
                     END
-                ) AS orders_web,
-
-                -- Total de órdenes (todas las enviadas)
-                SUM(
-                    CASE 
-                        WHEN current_status = 'enviada' 
-                        THEN 1 
-                        ELSE 0 
-                    END
-                ) AS orders_total
+                ) AS orders_web
             FROM orders.daily_order_sales_view
             WHERE
-                (order_date at time zone 'America/Bogota') BETWEEN %(start_date)s AND %(end_date)s
+                (order_date - INTERVAL '4 hours')::date BETWEEN %(start_date)s AND %(end_date)s
                 AND site_id = ANY(%(site_ids)s)
             GROUP BY 1
         )
         SELECT
             d.fecha,
-            COALESCE(s.orders_chatbot, 0) AS chatbot,
-            COALESCE(s.orders_callcenter, 0) AS callcenter,
-            COALESCE(s.orders_web, 0) AS web,
-            COALESCE(s.orders_total, 0) AS total
+            COALESCE(o.orders_chatbot, 0) AS chatbot,
+            COALESCE(o.orders_callcenter, 0) AS callcenter,
+            COALESCE(o.orders_web, 0) AS web
         FROM date_range d
-        LEFT JOIN daily_orders s ON d.fecha = s.day
+        LEFT JOIN daily_orders o ON d.fecha = o.day
         ORDER BY d.fecha;
         """
 
@@ -766,10 +751,10 @@ class Pqrs:
             "end_date": end_date
         }
 
-        # -- 2) Ejecutar la consulta
+        # -- Ejecutar la consulta
         result = self.db.execute_query(query=query, params=params, fetch=True)
 
-        # -- 3) Construir arrays para labels y datasets
+        # -- Construir estructuras para labels y datasets
         labels = []
         data_chatbot = []
         data_callcenter = []
@@ -777,40 +762,44 @@ class Pqrs:
         data_total = []
 
         for row in result:
-            # Formatear fecha en formato "dd-mmm" en español
-            fecha_str = row['fecha'].strftime('%d-%b').lower()
-            fecha_str = (fecha_str
-                        .replace('jan', 'ene')
-                        .replace('feb', 'feb')
-                        .replace('mar', 'mar')
-                        .replace('apr', 'abr')
-                        .replace('may', 'may')
-                        .replace('jun', 'jun')
-                        .replace('jul', 'jul')
-                        .replace('aug', 'ago')
-                        .replace('sep', 'sept')
-                        .replace('oct', 'oct')
-                        .replace('nov', 'nov')
-                        .replace('dec', 'dic'))
+            # Formato de fecha (ej: 01-ene)
+            try:
+                fecha_str = row['fecha'].strftime('%d-%b').lower()
+                fecha_str = (fecha_str
+                            .replace('jan', 'ene')
+                            .replace('feb', 'feb')
+                            .replace('mar', 'mar')
+                            .replace('apr', 'abr')
+                            .replace('may', 'may')
+                            .replace('jun', 'jun')
+                            .replace('jul', 'jul')
+                            .replace('aug', 'ago')
+                            .replace('sep', 'sept')
+                            .replace('oct', 'oct')
+                            .replace('nov', 'nov')
+                            .replace('dec', 'dic'))
+            except Exception as e:
+                raise ValueError(f"Error procesando la fecha {row['fecha']}: {e}")
+
             labels.append(fecha_str)
 
             chatbot = row['chatbot'] or 0
             callcenter = row['callcenter'] or 0
             web = row['web'] or 0
-            total = row['total'] or 0
+            total = chatbot + callcenter + web
 
             data_chatbot.append(chatbot)
             data_callcenter.append(callcenter)
             data_web.append(web)
             data_total.append(total)
 
-        # -- 4) Definir colores
+        # -- Definir colores (igual que en el ejemplo original)
         color_chatbot = "#36a2eb"
         color_callcenter = "#ff6384"
         color_web = "#ffce56"
         color_total = "#4bc0c0"
 
-        # -- 5) Preparar los datasets
+        # -- Preparar los datasets
         datasets = [
             {
                 "label": "web",
@@ -842,14 +831,13 @@ class Pqrs:
             }
         ]
 
-        # -- 6) Retornar el resultado final
+        # -- Retornar la estructura final
         return {
             "labels": labels,
             "datasets": datasets
         }
 
-
-            
+                
     def get_all_tags(self):
         query = self.db.build_select_query(table_name='pqr.pqr_tag',fields=["*"],condition='exist = true')
         pqr_id = self.db.execute_query(query=query,fetch=True)
