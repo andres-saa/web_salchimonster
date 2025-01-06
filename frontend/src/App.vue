@@ -19,7 +19,7 @@ const siteStore  = useSitesStore()
 
 
 onMounted(async() => {
-  // await getProducts()
+  await getProducts()
   await obtenerstatus()
   if (siteStore.status == 'cerrado') {
       verCerrado.value = true
@@ -61,34 +61,34 @@ watch(() => siteStore.location.site.site_id , async() => {
 
 
 
-// const getProducts = async (category_name) => {
+const getProducts = async (category_name) => {
 
-//     const site_id = siteStore.location.site.pe_site_id
-//     const category_id = route.params.category_id
-//     if(category_id && site_id){
+    const site_id = siteStore.location.site.pe_site_id
+    const category_id = route.params.category_id
+    if(category_id && site_id){
 
-//         if(store2.menu?.data?.length < 1 || !store2.menu?.data ){
-//           store.setLoading(true, 'cargando productos')
-//         }
-//         try {
-//         let response = await fetch(`${URI}/get-product-integration/6149/${site_id}`);
-//         if (!response.ok) {
-//             store.setLoading(false, 'cargando productos')
+        if(store2.menu?.data?.length < 1 || !store2.menu?.data ){
+          store.setLoading(true, 'cargando productos')
+        }
+        try {
+        let response = await fetch(`${URI}/get-product-integration/6149/${site_id}`);
+        if (!response.ok) {
+            store.setLoading(false, 'cargando productos')
 
-//             throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
 
-//         }
-//         store.setLoading(false, 'cargando productos')
+        }
+        store.setLoading(false, 'cargando productos')
 
-//         let data = await response.json();
-//         store2.menu = data.data;
-//     } catch (error) {
-//         store.setLoading(false, 'cargando productos')
+        let data = await response.json();
+        store2.menu = data.data;
+    } catch (error) {
+        store.setLoading(false, 'cargando productos')
 
-//         console.error('Error fetching data: ', error);
-//     }
-//     }
-// }
+        console.error('Error fetching data: ', error);
+    }
+    }
+}
    
 
 </script>

@@ -80,7 +80,7 @@ const updateScreenWidth = () => {
 onMounted(async() => {
   window.addEventListener('resize', updateScreenWidth);
   comprobar_sede()
-//   await getProducts()
+  await getProducts()
 });
 
 onBeforeUnmount(() => {
