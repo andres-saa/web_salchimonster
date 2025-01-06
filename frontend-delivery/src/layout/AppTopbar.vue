@@ -163,12 +163,12 @@ const changeCurrentGroupMenu = (grupoMenu) => {
 }
 const menus = [
     { name: 'Atender', to: '/' },
-    { name: ' Pedido manual', to: '/pedido-manual' },
-    { name: 'Historial de pedidos', to: '/historial' },
+    // { name: ' Pedido manual', to: '/pedido-manual' },
+    { name: 'Pedidos de hoy', to: '/historial' },
     { name: ' Cuadre de caja', to: '/cuadre' },
-    { name: ' Menu', to: '/tienda-menu/productos/SALCHIPAPAS/3' },
-    { name: ' Horarios', to: '/horarios' },
-    { name: ' Reportes', to: '/reporte-ventas/valor-ventas' }
+    // { name: ' Menu', to: '/tienda-menu/productos/SALCHIPAPAS/3' },
+    // { name: ' Horarios', to: '/horarios' },
+    // { name: ' Reportes', to: '/reporte-ventas/valor-ventas' }
 
 ]
 
