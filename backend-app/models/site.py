@@ -19,7 +19,7 @@ class Site:
         self.site_id = site_id
 
     def select_all_sites(self):
-        select_query = "SELECT * FROM sites;"
+        select_query = "SELECT * FROM sites where exist = true;"
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]

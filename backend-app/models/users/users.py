@@ -3,7 +3,7 @@ from db.db import Db as DataBase
 from pydantic import BaseModel
 # from schema.pqr import pqrs
 # from schema.user import user_schema_post
-from models.orders.order2 import Order2
+from models.orders.order2 import Order20
 
 
 
