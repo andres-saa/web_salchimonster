@@ -50,7 +50,7 @@ class Order:
             columns = [desc[0] for desc in self.cursor.description]
             return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
-    def get_sales_report_by_site_and_status(self, site_ids, status, start_date, end_date):
+    def get_sales_report_by_site_and_status5(self, site_ids, status, start_date, end_date):
         # Define the time zones
         tz_colombia = pytz.timezone('America/Bogota')
         tz_utc = pytz.utc
@@ -134,7 +134,185 @@ class Order:
             'orders_info': orders_info
         }
 
-    
+
+
+
+
+    def get_sales_report_by_site_and_status(self, status, site_ids, start_date, end_date):
+        """
+        Devuelve las órdenes en una estructura lista para exportar a Excel,
+        con una hoja por cada 'site_id' (sede).
+
+        Adicionalmente, guarda y consulta un archivo JSON de caché para no
+        volver a hacer la consulta con los mismos parámetros.
+        """
+
+        # --- 1) Preparar carpeta y archivo de caché ---
+        cache_folder = "cache"
+        cache_file = os.path.join(cache_folder, "sales_report_cache.json")
+
+        # Crear la carpeta si no existe
+        os.makedirs(cache_folder, exist_ok=True)
+
+        # Si el archivo no existe, inicializarlo con un diccionario vacío
+        if not os.path.exists(cache_file):
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump({}, f)
+
+        # Cargar el contenido actual de la caché
+        with open(cache_file, "r", encoding="utf-8") as f:
+            try:
+                cache_data = json.load(f)
+            except json.JSONDecodeError:
+                cache_data = {}
+
+        # --- 2) Construir la clave de caché con los parámetros ---
+        # Nota: si 'site_ids' es una lista, la convertimos a tupla/string para que sea hashable.
+        #       También podrías hacer un hash MD5/SHA1 para mayor robustez.
+        site_ids_str = ",".join(map(str, site_ids)) if isinstance(site_ids, (list, tuple)) else str(site_ids)
+        cache_key = f"{status}-{site_ids_str}-{start_date}-{end_date}"
+
+        # --- 3) Si la consulta existe en caché, retornar esa data directamente ---
+        if cache_key in cache_data:
+            # Ya existe en caché
+            return cache_data[cache_key]
+
+        # --- 4) Si no está en caché, realizar la consulta a la base de datos y procesar ---
+        tz_colombia = pytz.timezone('America/Bogota')
+
+        # Consulta SQL (ignora 'status' en esta versión)
+        query = """
+            SELECT
+                co.site_id,
+                co.site_name,
+                co.order_id,
+                co.user_id,
+                co.user_name,
+                co.user_phone,
+                co.user_address,
+                co.current_status,
+                co.latest_status_timestamp,
+                co.total_order_price,
+                co.payment_method,
+                co.delivery_price,
+                responsible_observation,
+                cancelation_solve_responsible
+            FROM orders.combined_order_view co
+            WHERE co.latest_status_timestamp BETWEEN %s AND %s
+            AND co.site_id = ANY(%s)
+            AND co.current_status IN ('enviada', 'cancelada')
+            ORDER BY co.site_name, co.order_id
+        """
+        params = (start_date, end_date, site_ids)
+
+        self.cursor.execute(query, params)
+        results = self.cursor.fetchall()
+
+        grouped_by_site = {}
+        for row in results:
+            (
+                site_id,
+                site_name,
+                order_id,
+                user_id,
+                user_name,
+                user_phone,
+                user_address,
+                current_status,
+                latest_ts,
+                total_order_price,
+                payment_method,
+                delivery_price,
+                responsible_observation,
+                cancelation_solve_responsible
+            ) = row
+
+            # Convertir fecha/hora a Colombia; separar fecha y hora
+            fecha_str = ""
+            hora_str = ""
+            if latest_ts:
+                try:
+                    if isinstance(latest_ts, datetime):
+                        dt_utc = latest_ts
+                    else:
+                        # Caso: latest_ts es una cadena
+                        if 'Z' in latest_ts:
+                            dt_utc = datetime.fromisoformat(latest_ts.replace('Z', '+00:00'))
+                        else:
+                            dt_utc = datetime.fromisoformat(latest_ts)
+
+                    dt_col = dt_utc.astimezone(tz_colombia)
+                    fecha_str = dt_col.strftime("%Y-%m-%d")  # Ej: 2025-01-14
+                    hora_str = dt_col.strftime("%H:%M:%S")   # Ej: 18:00:06
+                except ValueError:
+                    pass  # Si falla el parseo, queda en blanco
+
+            if site_id not in grouped_by_site:
+                grouped_by_site[site_id] = {
+                    "site_name": site_name or "SIN_SEDE",
+                    "orders": []
+                }
+
+            order_dict = {
+                "Orden No": order_id,
+                "Monto": float(total_order_price) if total_order_price else 0.0,
+                "Sede": site_name or "",
+                "Fecha": fecha_str,
+                "Hora": hora_str,
+                "Estado": current_status or "",
+                "Responsable": cancelation_solve_responsible if cancelation_solve_responsible else "no aplica",
+                "razon de la cancelacion": responsible_observation if responsible_observation else "no aplica",
+                "Domicilio": float(delivery_price) if delivery_price else 0.0,
+                "Metodo de pago": payment_method or "",
+                "Nombre del usuario": user_name or "",
+                "telefono del usuario": user_phone or "",
+                "direccion del usuario": user_address or ""
+            }
+
+            grouped_by_site[site_id]["orders"].append(order_dict)
+
+        hojas = []
+        for site_id, data_site in grouped_by_site.items():
+            site_name = data_site["site_name"]
+            orders = data_site["orders"]
+
+            column_widths = {
+                "Orden No": 12,
+                "Monto": 15,
+                "Sede": 15,
+                "Fecha": 12,
+                "Hora": 12,
+                "Estado": 12,
+                "Responsable": 20,
+                "razon de la cancelacion": 30,
+                "Domicilio": 10,
+                "Metodo de pago": 15,
+                "Nombre del usuario": 20,
+                "telefono del usuario": 15,
+                "direccion del usuario": 25
+            }
+
+            hoja = {
+                "hoja": site_name,
+                "title": f"Reporte de Ventas - {site_name}",
+                "column_widths": column_widths,
+                "data": orders
+            }
+            hojas.append(hoja)
+
+        final_result = {
+            "hojas": hojas
+        }
+
+        # --- 5) Guardar la nueva data en caché antes de retornar ---
+        cache_data[cache_key] = final_result
+
+        with open(cache_file, "w", encoding="utf-8") as f:
+            json.dump(cache_data, f, ensure_ascii=False, indent=4)
+
+        return final_result
+
+
     def get_sales_report_by_site(self, site_ids, start_date, end_date):
         tz_colombia = pytz.timezone('America/Bogota')
         tz_utc = pytz.utc

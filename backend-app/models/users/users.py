@@ -59,7 +59,7 @@ class Users:
                 -- Listado de órdenes como objetos JSON con id_order y valor_orden
                 JSON_AGG(
                     JSONB_BUILD_OBJECT(
-                         'id_order', co.order_id,
+                        'id_order', co.order_id,
                         'valor_orden', co.total_order_price,
                         'fecha_order', TO_CHAR(co.latest_status_timestamp::date, 'DD-MM-YYYY')
                     ) ORDER BY co.order_id DESC
@@ -120,7 +120,22 @@ class Users:
         # Construir la respuesta
         user_data = []
         for row in result:
-            # Las fechas ya están formateadas en la consulta SQL
+            times_purchased = row.get("times_purchased") or 0
+            
+            # Clasificación según la cantidad de veces que compró
+            if times_purchased == 1:
+                classification = "PREOCUPANTE"
+            elif times_purchased == 2:
+                classification = "CASUAL"
+            elif times_purchased in [3, 4]:
+                classification = "FRECUENTE"
+            elif 5 <= times_purchased <= 8:
+                classification = "TOP"
+            elif times_purchased > 8:
+                classification = "ESTRELLA"
+            else:
+                classification = "SIN DATOS"  # Por si viene 0 u otro caso no contemplado
+
             user_data.append({
                 "user_id": row.get("user_id"),
                 "user_name": row.get("user_name"),
@@ -129,9 +144,9 @@ class Users:
                 "total_spent": float(row["total_spent"]) if row.get("total_spent") else 0.0,
                 "last_purchase": row.get("last_purchase"),    # Fecha ya formateada
                 "orders": row.get("orders") or [],            # Lista de órdenes como objetos ya formateados
-                "times_purchased": row.get("times_purchased") or 0,
+                "times_purchased": times_purchased,
                 "joined_date": row.get("joined_date"),        # Fecha ya formateada
-                # "site_id": row.get("site_id")              # Descomentar si se necesita site_id
+                "classification": classification              # Clasificación añadida
             })
 
         return user_data
