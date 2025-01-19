@@ -274,6 +274,21 @@ def update_product_instance_status_endpoint(product_instance_id: int, new_status
         order_instance.close_connection()
 
 
+
+
+
+
+@order_router.put('/change-method/{order_id}/{payment_method_id}/')
+def update_product_instance_payment(order_id: str, payment_method_id:int):
+    order_instance = Order2()
+    result = order_instance.change_payment_method(order_id=order_id, payment_method_id=payment_method_id)
+    order_instance.close_connection()
+    return result
+
+
+
+
+
 @order_router.put("/resolve-cancellation/{cancellation_request_id}")
 def resolve_cancellation_request_endpoint(
     

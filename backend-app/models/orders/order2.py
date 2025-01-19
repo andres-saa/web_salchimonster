@@ -1092,18 +1092,24 @@ class Order2:
   
   
     def update_product_instance_status(self, product_instance_id, new_status):
-        """
-        Update the status of a specific product instance.
-        Parameters:
-        - product_instance_id: int or str, the identifier of the product instance.
-        - new_status: str, the new status to set for the product instance.
-        """
+
         update_query = """
         UPDATE inventory.product_instances
         SET status = %s
         WHERE id = %s;
         """
         self.cursor.execute(update_query, (new_status, product_instance_id))
+        self.conn.commit()
+
+    
+    def change_payment_method(self, order_id, payment_method_id):
+
+        update_query = """
+        UPDATE orders.order_details
+        SET payment_method_option_id = %s
+        WHERE order_id = %s;
+        """
+        self.cursor.execute(update_query, (payment_method_id, order_id))
         self.conn.commit()
 
 

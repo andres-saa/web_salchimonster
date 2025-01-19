@@ -311,8 +311,8 @@ class Order:
         cache_key = f"{status}-{site_ids_str}-{start_date}-{end_date}"
 
         # --- 3) Si la consulta existe en caché, retornar esa data directamente ---
-        if cache_key in cache_data:
-            return cache_data[cache_key]
+        # if cache_key in cache_data:
+        #     return cache_data[cache_key]
 
         # --- 4) Realizar la consulta a la base de datos y procesar ---
         tz_colombia = pytz.timezone('America/Bogota')
