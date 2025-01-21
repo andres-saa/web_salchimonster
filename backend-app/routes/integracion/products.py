@@ -121,17 +121,17 @@ def initialize_cache(dominio_id: int, quipupos: int = 0):
         fetch_and_cache_menu(dominio_id=dominio_id, local_id=local_id, quipupos=quipupos)
     logger.info(f"Actualización de caché completada para dominio_id: {dominio_id}.")
 
-# Programador de tareas para actualizar la caché cada 30 minutos
-scheduler = BackgroundScheduler()
-scheduler.start()
-scheduler.add_job(
-    func=initialize_cache,
-    trigger=IntervalTrigger(minutes=30),
-    args=[6149],  # Reemplaza 6149 con el dominio_id adecuado
-    id='cache_updater',
-    name='Actualizar caché cada 30 minutos',
-    replace_existing=True
-)
+    # Programador de tareas para actualizar la caché cada 30 minutos
+    scheduler = BackgroundScheduler()
+    scheduler.start()
+    scheduler.add_job(
+        func=initialize_cache,
+        trigger=IntervalTrigger(minutes=30),
+        args=[6149],  # Reemplaza 6149 con el dominio_id adecuado
+        id='cache_updater',
+        name='Actualizar caché cada 30 minutos',
+        replace_existing=True
+    )
 
 # Nota: No inicializar la caché al iniciar
 # initialize_cache()
