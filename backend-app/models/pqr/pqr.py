@@ -7,6 +7,7 @@ from models.orders.order2 import Order2
 from datetime import datetime, timedelta
 import json
 import os
+from collections import defaultdict
 
 
 
@@ -1394,421 +1395,110 @@ class Pqrs:
         return result_data
 
 
-    def get_daily_orders_report(self, site_ids: list, start_date: str, end_date: str):
-        """
-        Ejemplo de reporte adaptado, con caché en archivo JSON.
-        Cuando se solicitan los mismos parámetros, se retorna directamente
-        del caché en lugar de volver a consultar la base de datos.
-        """
 
-        # ------------------------------------------------------------------
-        # 0) CONFIGURACIÓN DEL ARCHIVO DE CACHÉ
-        # ------------------------------------------------------------------
-        #  - Verificamos que exista la carpeta "cache"; si no, la creamos.
-        #  - Verificamos que exista el archivo JSON; si no, lo creamos vacío.
-        # ------------------------------------------------------------------
+    def get_orders_by_site_and_responsible_transfer(self, site_ids: list, fecha_inicio: str, fecha_fin: str):
+            """
+            Genera un reporte de órdenes atendidas por transferencia agrupadas por sede y responsable.
+            Las órdenes seleccionadas tienen payment_method_id = 6 y authorized = true.
+            El reporte incluye una columna por cada responsable y una columna total.
 
-        cache_folder = "cache"
-        cache_file = os.path.join(cache_folder, "daily_orders_report.json")
+            :param site_ids: Lista de IDs de sitios a filtrar.
+            :param fecha_inicio: Fecha de inicio en formato 'YYYY-MM-DD'.
+            :param fecha_fin: Fecha de fin en formato 'YYYY-MM-DD'.
+            :return: Lista de diccionarios con el reporte.
+            """
+            # ------------------------------------------------------------------
+            # 0) CONFIGURACIÓN DEL ARCHIVO DE CACHÉ
+            # ------------------------------------------------------------------
+            cache_folder = "cache"
+            cache_file = os.path.join(cache_folder, "orders_by_site_and_responsible_transfer.json")
 
-        if not os.path.exists(cache_folder):
-            os.makedirs(cache_folder)
+            if not os.path.exists(cache_folder):
+                os.makedirs(cache_folder)
 
-        # Si no existe el archivo, lo creamos con un dict vacío
-        if not os.path.exists(cache_file):
+            # Si no existe el archivo, lo creamos con un dict vacío
+            if not os.path.exists(cache_file):
+                with open(cache_file, "w", encoding="utf-8") as f:
+                    json.dump({}, f)
+
+            # ------------------------------------------------------------------
+            # 1) GENERAR UNA CLAVE DE CACHÉ ÚNICA PARA ESTOS PARÁMETROS
+            # ------------------------------------------------------------------
+            site_ids_sorted = sorted(site_ids)
+            cache_key = f"{site_ids_sorted}-{fecha_inicio}-{fecha_fin}"
+
+            # ------------------------------------------------------------------
+            # 2) LEER EL ARCHIVO DE CACHÉ Y VER SI LA CLAVE YA EXISTE
+            # ------------------------------------------------------------------
+            with open(cache_file, "r", encoding="utf-8") as f:
+                cache_data = json.load(f)
+
+            if cache_key in cache_data:
+                # Si la clave existe, retornamos lo que está en caché
+                return cache_data[cache_key]
+
+            # ------------------------------------------------------------------
+            # 3) CONSULTA A LA BASE DE DATOS
+            # ------------------------------------------------------------------
+            query = """
+                SELECT 
+                    site_name,
+                    COALESCE(name, 'Sin Responsable') AS responsible_name,
+                    COUNT(*) AS order_count
+                FROM orders.combined_order_view
+                WHERE 
+                    payment_method_id = 6
+                    AND authorized = true
+                    AND rol_id = 40
+                    AND latest_status_timestamp BETWEEN %(fecha_inicio)s AND %(fecha_fin)s
+                    AND site_id = ANY(%(site_ids)s)
+                    
+                GROUP BY site_name, responsible_name
+                ORDER BY site_name, responsible_name;
+            """
+
+            params = {
+                "fecha_inicio": fecha_inicio,
+                "fecha_fin": fecha_fin,
+                "site_ids": site_ids_sorted
+            }
+
+            result = self.db.execute_query(query=query, params=params, fetch=True)
+
+            # ------------------------------------------------------------------
+            # 4) PROCESAMIENTO DE LOS DATOS PARA EL PIVOTE
+            # ------------------------------------------------------------------
+            # Identificar todos los responsables únicos
+            responsables_set = set()
+            for row in result:
+                responsables_set.add(row['responsible_name'])
+
+            responsables = sorted(responsables_set)  # Ordenar alfabéticamente
+
+            # Crear una lista de diccionarios para cada sede
+            sede_dict = defaultdict(lambda: {responsible: 0 for responsible in responsables})
+            for row in result:
+                sede = row['site_name']
+                responsible = row['responsible_name']
+                count = row['order_count']
+                sede_dict[sede][responsible] += count
+
+            # Construir la lista final con totales
+            final_report = []
+            for sede, counts in sede_dict.items():
+                entry = {"sede": sede}
+                total = 0
+                for responsible in responsables:
+                    entry[responsible] = counts[responsible]
+                    total += counts[responsible]
+                entry["total"] = total
+                final_report.append(entry)
+
+            # ------------------------------------------------------------------
+            # 5) GUARDAR EN EL CACHÉ Y RETORNAR
+            # ------------------------------------------------------------------
+            cache_data[cache_key] = final_report
             with open(cache_file, "w", encoding="utf-8") as f:
-                json.dump({}, f)
+                json.dump(cache_data, f, ensure_ascii=False, default=str)
 
-        # ------------------------------------------------------------------
-        # 1) GENERAR UNA CLAVE DE CACHÉ UNÍVOCA PARA ESTOS PARÁMETROS
-        # ------------------------------------------------------------------
-        #    - site_ids podría tener distinto orden, así que lo ordenamos
-        #    - Usamos un string como "clave" que combine los parámetros
-        # ------------------------------------------------------------------
-
-        # Ordenamos site_ids para evitar duplicados por orden distinto
-        site_ids_sorted = sorted(site_ids)
-        # Creamos la clave (string) a partir de los parámetros
-        cache_key = f"{site_ids_sorted}-{start_date}-{end_date}"
-
-        # ------------------------------------------------------------------
-        # 2) LEER EL ARCHIVO DE CACHÉ Y VER SI LA CLAVE YA EXISTE
-        # ------------------------------------------------------------------
-        with open(cache_file, "r", encoding="utf-8") as f:
-            cache_data = json.load(f)
-
-        if cache_key in cache_data:
-            # Si la clave existe, retornamos inmediatamente lo que está en caché
-            return cache_data[cache_key]
-        
-        # ------------------------------------------------------------------
-        # 3) SI LLEGAMOS AQUÍ, NO ESTÁ EN CACHÉ -> HACEMOS LA LÓGICA NORMAL
-        # ------------------------------------------------------------------
-        
-        # -- Conversión de fechas --
-        fmt_iso = "%Y-%m-%dT%H:%M:%S.%fZ"
-        start_date_dt = datetime.strptime(start_date, fmt_iso)
-        end_date_dt = datetime.strptime(end_date, fmt_iso)
-
-        # Intervalo principal
-        start_date_str = start_date_dt.strftime("%Y-%m-%d")
-        end_date_str = end_date_dt.strftime("%Y-%m-%d")
-
-        # Intervalo "antes"
-        start_date_before_dt = start_date_dt - timedelta(days=7)
-        end_date_before_dt = end_date_dt - timedelta(days=7)
-        start_date_before_str = start_date_before_dt.strftime("%Y-%m-%d")
-        end_date_before_str = end_date_before_dt.strftime("%Y-%m-%d")
-
-        # Labels de ejemplo
-        label_rango_ahora = formatear_rango_fechas(start_date_dt, end_date_dt)  # p. ej. "10/ene - 15/feb"
-        label_rango_antes = formatear_rango_fechas(start_date_before_dt, end_date_before_dt)  # p. ej. "03/ene - 08/feb"
-
-        # ------------------------------------------------------------------
-        # 4) CONSULTA "ACTUAL"
-        # ------------------------------------------------------------------
-        query_now = """
-            WITH date_range AS (
-                SELECT generate_series(
-                    %(start_date)s::date,
-                    %(end_date)s::date,
-                    '1 day'::interval
-                )::date AS fecha
-            ),
-            daily_orders AS (
-                SELECT
-                    (order_date - INTERVAL '4 hours')::date AS day,
-                    SUM(
-                        CASE 
-                            WHEN inserted_by = 1082 
-                                AND current_status = 'enviada' THEN 1 
-                            ELSE 0 
-                        END
-                    ) AS orders_chatbot,
-                    SUM(
-                        CASE 
-                            WHEN inserted_by != 1082 
-                                AND inserted_by IS NOT NULL 
-                                AND current_status = 'enviada' THEN 1 
-                            ELSE 0 
-                        END
-                    ) AS orders_callcenter,
-                    SUM(
-                        CASE 
-                            WHEN inserted_by IS NULL 
-                                AND current_status = 'enviada' THEN 1 
-                            ELSE 0 
-                        END
-                    ) AS orders_web
-                FROM orders.daily_order_sales_view
-                WHERE
-                    (order_date - INTERVAL '4 hours')::date BETWEEN %(start_date)s AND %(end_date)s
-                    AND site_id = ANY(%(site_ids)s)
-                GROUP BY 1
-            )
-            SELECT
-                d.fecha,
-                COALESCE(o.orders_chatbot, 0) AS chatbot,
-                COALESCE(o.orders_callcenter, 0) AS callcenter,
-                COALESCE(o.orders_web, 0) AS web
-            FROM date_range d
-            LEFT JOIN daily_orders o ON d.fecha = o.day
-            ORDER BY d.fecha;
-        """
-        params_now = {
-            "site_ids": site_ids,
-            "start_date": start_date_str,
-            "end_date": end_date_str
-        }
-        result_now = self.db.execute_query(query=query_now, params=params_now, fetch=True)
-
-        # ------------------------------------------------------------------
-        # 5) CONSULTA "ANTES"
-        # ------------------------------------------------------------------
-        query_before = """
-            WITH date_range AS (
-                SELECT generate_series(
-                    %(start_date_before)s::date,
-                    %(end_date_before)s::date,
-                    '1 day'::interval
-                )::date AS fecha
-            ),
-            daily_orders AS (
-                SELECT
-                    (order_date - INTERVAL '4 hours')::date AS day,
-                    SUM(
-                        CASE 
-                            WHEN inserted_by = 1082 
-                                AND current_status = 'enviada' THEN 1 
-                            ELSE 0 
-                        END
-                    ) AS orders_chatbot,
-                    SUM(
-                        CASE 
-                            WHEN inserted_by != 1082 
-                                AND inserted_by IS NOT NULL 
-                                AND current_status = 'enviada' THEN 1 
-                            ELSE 0 
-                        END
-                    ) AS orders_callcenter,
-                    SUM(
-                        CASE 
-                            WHEN inserted_by IS NULL 
-                                AND current_status = 'enviada' THEN 1 
-                            ELSE 0 
-                        END
-                    ) AS orders_web
-                FROM orders.daily_order_sales_view
-                WHERE
-                    (order_date - INTERVAL '4 hours')::date BETWEEN %(start_date_before)s AND %(end_date_before)s
-                    AND site_id = ANY(%(site_ids)s)
-                GROUP BY 1
-            )
-            SELECT
-                d.fecha,
-                COALESCE(o.orders_chatbot, 0) AS chatbot,
-                COALESCE(o.orders_callcenter, 0) AS callcenter,
-                COALESCE(o.orders_web, 0) AS web
-            FROM date_range d
-            LEFT JOIN daily_orders o ON d.fecha = o.day
-            ORDER BY d.fecha;
-        """
-        params_before = {
-            "site_ids": site_ids,
-            "start_date_before": start_date_before_str,
-            "end_date_before": end_date_before_str
-        }
-        result_before = self.db.execute_query(query=query_before, params=params_before, fetch=True)
-
-        # ------------------------------------------------------------------
-        # 6) Reporte básico
-        # ------------------------------------------------------------------
-        labels_basico = []
-        data_chatbot_basico = []
-        data_callcenter_basico = []
-        data_web_basico = []
-        data_total_basico = []
-
-        for row in result_now:
-            fecha_str = formatear_fecha(row['fecha'])
-            labels_basico.append(fecha_str)
-
-            chatbot_val = row['chatbot'] or 0
-            callcenter_val = row['callcenter'] or 0
-            web_val = row['web'] or 0
-            total_val = chatbot_val + callcenter_val + web_val
-
-            data_chatbot_basico.append(chatbot_val)
-            data_callcenter_basico.append(callcenter_val)
-            data_web_basico.append(web_val)
-            data_total_basico.append(total_val)
-
-        # Colores (ejemplo)
-        color_chatbot = "#36a2eb"
-        color_callcenter = "#ff6384"
-        color_web       = "#ffce56"
-        color_total     = "#4bc0c0"
-
-        datasets_basico = [
-            {
-                "label": "web",
-                "backgroundColor": color_web,
-                "borderColor": color_web,
-                "data": data_web_basico,
-                "tension": 0.4
-            },
-            {
-                "label": "chatbot",
-                "backgroundColor": color_chatbot,
-                "borderColor": color_chatbot,
-                "data": data_chatbot_basico,
-                "tension": 0.4
-            },
-            {
-                "label": "callcenter",
-                "backgroundColor": color_callcenter,
-                "borderColor": color_callcenter,
-                "data": data_callcenter_basico,
-                "tension": 0.4
-            },
-            {
-                "label": "total",
-                "backgroundColor": color_total,
-                "borderColor": color_total,
-                "data": data_total_basico,
-                "tension": 0.4
-            }
-        ]
-        reporte_basico = {
-            "labels": labels_basico,
-            "datasets": datasets_basico
-        }
-
-        # ------------------------------------------------------------------
-        # 7) Mapeo "antes" a dict
-        # ------------------------------------------------------------------
-        dict_before = {}
-        for row in result_before:
-            fecha_actual = row['fecha'] + timedelta(days=7)
-            dict_before[fecha_actual] = {
-                "chatbot": row['chatbot'] or 0,
-                "callcenter": row['callcenter'] or 0,
-                "web": row['web'] or 0
-            }
-
-        # ------------------------------------------------------------------
-        # 8) Construir comparaciones
-        # ------------------------------------------------------------------
-        labels_cmp = []
-        now_callcenter = []
-        now_total = []
-        now_chatbot = []
-        now_web = []
-
-        before_callcenter = []
-        before_total = []
-        before_chatbot = []
-        before_web = []
-
-        for row in result_now:
-            fecha = row['fecha']
-            fecha_str = formatear_fecha(fecha)
-            labels_cmp.append(fecha_str)
-
-            c_now = row['callcenter'] or 0
-            ch_now = row['chatbot'] or 0
-            w_now = row['web'] or 0
-            t_now = c_now + ch_now + w_now
-
-            if fecha in dict_before:
-                ch_before = dict_before[fecha]["chatbot"]
-                c_before = dict_before[fecha]["callcenter"]
-                w_before = dict_before[fecha]["web"]
-                t_before = ch_before + c_before + w_before
-            else:
-                ch_before = 0
-                c_before = 0
-                w_before = 0
-                t_before = 0
-
-            now_callcenter.append(c_now)
-            now_total.append(t_now)
-            now_chatbot.append(ch_now)
-            now_web.append(w_now)
-
-            before_callcenter.append(c_before)
-            before_total.append(t_before)
-            before_chatbot.append(ch_before)
-            before_web.append(w_before)
-
-        # ------------------------------------------------------------------
-        # 9) Reportes de comparación: callcenter, total, chatbot, web
-        # ------------------------------------------------------------------
-        reporte_callcenter = {
-            "labels": labels_cmp,
-            "datasets": [
-                {
-                    "label": label_rango_antes,  # p. ej. "03/ene - 08/feb"
-                    "backgroundColor": "#00000050",
-                    "borderColor": "#000",
-                    "borderDash": [5, 5],
-                    "data": before_callcenter,
-                    "tension": 0.4
-                },
-                {
-                    "label": label_rango_ahora,  # p. ej. "10/ene - 15/feb"
-                    "backgroundColor": "#ffa5b550",
-                    "borderColor": "#ffa5b5",
-                    "data": now_callcenter,
-                    "fill": True,
-                    "tension": 0.4
-                }
-            ]
-        }
-
-        reporte_total = {
-            "labels": labels_cmp,
-            "datasets": [
-                {
-                    "label": label_rango_antes,
-                    "backgroundColor": "#00000050",
-                    "borderColor": "#000",
-                    "borderDash": [5, 5],
-                    "data": before_total,
-                    "tension": 0.4
-                },
-                {
-                    "label": label_rango_ahora,
-                    "backgroundColor": "#4bc0c050",
-                    "borderColor": "#4bc0c0",
-                    "data": now_total,
-                    "fill": True,
-                    "tension": 0.4
-                },
-            ]
-        }
-
-        reporte_chatbot = {
-            "labels": labels_cmp,
-            "datasets": [
-                {
-                    "label": label_rango_antes,
-                    "backgroundColor": "#00000050",
-                    "borderColor": "#000",
-                    "borderDash": [5, 5],
-                    "data": before_chatbot,
-                    "tension": 0.4
-                },
-                {
-                    "label": label_rango_ahora,
-                    "backgroundColor": "#36a2eb50",
-                    "borderColor": "#36a2eb",
-                    "data": now_chatbot,
-                    "fill": True,
-                    "tension": 0.4
-                },
-            ]
-        }
-
-        reporte_web = {
-            "labels": labels_cmp,
-            "datasets": [
-                {
-                    "label": label_rango_antes,
-                    "backgroundColor": "#00000050",
-                    "borderDash": [5, 5],
-                    "borderColor": "#000",
-                    "data": before_web,
-                    "tension": 0.4
-                },
-                {
-                    "label": label_rango_ahora,
-                    "backgroundColor": "#ffce5650",
-                    "borderColor": "#ffce56",
-                    "fill": True,
-                    "data": now_web,
-                    "tension": 0.4
-                },
-            ]
-        }
-
-        # ------------------------------------------------------------------
-        # 10) Armamos el resultado final
-        # ------------------------------------------------------------------
-        result_data = {
-            "reporte_basico": reporte_basico,
-            "reporte_callcenter": reporte_callcenter,
-            "reporte_total": reporte_total,
-            "reporte_chatbot": reporte_chatbot,
-            "reporte_web": reporte_web
-        }
-
-        # ------------------------------------------------------------------
-        # 11) GUARDAR EN EL CACHÉ Y RETORNAR
-        # ------------------------------------------------------------------
-        cache_data[cache_key] = result_data
-        with open(cache_file, "w", encoding="utf-8") as f:
-            # `default=str` para evitar error con objetos datetime, etc.
-            json.dump(cache_data, f, ensure_ascii=False, default=str)
-
-        return result_data
+            return final_report

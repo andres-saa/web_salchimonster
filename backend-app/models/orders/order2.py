@@ -102,6 +102,8 @@ class Order2:
 
     def create_order_entry(self, user_id, order_data):
         # Crear el JSON inicial sin "delivery_codigointegracion"
+
+        pe_json_payment_id = 1 if order_data.payment_method_id == 8 else 2
         pe_json = {
             "delivery": {
                 "local_id": order_data.pe_site_id,
@@ -112,7 +114,8 @@ class Order2:
                 "delivery_pagocon": order_data.total + order_data.delivery_price,
                 "delivery_codigointegracion": None,
                 "delivery_codigolimadelivery":None,
-                "canaldelivery_id":500
+                "canaldelivery_id":500,
+                "delivery_tipopago":pe_json_payment_id,
             },
             
             "cliente": {

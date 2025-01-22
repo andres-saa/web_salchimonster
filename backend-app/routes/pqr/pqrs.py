@@ -159,6 +159,18 @@ def get_pqrs_by_date_range(data:report):
 
 
 
+@pqr_router.post("/transactio_report/", tags=["pqr"])
+def get_pqrs_by_date_range(data:report):
+    """
+    Obtiene las PQRs cuyo estado actual esté entre las fechas proporcionadas.
+    :param fecha_inicio: Fecha de inicio (formato: YYYY-MM-DD)
+    :param fecha_fin: Fecha de fin (formato: YYYY-MM-DD)
+    :return: Lista de PQRs agrupadas por sede y estados en JSON.
+    """
+    pqr_instance = Pqrs()
+    result = pqr_instance.get_orders_by_site_and_responsible_transfer(data.sites,data.start_date, data.end_date )
+    return result
+
 @pqr_router.get("/get-all-pqr-channel",tags=["pqr"])
 def create_pqrs():
     pqr_instance = Pqrs()
