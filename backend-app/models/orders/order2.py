@@ -103,7 +103,9 @@ class Order2:
     def create_order_entry(self, user_id, order_data):
         # Crear el JSON inicial sin "delivery_codigointegracion"
 
-        pe_json_payment_id = 1 if order_data.payment_method_id == 8 else 2
+        valid_payment_ids = {7, 8}
+        pe_json_payment_id = 1 if order_data.payment_method_id in valid_payment_ids else 2
+
         pe_json = {
             "delivery": {
                 "local_id": order_data.pe_site_id,
