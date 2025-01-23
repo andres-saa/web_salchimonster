@@ -396,9 +396,16 @@
 
           <Button  size="small" style="border-radius: 0.3rem;width: 100%;" @click="cancelDialogVisibleAdmin = true" severity="danger"
           label="CANCELAR "></Button>  
+
+
+  
       </div>
 
 
+      <div class="mt-3">
+        <Button       @click="changePaymentDialog = true"
+        label="Cambiar metodo de pago" severity="success"></Button>
+      </div>
 
     </template>
 
@@ -411,6 +418,39 @@
   </Dialog>
 
   </div>
+  
+
+  <Dialog v-model:visible="changePaymentDialog" closeOnEscape :closable="true" modal style="width: 30rem;">
+  <template #header>
+    <h3><b>Cambiar Método de Pago</b></h3>
+  </template>
+  <form @submit.prevent="submitChangePayment" style="display: flex; gap: 1rem; flex-direction: column; align-items: start">
+    <span for="paymentMethod">Método de Pago actual</span>
+
+    <Tag class="px-4" severity="warning">
+      <span for="paymentMethod"> <b>{{ store.currentOrder.payment_method }}</b></span>
+
+    </Tag>
+
+    <span for="paymentMethod">Nuevo método de Pago</span>
+    <Dropdown
+      style="width: 100%;"
+      id="paymentMethod"
+      v-model="newPaymentMethod"
+      :options="paymentMethods"
+      optionLabel="name"
+      optionValue="id"
+      placeholder="Selecciona un método de pago"
+      required
+    ></Dropdown>
+    <Button
+      style="width: 100%; border-radius: 0.5rem"
+      label="Cambiar"
+      type="submit"
+      class="p-button-help"
+    />
+  </form>
+</Dialog>
 
 </template>
 
@@ -419,14 +459,62 @@ import { formatoPesosColombianos } from '../../service/formatoPesos';
 import { onMounted,computed, ref } from 'vue'
 import { useOrderStore } from '../../store/order'
 import { orderService } from '../../service/orderService';
+import {fetchService} from '../../service/utils/fetchService'
 import printJS from 'print-js';
-
+import { URI } from '../../service/conection';
 const cancelDialogVisibleAdmin = ref(false)
 const store = useOrderStore()
 
 
+const submitChangePayment = async () => {
+  if (newPaymentMethod.value) {
+    try {
+      await fetchService.put(
+        `${URI}/change-method/${store.currentOrder.order_id}/${newPaymentMethod.value}`,
+        
+        `Cambiando método de pago para la orden ${store.currentOrder.order_id}`
+      )
 
-      
+      // Opcional: Actualizar los datos de la orden si es necesario
+      // await store.fetchCurrentOrder()
+
+      // Cerrar el diálogo
+      changePaymentDialog.value = false
+      store.visibles.currentOrder= false
+      store.getTodayOrders()
+      // Opcional: Mostrar una notificación de éxito
+      console.log('Método de pago cambiado exitosamente')
+    } catch (error) {
+      console.error('Error al cambiar el método de pago:', error)
+      // Opcional: Mostrar una notificación de error
+    }
+  }
+}
+
+
+
+
+const travelDialog = ref(false);
+
+const changePaymentDialog = ref(false)
+
+// Variable para almacenar el nuevo método de pago seleccionado
+const newPaymentMethod = ref(null)
+
+// Variable para almacenar los métodos de pago obtenidos del backend
+const paymentMethods = ref([])
+
+
+
+onMounted(async () => {
+  try {
+    const response = await fetchService.get(`${URI}/payment_methods`)
+    paymentMethods.value = response // Asegúrate de ajustar según la estructura de la respuesta
+  } catch (error) {
+    console.error('Error al obtener métodos de pago:', error)
+    // Opcional: Manejar errores, mostrar notificaciones, etc.
+  }})
+
 
 const sendRequest = async() => {
   const data = {
