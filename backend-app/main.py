@@ -58,6 +58,7 @@ from routes.cachier_money.cachier_money import cachier_money_router
 from routes.Franquicias.franquicias import franquis_router
 from routes.integracion.products import integration_router
 from routes.Users.Users import user_router as customer
+from routes.neigborhoods.neigborhoods import neiborhoods_route
 app = FastAPI()
 # from routes.area import area_router
 app.add_middleware(
@@ -68,7 +69,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+app.include_router(neiborhoods_route)
 app.include_router(customer)
 app.include_router(cachier_money_router)
 app.include_router(integration_router)

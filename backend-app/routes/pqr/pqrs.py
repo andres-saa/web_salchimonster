@@ -159,7 +159,7 @@ def get_pqrs_by_date_range(data:report):
 
 
 
-@pqr_router.post("/transactio_report/", tags=["pqr"])
+@pqr_router.post("/transaction_report/", tags=["pqr"])
 def get_pqrs_by_date_range(data:report):
     """
     Obtiene las PQRs cuyo estado actual esté entre las fechas proporcionadas.

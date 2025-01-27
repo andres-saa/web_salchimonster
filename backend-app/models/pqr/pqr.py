@@ -951,15 +951,6 @@ class Pqrs:
 
 
 
-
-
-
-
-
-
-
-
-
     def get_daily_sales_report(self, site_ids: list, start_date: str, end_date: str):
         """
         Obtiene las ventas diarias por canal (web, chatbot, callcenter) en un rango de fechas,
