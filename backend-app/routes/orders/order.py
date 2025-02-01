@@ -208,6 +208,26 @@ def get_all_cancellation_request():
     order_instance.close_connection()
     return result
 
+
+class CancellationSummaryBody(BaseModel):
+    site_ids: List[int]
+    start_date: str
+    end_date: str
+
+@order_router.post('/get_all_cancellation_request_summary')
+def get_all_cancellation_request(body: CancellationSummaryBody):
+    order_instance = Order2()
+    result = order_instance.get_cancellations_summary(
+        site_ids=body.site_ids,
+        start_date=body.start_date,
+        end_date=body.end_date
+    )
+    order_instance.close_connection()
+    return result
+
+
+
+
 @order_router.get('/get_all_cancellation_request_acepted')
 def get_all_cancellation_request():
     order_instance = Order2()

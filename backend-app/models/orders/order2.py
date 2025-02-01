@@ -14,6 +14,7 @@ from datetime import datetime, time
 from config.wsp import enviar_mensaje_whatsapp
 import pytz
 from psycopg2.extras import Json
+from dateutil import parser  # Asegúrate de tener python-dateutil instalado
 
 import random
 import requests
@@ -101,11 +102,35 @@ class Order2:
 
 
     def create_order_entry(self, user_id, order_data):
-        # Crear el JSON inicial sin "delivery_codigointegracion"
-
+        # Determina si es pago en efectivo (IDs de pago válidos)
         valid_payment_ids = {7, 8}
         pe_json_payment_id = 1 if order_data.payment_method_id in valid_payment_ids else 2
 
+        # Función interna para calcular el total
+        def calculate_total(pe_json_list, delivery_price):
+            total = 0
+            for item in pe_json_list:
+                precio = int(float(item["pedido_precio"]))
+                cantidad = int(item["pedido_cantidad"])
+                item_subtotal = precio * cantidad
+
+                # Suma de modificadores (si existen)
+                if "modificadorseleccionList" in item and item["modificadorseleccionList"]:
+                    for mod in item["modificadorseleccionList"]:
+                        mod_precio = int(float(mod["pedido_precio"]))
+                        mod_cantidad = int(mod["modificadorseleccion_cantidad"])
+                        item_subtotal += mod_precio * mod_cantidad
+
+                total += item_subtotal
+
+            # Suma el costo de domicilio
+            total += int(delivery_price)
+            return total
+
+        # Calcula el total (si deseas usarlo luego para validaciones, etc.)
+        calculated_total = calculate_total(order_data.pe_json, order_data.delivery_price)
+
+        # Estructura base del JSON (sin aún el 'delivery_codigointegracion')
         pe_json = {
             "delivery": {
                 "local_id": order_data.pe_site_id,
@@ -115,63 +140,88 @@ class Order2:
                 "delivery_horaentrega": "2020-12-06 10:00:00",
                 "delivery_pagocon": order_data.total + order_data.delivery_price,
                 "delivery_codigointegracion": None,
-                "delivery_codigolimadelivery":None,
-                "canaldelivery_id":500,
-                "delivery_tipopago":pe_json_payment_id,
+                "delivery_codigolimadelivery": None,
+                "canaldelivery_id": 500,
+                "delivery_tipopago": pe_json_payment_id
             },
-            
             "cliente": {
                 "cliente_nombres": order_data.user_data.user_name,
-                "cliente_apellidos": '.',
+                "cliente_apellidos": ".",
                 "cliente_direccion": order_data.user_data.user_address,
                 "cliente_telefono": order_data.user_data.user_phone
             },
             "listaPedidos": order_data.pe_json
         }
 
-        
-        if order_data.payment_method_id == 6:
+        # Define la consulta de inserción y sus argumentos según la forma de pago
+        if order_data.payment_method_id == 6:  # (payment_method_id == 6)
             order_insert_query = """
-            INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized, inserted_by_id, pe_json)
-            VALUES (%s, %s, %s, false, %s, %s) RETURNING id;
+                INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized, inserted_by_id, pe_json)
+                VALUES (%s, %s, %s, false, %s, %s)
+                RETURNING id;
             """
+            query_args = (user_id, order_data.site_id, 4, order_data.inserted_by, Json(pe_json))
         else:
             order_insert_query = """
-            INSERT INTO orders.orders (user_id, site_id, delivery_person_id, inserted_by_id, pe_json)
-            VALUES (%s, %s, %s, %s, %s) RETURNING id;
+                INSERT INTO orders.orders (user_id, site_id, delivery_person_id, inserted_by_id, pe_json)
+                VALUES (%s, %s, %s, %s, %s)
+                RETURNING id;
             """
+            query_args = (user_id, order_data.site_id, 4, order_data.inserted_by, Json(pe_json))
 
-        self.cursor.execute(order_insert_query, (
-            user_id,
-            order_data.site_id,
-            4,  # delivery_person_id
-            order_data.inserted_by,
-            Json(pe_json)
-        ))
+        # Ejecuta la inserción
+        self.cursor.execute(order_insert_query, query_args)
         result = self.cursor.fetchone()
         if result is None:
             raise ValueError("La orden no pudo ser creada.")
-        order_id = result[0]
+        order_id = result[0]  # Asigna correctamente el scope de la variable
 
-        # Actualizar "delivery_codigointegracion" en el JSON
+        # Actualiza los campos 'delivery_codigointegracion' y 'delivery_codigolimadelivery' en pe_json
         pe_json["delivery"]["delivery_codigointegracion"] = order_id
         pe_json["delivery"]["delivery_codigolimadelivery"] = order_id
 
-        # Actualizar el registro en la base de datos con el JSON actualizado
+        # Actualiza el registro de la base de datos
         update_query = """
-        UPDATE orders.orders
-        SET pe_json = %s
-        WHERE id = %s;
+            UPDATE orders.orders
+            SET pe_json = %s
+            WHERE id = %s;
         """
         self.cursor.execute(update_query, (Json(pe_json), order_id))
 
-        # Crear o actualizar el evento
-        if order_data.payment_method_id == 6:
-            self.create_or_update_event(3, 12, 1132, '3 minutes', False)
+        # Recupera el JSON actualizado de la orden
+        select_order_query = """
+            SELECT pe_json
+            FROM orders.orders
+            WHERE id = %s;
+        """
+        self.cursor.execute(select_order_query, (order_id,))
+        order_json = self.cursor.fetchone()
+
+        if not order_json:
+            raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
+
+        # Ajusta cantidades en la lista de pedidos
+        pedidos = order_json[0]["listaPedidos"]
+        order_json[0]["listaPedidos"] = self.ajustar_cantidades(pedidos)
+
+        # Registra el delivery con la lista de pedidos ajustada
+        delivery_response = self.registrar_delivery(order_json[0])
+
+        # Mensajes de depuración
+        print(delivery_response.get("listaPedidos", "No se encontró listaPedidos en response"))
+        if isinstance(delivery_response, dict):
+            print("Delivery enviado con éxito:", delivery_response)
         else:
-            self.create_or_update_event(1, order_data.site_id, 1132, '3 minutes', False)
+            print("Error al enviar el delivery:", delivery_response)
+
+        # Crea o actualiza un evento según la forma de pago
+        if order_data.payment_method_id == 6:
+            self.create_or_update_event(3, 12, 1132, "3 minutes", False)
+        else:
+            self.create_or_update_event(1, order_data.site_id, 1132, "3 minutes", False)
 
         return order_id
+
 
     
     def create_or_update_event(self, event_type_id, site_id, employee_id, update_interval, solved=False):
@@ -267,7 +317,252 @@ class Order2:
         self.cursor.execute(order_notes_insert_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
-    
+        
+
+
+    def get_cancellations_summary(self, site_ids, start_date, end_date):
+        """
+        Retorna un reporte de cuántas cancelaciones ocurrieron en cada sede y en cada
+        categoría de cancelación, filtrando por fecha y sedes. Devuelve 0 si no hubo
+        registros para esa categoría/esa sede.
+        Además, incluye reportes para gráficas:
+        - Total de cancelaciones por categoría.
+        - Cancelaciones a lo largo de los días por categoría.
+        La estructura de los reportes gráficos sigue el formato especificado por el usuario.
+        """
+        
+        # ----------------------------------------------------------------
+        # 1) Parsear las fechas usando dateutil.parser
+        # ----------------------------------------------------------------
+        try:
+            # `parser.parse` maneja múltiples formatos de fecha
+            start_date_dt = parser.parse(start_date).date()
+            end_date_dt = parser.parse(end_date).date()
+        except ValueError as e:
+            raise ValueError(f"Error al parsear las fechas: {e}")
+        
+        # Formatear como "YYYY-MM-DD" para la consulta SQL
+        start_date_str = start_date_dt.strftime("%Y-%m-%d")
+        end_date_str = end_date_dt.strftime("%Y-%m-%d")
+
+        # ----------------------------------------------------------------
+        # 2) Obtener todas las sedes para asegurar que aparezcan también si tienen 0 cancelaciones
+        # ----------------------------------------------------------------
+        query_all_sites = """
+            SELECT DISTINCT site_name, site_id
+            FROM orders.cancellation_request_complete
+            WHERE site_id = ANY(%s)
+        """
+        self.cursor.execute(query_all_sites, (site_ids,))
+        sites_rows = self.cursor.fetchall()
+        
+        # Diccionario auxiliar: { site_id: site_name }
+        site_dict = {row[1]: row[0] for row in sites_rows}
+
+        # ----------------------------------------------------------------
+        # 3) Obtener la lista de TODAS las categorías posibles
+        # ----------------------------------------------------------------
+        query_categories = """
+            SELECT DISTINCT cancellation_categorie
+            FROM orders.cancellation_request_complete
+            WHERE cancellation_categorie IS NOT NULL
+            ORDER BY cancellation_categorie
+        """
+        self.cursor.execute(query_categories)
+        categories_rows = self.cursor.fetchall()
+        all_categories = [row[0] for row in categories_rows]  # Lista con nombres de categoría
+
+        # ----------------------------------------------------------------
+        # 4) Contar cancelaciones por sede y categoría, filtrando fechas
+        # ----------------------------------------------------------------
+        query_counts = """
+            SELECT
+                site_id,
+                cancellation_categorie,
+                COUNT(*) AS total
+            FROM
+                orders.cancellation_request_complete
+            WHERE
+                site_id = ANY(%s)
+                AND "timestamp" BETWEEN %s AND %s
+            GROUP BY site_id, cancellation_categorie
+            ORDER BY site_id
+        """
+        self.cursor.execute(query_counts, (site_ids, start_date_str, end_date_str))
+        rows = self.cursor.fetchall()
+        # rows tendrá tuplas del estilo: (site_id, 'POR DEMORA', 10)
+
+        # Estructura auxiliar:
+        # {
+        #    site_id: {
+        #       'POR DEMORA': 10,
+        #       'NO HABIA PRODUCTO': 3,
+        #       ...
+        #    },
+        #    ...
+        # }
+        data_dict = {}
+
+        for site_id_db, cat, total in rows:
+            if site_id_db not in data_dict:
+                data_dict[site_id_db] = {}
+            data_dict[site_id_db][cat] = total
+
+        # ----------------------------------------------------------------
+        # 5) Construir el resumen final
+        # ----------------------------------------------------------------
+        # Queremos un arreglo de diccionarios con el formato:
+        # [
+        #   {
+        #       'site': site_name,
+        #       'POR DEMORA': 10,
+        #       'NO HABIA PRODUCTO': 3,
+        #       ...
+        #   },
+        #   ...
+        # ]
+        summary_result = []
+
+        # Para cada sede solicitada, si no está en 'data_dict', igual la agregamos con todas las categorías en 0
+        for s_id in site_ids:
+            # Tomamos el nombre del diccionario site_dict si existe. Si la sede no aparece en site_dict, por ejemplo no existe en la vista, podríamos poner un valor por defecto "DESCONOCIDA".
+            site_name = site_dict.get(s_id, f"Site {s_id} (Sin registros)")
+
+            # Construimos un dict base
+            site_entry = {'site': site_name}
+
+            # Para cada categoría global, si no existe en la sede, 0
+            for cat in all_categories:
+                count_cat = data_dict.get(s_id, {}).get(cat, 0)
+                site_entry[cat] = count_cat
+
+            summary_result.append(site_entry)
+
+        # ----------------------------------------------------------------
+        # 6) Generar Datos para la Gráfica de Categorías Totales
+        # ----------------------------------------------------------------
+        # Sumamos las cancelaciones por categoría para todas las sedes
+        category_totals = {cat: 0 for cat in all_categories}
+        for site_data in data_dict.values():
+            for cat, total in site_data.items():
+                if cat in category_totals:
+                    category_totals[cat] += total
+                else:
+                    category_totals[cat] = total  # En caso de nuevas categorías
+
+        # Preparar los datos para el gráfico de categorías totales
+        labels_graph_total = list(category_totals.keys())
+        data_graph_total = list(category_totals.values())
+
+        # Definir colores para las categorías (opcional)
+        # Puedes personalizar estos colores según tus preferencias
+        colors = [
+            "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0",
+            "#9966FF", "#FF9F40", "#E7E9ED", "#76A346",
+            "#FF5733", "#C70039", "#900C3F", "#581845"
+        ]
+
+        # Asignar un color a cada categoría
+        background_colors_total = colors[:len(labels_graph_total)] if len(labels_graph_total) <= len(colors) else colors * (len(labels_graph_total) // len(colors) + 1)
+        background_colors_total = background_colors_total[:len(labels_graph_total)]
+
+        datasets_graph_total = []
+        for idx, cat in enumerate(labels_graph_total):
+            datasets_graph_total.append({
+                "label": cat,
+                "backgroundColor": background_colors_total[idx],
+                "borderColor": background_colors_total[idx],
+                "data": [category_totals[cat]],
+                "tension": 0.4
+            })
+
+        graph_report_total = {
+            "labels": labels_graph_total,
+            "datasets": datasets_graph_total
+        }
+
+        # ----------------------------------------------------------------
+        # 7) Generar Datos para la Gráfica Temporal por Categoría
+        # ----------------------------------------------------------------
+        # Queremos una gráfica que muestre las cancelaciones diarias por categoría
+
+        # Primero, obtener todas las fechas en el rango
+        delta = end_date_dt - start_date_dt
+        all_dates = [(start_date_dt + timedelta(days=i)) for i in range(delta.days + 1)]
+        labels_graph_daily = [date.strftime("%a %d-%b").lower() for date in all_dates]
+        # Ajustar etiquetas a formato similar al proporcionado, e.g., "mar 21-ene"
+
+        # Consulta para obtener cancelaciones diarias por categoría
+        query_daily = """
+            SELECT
+                ("timestamp"::date) AS cancel_date,
+                cancellation_categorie,
+                COUNT(*) AS total
+            FROM
+                orders.cancellation_request_complete
+            WHERE
+                site_id = ANY(%s)
+                AND "timestamp" BETWEEN %s AND %s
+                AND cancellation_categorie IS NOT NULL
+            GROUP BY
+                cancel_date,
+                cancellation_categorie
+            ORDER BY
+                cancel_date
+        """
+        self.cursor.execute(query_daily, (site_ids, start_date_str, end_date_str))
+        daily_rows = self.cursor.fetchall()
+        # daily_rows tendrá tuplas del estilo: ('2023-01-10', 'POR DEMORA', 2)
+
+        # Estructura auxiliar:
+        # {
+        #    'POR DEMORA': { '2023-01-10': 2, '2023-01-11': 0, ... },
+        #    'NO HABIA PRODUCTO': { '2023-01-10': 1, '2023-01-11': 3, ... },
+        #    ...
+        # }
+        daily_data_dict = {cat: {date.strftime("%Y-%m-%d"): 0 for date in all_dates} for cat in all_categories}
+
+        for cancel_date, cat, total in daily_rows:
+            date_str = cancel_date.strftime("%Y-%m-%d")
+            if cat in daily_data_dict:
+                daily_data_dict[cat][date_str] += total
+            else:
+                # En caso de que haya categorías no previstas
+                daily_data_dict[cat] = {date_str: total}
+
+        # Preparar datasets para cada categoría
+        datasets_graph_daily = []
+        for idx, cat in enumerate(all_categories):
+            data_per_day = [daily_data_dict[cat][date.strftime("%Y-%m-%d")] for date in all_dates]
+            
+            # Asignar colores (puedes usar la misma paleta que antes o una diferente)
+            color = colors[idx % len(colors)] if idx < len(colors) else "#000000"
+            
+            datasets_graph_daily.append({
+                "label": cat,
+                "backgroundColor": color,
+                "borderColor": color,
+                "data": data_per_day,
+                "tension": 0.4
+            })
+
+        graph_report_daily = {
+            "labels": labels_graph_daily,
+            "datasets": datasets_graph_daily
+        }
+
+        # ----------------------------------------------------------------
+        # 8) Agregar los Reportes de Gráfica al Resultado Final
+        # ----------------------------------------------------------------
+        result_with_graph = {
+            "summary": summary_result,
+            "graph_total_categories": graph_report_total,
+            "graph_daily_categories": graph_report_daily
+        }
+
+        return result_with_graph
+
+
 
     def get_all_cancellation_request_categories(self, ):
         order_notes_insert_query = """
@@ -1001,11 +1296,29 @@ class Order2:
         affected_rows = self.cursor.rowcount  # Número de filas afectadas
         self.conn.commit()
         return affected_rows
-        
-        
     
+    def ajustar_cantidades(self, lista_pedidos):
+        """
+        Ajusta la cantidad de cada 'modificadorseleccion_cantidad'
+        dividiéndola entre 'pedido_cantidad' del producto padre.
+        """
+        for pedido in lista_pedidos:
+            cantidad_producto = pedido.get("pedido_cantidad", 1)
+
+            if "modificadorseleccionList" in pedido:
+                for mod_item in pedido["modificadorseleccionList"]:
+                    # Cantidad original del modificador
+                    cantidad_modificador = mod_item.get("modificadorseleccion_cantidad", 1)
+                    
+                    # Dividir entre la cantidad del producto (división entera)
+                    mod_item["modificadorseleccion_cantidad"] = cantidad_modificador // cantidad_producto
+
+        return lista_pedidos
+            
+
     def prepare_order(self, order_id):
-    # Prepara la orden
+
+        # Prepara la orden
         prepare_query = """
         INSERT INTO orders.order_status (order_id, status, timestamp)
         VALUES (%s, 'en preparacion', CURRENT_TIMESTAMP);
@@ -1019,6 +1332,7 @@ class Order2:
         """
         self.cursor.execute(history_query, (order_id,))
 
+        # Recupera el site_id asociado a la orden
         get_site_id_query = """
         SELECT site_id FROM orders.orders
         WHERE id = %s;
@@ -1027,32 +1341,13 @@ class Order2:
         site_id_result = self.cursor.fetchone()
         site_id = site_id_result[0]
 
+        # Marca eventos como resueltos según site_id
         self.mark_events_as_solved_by_site_id(site_id)
         
-         # Selecciona el JSON de la orden
-        select_order_query = """
-        SELECT pe_json
-        FROM orders.orders
-        WHERE id = %s;
-        """
-        self.cursor.execute(select_order_query, (order_id,))
-        order_json = self.cursor.fetchone()
-
-        if not order_json:
-            raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
-
- 
-        delivery_response = self.registrar_delivery(order_json[0])
-
-        print(delivery_response)
-        if isinstance(delivery_response, dict):
-            print("Delivery enviado con éxito:", delivery_response)
-        else:
-            print("Error al enviar el delivery:", delivery_response)
-
-
-
+        
         self.conn.commit()
+
+
 
     def cancel_order(self, order_id, responsible, reason):
         # Cancela la orden
@@ -1121,37 +1416,66 @@ class Order2:
     def registrar_delivery(self, data):
         """
         Realiza una solicitud POST para registrar un delivery.
-
-        Args:
-            dominio_id (int): ID del dominio.
-            local_id (int): ID del local.
-            data (dict): Datos a enviar en el cuerpo de la solicitud.
-
-        Returns:
-            dict: La respuesta del servidor si es exitosa.
-            str: Mensaje de error si ocurre algún problema.
+        Antes de enviar la data, se hace un preprocesamiento 
+        para que cada producto incluya en `pedido_precio` la 
+        suma de su precio base + los modificadores.
         """
-        # Construcción de la URL con los parámetros
-        url = f"https://api.restaurant.pe/restaurant/public/v2/rest/delivery/registrarDelivery/6149"
 
-        # Encabezados
+        # 1. Preprocesar la data (pe_json) para ajustar los precios de cada producto
+        def preprocess_pe_json(data):
+            lista_pedidos = data.get("listaPedidos", [])
+
+            for item in lista_pedidos:
+                # Tomamos el precio base del campo `pedido_base_price` si existe, 
+                # en caso contrario usamos el `pedido_precio` como base
+                if "pedido_base_price" in item:
+                    base_price = int(float(item["pedido_base_price"]))
+                else:
+                    base_price = int(float(item["pedido_precio"]))
+
+                # Sumamos los precios de los modificadores
+                modifiers_sum = 0
+                if "modificadorseleccionList" in item and item["modificadorseleccionList"]:
+                    for mod in item["modificadorseleccionList"]:
+                        mod_price = int(float(mod["pedido_precio"]))
+                        mod_qty = int(mod.get("modificadorseleccion_cantidad", 1))
+                        modifiers_sum += (mod_price * mod_qty)
+
+                # Ajustamos el `pedido_precio` al nuevo valor (base + modificadores)
+                final_price = base_price + modifiers_sum
+                # Puedes guardarlo como entero o como string; revisa qué exige tu endpoint
+                item["pedido_precio"] = final_price  # o str(final_price)
+
+            return data
+
+        # 2. Llamamos a la función que hace la suma y modifica `pedido_precio`
+        preprocessed_data = preprocess_pe_json(data)
+
+        # 3. Construimos la URL para el POST
+        url = "https://api.restaurant.pe/restaurant/public/v2/rest/delivery/registrarDelivery/6149"
+
+        # 4. Configuramos los headers
         headers = {
             "Authorization": f'Token token="{TOKEN}"',
             "Content-Type": "application/json"
         }
 
         try:
-            # Enviar la solicitud POST
-            response = requests.post(url, headers=headers, json=data)
+            # 5. Enviamos la solicitud POST con la data ya preprocesada
+            response = requests.post(url, headers=headers, json=preprocessed_data)
 
-            # Manejo de la respuesta
+            # 6. Manejo de la respuesta
             if response.status_code == 200:
-                print(response.json)
+                # Retorna el JSON de la respuesta si es exitoso
                 return response.json()
             else:
+                # Manejamos error con status_code
                 return f"Error {response.status_code}: {response.text}"
+
         except Exception as e:
+            # Manejamos excepciones (errores de conexión, timeouts, etc.)
             return f"Excepción durante la solicitud: {str(e)}"
+
 
 
     def authorize_order(self, order_id, responsible_id):
@@ -1192,6 +1516,43 @@ class Order2:
             site_id = site_id_result[0]
             self.create_or_update_event(1, site_id, 1132, '1 minute', False)
             self.conn.commit()
+
+
+
+
+
+                # Selecciona el JSON de la orden
+            select_order_query = """
+            SELECT pe_json
+            FROM orders.orders
+            WHERE id = %s;
+            """
+            self.cursor.execute(select_order_query, (order_id,))
+            order_json = self.cursor.fetchone()
+
+            if not order_json:
+                raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
+            
+            # order_json[0] debería ser el diccionario que contiene la información de la orden
+            pedidos = order_json[0]['listaPedidos']  # Asegúrate de que esté en esta estructura
+
+            # Ajusta las cantidades en listaPedidos
+            order_json[0]['listaPedidos'] = self.ajustar_cantidades(pedidos)
+
+            # Registra el delivery con la lista de pedidos ajustada
+            delivery_response = self.registrar_delivery(order_json[0])
+
+            # Opcional: Muestra la lista de pedidos resultante o el response para depuración
+            print(delivery_response.get('listaPedidos', 'No se encontró listaPedidos en response'))
+            
+            if isinstance(delivery_response, dict):
+                print("Delivery enviado con éxito:", delivery_response)
+            else:
+                print("Error al enviar el delivery:", delivery_response)
+
+
+
+
 
             return {"order_id": order_id, "message": "Order authorized successfully"}
         except Exception as e:
