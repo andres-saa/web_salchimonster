@@ -130,7 +130,7 @@ class Order2:
         # Calcula el total (si deseas usarlo luego para validaciones, etc.)
         calculated_total = calculate_total(order_data.pe_json, order_data.delivery_price)
 
-        # Estructura base del JSON (sin aún el 'delivery_codigointegracion')
+        # Estructura base del JSON
         pe_json = {
             "delivery": {
                 "local_id": order_data.pe_site_id,
@@ -174,7 +174,7 @@ class Order2:
         result = self.cursor.fetchone()
         if result is None:
             raise ValueError("La orden no pudo ser creada.")
-        order_id = result[0]  # Asigna correctamente el scope de la variable
+        order_id = result[0]
 
         # Actualiza los campos 'delivery_codigointegracion' y 'delivery_codigolimadelivery' en pe_json
         pe_json["delivery"]["delivery_codigointegracion"] = order_id
@@ -188,6 +188,12 @@ class Order2:
         """
         self.cursor.execute(update_query, (Json(pe_json), order_id))
 
+        # Si el método de pago es 6, hacemos el evento y retornamos de inmediato (NO registrar_delivery)
+        if order_data.payment_method_id == 6:
+            self.create_or_update_event(3, 12, 1132, "3 minutes", False)
+            return order_id
+
+        # En caso contrario (forma de pago distinta a 6), sí registramos el delivery
         # Recupera el JSON actualizado de la orden
         select_order_query = """
             SELECT pe_json
@@ -215,10 +221,7 @@ class Order2:
             print("Error al enviar el delivery:", delivery_response)
 
         # Crea o actualiza un evento según la forma de pago
-        if order_data.payment_method_id == 6:
-            self.create_or_update_event(3, 12, 1132, "3 minutes", False)
-        else:
-            self.create_or_update_event(1, order_data.site_id, 1132, "3 minutes", False)
+        self.create_or_update_event(1, order_data.site_id, 1132, "3 minutes", False)
 
         return order_id
 
