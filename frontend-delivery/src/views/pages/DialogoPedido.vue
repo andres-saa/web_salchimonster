@@ -134,7 +134,7 @@
             <div style="display: grid; grid-template-columns: auto auto;">
              
               <p class="p-0 m-0">
-                {{ product.pedido_cantidad }}
+            (    {{ product.pedido_cantidad }} )
                 {{ product.pedido_nombre_producto }}
                 <br>
               </p>
@@ -150,14 +150,14 @@
             <div >
               <p style="text-align: end;color: black;">
                 <!-- {{ formatoPesosColombianos(product.price) }} -->
-                {{ formatoPesosColombianos(product.pedido_precio * product.pedido_cantidad) }}
+                {{ formatoPesosColombianos(product.pedido_base_price * product.pedido_cantidad) }}
               </p>
             </div>
 
 
             </div>
 
-            <p v-if="product.lista_productocombo" class="p-0 m-0"><b>COMBO INCLUYE</b></p>
+            <p v-if="product.lista_productocombo.length > 0" class="p-0 m-0"><b>COMBO INCLUYE</b></p>
             <p v-if="product.lista_productocombo" class="p-0 m-0 ml-5" style="" v-for="i in product.lista_productocombo" > -- <b>{{i.pedido_cantidad  }}</b>  {{i.pedido_nombre  }} </p> 
 
 
@@ -169,9 +169,9 @@
      
               <div style="display: flex;width: ; justify-content: space-between;" class="p-0 m-0" v-for="i in  product.modificadorseleccionList?.filter(p => p.pedido_productoid == product.pedido_productoid)">
          
-                <p class="p-0 m-0 ml-5" style="">
+                <p class="p-0 m-0 " style="">
        
-                  -- <b>{{ i.modificadorseleccion_cantidad }}</b> {{ i.modificador_nombre }}
+                  - ( {{ product.pedido_cantidad }} ) <b>{{ i.modificadorseleccion_cantidad / product.pedido_cantidad }}</b> {{ i.modificador_nombre }}
                 </p>
 
                 <p class="p-0 m-0" style="text-align: end;"> {{ formatoPesosColombianos(i.pedido_precio * i.modificadorseleccion_cantidad)  }} </p>
