@@ -210,18 +210,18 @@ class Order2:
         pedidos = order_json[0]["listaPedidos"]
         order_json[0]["listaPedidos"] = self.ajustar_cantidades(pedidos)
 
-        # # Registra el delivery con la lista de pedidos ajustada
-        # delivery_response = self.registrar_delivery(order_json[0])
+        # Registra el delivery con la lista de pedidos ajustada
+        delivery_response = self.registrar_delivery(order_json[0])
 
-        # # Mensajes de depuración
-        # print(delivery_response.get("listaPedidos", "No se encontró listaPedidos en response"))
-        # if isinstance(delivery_response, dict):
-        #     print("Delivery enviado con éxito:", delivery_response)
-        # else:
-        #     print("Error al enviar el delivery:", delivery_response)
+        # Mensajes de depuración
+        print(delivery_response.get("listaPedidos", "No se encontró listaPedidos en response"))
+        if isinstance(delivery_response, dict):
+            print("Delivery enviado con éxito:", delivery_response)
+        else:
+            print("Error al enviar el delivery:", delivery_response)
 
-        # # Crea o actualiza un evento según la forma de pago
-        # self.create_or_update_event(1, order_data.site_id, 1132, "3 minutes", False)
+        # Crea o actualiza un evento según la forma de pago
+        self.create_or_update_event(1, order_data.site_id, 1132, "3 minutes", False)
 
         return order_id
 
@@ -1542,16 +1542,16 @@ class Order2:
             # Ajusta las cantidades en listaPedidos
             order_json[0]['listaPedidos'] = self.ajustar_cantidades(pedidos)
 
-            # # Registra el delivery con la lista de pedidos ajustada
-            # delivery_response = self.registrar_delivery(order_json[0])
+            # Registra el delivery con la lista de pedidos ajustada
+            delivery_response = self.registrar_delivery(order_json[0])
 
-            # # Opcional: Muestra la lista de pedidos resultante o el response para depuración
-            # print(delivery_response.get('listaPedidos', 'No se encontró listaPedidos en response'))
+            # Opcional: Muestra la lista de pedidos resultante o el response para depuración
+            print(delivery_response.get('listaPedidos', 'No se encontró listaPedidos en response'))
             
-            # if isinstance(delivery_response, dict):
-            #     print("Delivery enviado con éxito:", delivery_response)
-            # else:
-            #     print("Error al enviar el delivery:", delivery_response)
+            if isinstance(delivery_response, dict):
+                print("Delivery enviado con éxito:", delivery_response)
+            else:
+                print("Error al enviar el delivery:", delivery_response)
 
 
 
