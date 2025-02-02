@@ -1,6 +1,7 @@
 <template>
     <div class="col-12 p-0 m-0 xl:col-12 p-0 md:p-3 texto-negro" style="width: 100%;">
 
+        hhh
 
         
         <div class="col-12 p-0" style="display: flex;">
@@ -63,6 +64,26 @@ onMounted(async () => {
         // Puedes manejar el error según tus necesidades
     }
 })
+
+
+
+const getOrderMessage = (order) => {
+    const hora = obtenerHoraFormateadaAMPM(order.timestamp);
+    switch (order.status) {
+        case "enviada":
+            return `El pedido fue enviado a su domicilio a las ${hora}`;
+        case "cancelada":
+            return `El pedido fue cancelado a las ${hora}\nResponsable: ${order.responsible}\nRazón: ${order.reason}`;
+        case "en preparacion":
+            return `El pedido está en preparación desde las ${hora} y será enviado en breve.`;
+        case "generada":
+            return `Hemos recibido su pedido a las ${hora} y empezaremos a prepararlo en breve. Gracias por su espera.`;
+        default:
+            return "";
+    }
+};
+
+
 
 // function contarObjetosRepetidos(arr) {
 //     const objetoContador = {};

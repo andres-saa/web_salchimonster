@@ -73,6 +73,19 @@
 
   <Dialog class="mx-3"  closeOnEscape :closable="false" v-model:visible="store.visibles.currentOrder" modal
     style="max-height: 95vh;width: 35rem; position: relative;">
+
+    <div class="">
+        <div  >
+           
+
+            <p :class="`estado ${store.currentOrder?.current_status?.split(' ')[0]}`">
+                {{ getOrderMessage(store.currentOrder) }}
+            </p>
+
+          
+        </div>
+
+    </div>
     
     <div id="factura" style="width: 100%;">
 
@@ -129,7 +142,7 @@
           </div>
 
          
-          <div  v-for="product in store.currentOrder.pe_json.listaPedidos">
+          <div  v-for="product in store?.currentOrder?.pe_json?.listaPedidos">
 
             <div style="display: grid; grid-template-columns: auto auto;">
              
@@ -148,16 +161,21 @@
               </p>
             </div> -->
             <div >
-              <p style="text-align: end;color: black;">
+              <p v-if="product.pedido_base_price" style="text-align: end;color: black;">
                 <!-- {{ formatoPesosColombianos(product.price) }} -->
                 {{ formatoPesosColombianos(product.pedido_base_price * product.pedido_cantidad) }}
+              </p>
+
+              <p v-else style="text-align: end;color: black;">
+                <!-- {{ formatoPesosColombianos(product.price) }} -->
+                {{ formatoPesosColombianos(product.pedido_precio) }}
               </p>
             </div>
 
 
             </div>
 
-            <p v-if="product.lista_productocombo.length > 0" class="p-0 m-0"><b>COMBO INCLUYE</b></p>
+            <p v-if="product.lista_productocombo?.length > 0" class="p-0 m-0"><b>COMBO INCLUYE</b></p>
             <p v-if="product.lista_productocombo" class="p-0 m-0 ml-5" style="" v-for="i in product.lista_productocombo" > -- <b>{{i.pedido_cantidad  }}</b>  {{i.pedido_nombre  }} </p> 
 
 
@@ -454,6 +472,7 @@
 
 </template>
 
+
 <script setup>
 import { formatoPesosColombianos } from '../../service/formatoPesos';
 import { onMounted,computed, ref } from 'vue'
@@ -464,6 +483,25 @@ import printJS from 'print-js';
 import { URI } from '../../service/conection';
 const cancelDialogVisibleAdmin = ref(false)
 const store = useOrderStore()
+
+
+
+const getOrderMessage = (order) => {
+    const hora = order.latest_status_timestamp?.split('T')[1]?.split(':')?.slice(0,2)?.join(':') 
+    switch (order.current_status) {
+        case "enviada":
+            return `El pedido fue enviado a su domicilio a las ${hora}`;
+        case "cancelada":
+            return `El pedido fue cancelado a las ${hora}\nResponsable: ${order.responsible}\nRazón: ${order.reason}`;
+        case "en preparacion":
+            return `El pedido está en preparación desde las ${hora} y será enviado en breve.`;
+        case "generada":
+            return `Hemos recibido su pedido a las ${hora} y empezaremos a prepararlo en breve. Gracias por su espera.`;
+        default:
+            return "";
+    }
+};
+
 
 
 const submitChangePayment = async () => {
@@ -708,6 +746,90 @@ span {
     display: none;
   }
 }
+
+
+
+sticky-header {
+    /* background-color: white; */
+    position: sticky;
+    top: 3rem;
+    z-index: -1;
+}
+
+.container {
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Título */
+.title {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+/* Contenedor de entrada */
+.input-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.input-text {
+    flex: 1;
+    padding: 0.5rem;
+    /* border: 1px solid; */
+    /* box-shadow: 0 0 10px #00000030; */
+    width: 3rem
+}
+
+.search-button {
+    /* background-color: var(--p-primary-color); */
+    font-weight: bold;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    min-width: max-content;
+}
+
+/* Mensajes de estado */
+.estado {
+    font-size: 1.25rem;
+    text-transform: lowercase;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Colores por estado */
+.generada {
+    background-color: rgba(255, 255, 0, 0.8);
+}
+
+.enviada {
+    background-color: rgb(153, 255, 0);
+}
+
+.en {
+    background-color: rgb(84, 212, 255);
+}
+
+.cancelada {
+    background-color: rgba(255, 84, 84, 0.7);
+}
+
+.no-existe {
+    background-color: #f9741632;
+    text-align: center;
+}
+
+/* Capitalización del primer carácter */
+.estado::first-letter {
+    text-transform: capitalize;
+}
+
 
 </style>
 
