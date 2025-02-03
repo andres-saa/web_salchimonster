@@ -526,8 +526,8 @@ class Pqrs:
         end_date_str = end_date_dt.strftime("%Y-%m-%d")
 
         # Rango 7 días antes (para la consulta "antes")
-        start_date_before_dt = start_date_dt - timedelta(days=7)
-        end_date_before_dt = end_date_dt - timedelta(days=7)
+        start_date_before_dt = start_date_dt - timedelta(days=28)
+        end_date_before_dt = end_date_dt - timedelta(days=28)
         start_date_before_str = start_date_before_dt.strftime("%Y-%m-%d")
         end_date_before_str = end_date_before_dt.strftime("%Y-%m-%d")
 
@@ -756,7 +756,7 @@ class Pqrs:
         # -----------------------------------------------------------
         dict_before = {}
         for row in result_before:
-            fecha_actual = row['fecha'] + timedelta(days=7)
+            fecha_actual = row['fecha'] + timedelta(days=28)
 
             s_chatbot = row['sales_chatbot'] or 0
             o_chatbot = row['orders_chatbot'] or 0
@@ -1017,8 +1017,8 @@ class Pqrs:
         end_date_str = end_date_dt.strftime("%Y-%m-%d")
 
         # Rango "antes" (7 días atrás)
-        start_date_before_dt = start_date_dt - timedelta(days=7)
-        end_date_before_dt = end_date_dt - timedelta(days=7)
+        start_date_before_dt = start_date_dt - timedelta(days=28)
+        end_date_before_dt = end_date_dt - timedelta(days=28)
         start_date_before_str = start_date_before_dt.strftime("%Y-%m-%d")
         end_date_before_str = end_date_before_dt.strftime("%Y-%m-%d")
 
@@ -1223,7 +1223,7 @@ class Pqrs:
         # ---------------------------------------------------------
         dict_before = {}
         for row in result_before:
-            fecha_actual = row['fecha'] + timedelta(days=7)
+            fecha_actual = row['fecha'] + timedelta(days=28)
             dict_before[fecha_actual] = {
                 "chatbot": row['chatbot'] or 0,
                 "callcenter": row['callcenter'] or 0,
@@ -1449,8 +1449,8 @@ class Pqrs:
         end_date_str = end_date_dt.strftime("%Y-%m-%d")
 
         # Intervalo "antes"
-        start_date_before_dt = start_date_dt - timedelta(days=7)
-        end_date_before_dt = end_date_dt - timedelta(days=7)
+        start_date_before_dt = start_date_dt - timedelta(days=28)
+        end_date_before_dt = end_date_dt - timedelta(days=28)
         start_date_before_str = start_date_before_dt.strftime("%Y-%m-%d")
         end_date_before_str = end_date_before_dt.strftime("%Y-%m-%d")
 
@@ -1643,7 +1643,7 @@ class Pqrs:
         # ------------------------------------------------------------------
         dict_before = {}
         for row in result_before:
-            fecha_actual = row['fecha'] + timedelta(days=7)
+            fecha_actual = row['fecha'] + timedelta(days=28)
             dict_before[fecha_actual] = {
                 "chatbot": row['chatbot'] or 0,
                 "callcenter": row['callcenter'] or 0,
