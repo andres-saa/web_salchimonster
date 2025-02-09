@@ -141,8 +141,6 @@ class Order2:
             "total": int(total_carrito)  # Asegurar que el total sea entero
         }
 
-
-
     def create_order_entry(self, user_id, order_data):
         # Determina si es pago en efectivo (IDs de pago válidos)
         valid_payment_ids = {7, 8}
