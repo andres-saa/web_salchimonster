@@ -202,7 +202,7 @@ class Order2:
         return order_id
 
 
-    def procesar_carrito(cart):
+    def procesar_carrito(self,cart):
         def calculate_total_product(product):
             if not isinstance(product, dict):
                 return 0
