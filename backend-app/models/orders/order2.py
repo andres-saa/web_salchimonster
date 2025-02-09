@@ -96,6 +96,50 @@ class Order2:
     def create_user(self, user_data):
         user_id = User().insert_user(user_data)
         return user_id
+    
+    def procesar_carrito(self, cart):
+        def calculate_total_product(product):
+            if not isinstance(product, dict):
+                return 0
+
+            # Obtener valores con defaults
+            pedido_base_price = int(float(product.get("pedido_base_price", 0) or 0))
+            pedido_cantidad = int(product.get("pedido_cantidad", 1) or 1)
+            modificadorseleccion_list = product.get("modificadorseleccionList", [])
+
+            # Calcular el total de las adiciones (modificadores)
+            adiciones = 0
+            if isinstance(modificadorseleccion_list, list):
+                for mod in modificadorseleccion_list:
+                    pedido_precio_mod = int(float(mod.get("pedido_precio", 0) or 0))
+                    cantidad_mod = int(mod.get("modificadorseleccion_cantidad", 1) or 1)
+                    adiciones += pedido_precio_mod * cantidad_mod
+
+            # Total para el producto
+            total_producto = (pedido_base_price + adiciones) * pedido_cantidad
+            return total_producto
+
+        # Si `cart` no es lista o está vacía, retornamos total = 0
+        if not isinstance(cart, list) or len(cart) == 0:
+            return {
+                "carro": cart,  # Devuelve tal cual
+                "total": 0
+            }
+
+        total_carrito = 0
+
+        for product in cart:
+            total_producto = calculate_total_product(product)
+            # Sobrescribimos "pedido_precio" con el nuevo valor
+            product["pedido_precio"] = int(total_producto)  # Asegurar que sea entero
+
+            # Acumular en el total del carrito
+            total_carrito += total_producto
+
+        return {
+            "carro": cart,
+            "total": int(total_carrito)  # Asegurar que el total sea entero
+        }
 
 
     def create_order_entry(self, user_id, order_data):
@@ -104,28 +148,6 @@ class Order2:
         pe_json_payment_id = 1 if order_data.payment_method_id in valid_payment_ids else 2
 
         # Función interna para calcular el total
-        def calculate_total(pe_json_list, delivery_price):
-            total = 0
-            for item in pe_json_list:
-                precio = int(float(item["pedido_precio"]))
-                cantidad = int(item["pedido_cantidad"])
-                item_subtotal = precio * cantidad
-
-                # Suma de modificadores (si existen)
-                if "modificadorseleccionList" in item and item["modificadorseleccionList"]:
-                    for mod in item["modificadorseleccionList"]:
-                        mod_precio = int(float(mod["pedido_precio"]))
-                        mod_cantidad = int(mod["modificadorseleccion_cantidad"])
-                        item_subtotal += mod_precio * mod_cantidad
-
-                total += item_subtotal
-
-            # Suma el costo de domicilio
-            total += int(delivery_price)
-            return total
-
-        # Calcula el total (si deseas usarlo luego para validaciones, etc.)
-        calculated_total = calculate_total(order_data.pe_json, order_data.delivery_price)
 
         # Estructura base del JSON
         pe_json = {
@@ -135,7 +157,7 @@ class Order2:
                 "delivery_direccionenvio": order_data.user_data.user_address,
                 "delivery_notageneral": order_data.order_notes,
                 "delivery_horaentrega": "2020-12-06 10:00:00",
-                "delivery_pagocon": order_data.total + order_data.delivery_price,
+                "delivery_pagocon": self.procesar_carrito(order_data.pe_json)['total'] + order_data.delivery_price,
                 "delivery_codigointegracion": None,
                 "delivery_codigolimadelivery": None,
                 "canaldelivery_id": 500,
@@ -147,7 +169,7 @@ class Order2:
                 "cliente_direccion": order_data.user_data.user_address,
                 "cliente_telefono": order_data.user_data.user_phone
             },
-            "listaPedidos": order_data.pe_json
+            "listaPedidos": self.procesar_carrito(order_data.pe_json)['carro']
         }
 
         # Define la consulta de inserción y sus argumentos según la forma de pago
