@@ -183,8 +183,7 @@ class Order2:
             raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
 
         # Ajusta cantidades en la lista de pedidos
-        pedidos = order_json[0]["listaPedidos"]
-        order_json[0]["listaPedidos"] = self.ajustar_cantidades(pedidos)
+     
 
         # Registra el delivery con la lista de pedidos ajustada
         delivery_response = self.registrar_delivery(order_json[0])
