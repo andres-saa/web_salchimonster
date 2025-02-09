@@ -20,9 +20,6 @@ import random
 import requests
 
 
-
-
-
 load_dotenv()
 
 DB_USER = os.getenv('DB_USER')
@@ -1578,7 +1575,7 @@ class Order2:
             now_colombia = datetime.now(colombia_tz)
             elapsed_time = now_colombia - last_order_time
             # Verificar si han pasado al menos 30 segundos
-            return elapsed_time.total_seconds() > 20
+            return elapsed_time.total_seconds() > 120
         else:
             # Si no hay registro previo, el usuario puede realizar una orden
             return True
