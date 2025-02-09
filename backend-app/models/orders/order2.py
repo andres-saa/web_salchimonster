@@ -97,7 +97,7 @@ class Order2:
         user_id = User().insert_user(user_data)
         return user_id
         
-    def procesar_carrito(cart):
+    def procesar_carrito(self,cart):
         def calculate_total_product(product):
             if not isinstance(product, dict):
                 return 0
