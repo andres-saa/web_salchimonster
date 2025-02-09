@@ -96,8 +96,8 @@ class Order2:
     def create_user(self, user_data):
         user_id = User().insert_user(user_data)
         return user_id
-    
-    def procesar_carrito(self, cart):
+        
+    def procesar_carrito(cart):
         def calculate_total_product(product):
             if not isinstance(product, dict):
                 return 0
@@ -130,7 +130,7 @@ class Order2:
 
         for product in cart:
             total_producto = calculate_total_product(product)
-            # Sobrescribimos "pedido_precio" con el nuevo valor
+            # Sobrescribimos "pedido_precio" con el nuevo valor (subtotal del producto)
             product["pedido_precio"] = int(total_producto)  # Asegurar que sea entero
 
             # Acumular en el total del carrito
@@ -140,6 +140,7 @@ class Order2:
             "carro": cart,
             "total": int(total_carrito)  # Asegurar que el total sea entero
         }
+
 
 
     def create_order_entry(self, user_id, order_data):
