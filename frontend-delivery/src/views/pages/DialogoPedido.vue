@@ -185,14 +185,14 @@
             <!-- {{ product.modificadorseleccionList.filter(p => p.pedido_productoid == product.pedido_productoid) }} -->
 
      
-              <div style="display: flex;width: ; justify-content: space-between;" class="p-0 m-0" v-for="i in  product.modificadorseleccionList?.filter(p => p.pedido_productoid == product.pedido_productoid)">
+              <div style="display: flex;width: ; justify-content: space-between;" class="p-0 m-0" v-for="i in  product.modificadorseleccionList">
          
                 <p class="p-0 m-0 " style="">
        
-                  - ( {{ product.pedido_cantidad }} ) <b>{{ i.modificadorseleccion_cantidad / product.pedido_cantidad }}</b> {{ i.modificador_nombre }}
+                  - ( {{ product.pedido_cantidad }} ) <b>{{ i.modificadorseleccion_cantidad  }}</b> {{ i.modificadorseleccion_nombre }}
                 </p>
 
-                <p class="p-0 m-0" style="text-align: end;"> {{ formatoPesosColombianos(i.pedido_precio * i.modificadorseleccion_cantidad)  }} </p>
+                <p class="p-0 m-0" style="text-align: end;"> {{ formatoPesosColombianos(i.pedido_precio * i.modificadorseleccion_cantidad * product.pedido_cantidad)  }} </p>
 
             </div>
 
