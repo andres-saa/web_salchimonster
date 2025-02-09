@@ -97,49 +97,7 @@ class Order2:
         user_id = User().insert_user(user_data)
         return user_id
         
-    def procesar_carrito(self,cart):
-        def calculate_total_product(product):
-            if not isinstance(product, dict):
-                return 0
-
-            # Obtener valores con defaults
-            pedido_base_price = int(float(product.get("pedido_base_price", 0) or 0))
-            pedido_cantidad = int(product.get("pedido_cantidad", 1) or 1)
-            modificadorseleccion_list = product.get("modificadorseleccionList", [])
-
-            # Calcular el total de las adiciones (modificadores)
-            adiciones = 0
-            if isinstance(modificadorseleccion_list, list):
-                for mod in modificadorseleccion_list:
-                    pedido_precio_mod = int(float(mod.get("pedido_precio", 0) or 0))
-                    cantidad_mod = int(mod.get("modificadorseleccion_cantidad", 1) or 1)
-                    adiciones += pedido_precio_mod * cantidad_mod
-
-            # Total para el producto
-            total_producto = (pedido_base_price + adiciones) * pedido_cantidad
-            return total_producto
-
-        # Si `cart` no es lista o está vacía, retornamos total = 0
-        if not isinstance(cart, list) or len(cart) == 0:
-            return {
-                "carro": cart,  # Devuelve tal cual
-                "total": 0
-            }
-
-        total_carrito = 0
-
-        for product in cart:
-            total_producto = calculate_total_product(product)
-            # Sobrescribimos "pedido_precio" con el nuevo valor (subtotal del producto)
-            product["pedido_precio"] = int(total_producto)  # Asegurar que sea entero
-
-            # Acumular en el total del carrito
-            total_carrito += total_producto
-
-        return {
-            "carro": cart,
-            "total": int(total_carrito)  # Asegurar que el total sea entero
-        }
+ 
 
     def create_order_entry(self, user_id, order_data):
         # Determina si es pago en efectivo (IDs de pago válidos)
@@ -242,6 +200,51 @@ class Order2:
         self.create_or_update_event(1, order_data.site_id, 1132, "3 minutes", False)
 
         return order_id
+
+
+    def procesar_carrito(cart):
+        def calculate_total_product(product):
+            if not isinstance(product, dict):
+                return 0
+
+            # Obtener valores con defaults
+            pedido_base_price = int(float(product.get("pedido_base_price", 0) or 0))
+            pedido_cantidad = int(product.get("pedido_cantidad", 1) or 1)
+            modificadorseleccion_list = product.get("modificadorseleccionList", [])
+
+            # Calcular el total de las adiciones (modificadores)
+            adiciones = 0
+            if isinstance(modificadorseleccion_list, list):
+                for mod in modificadorseleccion_list:
+                    pedido_precio_mod = int(float(mod.get("pedido_precio", 0) or 0))
+                    cantidad_mod = int(mod.get("modificadorseleccion_cantidad", 1) or 1)
+                    adiciones += pedido_precio_mod * cantidad_mod
+
+            # Total para el producto
+            total_producto = (pedido_base_price + adiciones) * pedido_cantidad
+            return total_producto
+
+        # Si `cart` no es lista o está vacía, retornamos total = 0
+        if not isinstance(cart, list) or len(cart) == 0:
+            return {
+                "carro": cart,  # Devuelve tal cual
+                "total": 0
+            }
+
+        total_carrito = 0
+
+        for product in cart:
+            total_producto = calculate_total_product(product)
+            # Sobrescribimos "pedido_precio" con el nuevo valor (subtotal del producto)
+            product["pedido_precio"] = int(total_producto)  # Asegurar que sea entero
+
+            # Acumular en el total del carrito
+            total_carrito += total_producto
+
+        return {
+            "carro": cart,
+            "total": int(total_carrito)  # Asegurar que el total sea entero
+        }
 
 
     
