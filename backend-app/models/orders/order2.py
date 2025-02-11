@@ -1585,24 +1585,19 @@ class Order2:
         
     def can_place_order(self, user_id):
         query = """
-        SELECT last_order_time
-        FROM orders.user_last_order_time
+        SELECT seconds_since_last_order
+        FROM orders.view_user_last_order_seconds
         WHERE user_id = %s;
         """
         self.cursor.execute(query, (user_id,))
         result = self.cursor.fetchone()
+
         if result:
-            last_order_time = result[0]
-            # Define la zona horaria de Colombia
-            colombia_tz = pytz.timezone('America/Bogota')
-            now_colombia = datetime.now(colombia_tz)
-            elapsed_time = now_colombia - last_order_time
-            # Verificar si han pasado al menos 30 segundos
-            return elapsed_time.total_seconds() > 120
+            elapsed_seconds = result[0]
+            return elapsed_seconds > 60  # Verifica si han pasado más de 120 segundos
         else:
-            # Si no hay registro previo, el usuario puede realizar una orden
-            return True
-        
+            return True  # Si no hay registro previo, el usuario puede realizar una orden
+            
  
     def update_last_order_time(self, user_id):
         # Define la zona horaria de Colombia
