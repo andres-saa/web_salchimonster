@@ -7,6 +7,7 @@ from routes.delivery_person import delivery_person_router
 from routes.drive_files.drive_files import drive_file_router # Importa el nuevo router de delivery persons
 # from routes.order import order_router
 from routes.orders.order import order_router
+from routes.orders.order_distrimonster import order_distrimonster_router
 from routes.inventory.daily_inventory import daily_inventory_router
 from routes.inventory.monthly_inventory import monthly_inventory_router
 from routes.inventory.cdi_inventory import cdi_inventory_router
@@ -57,6 +58,7 @@ from routes.pqr.pqrs import pqr_router
 from routes.cachier_money.cachier_money import cachier_money_router
 from routes.Franquicias.franquicias import franquis_router
 from routes.integracion.products import integration_router
+from routes.integracion.distrimonster import distrimonster_router
 from routes.Users.Users import user_router as customer
 from routes.neigborhoods.neigborhoods import neiborhoods_route
 app = FastAPI()
@@ -73,6 +75,7 @@ app.include_router(neiborhoods_route)
 app.include_router(customer)
 app.include_router(cachier_money_router)
 app.include_router(integration_router)
+app.include_router(distrimonster_router)
 app.include_router(franquis_router)
 app.include_router(pqr_router)
 app.include_router(requisition_router)
@@ -97,6 +100,7 @@ app.include_router(ingredient_router)
 app.include_router(site_router)
 app.include_router(delivery_person_router)
 app.include_router(order_router)
+app.include_router(order_distrimonster_router)
 app.include_router(files_router.router)
 app.include_router(category_router)
 app.include_router(grupo_adicionales_router)

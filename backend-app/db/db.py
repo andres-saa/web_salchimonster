@@ -1,7 +1,7 @@
 
 import psycopg2
 from dotenv import load_dotenv
-from psycopg2.extras import RealDictCursor
+from psycopg2.extras import RealDictCursor, Json
 import os
 from pydantic import BaseModel
 from typing import Tuple,Dict,Any
@@ -38,6 +38,48 @@ class Db:
             self.conn.rollback()
             print(f"An error occurred: {e}")
 
+
+
+    def execute_query_json(self, query, params=None, fetch=False):
+            """
+            Ejecuta una consulta SQL procesando automáticamente los parámetros que sean
+            de tipo dict o list, envolviéndolos con psycopg2.extras.Json.
+            """
+            processed_params = self._process_json_params(params)
+            try:
+                with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    cursor.execute(query, processed_params)
+                    self.conn.commit()
+                    if fetch:
+                        return cursor.fetchall()
+            except Exception as e:
+                self.conn.rollback()
+                print(f"An error occurred: {e}")
+
+    def _process_json_params(self, params):
+        """
+        Si se detecta un dict o list en los parámetros, se envuelven en Json().
+        """
+        if params is None:
+            return None
+
+        # Si params es una tupla o lista que representa parámetros posicionales:
+        if isinstance(params, (list, tuple)):
+            new_params = []
+            for param in params:
+                if isinstance(param, (dict, list)):
+                    new_params.append(Json(param))
+                else:
+                    new_params.append(param)
+            # Si la consulta espera parámetros posicionales, se puede devolver la misma estructura (lista o tupla)
+            return type(params)(new_params)
+        
+        # Si params es un diccionario (por parámetros nombrados):
+        elif isinstance(params, dict):
+            return {key: Json(value) if isinstance(value, (dict, list)) else value 
+                    for key, value in params.items()}
+        else:
+            return params
 
 
 
