@@ -137,17 +137,15 @@ def initialize_cache(dominio_id: int, quipupos: int = 0):
 # initialize_cache()
 
 @integration_router.post('/refresh-cache/{dominio_id}')
-def refresh_cache(
-    dominio_id: int,
-    background_tasks: BackgroundTasks,
-    quipupos: int = 0
-):
+def refresh_cache(dominio_id: int, quipupos: int = 0):
     """
     Endpoint para refrescar la caché manualmente.
+    Este endpoint espera a que la actualización finalice antes de retornar.
     """
-    background_tasks.add_task(initialize_cache, dominio_id=dominio_id, quipupos=quipupos)
-    logger.info(f"Solicitud para actualizar caché recibida para dominio_id: {dominio_id}")
-    return {"message": "Actualización de caché iniciada."}
+    initialize_cache(dominio_id=dominio_id, quipupos=quipupos)
+    logger.info(f"Actualización de caché completada para dominio_id: {dominio_id}")
+    return {"message": "Actualización de caché completada."}
+
 
 @integration_router.get('/get-product-integration/{dominio_id}/{local_id}')
 def get_product_integration(
@@ -260,8 +258,8 @@ def get_categorized_products(dominio_id: int, local_id: int, quipupos: int = 0):
             logger.error(f"Error al obtener datos para local_id {local_id}: {e}")
             raise HTTPException(status_code=500, detail=str(e))
 
-    categorias_raw = api_response.get('data', {}).get('listaCategorias', [])
-    productos_raw = api_response.get('data', {}).get('data', [])
+    categorias_raw = api_response.get('listaCategorias', [])
+    productos_raw = api_response.get('data', [])
 
     logger.debug(productos_raw)
 
