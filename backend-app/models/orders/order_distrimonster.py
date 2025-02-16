@@ -221,7 +221,7 @@ class Order2:
                     adiciones += pedido_precio_mod * cantidad_mod
 
             # Determinar el precio unitario efectivo y el descuento unitario según la cantidad
-            if pedido_cantidad >= 700:
+            if pedido_cantidad >= 1000:
                 effective_unit_price = int(float(product.get("distribuidor", pedido_base_price)))
                 discount_unit = pedido_base_price - effective_unit_price
             elif pedido_cantidad >= 500:
