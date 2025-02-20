@@ -109,6 +109,12 @@ sites = [
         username="distrimonster",
         password="distrimonster_2025"
     ),
+     Site(
+        site_id=33,
+        site_name="NEW JERSEY - EE.UU",
+        username="salchi_jersey",
+        password="salchi_jersey_2025"
+    ),
 ]
 
 
