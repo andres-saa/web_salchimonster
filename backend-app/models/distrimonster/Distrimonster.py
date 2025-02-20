@@ -18,6 +18,7 @@ class Price(BaseModel):
     id:int
     mayor:int
     distribuidor:int
+    kilos:float
     
     
 class UpdatePrices(BaseModel):
@@ -54,7 +55,7 @@ class Distrimonster:
             # pasando mayor, distribuidor, id en ese orden
             result = self.db.execute_query_json(
                 query=query,
-                params=[price.mayor, price.distribuidor, price.id],
+                params=[price.mayor, price.distribuidor,price.kilos, price.id],
                 fetch=True
             )
             results.append(result)

@@ -28,7 +28,7 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 os.makedirs(CACHE_IMAGE_DIR, exist_ok=True)
 
 # Lista de locales a cachear (puedes ajustar esta lista según tus necesidades)
-LOCAL_IDS_TO_CACHE = [8, 6, 2, 9, 4, 5, 1, 11, 3, 13, 7]  # Ejemplo de IDs de locales
+LOCAL_IDS_TO_CACHE = [8, 6, 2, 9, 4, 5, 1, 11, 3, 13, 7, 16]  # Ejemplo de IDs de locales
 
 def download_and_resize_image(image_url: str, image_code: str):
     """

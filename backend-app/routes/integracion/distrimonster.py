@@ -142,6 +142,7 @@ class Price(BaseModel):
     id:int
     mayor:int
     distribuidor:int
+    kilos:float
         
 class UpdatePrices(BaseModel):
     prices:List[Price]
