@@ -24,7 +24,7 @@ class City:
         self.city_id = city_id
 
     def select_all_cities(self):
-        select_query = "SELECT * FROM cities where visible = true;"
+        select_query = "SELECT * FROM cities where visible = true order by index;"
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
