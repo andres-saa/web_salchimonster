@@ -293,10 +293,13 @@
 
           </div>
           <p  style="font-weight: bold;background-color: black;color: white;padding: 0; margin: 0; margin-top: 0.5rem;"><b>Notas</b></p>
-              <p class="notas" style="border: 1px solid;margin: 0;color: black; padding: 0.5rem;">
-                {{ store.currentOrder.order_notes }}
-              </p>
+          <p
+              class="notas"
+              style="border: 1px solid; margin: 0; color: black; padding: 0.5rem;"
+              v-html="formattedNotes"
+            ></p>
 
+           
 
 
 
@@ -486,6 +489,27 @@ const store = useOrderStore()
 
 
 
+function formatNotes(notes) {
+  if (!notes) return ''
+
+  // 1. Reemplazar saltos de línea
+  let result = notes.replace(/\n/g, '<br>')
+
+  // 2. Regex específica para el formato AAA-123
+  //    - \b límites de palabra
+  //    - [A-Za-z]{3} 3 letras
+  //    - - guion
+  //    - \d{3} 3 dígitos
+  result = result.replace(/\b([A-Za-z]{3}-\d{3})\b/g, (match) => {
+    return `<strong style="text-transform:uppercase">${match.toUpperCase()}</strong>`
+  })
+
+  return result
+}
+// Computed para formatear las notas en tiempo real (si cambian en el store)
+const formattedNotes = computed(() => {
+  return formatNotes(store.currentOrder.order_notes)
+})
 const getOrderMessage = (order) => {
     const hora = order.latest_status_timestamp?.split('T')[1]?.split(':')?.slice(0,2)?.join(':') 
     switch (order.current_status) {
