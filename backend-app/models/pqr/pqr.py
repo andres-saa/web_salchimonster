@@ -155,17 +155,25 @@ class Pqrs:
         query = self.db.build_select_query(table_name='pqr.networks',fields=["*"])
         pqr_id = self.db.execute_query(query=query,fetch=True)
         return pqr_id
-    
-    
+        
     def get_pqrs_by_date_range(self, fecha_inicio: str, fecha_fin: str):
         """
-        Obtiene las PQRs por sede y estado en un rango de fechas, incluyendo estados sin registros (con valor 0),
-        y agrega tanto una columna "total" en cada sede como una fila final "total" con la suma de los valores por estado.
-        
-        :param fecha_inicio: Fecha de inicio (formato: YYYY-MM-DD)
-        :param fecha_fin: Fecha de fin (formato: YYYY-MM-DD)
-        :return: Lista de JSON planos agrupados por sede, incluyendo un total general.
+        Obtiene las PQRs por sede y estado en un rango de fechas, incluyendo estados sin registros.
+        Estructura final de cada sede (y una fila global "total"):
+
+        {
+            "sede":    { "valor": <nombre_sede>, "pqrs": [] },
+            "Abierta": { "valor": X,             "pqrs": [IDs...] },
+            "Cerrada": { "valor": Y,             "pqrs": [IDs...] },
+            ...
+            "total":   { "valor": SumaEstados,   "pqrs": [...] }  # <-- Debe contener la unión de IDs
+        }
+
+        En la fila final (sede=total):
+        - Se suman las cantidades de todos los estados
+        - Se concatenan las listas de PQR de todos los estados en la clave "total"
         """
+
         query = """
         WITH all_states AS (
             SELECT DISTINCT name AS state_name
@@ -176,10 +184,11 @@ class Pqrs:
             FROM pqr.pqr_details_full_view
         ),
         state_counts AS (
-            SELECT 
+            SELECT
                 s.site_name AS sede,
                 st.state_name AS estado,
-                COUNT(pqr.pqr_request_id) AS cantidad
+                COUNT(pqr.pqr_request_id) AS cantidad,
+                jsonb_agg(pqr.pqr_request_id) FILTER (WHERE pqr.pqr_request_id IS NOT NULL) AS pqr_ids
             FROM all_sites s
             CROSS JOIN all_states st
             LEFT JOIN pqr.pqr_details_full_view pqr
@@ -189,145 +198,314 @@ class Pqrs:
                     BETWEEN %(fecha_inicio)s AND %(fecha_fin)s
             GROUP BY s.site_name, st.state_name
         )
-        SELECT 
-            jsonb_object_agg(estado, cantidad) || jsonb_build_object('sede', sede) AS result
+        SELECT
+            jsonb_object_agg(
+                estado,
+                jsonb_build_object(
+                    'valor', COALESCE(cantidad, 0),
+                    'pqrs',  COALESCE(pqr_ids, '[]'::jsonb)
+                )
+            )
+            || jsonb_build_object('sede', sede) AS result
         FROM state_counts
         GROUP BY sede
         ORDER BY sede;
         """
+
         params = {
             "fecha_inicio": f"{fecha_inicio} 00:00:00",
             "fecha_fin": f"{fecha_fin} 23:59:59"
         }
-        result = self.db.execute_query(query=query, params=params, fetch=True)
 
-        # Convertir el resultado SQL en una lista de Python
+        # Ejecutamos la consulta y obtenemos los resultados
+        result = self.db.execute_query(query=query, params=params, fetch=True)
         data = [row["result"] for row in result]
 
-        # 1. Agregar la columna "total" a cada sede (la suma de sus estados)
+        # 1. Reemplazar "sede" (string) por la forma { "valor": <sede>, "pqrs": [] }
+        #    y agregar "total" por sede con la suma de los 'valor' de los estados + concatenación de IDs.
         for entry in data:
             row_sum = 0
+            row_pqrs = []  # <--- Para acumular los IDs de esta sede
             for key, value in entry.items():
-                if key != "sede":  # Ignoramos la clave "sede" al sumar
-                    row_sum += value
-            entry["total"] = row_sum
+                if key not in ("sede", "total"):
+                    # value = { "valor": x, "pqrs": [...] }
+                    row_sum += value["valor"]
+                    row_pqrs.extend(value["pqrs"])
 
-        # 2. Calcular la fila de totales globales
-        total_entry = {"sede": "total"}
+            # Convertir la sede en { "valor": <nombre_sede>, "pqrs": [] }
+            sede_str = entry["sede"]  # Esto era un string
+            entry["sede"] = {"valor": sede_str, "pqrs": []}
+
+            # Agregar la clave "total" con la estructura { "valor": suma_estados, "pqrs": union_de_ids }
+            entry["total"] = {"valor": row_sum, "pqrs": row_pqrs}
+
+        # 2. Construir la fila de totales (sede=total) sumando valores y unificando IDs
+        total_entry = {
+            "sede": {"valor": "total", "pqrs": []}  # Estructura redundante, para mantener el formato
+        }
+
+        # Sumamos estado por estado a nivel global
         for entry in data:
             for key, value in entry.items():
-                if key not in ("sede", "total"):  # Sumamos solo los estados, no la clave "total" del propio entry
-                    total_entry[key] = total_entry.get(key, 0) + value
+                # Omitimos "sede" y "total" de la sede
+                if key not in ("sede", "total"):
+                    # value = { "valor": int, "pqrs": [...] }
+                    if key not in total_entry:
+                        total_entry[key] = {"valor": 0, "pqrs": []}
+                    total_entry[key]["valor"] += value["valor"]
+                    total_entry[key]["pqrs"].extend(value["pqrs"])
 
-        # 3. Agregar la columna "total" también en la fila final
+        # 3. En la fila final (total), calcular la suma de todos los estados y unificar sus IDs
         global_sum = 0
+        global_pqrs = []
         for key, value in total_entry.items():
-            if key != "sede":  # Excluimos la clave "sede" (que es "total")
-                global_sum += value
-        total_entry["total"] = global_sum
+            if key not in ("sede", "total"):
+                global_sum += value["valor"]
+                global_pqrs.extend(value["pqrs"])
 
-        # 4. Agregar la fila de totales al final de la lista
+        total_entry["total"] = {
+            "valor": global_sum,
+            "pqrs": global_pqrs
+        }
+
+        # 4. Agregar este total_entry al final de la lista
         data.append(total_entry)
 
         return data
-
-
-
 
 
     def get_pqrs_by_date_range_and_type(self, fecha_inicio: str, fecha_fin: str):
         """
-        Obtiene las PQRs por sede y etiqueta (tag) en un rango de fechas, incluyendo etiquetas sin registros (con valor 0),
-        y agrega una fila "total" con la suma de los valores por etiqueta.
-        :param fecha_inicio: Fecha de inicio (formato: YYYY-MM-DD)
-        :param fecha_fin: Fecha de fin (formato: YYYY-MM-DD)
-        :return: Lista de JSON planos agrupados por sede, incluyendo un total general.
+        Obtiene las PQRs por sede y etiqueta (tag) en un rango de fechas,
+        devuelve cada fila con el siguiente formato:
+            
+            {
+                "sede":  { "valor": <nombre_sede>, "pqrs": [] },
+                "tagA":  { "valor": X,    "pqrs": [IDs...] },
+                "tagB":  { "valor": Y,    "pqrs": [IDs...] },
+                ...
+                "total": { "valor": suma, "pqrs": [IDs...] }
+            }
+            
+        Y al final, agrega un registro 'total' global:
+
+            {
+                "sede":  { "valor": "total", "pqrs": [] },
+                "tagA":  { "valor": SumaX,   "pqrs": [...] },
+                "tagB":  { "valor": SumaY,   "pqrs": [...] },
+                ...
+                "total": { "valor": SumaGlobal, "pqrs": [...] }
+            }
+            
+        Además, nos aseguramos de que la clave 'sede' sea la primera del diccionario.
         """
+
+        # 1. Cargar la consulta SQL desde el archivo
         query = self.db.cargar_archivo_sql('./sql/get_pqrs_by_date_range_and_type.sql')
-        params = {"fecha_inicio": f"{fecha_inicio} 00:00:00", "fecha_fin": f"{fecha_fin} 23:59:59"}
-        result = self.db.execute_query(query=query, params=params, fetch=True)
 
-        # Convertir el resultado SQL en una lista de Python
-        data = []
-        for row in result:
-            sede = row['sede']
-            tags = row['tags']
-            # Crear un diccionario con 'sede' como primer elemento
-            ordered_entry = {"sede": sede}
-            ordered_entry.update(tags)  # Agregar las demás claves
-            data.append(ordered_entry)
-
-        # Calcular totales
-        total_entry = {"sede": "TOTAL"}
-        for entry in data:
-            for key, value in entry.items():
-                if key != "sede":  # Saltar la clave 'sede'
-                    total_entry[key] = total_entry.get(key, 0) + value
-
-        # Agregar el total al final de la lista
-        data.append(total_entry)
-
-        return data
-
-
-
-    def get_pqrs_by_responsible_and_state(self, fecha_inicio: str, fecha_fin: str):
-        """
-        Obtiene las PQRs por responsable y estado en un rango de fechas, incluyendo estados sin registros (con valor 0),
-        y agrega una fila "total" con la suma de los valores por estado y otra columna "total" con la suma de los estados por responsable.
-        Además, las PQRs sin responsable se marcan con 'responsible_name' = 'pendiente' y, si no tienen estado, 
-        se les asigna el estado 'generada' (ya existente en la tabla pqr.pqr_status).
-        
-        :param fecha_inicio: Fecha de inicio (formato: YYYY-MM-DD)
-        :param fecha_fin: Fecha de fin (formato: YYYY-MM-DD)
-        :return: Lista de JSON planos agrupados por responsable, incluyendo un total general.
-        """
-
-        query = self.db.cargar_archivo_sql('./sql/get_pqrs_by_responsible_and_state.sql')
-
+        # 2. Parámetros de fecha
         params = {
             "fecha_inicio": f"{fecha_inicio} 00:00:00",
             "fecha_fin": f"{fecha_fin} 23:59:59"
         }
+
+        # 3. Ejecutar la consulta
         result = self.db.execute_query(query=query, params=params, fetch=True)
 
-        # Convertir el resultado SQL en una lista de Python
-        data = [row['result'] for row in result]
+        # 4. Convertir a lista de dicts, cada fila trae la clave "result"
+        data = [row["result"] for row in result]
 
-        # Reestructurar cada entrada para asegurar que 'responsible_name' sea la primera clave
+        # 5. Para cada sede, reemplazar el string en 'sede' por { "valor": <sede>, "pqrs": [] }
+        #    y **acumular** los IDs de PQR de todos los tags en la clave "total".
+        for entry in data:
+            row_sum = 0
+            row_pqrs = []  # <-- Acumularemos aquí todos los IDs de la sede
+            for key, value in entry.items():
+                if key not in ("sede", "total"):
+                    # value = { "valor": x, "pqrs": [...] }
+                    row_sum += value["valor"]
+                    row_pqrs.extend(value["pqrs"])
+
+            # Guardar el valor de la sede y reemplazarlo por la estructura
+            sede_str = entry["sede"]
+            entry["sede"] = {"valor": sede_str, "pqrs": []}
+
+            # Agregar la clave "total" con la suma y la lista de todos los IDs de la sede
+            entry["total"] = {"valor": row_sum, "pqrs": row_pqrs}
+
+        # 6. Construir la fila "total" global, que acumula todo lo anterior
+        total_entry = {
+            "sede": {"valor": "total", "pqrs": []}
+        }
+
+        # 7. Acumular valores e IDs de cada tag en total_entry
+        for entry in data:
+            for key, value in entry.items():
+                if key not in ("sede", "total"):
+                    if key not in total_entry:
+                        total_entry[key] = {"valor": 0, "pqrs": []}
+                    total_entry[key]["valor"] += value["valor"]
+                    total_entry[key]["pqrs"].extend(value["pqrs"])
+
+        # 8. Calcular el total global sumando todos los tags y unificando IDs
+        global_sum = 0
+        global_pqrs = []
+        for key, value in total_entry.items():
+            if key not in ("sede", "total"):
+                global_sum += value["valor"]
+                global_pqrs.extend(value["pqrs"])
+
+        total_entry["total"] = {"valor": global_sum, "pqrs": global_pqrs}
+
+        # 9. Agregar la fila total global a la lista principal
+        data.append(total_entry)
+
+        # 10. Asegurar que 'sede' vaya primero en cada entrada
+        #     (Python 3.7+ mantiene orden de inserción, así que
+        #      simplemente reconstruimos el dict en ese orden).
+        final_data = []
+        for entry in data:
+            sede_val = entry.pop("sede")   # dict: {"valor": <>, "pqrs": []}
+            total_val = entry.pop("total") # dict: {"valor": <>, "pqrs": []}
+            
+            # Crear un diccionario nuevo para forzar el orden
+            new_entry = {}
+            # 1) sede
+            new_entry["sede"] = sede_val
+            # 2) tags (todas las claves restantes que no sean "sede"/"total")
+            for k, v in entry.items():
+                new_entry[k] = v
+            # 3) total
+            new_entry["total"] = total_val
+
+            final_data.append(new_entry)
+
+        return final_data
+    
+    def get_pqrs_by_responsible_and_state(self, fecha_inicio: str, fecha_fin: str):
+        """
+        Obtiene las PQRs por responsable y estado en un rango de fechas, 
+        con estructura uniforme para cada columna, y agrega una fila "total" global.
+        
+        Formato por responsable, por ejemplo:
+        {
+        "responsible_name": { "valor": "Juan Pérez", "pqrs": [] },
+        "generada": { "valor": 5, "pqrs": [101, 102, ...] },
+        "abierta":  { "valor": 2, "pqrs": [201, 205] },
+        ...
+        "total":    { "valor": 7, "pqrs": [...] }
+        }
+        
+        Fila final global:
+        {
+        "responsible_name": { "valor": "total", "pqrs": [] },
+        "generada": { "valor": 10, "pqrs": [...] },
+        "abierta":  { "valor": 15, "pqrs": [...] },
+        ...
+        "total":    { "valor": 25, "pqrs": [...] }
+        }
+        """
+
+        # 1. Cargamos la consulta SQL (la versión que devuelve {valor, pqrs} por estado)
+        query = self.db.cargar_archivo_sql('./sql/get_pqrs_by_responsible_and_state.sql')
+
+        # 2. Parámetros de fecha
+        params = {
+            "fecha_inicio": f"{fecha_inicio} 00:00:00",
+            "fecha_fin": f"{fecha_fin} 23:59:59"
+        }
+
+        # 3. Ejecutar la consulta y obtener resultados
+        result = self.db.execute_query(query=query, params=params, fetch=True)
+
+        # 4. Convertir la respuesta en una lista de dicts
+        #    Cada fila del SQL tiene la clave 'result'
+        data = [row["result"] for row in result]
+        # Por ejemplo, data[i] = {
+        #    "responsible_name": "Juan Pérez",
+        #    "generada": { "valor": 5, "pqrs": [101, 102] },
+        #    "abierta":  { "valor": 2, "pqrs": [201, 205] },
+        #    ...
+        # }
+
+        # 5. Para cada entrada, transformar "responsible_name" 
+        #    en { "valor": <nombre>, "pqrs": [] }, y dejarlo como primera clave
         structured_data = []
         for entry in data:
-            ordered_entry = {"responsible_name": entry["responsible_name"]}
-            for key, value in entry.items():
-                if key != "responsible_name":
-                    ordered_entry[key] = value
-            structured_data.append(ordered_entry)
+            # Sacamos el valor string y lo reemplazamos
+            resp_name_str = entry.pop("responsible_name")
 
-        # Calcular totales por estado (fila "total")
-        total_entry = {"responsible_name": "total"}
+            new_entry = {
+                "responsible_name": {
+                    "valor": resp_name_str,
+                    "pqrs": []
+                }
+            }
+            # Agregamos el resto de estados (ya tienen {valor, pqrs})
+            for state_key, state_val in entry.items():
+                new_entry[state_key] = state_val
 
-        # Añadimos la columna "total" (suma de sus estados) a cada responsable.
+            structured_data.append(new_entry)
+
+        # 6. Calcular la columna "total" en cada responsable 
+        #    con la suma de valores y la unión de IDs.
         for entry in structured_data:
             sum_for_responsible = 0
+            pqrs_for_responsible = []
+
+            # Recorrer todas las claves excepto "responsible_name" y "total"
             for key, value in entry.items():
-                if key != "responsible_name":  
-                    sum_for_responsible += value
-                    # Vamos acumulando en el total_entry por estado
-                    total_entry[key] = total_entry.get(key, 0) + value
-            # Agregamos la columna total a cada responsable
-            entry["total"] = sum_for_responsible
+                if key not in ("responsible_name", "total"):
+                    # value = { "valor": <int>, "pqrs": [IDs...] }
+                    sum_for_responsible += value["valor"]
+                    pqrs_for_responsible.extend(value["pqrs"])
 
-        # Calculamos la suma "total" para la fila "total" (la suma de todos los estados)
-        sum_for_all = 0
-        for key, value in total_entry.items():
-            if key not in ("responsible_name", "total"):
-                sum_for_all += value
-        total_entry["total"] = sum_for_all
+            # Agregamos la clave "total"
+            entry["total"] = {
+                "valor": sum_for_responsible,
+                "pqrs": pqrs_for_responsible
+            }
 
-        # Agregar la fila de totales al final
+        # 7. Construir la fila de totales global
+        total_entry = {
+            "responsible_name": {
+                "valor": "total",
+                "pqrs": []
+            }
+        }
+
+        # 8. Sumar estado por estado a nivel global
+        for entry in structured_data:
+            for key, value in entry.items():
+                if key not in ("responsible_name", "total"):
+                    # value: { "valor": int, "pqrs": [...] }
+                    if key not in total_entry:
+                        total_entry[key] = {
+                            "valor": 0,
+                            "pqrs": []
+                        }
+                    total_entry[key]["valor"] += value["valor"]
+                    total_entry[key]["pqrs"].extend(value["pqrs"])
+
+        # 9. Crear el "total" global uniendo todos los estados
+        global_sum = 0
+        global_pqrs = []
+        for key, val in total_entry.items():
+            if key in ("responsible_name", "total"):
+                continue
+            global_sum += val["valor"]
+            global_pqrs.extend(val["pqrs"])
+
+        total_entry["total"] = {
+            "valor": global_sum,
+            "pqrs": global_pqrs
+        }
+
+        # 10. Agregar la fila global a la lista
         structured_data.append(total_entry)
 
         return structured_data
+
 
 
    
