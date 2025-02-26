@@ -1062,7 +1062,7 @@ class Order2:
 
         # Fetch only today's orders from the combined order view
         combined_order_query = f"""
-            SELECT DISTINCT ON (order_id) order_id,inserted_by_id,inserted_by_name, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation,authorized,responsible_id,name,pe_json
+            SELECT DISTINCT ON (order_id) order_id,inserted_by_id,inserted_by_name,order_type,placa,  order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation,authorized,responsible_id,name,pe_json
             FROM orders.combined_order_view
             WHERE site_id = %s AND latest_status_timestamp >= %s AND latest_status_timestamp < %s AND authorized = true
             ORDER BY order_id, latest_status_timestamp DESC;
