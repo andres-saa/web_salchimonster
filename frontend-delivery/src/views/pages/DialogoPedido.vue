@@ -266,18 +266,34 @@
                
               </p>
             </div>
+
+
             <div class="">
               <span style="font-weight: bold;"><b>Domicilio</b></span>
             </div>
-            <div class="">
 
-            
+            <div class="">
               <p style="text-align: end;font-weight: bold;color: black;"> <b>
                
                   {{ formatoPesosColombianos(store.currentOrder.delivery_price) }}
                 </b>
               </p>
             </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             <div class="">
               <span  style="font-weight: bold;color: black;" ><b>Total</b></span>
             </div>
@@ -308,6 +324,10 @@
               </p>
 
               <div style="display: grid; grid-template-columns: auto auto;">
+
+
+
+
                 <div class="" style="">
               <span><b>NOMBRE</b></span>
             </div>
@@ -318,6 +338,40 @@
               </p>
 
             </div>
+
+
+
+
+
+            <div class="" style="">
+              <span><b>Metodo de entrega</b></span>
+            </div>
+            <div class="">
+              <p style="text-align: end;color: black;">
+
+                {{ store.currentOrder.order_type }}
+              </p>
+
+            </div>
+
+
+
+
+            <div class="" style=""  v-if="store.currentOrder.placa">
+              <span><b>Placa del vehiculo</b></span>
+            </div>
+            <div class=""  v-if="store.currentOrder.placa">
+              <p style="text-align: end;color: black;">
+
+                {{ store.currentOrder.placa }}
+              </p>
+
+            </div>
+
+
+
+
+
             <div  style="">
               <span><b>telefono</b></span>
             </div>
@@ -329,10 +383,10 @@
 
               </p>
             </div>
-            <div style="">
+            <div style="" v-if="store.currentOrder.order_type != 'Pasar a recoger'">
               <span><b>direccion </b></span>
             </div>
-            <div >
+            <div v-if="store.currentOrder.order_type != 'Pasar a recoger'" >
               <p style="text-align: end;color: black;">
 
                 {{ store.currentOrder.user_address }}
