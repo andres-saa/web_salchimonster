@@ -111,3 +111,5 @@ class OrderSchemaPost(BaseModel):
     inserted_by:Optional[int] = None
     pe_json:Optional[object] = {}
     total:int
+    order_type_id:int
+    placa:Optional[str]= None

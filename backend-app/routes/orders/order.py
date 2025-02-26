@@ -209,6 +209,13 @@ def get_all_cancellation_request():
     return result
 
 
+@order_router.get('/get_all_order_types')
+def get_all_order_types():
+    order_instance = Order2()
+    result = order_instance.get_all_order_types()
+    order_instance.close_connection()
+    return result
+
 class CancellationSummaryBody(BaseModel):
     site_ids: List[int]
     start_date: str

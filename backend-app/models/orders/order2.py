@@ -55,6 +55,9 @@ class Order2:
             #     self.generate_order_code(order_data.user_data.user_phone,order_id)
 
             self.insert_order_details(order_id, order_data)
+
+            if (order_data.placa):
+                self.insert_order_placa(order_id,order_data.placa)
             # self.insert_order_products(order_id, order_data)
             # self.insert_order_aditionals(order_id, order_data)
             self.update_order_status(order_id, order_data.payment_method_id,order_data.inserted_by)
@@ -132,18 +135,18 @@ class Order2:
         # Define la consulta de inserción y sus argumentos según la forma de pago
         if order_data.payment_method_id == 6:  # (payment_method_id == 6)
             order_insert_query = """
-                INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized, inserted_by_id, pe_json)
-                VALUES (%s, %s, %s, false, %s, %s)
+                INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized, inserted_by_id, pe_json, order_type_id)
+                VALUES (%s, %s, %s, false, %s, %s,%s)
                 RETURNING id;
             """
-            query_args = (user_id, order_data.site_id, 4, order_data.inserted_by, Json(pe_json))
+            query_args = (user_id, order_data.site_id, 4, order_data.inserted_by, Json(pe_json), order_data.order_type_id)
         else:
             order_insert_query = """
-                INSERT INTO orders.orders (user_id, site_id, delivery_person_id, inserted_by_id, pe_json)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO orders.orders (user_id, site_id, delivery_person_id, inserted_by_id, pe_json,order_type_id)
+                VALUES (%s, %s, %s, %s, %s,%s)
                 RETURNING id;
             """
-            query_args = (user_id, order_data.site_id, 4, order_data.inserted_by, Json(pe_json))
+            query_args = (user_id, order_data.site_id, 4, order_data.inserted_by, Json(pe_json),order_data.order_type_id)
 
         # Ejecuta la inserción
         self.cursor.execute(order_insert_query, query_args)
@@ -304,6 +307,18 @@ class Order2:
         """
         self.cursor.execute(order_details_insert_query, (order_id, order_data.payment_method_id, order_data.delivery_price))
         
+
+        
+
+    def insert_order_placa(self, order_id, order_placa):
+            order_details_insert_query = """
+            INSERT INTO orders.aditional_data (order_id, placa)
+            VALUES (%s, %s);
+            """
+            self.cursor.execute(order_details_insert_query, (order_id, order_placa))
+            
+
+
     def insert_order_notes(self, order_id, order_notes):
         order_notes_insert_query = """
         INSERT INTO orders.order_notes (order_id, notes)
@@ -336,6 +351,15 @@ class Order2:
     def get_all_cancellation_request(self, ):
         order_notes_insert_query = """
         select * from orders.cancellation_request_complete;
+        """
+        self.cursor.execute(order_notes_insert_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+        
+
+    def get_all_order_types(self, ):
+        order_notes_insert_query = """
+        select * from orders.order_type;
         """
         self.cursor.execute(order_notes_insert_query)
         columns = [desc[0] for desc in self.cursor.description]
