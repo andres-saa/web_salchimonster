@@ -32,6 +32,11 @@ def recent():
     return result
 
 
+@pqr_router.get('/recent-order' ,tags=["pqr"])
+def recent():
+    pqr_instance = Pqrs()
+    result = pqr_instance.is_recent_order_generated()
+    return result
 
 
 

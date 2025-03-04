@@ -186,6 +186,15 @@ def get_orders_to_transfer():
     return result
 
 
+@order_router.get('/order-to-validate')
+def get_orders_to_validate():
+    order_instance = Order2()
+    result = order_instance.get_orders_to_validate()
+    order_instance.close_connection()
+    return result
+
+
+
 @order_router.get('/order-by-phone/{user_phone}')
 def get_orders_gy_site(user_phone:str):
     order_instance = Order2()
@@ -287,6 +296,19 @@ def get_order_count_by_site_id(order_id:str):
     return result
 
 
+
+class delivery(BaseModel):
+    price:float
+
+@order_router.put('/changue-delivery/{order_id}')
+def get_order_count_by_site_id(order_id:str, data:delivery):
+    order_instance = Order2()
+    result = order_instance.change_delivery_price(order_id ,data.price)
+    order_instance.close_connection()
+    return result
+
+
+
 class updateProduct (BaseModel):
     new_status:bool
 @order_router.put('/product-instance/{product_instance_id}/status')
@@ -371,6 +393,22 @@ async def authorize_order(order_id: str, responsible_id: int = Body(..., embed=T
     order_instance = Order2()
     try:
         result = order_instance.authorize_order(order_id, responsible_id)
+        return result
+    except Exception as e:
+        order_instance.close_connection()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        order_instance.close_connection()
+
+
+
+
+
+@order_router.put("/aprove-order/{order_id}")
+async def authorize_order(order_id: str, responsible_id: int = Body(..., embed=True)):
+    order_instance = Order2()
+    try:
+        result = order_instance.aprove_order(order_id, responsible_id)
         return result
     except Exception as e:
         order_instance.close_connection()

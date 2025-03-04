@@ -150,6 +150,24 @@ class Pqrs:
         # Devuelve None si no hay resultados o el timestamp del evento si existe un evento reciente de tipo 1
         return result
     
+
+
+        
+    def is_recent_order_generated(self):
+        # Consulta para verificar si existe algún evento de tipo 1 para la sede especificada en la vista 'recent_events'
+        recent_event_query = """
+        SELECT id
+        FROM public.recent_events
+        WHERE event_type_id = 8
+        ORDER BY id DESC
+        LIMIT 1;
+        """
+        query = self.db.build_select_query(table_name='public.recent_events',fields=["id"],condition='event_type_id = 8',order_by='id desc',limit=1)
+        result = self.db.execute_query(query=query, fetch=True)
+        result = None if not result else result
+        # Devuelve None si no hay resultados o el timestamp del evento si existe un evento reciente de tipo 1
+        return result
+    
         
     def get_all_networks(self):
         query = self.db.build_select_query(table_name='pqr.networks',fields=["*"])
