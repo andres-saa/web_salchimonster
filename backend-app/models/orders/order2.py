@@ -217,16 +217,16 @@ class Order2:
                 return 0
 
             # Obtener valores con defaults
-            pedido_base_price = int(float(product.get("pedido_base_price", 0) or 0))
-            pedido_cantidad = int(product.get("pedido_cantidad", 1) or 1)
+            pedido_base_price = float(product.get("pedido_base_price", 0) or 0)
+            pedido_cantidad = product.get("pedido_cantidad", 1) or 1
             modificadorseleccion_list = product.get("modificadorseleccionList", [])
 
             # Calcular el total de las adiciones (modificadores)
             adiciones = 0
             if isinstance(modificadorseleccion_list, list):
                 for mod in modificadorseleccion_list:
-                    pedido_precio_mod = int(float(mod.get("pedido_precio", 0) or 0))
-                    cantidad_mod = int(mod.get("modificadorseleccion_cantidad", 1) or 1)
+                    pedido_precio_mod = float(mod.get("pedido_precio", 0) or 0)
+                    cantidad_mod = mod.get("modificadorseleccion_cantidad", 1) or 1
                     adiciones += pedido_precio_mod * cantidad_mod
 
             # Total para el producto
@@ -245,14 +245,14 @@ class Order2:
         for product in cart:
             total_producto = calculate_total_product(product)
             # Sobrescribimos "pedido_precio" con el nuevo valor (subtotal del producto)
-            product["pedido_precio"] = int(total_producto)  # Asegurar que sea entero
+            product["pedido_precio"] = total_producto  # Asegurar que sea entero
 
             # Acumular en el total del carrito
             total_carrito += total_producto
 
         return {
             "carro": cart,
-            "total": int(total_carrito)  # Asegurar que el total sea entero
+            "total": total_carrito  # Asegurar que el total sea entero
         }
 
 
@@ -741,7 +741,7 @@ class Order2:
             SET pe_json = %s
             WHERE id = %s;
         """
-        from psycopg2.extras import Json
+     
         self.cursor.execute(update_pe_json_query, (Json(pe_json), order_id))
 
         # 5) Confirmar la transacción
@@ -1617,16 +1617,16 @@ class Order2:
                 # Tomamos el precio base del campo `pedido_base_price` si existe, 
                 # en caso contrario usamos el `pedido_precio` como base
                 if "pedido_base_price" in item:
-                    base_price = int(float(item["pedido_base_price"]))
+                    base_price = float(item["pedido_base_price"])
                 else:
-                    base_price = int(float(item["pedido_precio"]))
+                    base_price = float(item["pedido_precio"])
 
                 # Sumamos los precios de los modificadores
                 modifiers_sum = 0
                 if "modificadorseleccionList" in item and item["modificadorseleccionList"]:
                     for mod in item["modificadorseleccionList"]:
-                        mod_price = int(float(mod["pedido_precio"]))
-                        mod_qty = int(mod.get("modificadorseleccion_cantidad", 1))
+                        mod_price = float(mod["pedido_precio"])
+                        mod_qty = mod.get("modificadorseleccion_cantidad", 1)
                         modifiers_sum += (mod_price * mod_qty)
 
                 # Ajustamos el `pedido_precio` al nuevo valor (base + modificadores)
