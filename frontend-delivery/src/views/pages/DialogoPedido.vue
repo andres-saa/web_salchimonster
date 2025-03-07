@@ -262,7 +262,7 @@
             </div>
             <div class="">
               <p  style="text-align: end;font-weight: bold; color: black;">
-                <b >{{ formatoPesosColombianos(store.currentOrder.pe_json.delivery.delivery_pagocon -  store.currentOrder.delivery_price) }}</b>
+                <b >{{ formatoPesosColombianos(store.currentOrder.pe_json.delivery.delivery_pagocon -  store.currentOrder.pe_json.delivery.delivery_costoenvio) }}</b>
                
               </p>
             </div>
@@ -275,7 +275,7 @@
             <div class="">
               <p style="text-align: end;font-weight: bold;color: black;"> <b>
                
-                  {{ formatoPesosColombianos(store.currentOrder.delivery_price) }}
+                  {{ formatoPesosColombianos(store.currentOrder.pe_json.delivery.delivery_costoenvio) }}
                 </b>
               </p>
             </div>
