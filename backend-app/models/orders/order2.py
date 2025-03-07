@@ -173,7 +173,7 @@ class Order2:
             return order_id
         
         
-        if (order_data.site_id == 33  or not order_data.inserted_by):
+        if ((order_data.site_id == 33 and order_data.inserted_by == 1082) or not order_data.inserted_by):
             self.create_or_update_event(8, 12, 1132, "3 minutes", False)
             return order_id
         
@@ -832,7 +832,7 @@ class Order2:
 
             validation = 'generada'
 
-            if (site_id == 33  or not inserted_by):
+            if ( (site_id == 33 and inserted_by == 1082) or not inserted_by):
                 validation = 'validacion pendiente'
             
             
@@ -1286,10 +1286,7 @@ class Order2:
 
         # Consulta para obtener las órdenes de hoy desde la vista combinada de órdenes
         combined_order_query = """
-            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, 
-            total_order_price, current_status, latest_status_timestamp, user_name, user_address, 
-            user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, 
-            responsible_observation, pe_json
+            SELECT DISTINCT ON (order_id) *
             FROM orders.combined_order_view
 
             WHERE 
