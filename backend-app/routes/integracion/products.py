@@ -36,6 +36,8 @@ LOCAL_IDS_TO_CACHE = [8, 6, 2, 9, 4, 5, 1, 11, 3, 13, 7, 16]  # Ejemplo de IDs d
 scheduler = BackgroundScheduler()
 scheduler.start()
 
+
+
 def download_and_resize_image(image_url: str, image_code: str):
     """
     Descarga y redimensiona la imagen a 600px de ancho.
@@ -58,6 +60,10 @@ def download_and_resize_image(image_url: str, image_code: str):
         # Abrir la imagen con Pillow
         image = Image.open(response.raw)
         
+        # Convertir a modo RGB si no está en ese modo
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+        
         # Calcular la nueva altura manteniendo la relación de aspecto
         width_percent = (600 / float(image.size[0]))
         new_height = int((float(image.size[1]) * float(width_percent)))
@@ -70,6 +76,10 @@ def download_and_resize_image(image_url: str, image_code: str):
         logger.info(f"Imagen descargada y redimensionada: {image_code}")
     except Exception as e:
         logger.error(f"Error al descargar o redimensionar la imagen {image_code}: {e}")
+
+
+
+
 
 def process_images_from_menu_data(menu_data: dict):
     """
