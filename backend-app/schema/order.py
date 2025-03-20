@@ -131,4 +131,5 @@ class OrderSchemaPostDistri(BaseModel):
     pe_json:Optional[object] = {}
     total:int
     order_type_id:int
-    placa:Optional[str]= None
+    placa:Optional[str]= None,
+    sede_recoger:str

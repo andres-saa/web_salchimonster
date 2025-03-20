@@ -61,6 +61,10 @@ class Order2:
     def create_order(self, order_data: OrderSchemaPostDistri):
         user_id = order_data.user_id
         
+        query_update_user_recoger = f"update users set user_address = '{order_data.sede_recoger}' where user_id = {user_id}"
+        
+        self.db.execute_query(query_update_user_recoger)
+        
         # Verificar si el usuario puede realizar una nueva orden
         if self.can_place_order(user_id):
             
