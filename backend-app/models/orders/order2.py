@@ -136,17 +136,30 @@ class Order2:
         if order_data.payment_method_id == 6:  # (payment_method_id == 6)
             order_insert_query = """
                 INSERT INTO orders.orders (user_id, site_id, delivery_person_id, authorized, inserted_by_id, pe_json, order_type_id)
-                VALUES (%s, %s, %s, false, %s, %s,%s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
                 RETURNING id;
             """
-            query_args = (user_id, order_data.site_id, 4, order_data.inserted_by, Json(pe_json), order_data.order_type_id)
+            query_args = (
+                user_id, 
+                order_data.site_id, 
+                4,
+                False,
+                order_data.inserted_by, 
+                Json(pe_json),
+                order_data.order_type_id)
         else:
             order_insert_query = """
                 INSERT INTO orders.orders (user_id, site_id, delivery_person_id, inserted_by_id, pe_json,order_type_id)
-                VALUES (%s, %s, %s, %s, %s,%s)
+                VALUES (%s, %s, %s, %s, %s, %s)
                 RETURNING id;
             """
-            query_args = (user_id, order_data.site_id, 4, order_data.inserted_by, Json(pe_json),order_data.order_type_id)
+            query_args = (
+                user_id, 
+                order_data.site_id, 
+                4, 
+                order_data.inserted_by, 
+                Json(pe_json),
+                order_data.order_type_id)
 
         # Ejecuta la inserción
         self.cursor.execute(order_insert_query, query_args)
@@ -1121,7 +1134,7 @@ class Order2:
 
         # Fetch only today's orders from the combined order view
         combined_order_query = f"""
-            SELECT DISTINCT ON (order_id) order_id,inserted_by_id,inserted_by_name,order_type,placa,  order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation,authorized,responsible_id,name,pe_json
+            SELECT DISTINCT ON (order_id) order_id,inserted_by_id,inserted_by_name,order_type,placa,  order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation,authorized,responsible_id,name,pe_json, order_type
             FROM orders.combined_order_view
             WHERE site_id = %s AND latest_status_timestamp >= %s AND latest_status_timestamp < %s AND authorized = true
             ORDER BY order_id, latest_status_timestamp DESC;
@@ -1203,7 +1216,7 @@ class Order2:
             SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, 
             total_order_price, current_status, latest_status_timestamp, user_name, user_address, 
             user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, 
-            responsible_observation, pe_json
+            responsible_observation, pe_json,order_type
             FROM orders.combined_order_view
 
             WHERE 

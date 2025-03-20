@@ -113,3 +113,22 @@ class OrderSchemaPost(BaseModel):
     total:int
     order_type_id:int
     placa:Optional[str]= None
+    
+class OrderSchemaPostDistri(BaseModel):
+    order_products: List[minOrderItem]
+    order_aditionals:list[AdditionalItemMin]
+    user_id: Optional[int] = None
+    site_id: int
+    pe_site_id:int
+    order_status:Optional[OrderStatus] = None
+    status_history: Optional[List[OrderStatus]] = None
+    payment_method_id: int
+    delivery_price: int
+    order_notes: str
+    delivery_horaentrega:str
+    user_data: user_schema_post
+    inserted_by:Optional[int] = None
+    pe_json:Optional[object] = {}
+    total:int
+    order_type_id:int
+    placa:Optional[str]= None

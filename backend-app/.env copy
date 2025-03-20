@@ -1,0 +1,6 @@
+DB_USER=doadmin
+DB_PASSWORD=AVNS_WiWTpT25FqlvWVW5QNC
+DB_HOST=database-do-user-15089908-0.c.db.ondigitalocean.com
+DB_PORT=25060
+DB_NAME=TesosPizza
+API_SECRET_TOKEN=9yqQJxLc0hcSx47-_9Ya1k8KiLrIdMs-45xOWrYEQWI
