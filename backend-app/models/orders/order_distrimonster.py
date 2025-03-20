@@ -202,12 +202,12 @@ class Order2:
 
         # Si el método de pago es 6, hacemos el evento y retornamos de inmediato (NO registrar_delivery)
         if order_data.payment_method_id == 6:
-            self.create_or_update_event(10, 12, 1132, "3 minutes", False)
+            self.create_or_update_event(3, 12, 1132, "3 minutes", False)
             return order_id
         
         
         if ((order_data.site_id == 33 and order_data.inserted_by == 1082) or not order_data.inserted_by):
-            self.create_or_update_event(9, 12, 1132, "3 minutes", False)
+            self.create_or_update_event(8, 12, 1132, "3 minutes", False)
             return order_id
         
     
