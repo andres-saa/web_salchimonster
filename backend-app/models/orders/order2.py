@@ -1133,12 +1133,52 @@ class Order2:
         tomorrow_start = datetime.combine(tomorrow_date, time(2, 0)).astimezone(colombia_tz).isoformat()
 
         # Fetch only today's orders from the combined order view
-        combined_order_query = f"""
-            SELECT DISTINCT ON (order_id) order_id,inserted_by_id,inserted_by_name,order_type,placa,  order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone,calcel_sol_state,calcel_sol_asnwer, cancelation_solve_responsible,responsible_observation,authorized,responsible_id,name,pe_json, order_type, second_name, first_last_name, second_last_name, email, cedula_nit, site_id
-            FROM orders.combined_order_view
-            WHERE site_id = %s AND latest_status_timestamp >= %s AND latest_status_timestamp < %s AND authorized = true
-            ORDER BY order_id, latest_status_timestamp DESC;
-            """
+        combined_order_query = fcombined_order_query = f"""
+        SELECT DISTINCT ON (order_id)
+            order_id,
+            inserted_by_id,
+            inserted_by_name,
+            order_type,
+            placa,
+            order_notes,
+            delivery_price,
+            payment_method,
+            total_order_price,
+            current_status,
+            latest_status_timestamp,
+            user_name,
+            user_address,
+            user_phone,
+            calcel_sol_state,
+            calcel_sol_asnwer,
+            cancelation_solve_responsible,
+            responsible_observation,
+            authorized,
+            responsible_id,
+            name,
+            pe_json,
+            order_type,
+            second_name,
+            first_last_name,
+            second_last_name,
+            email,
+            cedula_nit,
+            site_id
+        FROM orders.combined_order_view
+        WHERE site_id = %s
+        AND (
+            /* Si es site_id = 32, devolver últimos 15 días */
+            (site_id = 32 AND latest_status_timestamp >= NOW() - INTERVAL '15 days')
+            
+            /* Si es diferente de 32, aplicar el rango de fechas que recibes como parámetro */
+            OR (site_id <> 32 
+                AND latest_status_timestamp >= %s 
+                AND latest_status_timestamp < %s)
+        )
+        AND authorized = true
+        ORDER BY order_id, latest_status_timestamp DESC;
+        """
+
         self.cursor.execute(combined_order_query, (site_id, today_start, tomorrow_start))
         orders_info = self.cursor.fetchall()
         columns_info = [desc[0] for desc in self.cursor.description]
