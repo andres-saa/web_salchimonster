@@ -1213,16 +1213,44 @@ class Order2:
 
         # Consulta para obtener las órdenes de hoy desde la vista combinada de órdenes
         combined_order_query = """
-            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, 
-            total_order_price, current_status, latest_status_timestamp, user_name, user_address, 
-            user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, 
-            responsible_observation, pe_json,order_type,second_name, first_last_name, second_last_name, cedula_nit, email, site_id
-            FROM orders.combined_order_view 
-
+            SELECT DISTINCT ON (order_id)
+                order_id,
+                order_notes,
+                delivery_price,
+                payment_method,
+                total_order_price,
+                current_status,
+                latest_status_timestamp,
+                user_name,
+                user_address,
+                user_phone,
+                calcel_sol_state,
+                calcel_sol_asnwer,
+                cancelation_solve_responsible,
+                responsible_observation,
+                pe_json,
+                order_type,
+                second_name,
+                first_last_name,
+                second_last_name,
+                cedula_nit,
+                email,
+                site_id
+            FROM orders.combined_order_view
             WHERE 
-               authorized = false  AND current_status = 'transferencia pendiente'  and latest_status_timestamp > (NOW() - INTERVAL '15 days')
-            ORDER BY order_id, latest_status_timestamp DESC limit 100;
-            """
+            authorized = false
+            AND current_status = 'transferencia pendiente'
+            AND (
+                    (site_id = 32 AND latest_status_timestamp > (NOW() - INTERVAL '15 days'))
+                    OR
+                    (site_id <> 32 AND latest_status_timestamp > (NOW() - INTERVAL '1 day'))
+            )
+            ORDER BY 
+            order_id,
+            latest_status_timestamp DESC
+            LIMIT 100;
+        """
+
         self.cursor.execute(combined_order_query, (today_start, tomorrow_start))
         orders_info = self.cursor.fetchall()
         columns_info = [desc[0] for desc in self.cursor.description]
@@ -1294,17 +1322,43 @@ class Order2:
         tomorrow_start = datetime.combine(tomorrow_date, time(2, 0)).astimezone(colombia_tz).isoformat()
 
         # Consulta para obtener las órdenes de hoy desde la vista combinada de órdenes
-        combined_order_query = """
-            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, 
-            total_order_price, current_status, latest_status_timestamp, user_name, user_address, 
-            user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, 
-            responsible_observation, pe_json,order_type,second_name, first_last_name, second_last_name, cedula_nit, email, site_id
-            FROM orders.combined_order_view 
+        combined_order_query = combined_order_query = """
+    SELECT DISTINCT ON (order_id)
+           order_id,
+           order_notes,
+           delivery_price,
+           payment_method,
+           total_order_price,
+           current_status,
+           latest_status_timestamp,
+           user_name,
+           user_address,
+           user_phone,
+           calcel_sol_state,
+           calcel_sol_asnwer,
+           cancelation_solve_responsible,
+           responsible_observation,
+           pe_json,
+           order_type,
+           second_name,
+           first_last_name,
+           second_last_name,
+           cedula_nit,
+           email,
+           site_id
+    FROM orders.combined_order_view
+    WHERE
+       authorized = false
+       AND current_status = 'no corfirmada'
+       AND (
+            (site_id = 32 AND latest_status_timestamp > (NOW() - INTERVAL '15 days'))
+            OR
+            (site_id <> 32 AND latest_status_timestamp > (NOW() - INTERVAL '1 day'))
+       )
+    ORDER BY order_id, latest_status_timestamp DESC
+    LIMIT 100;
+"""
 
-            WHERE 
-               authorized = false  AND current_status = 'no corfirmada'  and latest_status_timestamp > (NOW() - INTERVAL '15 days')
-            ORDER BY order_id, latest_status_timestamp DESC limit 100;
-            """
         self.cursor.execute(combined_order_query, (today_start, tomorrow_start))
         orders_info = self.cursor.fetchall()
         columns_info = [desc[0] for desc in self.cursor.description]
@@ -1377,15 +1431,41 @@ class Order2:
 
         # Consulta para obtener las órdenes de hoy desde la vista combinada de órdenes
         combined_order_query = """
-            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, 
-            total_order_price, current_status, latest_status_timestamp, user_name, user_address, 
-            user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, 
-            responsible_observation, pe_json,order_type,second_name, first_last_name, second_last_name, cedula_nit, email, site_id
-            FROM orders.combined_order_view 
-
-            WHERE 
-                (current_status IN ('enviada', 'en preparacion' , 'generada'))  and latest_status_timestamp > (NOW() - INTERVAL '15 days') and responsible_id is not null
-            ORDER BY order_id, latest_status_timestamp DESC ;
+            SELECT DISTINCT ON (order_id)
+       order_id,
+       order_notes,
+       delivery_price,
+       payment_method,
+       total_order_price,
+       current_status,
+       latest_status_timestamp,
+       user_name,
+       user_address,
+       user_phone,
+       calcel_sol_state,
+       calcel_sol_asnwer,
+       cancelation_solve_responsible,
+       responsible_observation,
+       pe_json,
+       order_type,
+       second_name,
+       site_id,
+       first_last_name,
+       second_last_name,
+       cedula_nit,
+       email
+        FROM orders.combined_order_view
+        WHERE 
+            current_status IN ('enviada', 'en preparacion', 'generada')
+            AND responsible_id IS NOT NULL
+            AND (
+                (site_id = 32 AND latest_status_timestamp > (NOW() - INTERVAL '15 days'))
+                OR
+                (site_id <> 32 AND latest_status_timestamp > (NOW() - INTERVAL '1 day'))
+            )
+        ORDER BY 
+            order_id,
+            latest_status_timestamp DESC;
             """
         self.cursor.execute(combined_order_query, (today_start, tomorrow_start))
         orders_info = self.cursor.fetchall()
