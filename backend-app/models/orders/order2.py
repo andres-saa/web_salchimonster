@@ -1216,14 +1216,176 @@ class Order2:
             SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, 
             total_order_price, current_status, latest_status_timestamp, user_name, user_address, 
             user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, 
-            responsible_observation, pe_json,order_type
-            FROM orders.combined_order_view
+            responsible_observation, pe_json,order_type,second_name, first_last_name, second_last_name, cedula_nit, email, site_id
+            FROM orders.combined_order_view 
 
             WHERE 
-                latest_status_timestamp >= %s 
-                AND latest_status_timestamp < %s 
-                AND authorized = false  AND current_status = 'transferencia pendiente'
-            ORDER BY order_id, latest_status_timestamp DESC;
+               authorized = false  AND current_status = 'transferencia pendiente'  and latest_status_timestamp > (NOW() - INTERVAL '15 days')
+            ORDER BY order_id, latest_status_timestamp DESC limit 100;
+            """
+        self.cursor.execute(combined_order_query, (today_start, tomorrow_start))
+        orders_info = self.cursor.fetchall()
+        columns_info = [desc[0] for desc in self.cursor.description]
+        orders_dict = [dict(zip(columns_info, row)) for row in orders_info]
+
+        # Convertir y formatear los timestamps a la zona horaria de Colombia
+        for order in orders_dict:
+            if 'latest_status_timestamp' in order:
+                order['latest_status_timestamp'] = order['latest_status_timestamp'].astimezone(colombia_tz)
+
+        # Obtener detalles adicionales de la orden
+        for order in orders_dict:
+            order_id = order['order_id']
+
+            # Consultar productos relacionados con la orden
+            products_query = """
+            SELECT name, price, quantity, total_price, product_id 
+            FROM orders.order_products WHERE order_id = %s;
+            """
+            self.cursor.execute(products_query, (order_id,))
+            products = self.cursor.fetchall()
+            products_columns = [desc[0] for desc in self.cursor.description]
+            order['products'] = [dict(zip(products_columns, row)) for row in products]
+
+            # Consultar ítems adicionales relacionados con la orden
+            additionals_query = """
+            SELECT aditional_name, aditional_quantity, aditional_type, aditional_price, 
+            total_aditional_price
+            FROM orders.vw_order_aditional_items WHERE order_id = %s;
+            """
+            self.cursor.execute(additionals_query, (order_id,))
+            additionals = self.cursor.fetchall()
+            additionals_columns = [desc[0] for desc in self.cursor.description]
+
+            # Agrupar ítems adicionales por tipo
+            grouped_additionals = {}
+            for row in additionals:
+                additional = dict(zip(additionals_columns, row))
+                additional_type = additional['aditional_type']
+                if additional_type not in grouped_additionals:
+                    grouped_additionals[additional_type] = [additional]
+                else:
+                    grouped_additionals[additional_type].append(additional)
+
+            order['additional_items'] = grouped_additionals
+
+        # Ordenar las órdenes por latest_status_timestamp en orden descendente (más recientes primero)
+        orders_dict.sort(key=lambda x: x['latest_status_timestamp'], reverse=True)
+
+        return orders_dict
+
+
+    
+
+    def get_orders_to_transfer_no_confirmed(self):
+        colombia_tz = pytz.timezone('America/Bogota')
+        now = datetime.now(colombia_tz)
+        
+        # Ajuste para empezar desde las 2 AM de hoy
+        if now.time() < time(2, 0):
+            today_date = (now - timedelta(days=1)).date()
+        else:
+            today_date = now.date()
+
+        tomorrow_date = today_date + timedelta(days=1)
+
+        # Convertir fechas a datetime a las 2 AM para usar en la consulta SQL
+        today_start = datetime.combine(today_date, time(2, 0)).astimezone(colombia_tz).isoformat()
+        tomorrow_start = datetime.combine(tomorrow_date, time(2, 0)).astimezone(colombia_tz).isoformat()
+
+        # Consulta para obtener las órdenes de hoy desde la vista combinada de órdenes
+        combined_order_query = """
+            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, 
+            total_order_price, current_status, latest_status_timestamp, user_name, user_address, 
+            user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, 
+            responsible_observation, pe_json,order_type,second_name, first_last_name, second_last_name, cedula_nit, email, site_id
+            FROM orders.combined_order_view 
+
+            WHERE 
+               authorized = false  AND current_status = 'no corfirmada'  and latest_status_timestamp > (NOW() - INTERVAL '15 days')
+            ORDER BY order_id, latest_status_timestamp DESC limit 100;
+            """
+        self.cursor.execute(combined_order_query, (today_start, tomorrow_start))
+        orders_info = self.cursor.fetchall()
+        columns_info = [desc[0] for desc in self.cursor.description]
+        orders_dict = [dict(zip(columns_info, row)) for row in orders_info]
+
+        # Convertir y formatear los timestamps a la zona horaria de Colombia
+        for order in orders_dict:
+            if 'latest_status_timestamp' in order:
+                order['latest_status_timestamp'] = order['latest_status_timestamp'].astimezone(colombia_tz)
+
+        # Obtener detalles adicionales de la orden
+        for order in orders_dict:
+            order_id = order['order_id']
+
+            # Consultar productos relacionados con la orden
+            products_query = """
+            SELECT name, price, quantity, total_price, product_id 
+            FROM orders.order_products WHERE order_id = %s;
+            """
+            self.cursor.execute(products_query, (order_id,))
+            products = self.cursor.fetchall()
+            products_columns = [desc[0] for desc in self.cursor.description]
+            order['products'] = [dict(zip(products_columns, row)) for row in products]
+
+            # Consultar ítems adicionales relacionados con la orden
+            additionals_query = """
+            SELECT aditional_name, aditional_quantity, aditional_type, aditional_price, 
+            total_aditional_price
+            FROM orders.vw_order_aditional_items WHERE order_id = %s;
+            """
+            self.cursor.execute(additionals_query, (order_id,))
+            additionals = self.cursor.fetchall()
+            additionals_columns = [desc[0] for desc in self.cursor.description]
+
+            # Agrupar ítems adicionales por tipo
+            grouped_additionals = {}
+            for row in additionals:
+                additional = dict(zip(additionals_columns, row))
+                additional_type = additional['aditional_type']
+                if additional_type not in grouped_additionals:
+                    grouped_additionals[additional_type] = [additional]
+                else:
+                    grouped_additionals[additional_type].append(additional)
+
+            order['additional_items'] = grouped_additionals
+
+        # Ordenar las órdenes por latest_status_timestamp en orden descendente (más recientes primero)
+        orders_dict.sort(key=lambda x: x['latest_status_timestamp'], reverse=True)
+
+        return orders_dict
+
+
+
+    
+    def get_orders_to_transfer_confirmed(self):
+        colombia_tz = pytz.timezone('America/Bogota')
+        now = datetime.now(colombia_tz)
+        
+        # Ajuste para empezar desde las 2 AM de hoy
+        if now.time() < time(2, 0):
+            today_date = (now - timedelta(days=1)).date()
+        else:
+            today_date = now.date()
+
+        tomorrow_date = today_date + timedelta(days=1)
+
+        # Convertir fechas a datetime a las 2 AM para usar en la consulta SQL
+        today_start = datetime.combine(today_date, time(2, 0)).astimezone(colombia_tz).isoformat()
+        tomorrow_start = datetime.combine(tomorrow_date, time(2, 0)).astimezone(colombia_tz).isoformat()
+
+        # Consulta para obtener las órdenes de hoy desde la vista combinada de órdenes
+        combined_order_query = """
+            SELECT DISTINCT ON (order_id) order_id, order_notes, delivery_price, payment_method, 
+            total_order_price, current_status, latest_status_timestamp, user_name, user_address, 
+            user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, 
+            responsible_observation, pe_json,order_type,second_name, first_last_name, second_last_name, cedula_nit, email, site_id
+            FROM orders.combined_order_view 
+
+            WHERE 
+                (current_status IN ('enviada', 'en preparacion' , 'generada'))  and latest_status_timestamp > (NOW() - INTERVAL '15 days') and responsible_id is not null
+            ORDER BY order_id, latest_status_timestamp DESC ;
             """
         self.cursor.execute(combined_order_query, (today_start, tomorrow_start))
         orders_info = self.cursor.fetchall()
@@ -1761,6 +1923,88 @@ class Order2:
             return {"order_id": order_id, "message": f"Failed to authorize order: {str(e)}"}
 
 
+
+
+    def reject_order(self, order_id, responsible_id):
+        """
+        Authorize an order and update the responsible person.
+        
+        Args:
+            order_id (int): The ID of the order to authorize.
+            responsible_id (int): The ID of the responsible person authorizing the order.
+        
+        Returns:
+            dict: A dictionary with the order_id and a confirmation message.
+        """
+        try:
+            # Update the authorized status of the order
+            update_authorization_query = """
+            UPDATE orders.orders
+            SET authorized = FALSE, responsible_id = %s
+            WHERE id = %s;
+            """
+            self.cursor.execute(update_authorization_query, (responsible_id, order_id))
+            
+            # Insert a record into the order status history to reflect this change
+            order_status_history_insert_query = """
+            INSERT INTO orders.order_status (order_id, status, timestamp)
+            VALUES (%s, 'no corfirmada', CURRENT_TIMESTAMP);
+            """
+            self.cursor.execute(order_status_history_insert_query, (order_id,))
+            
+            # Commit the transaction
+
+            get_site_id_query = """
+            SELECT site_id FROM orders.orders
+            WHERE id = %s;
+            """
+            self.cursor.execute(get_site_id_query, (order_id,))
+            site_id_result = self.cursor.fetchone()
+            site_id = site_id_result[0]
+            # self.create_or_update_event(1, site_id, 1132, '1 minute', False)
+            self.conn.commit()
+
+
+
+
+
+            #     # Selecciona el JSON de la orden
+            # select_order_query = """
+            # SELECT pe_json
+            # FROM orders.orders
+            # WHERE id = %s;
+            # """
+            # self.cursor.execute(select_order_query, (order_id,))
+            # order_json = self.cursor.fetchone()
+
+            # if not order_json:
+            #     raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
+            
+            # # order_json[0] debería ser el diccionario que contiene la información de la orden
+            # pedidos = order_json[0]['listaPedidos']  # Asegúrate de que esté en esta estructura
+
+            # # Ajusta las cantidades en listaPedidos
+            # order_json[0]['listaPedidos'] = self.ajustar_cantidades(pedidos)
+
+            # # Registra el delivery con la lista de pedidos ajustada
+            # delivery_response = self.registrar_delivery(order_json[0])
+
+            # # Opcional: Muestra la lista de pedidos resultante o el response para depuración
+            # print(delivery_response.get('listaPedidos', 'No se encontró listaPedidos en response'))
+            
+            # if isinstance(delivery_response, dict):
+            #     print("Delivery enviado con éxito:", delivery_response)
+            # else:
+            #     print("Error al enviar el delivery:", delivery_response)
+
+
+
+
+
+            return {"order_id": order_id, "message": "Order rejected successfully"}
+        except Exception as e:
+            self.conn.rollback()
+            return {"order_id": order_id, "message": f"Failed to authorize order: {str(e)}"}
 
 
 

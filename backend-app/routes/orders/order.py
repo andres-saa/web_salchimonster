@@ -186,6 +186,23 @@ def get_orders_to_transfer():
     return result
 
 
+@order_router.get('/order-to-transfer-no-confirmed')
+def get_orders_to_transfer():
+    order_instance = Order2()
+    result = order_instance.get_orders_to_transfer_no_confirmed()
+    order_instance.close_connection()
+    return result
+
+
+@order_router.get('/order-to-transfer-confirmed')
+def get_orders_to_transfer():
+    order_instance = Order2()
+    result = order_instance.get_orders_to_transfer_confirmed()
+    order_instance.close_connection()
+    return result
+
+
+
 @order_router.get('/order-to-validate')
 def get_orders_to_validate():
     order_instance = Order2()
@@ -393,6 +410,19 @@ async def authorize_order(order_id: str, responsible_id: int = Body(..., embed=T
     order_instance = Order2()
     try:
         result = order_instance.authorize_order(order_id, responsible_id)
+        return result
+    except Exception as e:
+        order_instance.close_connection()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        order_instance.close_connection()
+
+
+@order_router.put("/reject_order/{order_id}")
+async def authorize_order(order_id: str, responsible_id: int = Body(..., embed=True)):
+    order_instance = Order2()
+    try:
+        result = order_instance.reject_order(order_id, responsible_id)
         return result
     except Exception as e:
         order_instance.close_connection()
