@@ -1134,7 +1134,7 @@ class Order2:
 
         # Fetch only today's orders from the combined order view
         combined_order_query = fcombined_order_query = f"""
-        SELECT DISTINCT ON (order_id)
+        SELECT
             order_id,
             inserted_by_id,
             inserted_by_name,
