@@ -56,38 +56,20 @@ class site_schedule:
             schedule_list.append({"schedule_id": schedule_id, "site_id": site_id, "day_of_week": day_of_week, "opening_time": opening_time, "closing_time": closing_time})
         return schedule_list
 
-    def is_site_open(self, site_id: int, current_time: str = None):
-        # Configurar la zona horaria de Colombia
-        colombia_tz = pytz.timezone('America/Bogota')
-        
-        if current_time is None:
-            # Obtener la hora actual en la zona horaria de Colombia
-            current_time = datetime.now(colombia_tz).strftime("%H:%M:%S")
 
-        current_time = datetime.strptime(current_time, "%H:%M:%S").time()  # Convertir la cadena a datetime.time
-        
-        # Obtener el día de la semana en la zona horaria de Colombia
-        current_day_of_week = (int(datetime.now(colombia_tz).strftime("%w")) + 1) % 7 or 7
-        
-        print(current_day_of_week)
+    def is_site_open(self, site_id: int):
+        # Configurar la zona horaria de Colombia
+
         query = f"""
-        SELECT opening_time, closing_time
-        FROM site_schedule_open
+        SELECT status_json from public.v_site_status
         WHERE site_id = {site_id}
-        AND day_of_week = '{current_day_of_week}' AND open = true;
         """
         
         self.cursor.execute(query)
         schedule_data = self.cursor.fetchone()
 
-        if schedule_data:
-            opening_time, closing_time = schedule_data
-            if opening_time <= current_time < closing_time:
-                return True, None  # El sitio está abierto
-            else:
-                return False, opening_time  # El sitio está cerrado, devolver la hora de apertura
-        else:
-            return False, None  # No se encontró ningún horario para el sitio y el día dados   
+        
+        return schedule_data[0]  # No se encontró ningún horario para el sitio y el día dados   
 
     def update_schedule(self, schedule_id, schedule_data: site_schedule_schema):
         site_id = schedule_data.site_id

@@ -35,14 +35,8 @@ def get_schedule_by_site_id(site_id: int):
 
 @site_schedule_router.get("/site/{site_id}/status")
 def get_site_status(site_id: int, schedule_instance: site_schedule = Depends()):
-    is_open, next_opening_time = schedule_instance.is_site_open(site_id)
-    if is_open:
-        return {"status": "open"}
-    else:
-        if next_opening_time:
-            return {"status": "closed", "next_opening_time": next_opening_time}
-        else:
-            return {"status": "closed", "message": "No schedule found for the site."}
+    is_open = schedule_instance.is_site_open(site_id)
+    return is_open
         
 
 
