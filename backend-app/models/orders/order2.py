@@ -1175,8 +1175,7 @@ class Order2:
                 AND latest_status_timestamp >= %s 
                 AND latest_status_timestamp < %s)
         )
-        AND authorized = true
-        ORDER BY latest_status_timestamp;
+        AND authorized = true;
         """
 
         self.cursor.execute(combined_order_query, (site_id, today_start, tomorrow_start))
