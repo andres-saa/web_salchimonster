@@ -109,6 +109,19 @@ class Neighborhood:
             return [dict(zip(columns, row)) for row in neighborhoods_data]
         else:
             return []
+        
+     
+    def select_neighborhoods_by_site_id(self, site_id: int):
+        select_query = "SELECT * FROM neighborhoods WHERE site_id = %s;"
+        self.cursor.execute(select_query, (site_id,))
+        columns = [desc[0] for desc in self.cursor.description]
+        neighborhoods_data = self.cursor.fetchall()
+
+        if neighborhoods_data:
+            return [dict(zip(columns, row)) for row in neighborhoods_data]
+        else:
+            return []   
+        
 
     def close_connection(self):
         self.conn.close()

@@ -4,8 +4,8 @@ SELECT json_agg(
             'title', site_name,
             'column_widths', json_build_object(
                 'id',10,
-                'name', 40,
-                'delivery_price', 15
+                'nombre del barrio', 50,
+                'valor del domicilio', 30
             ),
             'data', barrios
         )
@@ -16,14 +16,14 @@ FROM (
         json_agg(
             json_build_object(
                 'id', n.neighborhood_id,
-                'name', n.name,
-                'delivery_price', n.delivery_price
+                'nombre del barrio', n.name,
+                'valor del domicilio', n.delivery_price
             )
         ) AS barrios
-    FROM 
-        sites s
-    JOIN 
-        neighborhoods n ON s.site_id = n.site_id and s.show_on_web = true
-    GROUP BY 
-        s.site_id, s.site_name
+    FROM sites s
+    JOIN neighborhoods n 
+      ON s.site_id = n.site_id
+    WHERE s.show_on_web = true
+      AND s.site_id IN (%s)
+    GROUP BY s.site_id, s.site_name
 ) subquery;
