@@ -49,64 +49,64 @@ class Neigborhoods:
     
     def update_neigborhoods(self, data:dict):
         
-        for sede in data["hojas"]:
-            query1 = f"select site_id , city_id from sites where site_name = '{sede["hoja"]}'"
-            response1 = self.db.execute_query(query1,fetch=True)
-            site_id = response1[0]["site_id"]
-            city_id = response1[0]["city_id"]
-            query2 = f"delete from neighborhoods where site_id = {site_id} and city_id = {city_id}"
-            response2 = self.db.execute_query(query2,fetch=False)
-            print(site_id,city_id)
-            for barrio in sede["data"]:
-                name = barrio["nombre del barrio"]
-                delivery_price = barrio["valor del domicilio"]
-                
-                query3 = f"insert into neighborhoods(name, delivery_price,site_id,city_id) values ('{name}',{delivery_price},{site_id},{city_id})"
-                response3 = self.db.execute_query(query3,fetch=False)
-
-                # print (name, delivery_price)
-                
-
-
         # for sede in data["hojas"]:
-        #     # -- 1) Obtenemos site_id y city_id para esta sede
-        #     query_site = f"SELECT site_id, city_id FROM sites WHERE site_name = '{sede['hoja']}'"
-        #     response_site = self.db.execute_query(query_site, fetch=True)
-        #     site_id = response_site[0]["site_id"]
-        #     city_id = response_site[0]["city_id"]
-            
-        #     # -- 2) Armamos la sentencia DELETE para limpiar todos los barrios de esa sede
-        #     delete_query = f"DELETE FROM neighborhoods WHERE site_id = {site_id} AND city_id = {city_id}"
-            
-        #     # -- 3) Construimos el INSERT multi-row
-        #     #    Básicamente: INSERT INTO tabla (...) VALUES (..), (..), (..)
-        #     #    Esto evita ejecutar un INSERT por cada barrio.
-        #     values_list = []
+        #     query1 = f"select site_id , city_id from sites where site_name = '{sede["hoja"]}'"
+        #     response1 = self.db.execute_query(query1,fetch=True)
+        #     site_id = response1[0]["site_id"]
+        #     city_id = response1[0]["city_id"]
+        #     query2 = f"delete from neighborhoods where site_id = {site_id} and city_id = {city_id}"
+        #     response2 = self.db.execute_query(query2,fetch=False)
+        #     print(site_id,city_id)
         #     for barrio in sede["data"]:
         #         name = barrio["nombre del barrio"]
         #         delivery_price = barrio["valor del domicilio"]
-        #         # OJO con inyección SQL, lo ideal es usar parámetros, 
-        #         # pero aquí se muestra con f-string a modo de ejemplo:
-        #         values_list.append(f"('{name}', {delivery_price}, {site_id}, {city_id})")
+                
+        #         query3 = f"insert into neighborhoods(name, delivery_price,site_id,city_id) values ('{name}',{delivery_price},{site_id},{city_id})"
+        #         response3 = self.db.execute_query(query3,fetch=False)
 
-        #     # Si no hay barrios que insertar, te evitas el INSERT
-        #     # para no meter un INSERT sin valores.
-        #     if values_list:
-        #         insert_query = (
-        #             "INSERT INTO neighborhoods (name, delivery_price, site_id, city_id) "
-        #             f"VALUES {', '.join(values_list)}"
-        #         )
-        #     else:
-        #         # Si no hay barrios, puedes saltarte el INSERT
-        #         insert_query = None
+        #         # print (name, delivery_price)
+                
+
+
+        for sede in data["hojas"]:
+            # -- 1) Obtenemos site_id y city_id para esta sede
+            query_site = f"SELECT site_id, city_id FROM sites WHERE site_name = '{sede['hoja']}'"
+            response_site = self.db.execute_query(query_site, fetch=True)
+            site_id = response_site[0]["site_id"]
+            city_id = response_site[0]["city_id"]
             
-        #     # -- 4) Ejecutamos todo en una sola llamada
-        #     #    Puedes envolverlo en BEGIN/COMMIT si deseas transacción atómica:
-        #     #    "BEGIN; {delete_query}; {insert_query}; COMMIT;"
+            # -- 2) Armamos la sentencia DELETE para limpiar todos los barrios de esa sede
+            delete_query = f"DELETE FROM neighborhoods WHERE site_id = {site_id} AND city_id = {city_id}"
             
-        #     if insert_query:
-        #         final_query = f"{delete_query}; {insert_query};"
-        #     else:
-        #         final_query = f"{delete_query};"
+            # -- 3) Construimos el INSERT multi-row
+            #    Básicamente: INSERT INTO tabla (...) VALUES (..), (..), (..)
+            #    Esto evita ejecutar un INSERT por cada barrio.
+            values_list = []
+            for barrio in sede["data"]:
+                name = barrio["nombre del barrio"]
+                delivery_price = barrio["valor del domicilio"]
+                # OJO con inyección SQL, lo ideal es usar parámetros, 
+                # pero aquí se muestra con f-string a modo de ejemplo:
+                values_list.append(f"('{name}', {delivery_price}, {site_id}, {city_id})")
+
+            # Si no hay barrios que insertar, te evitas el INSERT
+            # para no meter un INSERT sin valores.
+            if values_list:
+                insert_query = (
+                    "INSERT INTO neighborhoods (name, delivery_price, site_id, city_id) "
+                    f"VALUES {', '.join(values_list)}"
+                )
+            else:
+                # Si no hay barrios, puedes saltarte el INSERT
+                insert_query = None
             
-        #     self.db.execute_query(final_query, fetch=False)
+            # -- 4) Ejecutamos todo en una sola llamada
+            #    Puedes envolverlo en BEGIN/COMMIT si deseas transacción atómica:
+            #    "BEGIN; {delete_query}; {insert_query}; COMMIT;"
+            
+            if insert_query:
+                final_query = f"{delete_query}; {insert_query};"
+            else:
+                final_query = f"{delete_query};"
+            
+            self.db.execute_query(final_query, fetch=False)
