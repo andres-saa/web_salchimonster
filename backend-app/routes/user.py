@@ -22,7 +22,7 @@ def get_products():
 @user_router.get("/users-distri")
 def get_products():
     user_instance = User()
-    users = user_instance.select_all_users_distri()
+    users = user_instance.select_all_users_distri   ()
     user_instance.close_connection()
     return users
 
