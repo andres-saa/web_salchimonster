@@ -3,6 +3,7 @@ from fastapi.responses import FileResponse
 from typing import Dict, List
 from pydantic import BaseModel
 import requests
+from typing import Optional
 from dotenv import load_dotenv
 import os
 import json
@@ -142,10 +143,30 @@ class Price(BaseModel):
     id:int
     mayor:int
     distribuidor:int
-    kilos:float
+    presentacion:float
+    presentation_unit_measure_id:int
+    unit_measure_id:int
         
 class UpdatePrices(BaseModel):
     prices:List[Price]
+    
+    
+
+    
+    
+class Users(BaseModel):
+    user_id:int
+    user_name:Optional[str] = ''
+    user_phone:Optional[str] = ''
+    cedula_nit:Optional[str] = ''
+    email:Optional[str] = ''
+    first_last_name:Optional[str] = ''
+    second_last_name:Optional[str] = ''
+    second_name:Optional[str] = ''
+    visible:bool
+
+class UpdateUsers(BaseModel):
+    users:List[Users]
 
     
 @distrimonster_router.put('/update-prices/')
@@ -154,8 +175,23 @@ def update_prices(data:UpdatePrices):
     result = instance.updatePrices(data=data)
     sync_api_to_db_and_cache(0)
     return result
+
+@distrimonster_router.put('/update-users/')
+def update_prices(data:UpdateUsers):
+    instance = Distrimonster()
+    result = instance.updateUsers(data=data)
+    sync_api_to_db_and_cache(0)
+    return result
     
     
+    
+@distrimonster_router.get('/distrimonster-measures/')
+def update_prices():
+    instance = Distrimonster()
+    result = instance.getUnitMeasures()
+    return result
+
+
 
 
 def get_db_menu_data() -> dict:

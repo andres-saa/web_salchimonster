@@ -126,7 +126,6 @@ class OrderSchemaPostDistri(BaseModel):
     delivery_price: int
     order_notes: str
     delivery_horaentrega:str
-    user_data: user_schema_post
     inserted_by:Optional[int] = None
     pe_json:Optional[object] = {}
     total:int

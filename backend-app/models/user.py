@@ -24,6 +24,13 @@ class User:
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+    
+    
+    def select_all_users_distri(self):
+        select_query = "SELECT * FROM users where site_id = 32 and visible = true;"
+        self.cursor.execute(select_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
     def select_user_by_id(self, user_id):
         select_query = "SELECT * FROM users WHERE user_id = %s;"

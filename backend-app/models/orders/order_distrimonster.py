@@ -128,13 +128,14 @@ class Order2:
         pe_json_payment_id = 1 if order_data.payment_method_id in valid_payment_ids else 2
 
         # Función interna para calcular el total
+        user = self.db.fetch_one(f"select * from users where user_id = {user_id}")
 
         # Estructura base del JSON
         pe_json = {
             "delivery": {
                 "local_id": order_data.pe_site_id,
                 "delivery_costoenvio": order_data.delivery_price,
-                "delivery_direccionenvio": order_data.user_data.user_address,
+                "delivery_direccionenvio": f"{user["user_address"]}",
                 "delivery_notageneral": order_data.order_notes,
                 "delivery_horaentrega": order_data.delivery_horaentrega,
                 "delivery_pagocon": self.procesar_carrito(order_data.pe_json)['total'] + order_data.delivery_price,
@@ -144,10 +145,11 @@ class Order2:
                 "delivery_tipopago": pe_json_payment_id
             },
             "cliente": {
-                "cliente_nombres": order_data.user_data.user_name,
-                "cliente_apellidos": ".",
-                "cliente_direccion": order_data.user_data.user_address,
-                "cliente_telefono": order_data.user_data.user_phone
+                "cliente_nombres": f"{user["user_name"]} {user["second_name"]}",
+                "cliente_apellidos": f"{user["first_last_name"]} {user["second_last_name"]}",
+                "cliente_direccion": f"{user["user_address"]}",
+                "cliente_telefono": f"{user["user_phone"]}",
+                "cliente_dniruc":f"{user["cedula_nit"]}"
             },
             "listaPedidos": self.procesar_carrito(order_data.pe_json)['carro']
         }
@@ -1243,10 +1245,22 @@ class Order2:
         
         query = """
         
-        SELECT * FROM users where cedula_nit = %s
+        SELECT * FROM users where cedula_nit = %s and visible = true
         """
 
         result = self.db.fetch_one(query=query, params=[dni])
+        
+        
+        return result
+    
+    def delete_user(self, id):
+        
+        query = """
+        
+        update users set visible = false where user_id = %s;
+        """
+
+        result = self.db.execute_query(query=query, params=[id])
         
         
         return result
@@ -1932,7 +1946,7 @@ class Order2:
 
         if result:
             elapsed_seconds = result[0]
-            return elapsed_seconds > 60  # Verifica si han pasado más de 120 segundos
+            return elapsed_seconds > 10  # Verifica si han pasado más de 120 segundos
         else:
             return True  # Si no hay registro previo, el usuario puede realizar una orden
             

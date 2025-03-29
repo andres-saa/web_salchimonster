@@ -61,6 +61,15 @@ def get_orders_to_transfed(dni:str):
 
 
 
+
+@order_distrimonster_router.put('/delete-user-by-id/{id}')
+def get_orders_to_transfed(id:int):
+    order_instance = Order2()
+    result = order_instance.delete_user(id)
+    order_instance.close_connection()
+    return result
+
+
 class User(BaseModel):
     user_name: str
     user_phone: str

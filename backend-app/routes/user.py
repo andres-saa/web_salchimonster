@@ -19,6 +19,13 @@ def get_products():
     user_instance.close_connection()
     return users
 
+@user_router.get("/users-distri")
+def get_products():
+    user_instance = User()
+    users = user_instance.select_all_users_distri()
+    user_instance.close_connection()
+    return users
+
 # @product_router.post("/products")
 # def create_product(product: Product_schema_post):
 #     user_instance = Product()
