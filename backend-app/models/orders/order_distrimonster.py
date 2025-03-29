@@ -132,27 +132,27 @@ class Order2:
 
         # Estructura base del JSON
         pe_json = {
-            "delivery": {
-                "local_id": order_data.pe_site_id,
-                "delivery_costoenvio": order_data.delivery_price,
-                "delivery_direccionenvio": f"{user["user_address"]}",
-                "delivery_notageneral": order_data.order_notes,
-                "delivery_horaentrega": order_data.delivery_horaentrega,
-                "delivery_pagocon": self.procesar_carrito(order_data.pe_json)['total'] + order_data.delivery_price,
-                "delivery_codigointegracion": None,
-                "delivery_codigolimadelivery": None,
-                "canaldelivery_id": 500,
-                "delivery_tipopago": pe_json_payment_id
-            },
-            "cliente": {
-                "cliente_nombres": f"{user["user_name"]} {user["second_name"]}",
-                "cliente_apellidos": f"{user["first_last_name"]} {user["second_last_name"]}",
-                "cliente_direccion": f"{user["user_address"]}",
-                "cliente_telefono": f"{user["user_phone"]}",
-                "cliente_dniruc":f"{user["cedula_nit"]}"
-            },
-            "listaPedidos": self.procesar_carrito(order_data.pe_json)['carro']
-        }
+                "delivery": {
+                    "local_id": order_data.pe_site_id,
+                    "delivery_costoenvio": order_data.delivery_price,
+                    "delivery_direccionenvio": f"{user['user_address']}",
+                    "delivery_notageneral": order_data.order_notes,
+                    "delivery_horaentrega": order_data.delivery_horaentrega,
+                    "delivery_pagocon": self.procesar_carrito(order_data.pe_json)['total'] + order_data.delivery_price,
+                    "delivery_codigointegracion": None,
+                    "delivery_codigolimadelivery": None,
+                    "canaldelivery_id": 500,
+                    "delivery_tipopago": pe_json_payment_id
+                },
+                "cliente": {
+                    "cliente_nombres": f"{user['user_name']} {user['second_name']}",
+                    "cliente_apellidos": f"{user['first_last_name']} {user['second_last_name']}",
+                    "cliente_direccion": f"{user['user_address']}",
+                    "cliente_telefono": f"{user['user_phone']}",
+                    "cliente_dniruc": f"{user['cedula_nit']}"
+                },
+                "listaPedidos": self.procesar_carrito(order_data.pe_json)['carro']
+            }
 
         # Define la consulta de inserción y sus argumentos según la forma de pago
         if order_data.payment_method_id == 6:  # (payment_method_id == 6)
