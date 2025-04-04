@@ -146,6 +146,7 @@ class Price(BaseModel):
     presentacion:float
     presentation_unit_measure_id:int
     unit_measure_id:int
+    kilos_delivery:float
         
 class UpdatePrices(BaseModel):
     prices:List[Price]
