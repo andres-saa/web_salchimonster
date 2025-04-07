@@ -61,6 +61,7 @@ from routes.integracion.products import integration_router
 from routes.integracion.distrimonster import distrimonster_router
 from routes.Users.Users import user_router as customer
 from routes.neigborhoods.neigborhoods import neiborhoods_route
+from routes.integracion.tiendas import tiendas_router
 app = FastAPI()
 # from routes.area import area_router
 app.add_middleware(
@@ -71,6 +72,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+app.include_router(tiendas_router)
 app.include_router(neiborhoods_route)
 app.include_router(customer)
 app.include_router(cachier_money_router)
