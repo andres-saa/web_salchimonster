@@ -8,6 +8,7 @@ from PIL import Image
 from typing import Dict, Any, List, Optional
 from dotenv import load_dotenv
 from apscheduler.schedulers.background import BackgroundScheduler
+# from apscheduler.schedulers.asyncio import AsyncIOScheduler  # <- Úsalo si tu app es async
 
 # Modelos y lógica de negocio (ajusta las importaciones a tu estructura real)
 from models.tiendas.Tiendas import Tiendas, Menu
@@ -85,7 +86,7 @@ def process_images_from_menu_data(menu_data: Any):
     def extract_images(data):
         if isinstance(data, dict):
             for key, value in data.items():
-                # Podrías ajustar si tu JSON de BD guarda la url con otro nombre
+                # Ajusta si tu JSON de BD guarda la url con otro nombre
                 if key.endswith("urlimagen") and isinstance(value, str):
                     image_urls.append(value)
                 elif isinstance(value, (dict, list)):
@@ -107,24 +108,14 @@ def get_db_menu_for_local(local_id: int) -> Optional[Any]:
     """
     Obtiene el menú de la BD para un local_id específico.
     Debe retornar la ESTRUCTURA FINAL que se quiera servir al usuario.
-    Por ejemplo:
-      [
-        {
-          "local_id": ...,
-          "categorias": [{...}, ...]
-        }
-      ]
-    Ajusta a tu método real.
     """
     logger.info(f"Buscando en la BD el menú para local_id={local_id}...")
     instance = Tiendas()
     # Ejemplo: tu método podría ser getMenu(local_id), revisa tu implementación
     result = instance.getMenu(local_id=local_id)
     if result and isinstance(result, list) and len(result) > 0:
-        return result  # O result[0], según tu implementación
+        return result
     return None
-
-
 
 def update_db_menu_data(menu_data: List[Dict[str, Any]], local_id: int) -> dict:
     """
@@ -143,13 +134,8 @@ def update_db_menu_data(menu_data: List[Dict[str, Any]], local_id: int) -> dict:
 def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupos: int = 0) -> Any:
     """
     1. Revisa si existe un archivo de caché en disco (JSON).
-       - Si sí, retorna ese contenido.
     2. Si no hay caché, se consulta la BD.
-       - Si la BD sí tiene datos, se guardan en caché, se procesan imágenes y se retorna.
-    3. Si tampoco hay en BD, se llama a la API,
-       se guarda el resultado *crudo* en la BD,
-       luego se vuelve a leer la BD para obtener la versión final y
-       se guarda en caché el resultado de la BD (se procesan imágenes) y se retorna.
+    3. Si tampoco hay en BD, se llama a la API -> se guarda en BD -> se vuelve a leer la BD -> se guarda en caché.
     """
     cache_file = os.path.join(CACHE_DIR, f"menu_{local_id}.json")
 
@@ -168,15 +154,14 @@ def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupo
     db_data = get_db_menu_for_local(local_id)
     if db_data:
         logger.info(f"Menú de local_id={local_id} encontrado en la BD. Guardando en caché...")
-        # Guardar en caché
         with open(cache_file, "w", encoding="utf-8") as f:
             json.dump(db_data, f, ensure_ascii=False, indent=4)
 
-        # Procesar imágenes según lo que retorna la BD
+        # Procesar imágenes
         process_images_from_menu_data(db_data)
         return db_data
 
-    # 3. Ni caché ni BD: Llamar a la API y luego a la BD para la versión "final"
+    # 3. Ni caché ni BD: Llamar a la API y luego a la BD para la versión final
     logger.info(f"No hay menú para local_id={local_id} en caché ni en BD. Descargando de la API...")
 
     try:
@@ -193,11 +178,6 @@ def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupo
         logger.error(f"Error al obtener datos de la API para local_id={local_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-    # -------------------------------------------------------------------
-    # Aquí puedes hacer la categorización interna, si la BD
-    # necesita solo los productos "categorizados" o un array de categorías.
-    # Ejemplo: construir la lista final_data (igual que antes).
-    # -------------------------------------------------------------------
     categorias_raw = api_response.get("listaCategorias", [])
     productos_raw = api_response.get("data", [])
 
@@ -223,22 +203,20 @@ def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupo
 
     api_categorized_data = list(categorias.values())
 
-    # Guardar PRIMERO la data bruta (o categorizada) en la BD
+    # Guardar PRIMERO en la BD
     update_db_menu_data(api_categorized_data, local_id)
 
-    # Leer nuevamente la BD para obtener la versión final (ya transformada o enriquecida)
+    # Leer nuevamente la BD para obtener la versión final
     final_db_data = get_db_menu_for_local(local_id)
     if not final_db_data:
-        # Si por algún motivo la BD siguió vacía, retornamos lo categorizado
-        # o lanzamos un error, según tu necesidad
-        logger.warning(f"La BD no devolvió datos tras update. Devolviendo data categorizada.")
+        logger.warning("La BD no devolvió datos tras update. Devolviendo data categorizada.")
         final_db_data = api_categorized_data
 
-    # Guardar la data final en caché
+    # Guardar en caché
     with open(cache_file, "w", encoding="utf-8") as f:
         json.dump(final_db_data, f, ensure_ascii=False, indent=4)
 
-    # Procesar imágenes con la data final proveniente de la BD
+    # Procesar imágenes
     process_images_from_menu_data(final_db_data)
 
     logger.info(f"Menú de local_id={local_id} listo (API -> BD -> caché).")
@@ -251,9 +229,6 @@ def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupo
 def get_products_for_tienda(local_id: int, quipupos: int = 0):
     """
     Devuelve el menú categorizado para un local.
-    1. Intenta leer caché local.
-    2. Si no hay, lee BD.
-    3. Si no hay en BD, descarga de API -> guarda en BD -> vuelve a leer BD -> guarda en caché.
     """
     return fetch_and_cache_categorized_products(DOMAIN_ID, local_id, quipupos)
 
@@ -312,7 +287,6 @@ def refresh_menu_for_tienda(local_id: int, quipupos: int = 0):
         logger.error(f"Error al refrescar datos de la API para local_id={local_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-    # Categorizar
     categorias_raw = api_response.get("listaCategorias", [])
     productos_raw = api_response.get("data", [])
 
@@ -344,7 +318,7 @@ def refresh_menu_for_tienda(local_id: int, quipupos: int = 0):
     # Leer la versión definitiva desde la BD
     final_db_data = get_db_menu_for_local(local_id)
     if not final_db_data:
-        logger.warning(f"La BD no devolvió nada tras el refresco. Usando data categorizada sin procesar.")
+        logger.warning("La BD no devolvió nada tras el refresco. Usando data categorizada sin procesar.")
         final_db_data = api_categorized_data
 
     # Guardar en caché
@@ -352,7 +326,7 @@ def refresh_menu_for_tienda(local_id: int, quipupos: int = 0):
     with open(cache_file, "w", encoding="utf-8") as f:
         json.dump(final_db_data, f, ensure_ascii=False, indent=4)
 
-    # Procesar imágenes a partir de la data final
+    # Procesar imágenes
     process_images_from_menu_data(final_db_data)
 
     return {
@@ -377,7 +351,6 @@ def refresh_all_tiendas(quipupos: int = 0):
             results.append({
                 "local_id": l_id,
                 "status": "ok",
-                
                 "db_update_result": db_result
             })
         except Exception as e:
@@ -394,7 +367,7 @@ def refresh_all_tiendas(quipupos: int = 0):
     }
 
 # -----------------------------------------------------
-# Programar tarea repetitiva con APScheduler
+# Scheduler
 # -----------------------------------------------------
 scheduler = BackgroundScheduler()
 
@@ -403,16 +376,19 @@ def scheduled_job():
     Cada X tiempo se actualiza la caché (y la BD) de todos los locales.
     """
     logger.info("=== Tarea programada: actualizando todos los locales ===")
-    for local_id in LOCAL_IDS_TO_CACHE:
-        try:
-            # Llama la misma función de siempre
-            fetch_and_cache_categorized_products(DOMAIN_ID, local_id, quipupos=0)
-        except Exception as e:
-            logger.error(f"Error actualizando local_id={local_id}: {e}")
-    logger.info("=== Tarea programada finalizada ===")
+    try:
+        for local_id in LOCAL_IDS_TO_CACHE:
+            try:
+                fetch_and_cache_categorized_products(DOMAIN_ID, local_id, quipupos=0)
+            except Exception as e:
+                logger.error(f"Error actualizando local_id={local_id}: {e}")
+    except Exception as e:
+        logger.error(f"Error global en la tarea programada: {e}")
+    finally:
+        logger.info("=== Tarea programada finalizada ===")
 
-scheduler.add_job(scheduled_job, "interval", minutes=30)  # Ajusta el intervalo a tus necesidades
-scheduler.start()
+# Configuramos la tarea cada 30 minutos (ajusta el intervalo según requieras)
+scheduler.add_job(scheduled_job, "interval", minutes=30)
 
 # -----------------------------------------------------
 # Crear la app FastAPI
@@ -421,13 +397,16 @@ app = FastAPI()
 
 @app.on_event("startup")
 def on_startup():
-    logger.info("Iniciando aplicación FastAPI... (scheduler on)")
+    logger.info("Iniciando aplicación FastAPI...")
+    # Iniciar scheduler si está detenido (por ejemplo, en modo reload)
+    if scheduler.state == 0:  # 0 = STATE_STOPPED
+        logger.info("Iniciando APScheduler (BackgroundScheduler)...")
+        scheduler.start()
 
 @app.on_event("shutdown")
 def on_shutdown():
-    scheduler.shutdown()
+    if scheduler.state == 1:  # 1 = STATE_RUNNING
+        scheduler.shutdown()
     logger.info("Cerrando aplicación FastAPI... (scheduler off)")
 
 app.include_router(tiendas_router)
-
-# uvicorn <este_archivo>:app --reload
