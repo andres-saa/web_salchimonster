@@ -50,6 +50,31 @@ LOCAL_IDS_TO_CACHE = [8, 6, 2, 9, 4, 5, 1, 11, 3, 13, 7, 16]
 tiendas_router = APIRouter()
 
 # -----------------------------------------------------
+# Función para eliminar subcategorías y productos nulos
+# -----------------------------------------------------
+def remove_nested_categories_and_null_products(data: Any) -> Any:
+    """
+    Recorre la estructura de datos y:
+      - Elimina el campo 'categorias' dentro de cada categoría para
+        evitar anidaciones (subcategorías).
+      - Elimina productos = None en cada categoría.
+    """
+    if not isinstance(data, list):
+        return data
+    
+    for menu_item in data:
+        # Cada menu_item debe ser algo como:
+        # { "local_id": X, "categorias": [ { ... }, { ... } ] }
+        categorias = menu_item.get("categorias", [])
+        for cat in categorias:
+            # Si existe un campo 'categorias' en la categoría, lo borramos
+            cat.pop("categorias", None)
+            # Filtra productos que no sean None
+            cat["products"] = [p for p in cat.get("products", []) if p is not None]
+
+    return data
+
+# -----------------------------------------------------
 # Funciones auxiliares para manejo de imágenes
 # -----------------------------------------------------
 def download_and_resize_image(image_url: str, image_code: str):
@@ -126,7 +151,6 @@ def update_db_menu_data(menu_data: List[Dict[str, Any]], local_id: int) -> dict:
     instance = Tiendas()
     menu = Menu(data=menu_data, local_id=local_id)
     result = instance.updateMenu(menu)
-    # Si 'result' es lista, tomamos el primer elemento. Ajusta según tu caso.
     return result[0] if result else {}
 
 # -----------------------------------------------------
@@ -135,8 +159,8 @@ def update_db_menu_data(menu_data: List[Dict[str, Any]], local_id: int) -> dict:
 def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupos: int = 0) -> Any:
     """
     1. Verifica archivo de caché; si está OK, lo devuelve.
-    2. Sino, revisa BD; si encuentra, lo guarda en caché y retorna.
-    3. Sino, va a la API, guarda en BD, luego lee de la BD y guarda en caché.
+    2. Sino, revisa BD; si encuentra, lo limpia, lo guarda en caché y retorna.
+    3. Sino, va a la API, guarda en BD, luego lee de la BD, limpia y guarda en caché.
     """
     cache_file = os.path.join(CACHE_DIR, f"menu_{local_id}.json")
 
@@ -154,6 +178,9 @@ def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupo
     # 2. Verificar en la BD
     db_data = get_db_menu_for_local(local_id)
     if db_data:
+        # Eliminamos subcategorías anidadas y productos nulos
+        db_data = remove_nested_categories_and_null_products(db_data)
+
         logger.info(f"Menú de local_id={local_id} encontrado en la BD. Guardando en caché...")
         with open(cache_file, "w", encoding="utf-8") as f:
             json.dump(db_data, f, ensure_ascii=False, indent=4)
@@ -180,7 +207,7 @@ def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupo
     categorias_raw = api_response.get("listaCategorias", [])
     productos_raw = api_response.get("data", [])
 
-    # Construye estructura de categorías
+    # Construye estructura de categorías (sin subcategorías)
     categorias = {
         cat["categoria_id"]: {
             "categoria_id": cat["categoria_id"],
@@ -216,6 +243,9 @@ def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupo
     if not final_db_data:
         logger.warning("La BD no devolvió datos tras update. Usamos la data categorizada local.")
         final_db_data = api_categorized_data
+
+    # Limpieza final (remover subcategorías y nulos) antes de caché
+    final_db_data = remove_nested_categories_and_null_products(final_db_data)
 
     # Guardar en caché
     with open(cache_file, "w", encoding="utf-8") as f:
@@ -276,8 +306,9 @@ def refresh_menu_for_tienda(local_id: int, quipupos: int = 0):
       1) Llama SIEMPRE a la API (ignorando caché y BD previas).
       2) Guarda en BD.
       3) Re-lee de BD (versión final).
-      4) Actualiza el caché.
-      5) Retorna el menú final.
+      4) Elimina subcategorías anidadas y productos nulos.
+      5) Actualiza el caché.
+      6) Retorna el menú final.
     """
     logger.info(f"Forzando refresco de menú para local_id={local_id}...")
 
@@ -299,7 +330,7 @@ def refresh_menu_for_tienda(local_id: int, quipupos: int = 0):
     categorias_raw = api_response.get("listaCategorias", [])
     productos_raw = api_response.get("data", [])
 
-    # Reconstruir la lista de categorías
+    # Reconstruir la lista de categorías (sin subcategorías)
     categorias = {
         cat["categoria_id"]: {
             "categoria_id": cat["categoria_id"],
@@ -336,6 +367,9 @@ def refresh_menu_for_tienda(local_id: int, quipupos: int = 0):
         logger.warning("La BD no devolvió nada tras el refresco. Usamos data categorizada sin procesar.")
         final_db_data = api_categorized_data
 
+    # Elimina subcategorías y productos nulos
+    final_db_data = remove_nested_categories_and_null_products(final_db_data)
+
     # Actualizar caché
     cache_file = os.path.join(CACHE_DIR, f"menu_{local_id}.json")
     with open(cache_file, "w", encoding="utf-8") as f:
@@ -353,19 +387,17 @@ def refresh_menu_for_tienda(local_id: int, quipupos: int = 0):
 def refresh_all_tiendas(quipupos: int = 0):
     """
     Fuerza el refresco para cada local en LOCAL_IDS_TO_CACHE.
-    Igual que refresco individual, pero para varios.
+    Similar a refresco individual, pero para varios.
     """
     results = []
     logger.info("Refrescando menú para TODOS los locales en LOCAL_IDS_TO_CACHE...")
     for l_id in LOCAL_IDS_TO_CACHE:
         try:
-            # La forma más directa es usar la misma lógica:
-            # 1) Llamar a la API, 2) Guardar en BD, 3) Leer de BD, 4) Actualizar caché
-            # Se puede reusar la función refresh_menu_for_tienda o replicar la lógica.
+            # Llamar a la API
             url = f"https://api.restaurant.pe/restaurant/readonly/rest/delivery/obtenerCartaPorLocal/{DOMAIN_ID}/{l_id}"
             headers = {
                 "Content-Type": "application/json",
-                "Authorization": f'Token token="{TOKEN}"'
+                "Authorization": f'Token token=\"{TOKEN}\"'
             }
             params = {"quipupos": quipupos}
             response = requests.get(url, headers=headers, params=params)
@@ -375,6 +407,7 @@ def refresh_all_tiendas(quipupos: int = 0):
             cat_raw = api_response.get("listaCategorias", [])
             prod_raw = api_response.get("data", [])
 
+            # Construir categorías sin subcategorías
             categorias = {
                 cat["categoria_id"]: {
                     "categoria_id": cat["categoria_id"],
@@ -389,6 +422,7 @@ def refresh_all_tiendas(quipupos: int = 0):
                 for cat in cat_raw
             }
 
+            # Asignar productos
             for producto in prod_raw:
                 if isinstance(producto, dict):
                     cid = producto.get("categoria_id")
@@ -400,6 +434,7 @@ def refresh_all_tiendas(quipupos: int = 0):
                 "categorias": list(categorias.values())
             }]
 
+            # Guardar en BD
             db_result = update_db_menu_data(new_data, l_id)
 
             # Releer BD
@@ -407,6 +442,10 @@ def refresh_all_tiendas(quipupos: int = 0):
             if not final_data:
                 final_data = new_data
 
+            # Elimina subcategorías y productos nulos
+            final_data = remove_nested_categories_and_null_products(final_data)
+
+            # Guardar en caché
             cache_file = os.path.join(CACHE_DIR, f"menu_{l_id}.json")
             with open(cache_file, "w", encoding="utf-8") as f:
                 json.dump(final_data, f, ensure_ascii=False, indent=4)
@@ -433,7 +472,7 @@ def refresh_all_tiendas(quipupos: int = 0):
     }
 
 # -----------------------------------------------------
-# Scheduler
+# Scheduler (opcional)
 # -----------------------------------------------------
 scheduler = BackgroundScheduler()
 
@@ -445,9 +484,7 @@ def scheduled_job():
     try:
         for local_id in LOCAL_IDS_TO_CACHE:
             try:
-                # Podemos usar la misma lógica de fetch_and_cache_categorized_products
-                # (que revisa BD y caché y, si no hay, llama a la API).
-                # Si deseas forzarlo, podrías replicar la lógica de 'refresh'.
+                # Usa la misma lógica de fetch_and_cache_categorized_products
                 fetch_and_cache_categorized_products(DOMAIN_ID, local_id, quipupos=0)
             except Exception as e:
                 logger.error(f"Error actualizando local_id={local_id}: {e}")
@@ -456,7 +493,7 @@ def scheduled_job():
     finally:
         logger.info("=== Tarea programada finalizada ===")
 
-# Configuramos la tarea cada 30 minutos (ajusta el intervalo según tus necesidades)
+# Ajusta el intervalo según tus necesidades (30 min aquí a modo de ejemplo)
 scheduler.add_job(scheduled_job, "interval", minutes=30)
 
 # -----------------------------------------------------
