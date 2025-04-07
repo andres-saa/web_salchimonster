@@ -8,9 +8,9 @@ from PIL import Image
 from typing import Dict, Any, List, Optional
 from dotenv import load_dotenv
 from apscheduler.schedulers.background import BackgroundScheduler
-# from apscheduler.schedulers.asyncio import AsyncIOScheduler  # <- Úsalo si tu app es async
+# from apscheduler.schedulers.asyncio import AsyncIOScheduler  # si tu app es async
 
-# Modelos y lógica de negocio (ajusta las importaciones a tu estructura real)
+# Modelos y lógica de negocio
 from models.tiendas.Tiendas import Tiendas, Menu
 
 # -----------------------------------------------------
@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # -----------------------------------------------------
-# Cargamos el token desde .env
+# Carga de variables de entorno
 # -----------------------------------------------------
 load_dotenv()
 TOKEN = os.getenv("API_TOKEN")
@@ -28,7 +28,7 @@ TOKEN = os.getenv("API_TOKEN")
 # -----------------------------------------------------
 # Ajusta tu dominio
 # -----------------------------------------------------
-DOMAIN_ID = 6149  # Ajustar si es necesario
+DOMAIN_ID = 6149
 
 # -----------------------------------------------------
 # Directorios de caché
@@ -79,14 +79,14 @@ def download_and_resize_image(image_url: str, image_code: str):
 
 def process_images_from_menu_data(menu_data: Any):
     """
-    Recorre la estructura de menú en busca de URLs de imágenes y las guarda en caché.
+    Recorre la estructura de menú y extrae URLs de imágenes.
+    Luego las descarga/resizea si no están en caché.
     """
     image_urls = []
 
     def extract_images(data):
         if isinstance(data, dict):
             for key, value in data.items():
-                # Ajusta si tu JSON de BD guarda la url con otro nombre
                 if key.endswith("urlimagen") and isinstance(value, str):
                     image_urls.append(value)
                 elif isinstance(value, (dict, list)):
@@ -107,11 +107,11 @@ def process_images_from_menu_data(menu_data: Any):
 def get_db_menu_for_local(local_id: int) -> Optional[Any]:
     """
     Obtiene el menú de la BD para un local_id específico.
-    Debe retornar la ESTRUCTURA FINAL que se quiera servir al usuario.
+    Retorna la estructura final (list/dict) que se usa en la app.
     """
     logger.info(f"Buscando en la BD el menú para local_id={local_id}...")
     instance = Tiendas()
-    # Ejemplo: tu método podría ser getMenu(local_id), revisa tu implementación
+    # Ajustar según tu implementación real
     result = instance.getMenu(local_id=local_id)
     if result and isinstance(result, list) and len(result) > 0:
         return result
@@ -126,6 +126,7 @@ def update_db_menu_data(menu_data: List[Dict[str, Any]], local_id: int) -> dict:
     instance = Tiendas()
     menu = Menu(data=menu_data, local_id=local_id)
     result = instance.updateMenu(menu)
+    # Si 'result' es lista, tomamos el primer elemento. Ajusta según tu caso.
     return result[0] if result else {}
 
 # -----------------------------------------------------
@@ -133,9 +134,9 @@ def update_db_menu_data(menu_data: List[Dict[str, Any]], local_id: int) -> dict:
 # -----------------------------------------------------
 def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupos: int = 0) -> Any:
     """
-    1. Revisa si existe un archivo de caché en disco (JSON).
-    2. Si no hay caché, se consulta la BD.
-    3. Si tampoco hay en BD, se llama a la API -> se guarda en BD -> se vuelve a leer la BD -> se guarda en caché.
+    1. Verifica archivo de caché; si está OK, lo devuelve.
+    2. Sino, revisa BD; si encuentra, lo guarda en caché y retorna.
+    3. Sino, va a la API, guarda en BD, luego lee de la BD y guarda en caché.
     """
     cache_file = os.path.join(CACHE_DIR, f"menu_{local_id}.json")
 
@@ -147,7 +148,7 @@ def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupo
             logger.info(f"Menú de local_id={local_id} obtenido desde caché de archivos.")
             return final_data
         except json.JSONDecodeError:
-            logger.warning(f"El archivo de caché local_id={local_id} está dañado. Se eliminará.")
+            logger.warning(f"El caché (local_id={local_id}) está dañado. Lo eliminamos.")
             os.remove(cache_file)
 
     # 2. Verificar en la BD
@@ -157,13 +158,11 @@ def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupo
         with open(cache_file, "w", encoding="utf-8") as f:
             json.dump(db_data, f, ensure_ascii=False, indent=4)
 
-        # Procesar imágenes
         process_images_from_menu_data(db_data)
         return db_data
 
-    # 3. Ni caché ni BD: Llamar a la API y luego a la BD para la versión final
-    logger.info(f"No hay menú para local_id={local_id} en caché ni en BD. Descargando de la API...")
-
+    # 3. No había en caché ni BD -> Vamos a la API
+    logger.info(f"No hay menú para local_id={local_id} en caché ni BD. Descargando de la API...")
     try:
         url = f"https://api.restaurant.pe/restaurant/readonly/rest/delivery/obtenerCartaPorLocal/{dominio_id}/{local_id}"
         headers = {
@@ -181,6 +180,7 @@ def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupo
     categorias_raw = api_response.get("listaCategorias", [])
     productos_raw = api_response.get("data", [])
 
+    # Construye estructura de categorías
     categorias = {
         cat["categoria_id"]: {
             "categoria_id": cat["categoria_id"],
@@ -195,28 +195,32 @@ def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupo
         for cat in categorias_raw
     }
 
+    # Asigna productos a la categoría correspondiente
     for producto in productos_raw:
         if isinstance(producto, dict):
             cid = producto.get("categoria_id")
             if cid in categorias:
                 categorias[cid]["products"].append(producto)
 
-    api_categorized_data = list(categorias.values())
+    # Envolver en la estructura final (ajusta según tu DB)
+    api_categorized_data = [{
+        "local_id": local_id,
+        "categorias": list(categorias.values())
+    }]
 
-    # Guardar PRIMERO en la BD
+    # Guardar primero en la BD
     update_db_menu_data(api_categorized_data, local_id)
 
-    # Leer nuevamente la BD para obtener la versión final
+    # Leer nuevamente de la BD
     final_db_data = get_db_menu_for_local(local_id)
     if not final_db_data:
-        logger.warning("La BD no devolvió datos tras update. Devolviendo data categorizada.")
+        logger.warning("La BD no devolvió datos tras update. Usamos la data categorizada local.")
         final_db_data = api_categorized_data
 
     # Guardar en caché
     with open(cache_file, "w", encoding="utf-8") as f:
         json.dump(final_db_data, f, ensure_ascii=False, indent=4)
 
-    # Procesar imágenes
     process_images_from_menu_data(final_db_data)
 
     logger.info(f"Menú de local_id={local_id} listo (API -> BD -> caché).")
@@ -229,6 +233,7 @@ def fetch_and_cache_categorized_products(dominio_id: int, local_id: int, quipupo
 def get_products_for_tienda(local_id: int, quipupos: int = 0):
     """
     Devuelve el menú categorizado para un local.
+    Primero buscará en caché; si no existe, va a BD; si tampoco, llama la API.
     """
     return fetch_and_cache_categorized_products(DOMAIN_ID, local_id, quipupos)
 
@@ -236,7 +241,7 @@ def get_products_for_tienda(local_id: int, quipupos: int = 0):
 def get_image_tienda(image_url: str):
     """
     Devuelve una imagen redimensionada (ya en caché).
-    Si no está, intenta descargar en ese momento.
+    Si no está, la descarga en ese momento.
     """
     image_code = image_url.split('/')[-1]
     image_path = os.path.join(CACHE_IMAGE_DIR, image_code)
@@ -267,12 +272,16 @@ def get_image_tienda(image_url: str):
 @tiendas_router.get("/tiendas/{local_id}/refresh")
 def refresh_menu_for_tienda(local_id: int, quipupos: int = 0):
     """
-    Fuerza la descarga desde la API, ignorando caché/BD, y luego usa la misma
-    lógica de 'guardar en BD -> leer BD -> guardar en caché'.
+    Fuerza la actualización:
+      1) Llama SIEMPRE a la API (ignorando caché y BD previas).
+      2) Guarda en BD.
+      3) Re-lee de BD (versión final).
+      4) Actualiza el caché.
+      5) Retorna el menú final.
     """
     logger.info(f"Forzando refresco de menú para local_id={local_id}...")
 
-    # Descargamos directamente de la API
+    # Llamada forzada a la API
     try:
         url = f"https://api.restaurant.pe/restaurant/readonly/rest/delivery/obtenerCartaPorLocal/{DOMAIN_ID}/{local_id}"
         headers = {
@@ -290,6 +299,7 @@ def refresh_menu_for_tienda(local_id: int, quipupos: int = 0):
     categorias_raw = api_response.get("listaCategorias", [])
     productos_raw = api_response.get("data", [])
 
+    # Reconstruir la lista de categorías
     categorias = {
         cat["categoria_id"]: {
             "categoria_id": cat["categoria_id"],
@@ -304,29 +314,33 @@ def refresh_menu_for_tienda(local_id: int, quipupos: int = 0):
         for cat in categorias_raw
     }
 
+    # Asignar productos
     for producto in productos_raw:
         if isinstance(producto, dict):
             cid = producto.get("categoria_id")
             if cid in categorias:
                 categorias[cid]["products"].append(producto)
 
-    api_categorized_data = list(categorias.values())
+    # Envolver en la estructura final
+    api_categorized_data = [{
+        "local_id": local_id,
+        "categorias": list(categorias.values())
+    }]
 
     # Guardar en BD
     db_result = update_db_menu_data(api_categorized_data, local_id)
 
-    # Leer la versión definitiva desde la BD
+    # Re-lee desde la BD
     final_db_data = get_db_menu_for_local(local_id)
     if not final_db_data:
-        logger.warning("La BD no devolvió nada tras el refresco. Usando data categorizada sin procesar.")
+        logger.warning("La BD no devolvió nada tras el refresco. Usamos data categorizada sin procesar.")
         final_db_data = api_categorized_data
 
-    # Guardar en caché
+    # Actualizar caché
     cache_file = os.path.join(CACHE_DIR, f"menu_{local_id}.json")
     with open(cache_file, "w", encoding="utf-8") as f:
         json.dump(final_db_data, f, ensure_ascii=False, indent=4)
 
-    # Procesar imágenes
     process_images_from_menu_data(final_db_data)
 
     return {
@@ -338,21 +352,73 @@ def refresh_menu_for_tienda(local_id: int, quipupos: int = 0):
 @tiendas_router.get("/tiendas/refresh_all")
 def refresh_all_tiendas(quipupos: int = 0):
     """
-    Para cada local en LOCAL_IDS_TO_CACHE, ejecuta la lógica fetch_and_cache_categorized_products
-    y actualiza la BD. Retorna un estado de cada uno.
+    Fuerza el refresco para cada local en LOCAL_IDS_TO_CACHE.
+    Igual que refresco individual, pero para varios.
     """
     results = []
     logger.info("Refrescando menú para TODOS los locales en LOCAL_IDS_TO_CACHE...")
     for l_id in LOCAL_IDS_TO_CACHE:
         try:
-            new_data = fetch_and_cache_categorized_products(DOMAIN_ID, l_id, quipupos)
-            # new_data aquí ya es la data final de la BD
+            # La forma más directa es usar la misma lógica:
+            # 1) Llamar a la API, 2) Guardar en BD, 3) Leer de BD, 4) Actualizar caché
+            # Se puede reusar la función refresh_menu_for_tienda o replicar la lógica.
+            url = f"https://api.restaurant.pe/restaurant/readonly/rest/delivery/obtenerCartaPorLocal/{DOMAIN_ID}/{l_id}"
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f'Token token="{TOKEN}"'
+            }
+            params = {"quipupos": quipupos}
+            response = requests.get(url, headers=headers, params=params)
+            response.raise_for_status()
+            api_response = response.json()
+
+            cat_raw = api_response.get("listaCategorias", [])
+            prod_raw = api_response.get("data", [])
+
+            categorias = {
+                cat["categoria_id"]: {
+                    "categoria_id": cat["categoria_id"],
+                    "local_id": cat["local_id"],
+                    "categoria_descripcion": cat["categoria_descripcion"],
+                    "categoria_estado": cat["categoria_estado"],
+                    "categoria_padreid": cat["categoria_padreid"],
+                    "categoria_color": cat["categoria_color"],
+                    "categoria_delivery": cat["categoria_delivery"],
+                    "products": []
+                }
+                for cat in cat_raw
+            }
+
+            for producto in prod_raw:
+                if isinstance(producto, dict):
+                    cid = producto.get("categoria_id")
+                    if cid in categorias:
+                        categorias[cid]["products"].append(producto)
+
+            new_data = [{
+                "local_id": l_id,
+                "categorias": list(categorias.values())
+            }]
+
             db_result = update_db_menu_data(new_data, l_id)
+
+            # Releer BD
+            final_data = get_db_menu_for_local(l_id)
+            if not final_data:
+                final_data = new_data
+
+            cache_file = os.path.join(CACHE_DIR, f"menu_{l_id}.json")
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(final_data, f, ensure_ascii=False, indent=4)
+
+            process_images_from_menu_data(final_data)
+
             results.append({
                 "local_id": l_id,
                 "status": "ok",
                 "db_update_result": db_result
             })
+
         except Exception as e:
             logger.error(f"Error refrescando local_id={l_id}: {e}")
             results.append({
@@ -379,6 +445,9 @@ def scheduled_job():
     try:
         for local_id in LOCAL_IDS_TO_CACHE:
             try:
+                # Podemos usar la misma lógica de fetch_and_cache_categorized_products
+                # (que revisa BD y caché y, si no hay, llama a la API).
+                # Si deseas forzarlo, podrías replicar la lógica de 'refresh'.
                 fetch_and_cache_categorized_products(DOMAIN_ID, local_id, quipupos=0)
             except Exception as e:
                 logger.error(f"Error actualizando local_id={local_id}: {e}")
@@ -387,7 +456,7 @@ def scheduled_job():
     finally:
         logger.info("=== Tarea programada finalizada ===")
 
-# Configuramos la tarea cada 30 minutos (ajusta el intervalo según requieras)
+# Configuramos la tarea cada 30 minutos (ajusta el intervalo según tus necesidades)
 scheduler.add_job(scheduled_job, "interval", minutes=30)
 
 # -----------------------------------------------------
@@ -398,7 +467,6 @@ app = FastAPI()
 @app.on_event("startup")
 def on_startup():
     logger.info("Iniciando aplicación FastAPI...")
-    # Iniciar scheduler si está detenido (por ejemplo, en modo reload)
     if scheduler.state == 0:  # 0 = STATE_STOPPED
         logger.info("Iniciando APScheduler (BackgroundScheduler)...")
         scheduler.start()
