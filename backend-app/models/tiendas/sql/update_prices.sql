@@ -1,3 +1,3 @@
-UPDATE distrimonster.prices
-	SET  mayor= %s, distribuidor= %s, presentacion= %s, unit_measure_id= %s, presentation_unit_measure_id= %s, kilos_delivery = %s, index = %s
-	WHERE product_id = %s returning product_id;
+UPDATE tiendas.producto
+	SET  index=%s, english_name=%s, english_description=%s, last_price=%s
+	WHERE producto_id = %s returning producto_id;

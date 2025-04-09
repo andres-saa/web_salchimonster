@@ -1,1 +1,1 @@
-SELECT * FROM tiendas.menu_by_local where local_id = %s;
+SELECT data FROM tiendas.menu_enriched where local_id = %s;

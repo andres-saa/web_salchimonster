@@ -15,17 +15,16 @@ class Menu(BaseModel):
     data:list[Dict]
     local_id:int
     
-class Price(BaseModel):
-    id:int
-    mayor:int
-    distribuidor:int
-    kilos:float
-    kilos_delivery:float
-    index:int
+class Producto(BaseModel):
+    producto_id:int
+    english_description:str
+    english_name: str
+    index: int
+    last_price:float
     
-    
+
 class UpdatePrices(BaseModel):
-    prices:List[Price]
+    productos:List[Producto]
     
     
     
@@ -43,6 +42,15 @@ class Users(BaseModel):
 class UpdateUsers(BaseModel):
     users:List[Users]
 
+
+class Categoria(BaseModel):
+    categoria_id:int
+    index:int
+    visible:bool
+    
+
+class UpdateCategorias(BaseModel):
+    categorias:List[Categoria]
 
 class Tiendas:
     
@@ -85,17 +93,54 @@ class Tiendas:
         query = self.db.cargar_archivo_sql('./sql/update_prices.sql')
         
         results = []
-        for price in data.prices:
+        for producto in data.productos:
             # Ejecutamos la consulta para cada elemento de la lista
             # pasando mayor, distribuidor, id en ese orden
             result = self.db.execute_query_json(
                 query=query,
-                params=[price.mayor, price.distribuidor, price.presentacion, price.unit_measure_id, price.presentation_unit_measure_id,price.kilos_delivery,price.index, price.id],
+                params=[producto.index,producto.english_name, producto.english_description, producto.last_price, producto.producto_id],
                 fetch=True
             )
             results.append(result)
 
         return results
+    
+    
+    
+    
+    def update_categorias(self, data: UpdateCategorias):
+        # Cargamos el SQL "update_prices.sql"
+        query = self.db.cargar_archivo_sql('./sql/update_categorias.sql')
+        
+        results = []
+        for categoria in data.categorias:
+            # Ejecutamos la consulta para cada elemento de la lista
+            # pasando mayor, distribuidor, id en ese orden
+            result = self.db.execute_query(
+                query=query,
+                params=[categoria.index,categoria.visible, categoria.categoria_id],
+                fetch=True
+            )
+            results.append(result)
+
+        return results
+    
+    
+    
+    
+    
+    def updateCategory(self, english_name:str,categoria_id:int):
+        # Cargamos el SQL "update_prices.sql"
+        query = self.db.cargar_archivo_sql('./sql/update_category.sql')
+
+        result = self.db.execute_query(
+                query=query,
+                params=[english_name,categoria_id ],
+                fetch=True
+            )
+
+
+        return result
 
 
 
