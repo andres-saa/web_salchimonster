@@ -871,14 +871,14 @@ class Order2:
             INSERT INTO orders.order_status (order_id, status,timestamp)
             VALUES (%s, %s,CURRENT_TIMESTAMP );
             """
-            self.cursor.execute(order_status_insert_query, (order_id, 'transferencia pendiente',))
+            self.cursor.execute(order_status_insert_query, (order_id, 'Pago pendiente',))
             
             # Consulta para insertar el historial del estado de la orden
             order_status_history_insert_query = """
             INSERT INTO orders.order_status_history (order_id, status,timestamp)
             VALUES (%s, %s,CURRENT_TIMESTAMP );
             """
-            self.cursor.execute(order_status_history_insert_query, (order_id, 'transferencia pendiente',))
+            self.cursor.execute(order_status_history_insert_query, (order_id, 'Pago pendiente',))
 
 
     def traslate_order(self, order_id:str, site_id:int):
@@ -982,6 +982,24 @@ class Order2:
         self.cursor.execute(order_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()][0]
+    
+    
+    def get_order_by_epayco_ref(self, epayco_ref):
+        # Limpieza del order_id para quitar espacios y el caracter #
+        # clean_order_id = order_id.replace('#', '').strip().lower()
+        
+        order_query = f"""
+        SELECT *
+        FROM orders.order_status AS os
+        JOIN orders.orders AS o ON os.order_id = o.id
+        WHERE o.epayco_ref = '{epayco_ref}'
+        ORDER BY os.timestamp DESC
+        LIMIT 1;
+        """
+        self.cursor.execute(order_query)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()][0]
+    
     
     
     def is_recent_order_generated(self, site_id):
@@ -2041,6 +2059,82 @@ class Order2:
             self.conn.rollback()
             return {"order_id": order_id, "message": f"Failed to authorize order: {str(e)}"}
 
+
+
+    
+    def pay_order(self, order_id, epayco_ref):
+        """
+        Authorize an order and update the responsible person.
+        
+        Args:
+            order_id (int): The ID of the order to authorize.
+            responsible_id (int): The ID of the responsible person authorizing the order.
+        
+        Returns:
+            dict: A dictionary with the order_id and a confirmation message.
+        """
+        try:
+            # Update the authorized status of the order
+            update_authorization_query = """
+            UPDATE orders.orders
+            SET authorized = TRUE, epayco_ref = %s ,  responsible_id = 1360
+            WHERE id = %s;
+            """
+            self.cursor.execute(update_authorization_query, (epayco_ref,order_id,))
+            
+            # Insert a record into the order status history to reflect this change
+            order_status_history_insert_query = """
+            INSERT INTO orders.order_status (order_id, status, timestamp)
+            VALUES (%s, 'generada', CURRENT_TIMESTAMP);
+            """
+            self.cursor.execute(order_status_history_insert_query, (order_id,))
+            
+            # Commit the transaction
+
+            get_site_id_query = """
+            SELECT site_id FROM orders.orders
+            WHERE id = %s;
+            """
+            self.cursor.execute(get_site_id_query, (order_id,))
+            site_id_result = self.cursor.fetchone()
+            site_id = site_id_result[0]
+            self.create_or_update_event(1, site_id, 1132, '1 minute', False)
+            self.conn.commit()
+
+
+            select_order_query = """
+            SELECT pe_json
+            FROM orders.orders
+            WHERE id = %s;
+            """
+            self.cursor.execute(select_order_query, (order_id,))
+            order_json = self.cursor.fetchone()
+
+            if not order_json:
+                raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
+            
+            # order_json[0] debería ser el diccionario que contiene la información de la orden
+            pedidos = order_json[0]['listaPedidos']  # Asegúrate de que esté en esta estructura
+
+            # Ajusta las cantidades en listaPedidos
+            order_json[0]['listaPedidos'] = self.ajustar_cantidades(pedidos)
+
+            # Registra el delivery con la lista de pedidos ajustada
+            delivery_response = self.registrar_delivery(order_json[0])
+
+            # Opcional: Muestra la lista de pedidos resultante o el response para depuración
+            print(delivery_response.get('listaPedidos', 'No se encontró listaPedidos en response'))
+            
+            if isinstance(delivery_response, dict):
+                print("Delivery enviado con éxito:", delivery_response)
+            else:
+                print("Error al enviar el delivery:", delivery_response)
+
+
+            return {"order_id": order_id, "message": "Order authorized successfully"}
+        except Exception as e:
+            self.conn.rollback()
+            return {"order_id": order_id, "message": f"Failed to authorize order: {str(e)}"}
 
 
 

@@ -58,6 +58,8 @@ class Order2:
         self.cursor = self.conn.cursor()
         self.db = database()
         
+        
+        
     def create_order(self, order_data: OrderSchemaPostDistri):
         user_id = order_data.user_id
         
@@ -883,6 +885,9 @@ class Order2:
         VALUES (%s, %s, %s, %s);
         """
         self.cursor.execute(order_aditionals_insert_query, (order_id, aditional.aditional_item_instance_id, aditional.quantity, aditional_prices[aditional.aditional_item_instance_id]))
+        
+        
+        
 
     def update_order_status(self, order_id, payment_method_id, inserted_by, site_id ):
 
@@ -917,14 +922,14 @@ class Order2:
             INSERT INTO orders.order_status (order_id, status,timestamp)
             VALUES (%s, %s,CURRENT_TIMESTAMP );
             """
-            self.cursor.execute(order_status_insert_query, (order_id, 'transferencia pendiente',))
+            self.cursor.execute(order_status_insert_query, (order_id, 'Pago pendiente',))
             
             # Consulta para insertar el historial del estado de la orden
             order_status_history_insert_query = """
             INSERT INTO orders.order_status_history (order_id, status,timestamp)
             VALUES (%s, %s,CURRENT_TIMESTAMP );
             """
-            self.cursor.execute(order_status_history_insert_query, (order_id, 'transferencia pendiente',))
+            self.cursor.execute(order_status_history_insert_query, (order_id, 'Pago pendiente',))
 
 
     def traslate_order(self, order_id:str, site_id:int):

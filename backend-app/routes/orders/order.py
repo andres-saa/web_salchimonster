@@ -169,6 +169,16 @@ def get_orders_gy_site(order_id:str):
     return result
 
 
+
+@order_router.get('/order/epayco/{epayco_ref}')
+def get_orders_gy_site(epayco_ref:str):
+    order_instance = Order2()
+    result = order_instance.get_order_by_epayco_ref(epayco_ref)
+    order_instance.close_connection()
+    return result
+
+
+
 @order_router.get('/order-by-id/{order_id}')
 def get_orders_gy_site(order_id:str):
     order_instance = Order2()
