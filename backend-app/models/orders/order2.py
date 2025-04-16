@@ -1181,7 +1181,8 @@ class Order2:
             second_last_name,
             email,
             cedula_nit,
-            site_id
+            site_id,
+            epayco_ref
         FROM orders.combined_order_view
         WHERE site_id = %s
         AND (

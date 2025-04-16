@@ -64,7 +64,11 @@ from routes.neigborhoods.neigborhoods import neiborhoods_route
 from routes.integracion.tiendas import tiendas_router
 from routes.carta.carta import carta_router
 from routes.Banners.Banners import banner_router
+<<<<<<< HEAD
 from routes.checkout.checkout import checkout_router
+=======
+from routes.chaeckout import checkout_router
+>>>>>>> 70360509b708c1f8a734a0ff2daf783a7586bc20
 app = FastAPI()
 # from routes.area import area_router
 app.add_middleware(
@@ -75,6 +79,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 70360509b708c1f8a734a0ff2daf783a7586bc20
 app.include_router(checkout_router)
 app.include_router(carta_router)
 app.include_router(banner_router)
