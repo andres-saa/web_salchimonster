@@ -210,7 +210,7 @@ class Order2:
             return order_id
         
         
-        if ((order_data.site_id == 33 and order_data.inserted_by == 1082) or not order_data.inserted_by):
+        if ((order_data.site_id == 33 and order_data.inserted_by == 1082) or (not order_data.inserted_by and order_data.payment_method_id != 9)):
             self.create_or_update_event(8, 12, 1132, "3 minutes", False)
             return order_id
         
@@ -218,32 +218,32 @@ class Order2:
 
         # En caso contrario (forma de pago distinta a 6), sí registramos el delivery
         # Recupera el JSON actualizado de la orden
-        select_order_query = """
-            SELECT pe_json
-            FROM orders.orders
-            WHERE id = %s;
-        """
-        self.cursor.execute(select_order_query, (order_id,))
-        order_json = self.cursor.fetchone()
+        # select_order_query = """
+        #     SELECT pe_json
+        #     FROM orders.orders
+        #     WHERE id = %s;
+        # """
+        # self.cursor.execute(select_order_query, (order_id,))
+        # order_json = self.cursor.fetchone()
 
-        if not order_json:
-            raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
+        # if not order_json:
+        #     raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
 
-        # Ajusta cantidades en la lista de pedidos
+        # # Ajusta cantidades en la lista de pedidos
      
 
-        # Registra el delivery con la lista de pedidos ajustada
-        delivery_response = self.registrar_delivery(order_json[0])
+        # # Registra el delivery con la lista de pedidos ajustada
+        # delivery_response = self.registrar_delivery(order_json[0])
 
-        # Mensajes de depuración
-        print(delivery_response.get("listaPedidos", "No se encontró listaPedidos en response"))
-        if isinstance(delivery_response, dict):
-            print("Delivery enviado con éxito:", delivery_response)
-        else:
-            print("Error al enviar el delivery:", delivery_response)
+        # # Mensajes de depuración
+        # print(delivery_response.get("listaPedidos", "No se encontró listaPedidos en response"))
+        # if isinstance(delivery_response, dict):
+        #     print("Delivery enviado con éxito:", delivery_response)
+        # else:
+        #     print("Error al enviar el delivery:", delivery_response)
 
-        # Crea o actualiza un evento según la forma de pago
-        self.create_or_update_event(1, order_data.site_id, 1132, "3 minutes", False)
+        # # Crea o actualiza un evento según la forma de pago
+        # self.create_or_update_event(1, order_data.site_id, 1132, "3 minutes", False)
 
         return order_id
 
@@ -891,7 +891,7 @@ class Order2:
 
     def update_order_status(self, order_id, payment_method_id, inserted_by, site_id ):
 
-        if  payment_method_id != 6:
+        if  payment_method_id != 6 and  payment_method_id != 9:
 
 
             validation = 'generada'
@@ -914,7 +914,26 @@ class Order2:
             self.cursor.execute(order_status_history_insert_query, (order_id, validation,))
 
 
-        else:
+        elif  payment_method_id == 6 :
+            
+       
+            # Consulta para insertar el estado de la orden
+            order_status_insert_query = """
+            INSERT INTO orders.order_status (order_id, status,timestamp)
+            VALUES (%s, %s,CURRENT_TIMESTAMP );
+            """
+            self.cursor.execute(order_status_insert_query, (order_id, 'transferencia pendiente',))
+            
+            # Consulta para insertar el historial del estado de la orden
+            order_status_history_insert_query = """
+            INSERT INTO orders.order_status_history (order_id, status,timestamp)
+            VALUES (%s, %s,CURRENT_TIMESTAMP );
+            """
+            self.cursor.execute(order_status_history_insert_query, (order_id, 'transferencia pendiente',))
+        
+        
+        
+        elif  payment_method_id == 9 :
             
        
             # Consulta para insertar el estado de la orden
@@ -930,7 +949,7 @@ class Order2:
             VALUES (%s, %s,CURRENT_TIMESTAMP );
             """
             self.cursor.execute(order_status_history_insert_query, (order_id, 'Pago pendiente',))
-
+            
 
     def traslate_order(self, order_id:str, site_id:int):
         query = "update orders.orders set site_id = %s where id = %s returning id;"

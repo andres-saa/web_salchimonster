@@ -15,10 +15,12 @@ from config.wsp import enviar_mensaje_whatsapp
 import pytz
 from psycopg2.extras import Json
 from dateutil import parser  # Asegúrate de tener python-dateutil instalado
-
+from routes.push.push import send_to_site
 import random
 import requests
-
+from pathlib import Path
+from datetime import datetime
+import json
 
 load_dotenv()
 
@@ -79,20 +81,20 @@ class Order2:
             
             
             
-    def traslate_order(self, order_id:str, site_id:int):
-        query = "update orders.orders set site_id = %s where id = %s returning id;"
-        result = self.cursor.execute(query,(site_id,order_id,))
+    # def traslate_order(self, order_id:str, site_id:int):
+    #     query = "update orders.orders set site_id = %s where id = %s returning id;"
+    #     result = self.cursor.execute(query,(site_id,order_id,))
         
-        order_status_insert_query = """
-                    INSERT INTO orders.order_status (order_id, status, timestamp)
-                    VALUES (%s, %s, CURRENT_TIMESTAMP)
-                    """
-        self.cursor.execute(order_status_insert_query, (order_id, 'generada'))
+    #     order_status_insert_query = """
+    #                 INSERT INTO orders.order_status (order_id, status, timestamp)
+    #                 VALUES (%s, %s, CURRENT_TIMESTAMP)
+    #                 """
+    #     self.cursor.execute(order_status_insert_query, (order_id, 'generada'))
                     
-        self.conn.commit()
+    #     self.conn.commit()
         
-        self.create_or_update_event(1, site_id, 1132, '3 minutes', False)
-        return result
+    #     self.create_or_update_event(1, site_id, 1132, '3 minutes', False)
+    #     return result
         
             
 
@@ -186,41 +188,41 @@ class Order2:
             return order_id
         
         
-        if ((order_data.site_id == 33 and order_data.inserted_by == 1082) or not order_data.inserted_by):
+        if ((order_data.site_id == 33 and order_data.inserted_by == 1082) or (not order_data.inserted_by and order_data.payment_method_id != 9) ):
             self.create_or_update_event(8, 12, 1132, "3 minutes", False)
             return order_id
         
     
 
+
         # En caso contrario (forma de pago distinta a 6), sí registramos el delivery
         # Recupera el JSON actualizado de la orden
-        select_order_query = """
-            SELECT pe_json
-            FROM orders.orders
-            WHERE id = %s;
-        """
-        self.cursor.execute(select_order_query, (order_id,))
-        order_json = self.cursor.fetchone()
+        # select_order_query = """
+        #     SELECT pe_json
+        #     FROM orders.orders
+        #     WHERE id = %s;
+        # """
+        # self.cursor.execute(select_order_query, (order_id,))
+        # order_json = self.cursor.fetchone()
 
-        if not order_json:
-            raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
+        # if not order_json:
+        #     raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
 
-        # Ajusta cantidades en la lista de pedidos
+        # # Ajusta cantidades en la lista de pedidos
      
 
-        # Registra el delivery con la lista de pedidos ajustada
-        delivery_response = self.registrar_delivery(order_json[0])
+        # # Registra el delivery con la lista de pedidos ajustada
+        # delivery_response = self.registrar_delivery(order_json[0])
 
-        # Mensajes de depuración
-        print(delivery_response.get("listaPedidos", "No se encontró listaPedidos en response"))
-        if isinstance(delivery_response, dict):
-            print("Delivery enviado con éxito:", delivery_response)
-        else:
-            print("Error al enviar el delivery:", delivery_response)
+        # # Mensajes de depuración
+        # print(delivery_response.get("listaPedidos", "No se encontró listaPedidos en response"))
+        # if isinstance(delivery_response, dict):
+        #     print("Delivery enviado con éxito:", delivery_response)
+        # else:
+        #     print("Error al enviar el delivery:", delivery_response)
 
         # Crea o actualiza un evento según la forma de pago
-        self.create_or_update_event(1, order_data.site_id, 1132, "3 minutes", False)
-
+        self.conn.commit()
         return order_id
 
 
@@ -268,8 +270,6 @@ class Order2:
             "total": total_carrito  # Asegurar que el total sea entero
         }
 
-
-    
     def create_or_update_event(self, event_type_id, site_id, employee_id, update_interval, solved=False):
         # Primero, intentar eliminar cualquier evento existente que coincida con los criterios
         delete_query = """
@@ -291,6 +291,8 @@ class Order2:
         """
         self.cursor.execute(event_insert_query, (event_type_id, site_id, employee_id, update_interval, solved))
         event_id = self.cursor.fetchone()[0]
+        if(event_type_id == 1):
+            send_to_site(site_id,'titulo','body')
         return event_id
 
 
@@ -348,17 +350,20 @@ class Order2:
 
 
 
-    def insert_cancellation_request(self, order_id,responsible,reason):
+    def insert_cancellation_request(self, order_id,responsible, reason, product_disposition:str = '', file_id:str = ''):
+        
         order_notes_insert_query = """
-        INSERT INTO orders.cancellation_requests (order_id, timestamp,responsible,reason)
-        VALUES (%s, CURRENT_TIMESTAMP, %s, %s);
+        INSERT INTO orders.cancellation_requests (order_id, timestamp, responsible, reason, product_disposition, file_id )
+        VALUES (%s, CURRENT_TIMESTAMP, %s, %s, %s, %s);
         """
-        self.cursor.execute(order_notes_insert_query, (order_id, responsible,reason))
-
+        
+        self.cursor.execute(order_notes_insert_query, (order_id, responsible, reason, product_disposition, file_id))
+        
         get_site_id_query = """
         SELECT site_id FROM orders.orders
         WHERE id = %s;
         """
+        
         self.cursor.execute(get_site_id_query, (order_id,))
         site_id_result = self.cursor.fetchone()
         site_id = site_id_result[0]
@@ -775,16 +780,16 @@ class Order2:
         """
         # Obtener la información de la solicitud de cancelación
         get_request_query = """
-        SELECT order_id, reason, responsible
-        FROM orders.cancellation_requests
-        WHERE id = %s;
+        SELECT order_id, reason, responsible, o.pe_id
+        FROM orders.cancellation_requests cr join orders.orders o ON cr.order_id = o.id
+        WHERE cr.id = %s;
         """
         self.cursor.execute(get_request_query, (cancellation_request_id,))
         result = self.cursor.fetchone()
         if not result:
             raise ValueError("No se encontró la solicitud de cancelación.")
         
-        order_id, reason, responsible = result
+        order_id, reason, responsible, pe_id = result
         
         # Actualizar la solicitud como resuelta y autorizada/no autorizada
         update_request_query = f"""
@@ -797,6 +802,46 @@ class Order2:
         # Si la solicitud está autorizada, cancelar la orden
         if authorized:
             self.cancel_order(order_id, responsible, reason)
+             
+            url = "https://api.restaurant.pe/restaurant/public/v2/rest/delivery/cancelarDelivery/6149"
+
+            # 4. Configuramos los headers
+            headers = {
+                "Authorization": f'Token token="{TOKEN}"',
+                "Content-Type": "application/json"
+            }
+            
+      
+            preprocessed_data = {
+                        "delivery_id": pe_id,
+                        "delivery_motivocancelacion": responsible_observation
+                        }
+            try:
+                # 5. Enviamos la solicitud POST con la data ya preprocesada
+                response = requests.post(url, headers=headers, json=preprocessed_data)
+
+                if response.status_code == 200:
+                    # Retorna el JSON de la respuesta si es exitoso
+                    
+                
+                    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                    filename = f"delivery_response_{pe_id}_{timestamp}.json"
+                    filepath = Path("./logs") / filename        # ./logs para mantener todo organizado
+                    filepath.parent.mkdir(parents=True, exist_ok=True)
+
+                    # 5. Guardamos la respuesta
+                    with filepath.open("w", encoding="utf-8") as f:
+                        json.dump(response.json(), f, ensure_ascii=False, indent=4)
+                    return response.json()
+                else:
+                    # M anejamos error con status_code
+                    return f"Error {response.status_code}: {response.text}"
+
+            except Exception as e:
+                # Manejamos excepciones (errores de conexión, timeouts, etc.)
+                return f"Excepción durante la solicitud: {str(e)}"
+            
+
         
         self.conn.commit()
 
@@ -840,15 +885,45 @@ class Order2:
 
     def update_order_status(self, order_id, payment_method_id, inserted_by, site_id ):
 
-        if  payment_method_id != 6:
+        if  payment_method_id != 6 and  payment_method_id != 9:
 
 
             validation = 'generada'
 
-            if ( (site_id == 33 and inserted_by == 1082) or not inserted_by):
+            # if ( (site_id == 33 and inserted_by == 1082) or not inserted_by):
+            #     validation = 'validacion pendiente'
+            
+            
+            if ( not inserted_by):
                 validation = 'validacion pendiente'
             
             
+            if validation == 'generada':
+                self.create_or_update_event(1,site_id, 1132, "3 minutes", False)
+                self.conn.commit()
+                
+                select_order_query = """
+                SELECT pe_json
+                FROM orders.orders
+                WHERE id = %s;
+                """
+                
+                self.cursor.execute(select_order_query, (order_id,))
+                order_json = self.cursor.fetchone()
+
+                if not order_json:
+                    raise ValueError(f"No se encontró JSON para la orden con ID {order_id}")
+                
+                # order_json[0] debería ser el diccionario que contiene la información de la orden
+                pedidos = order_json[0]['listaPedidos']  # Asegúrate de que esté en esta estructura
+
+                # Ajusta las cantidades en listaPedidos
+                order_json[0]['listaPedidos'] = self.ajustar_cantidades(pedidos)
+
+                # Registra el delivery con la lista de pedidos ajustada
+                delivery_response = self.registrar_delivery(order_json[0],order_id)
+                
+
             order_status_insert_query = """
             INSERT INTO orders.order_status (order_id, status,timestamp)
             VALUES (%s, %s,CURRENT_TIMESTAMP );
@@ -862,8 +937,28 @@ class Order2:
             """
             self.cursor.execute(order_status_history_insert_query, (order_id, validation,))
 
+            
 
-        else:
+        elif  payment_method_id == 6 :
+            
+       
+            # Consulta para insertar el estado de la orden
+            order_status_insert_query = """
+            INSERT INTO orders.order_status (order_id, status,timestamp)
+            VALUES (%s, %s,CURRENT_TIMESTAMP );
+            """
+            self.cursor.execute(order_status_insert_query, (order_id, 'transferencia pendiente',))
+            
+            # Consulta para insertar el historial del estado de la orden
+            order_status_history_insert_query = """
+            INSERT INTO orders.order_status_history (order_id, status,timestamp)
+            VALUES (%s, %s,CURRENT_TIMESTAMP );
+            """
+            self.cursor.execute(order_status_history_insert_query, (order_id, 'transferencia pendiente',))
+        
+        
+        
+        elif  payment_method_id == 9 :
             
        
             # Consulta para insertar el estado de la orden
@@ -879,6 +974,8 @@ class Order2:
             VALUES (%s, %s,CURRENT_TIMESTAMP );
             """
             self.cursor.execute(order_status_history_insert_query, (order_id, 'Pago pendiente',))
+            
+            
 
 
     def traslate_order(self, order_id:str, site_id:int):
@@ -890,10 +987,10 @@ class Order2:
                     VALUES (%s, %s, CURRENT_TIMESTAMP)
                     """
         self.cursor.execute(order_status_insert_query, (order_id, 'generada'))
-                    
+        self.create_or_update_event(1, site_id, 1132, '3 minutes', False)
+
         self.conn.commit()
         
-        self.create_or_update_event(1, site_id, 1132, '3 minutes', False)
         return result
         
         
@@ -989,11 +1086,7 @@ class Order2:
         # clean_order_id = order_id.replace('#', '').strip().lower()
         
         order_query = f"""
-        SELECT *
-        FROM orders.order_status AS os
-        JOIN orders.orders AS o ON os.order_id = o.id
-        WHERE o.epayco_ref = '{epayco_ref}'
-        ORDER BY os.timestamp DESC
+        SELECT * FROM orders.combined_order_view co join orders.orders o on co.order_id = o.id where o.epayco_ref = '{epayco_ref}'
         LIMIT 1;
         """
         self.cursor.execute(order_query)
@@ -1584,78 +1677,41 @@ class Order2:
     def get_orders_to_validate(self):
         colombia_tz = pytz.timezone('America/Bogota')
         now = datetime.now(colombia_tz)
-        
+
         # Ajuste para empezar desde las 2 AM de hoy
         if now.time() < time(2, 0):
             today_date = (now - timedelta(days=1)).date()
         else:
             today_date = now.date()
 
+        yesterday_date = today_date - timedelta(days=1)
         tomorrow_date = today_date + timedelta(days=1)
 
-        # Convertir fechas a datetime a las 2 AM para usar en la consulta SQL
+        # Convertir fechas a datetime a las 2 AM
         today_start = datetime.combine(today_date, time(2, 0)).astimezone(colombia_tz).isoformat()
+        yesterday_start = datetime.combine(yesterday_date, time(2, 0)).astimezone(colombia_tz).isoformat()
         tomorrow_start = datetime.combine(tomorrow_date, time(2, 0)).astimezone(colombia_tz).isoformat()
 
-        # Consulta para obtener las órdenes de hoy desde la vista combinada de órdenes
         combined_order_query = """
-            SELECT DISTINCT ON (order_id) *
-            FROM orders.combined_order_view
-
-            WHERE 
-                latest_status_timestamp >= %s 
-                AND latest_status_timestamp < %s 
-                  AND current_status = 'validacion pendiente'
-            ORDER BY order_id, latest_status_timestamp DESC;
-            """
-        self.cursor.execute(combined_order_query, (today_start, tomorrow_start))
+            SELECT *
+            FROM (
+                SELECT DISTINCT ON (order_id) *
+                FROM orders.combined_order_view
+                WHERE (
+                    (latest_status_timestamp >= %s AND latest_status_timestamp < %s AND site_id != 32)
+                    OR
+                    (latest_status_timestamp >= %s AND latest_status_timestamp < %s AND site_id = 32)
+                )
+                AND current_status = 'validacion pendiente'
+                ORDER BY order_id, latest_status_timestamp DESC
+            ) AS sub
+            ORDER BY latest_status_timestamp DESC;
+        """
+        
+        self.cursor.execute(combined_order_query, (today_start, tomorrow_start, yesterday_start, tomorrow_start))
         orders_info = self.cursor.fetchall()
         columns_info = [desc[0] for desc in self.cursor.description]
         orders_dict = [dict(zip(columns_info, row)) for row in orders_info]
-
-        # Convertir y formatear los timestamps a la zona horaria de Colombia
-        for order in orders_dict:
-            if 'latest_status_timestamp' in order:
-                order['latest_status_timestamp'] = order['latest_status_timestamp'].astimezone(colombia_tz)
-
-        # Obtener detalles adicionales de la orden
-        for order in orders_dict:
-            order_id = order['order_id']
-
-            # Consultar productos relacionados con la orden
-            products_query = """
-            SELECT name, price, quantity, total_price, product_id 
-            FROM orders.order_products WHERE order_id = %s;
-            """
-            self.cursor.execute(products_query, (order_id,))
-            products = self.cursor.fetchall()
-            products_columns = [desc[0] for desc in self.cursor.description]
-            order['products'] = [dict(zip(products_columns, row)) for row in products]
-
-            # Consultar ítems adicionales relacionados con la orden
-            additionals_query = """
-            SELECT aditional_name, aditional_quantity, aditional_type, aditional_price, 
-            total_aditional_price
-            FROM orders.vw_order_aditional_items WHERE order_id = %s;
-            """
-            self.cursor.execute(additionals_query, (order_id,))
-            additionals = self.cursor.fetchall()
-            additionals_columns = [desc[0] for desc in self.cursor.description]
-
-            # Agrupar ítems adicionales por tipo
-            grouped_additionals = {}
-            for row in additionals:
-                additional = dict(zip(additionals_columns, row))
-                additional_type = additional['aditional_type']
-                if additional_type not in grouped_additionals:
-                    grouped_additionals[additional_type] = [additional]
-                else:
-                    grouped_additionals[additional_type].append(additional)
-
-            order['additional_items'] = grouped_additionals
-
-        # Ordenar las órdenes por latest_status_timestamp en orden descendente (más recientes primero)
-        orders_dict.sort(key=lambda x: x['latest_status_timestamp'], reverse=True)
 
         return orders_dict
 
@@ -1668,7 +1724,7 @@ class Order2:
 
         # Fetch the specific order from the combined order view
         order_query = f"""
-        SELECT DISTINCT ON (order_id) order_id,site_id,responsible,reason, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, responsible_observation, responsible_id,name,pe_json
+        SELECT DISTINCT ON (order_id) order_id,order_type, site_id,responsible,reason, order_notes, delivery_price, payment_method, total_order_price, current_status, latest_status_timestamp, user_name, user_address, user_phone, calcel_sol_state, calcel_sol_asnwer, cancelation_solve_responsible, responsible_observation, responsible_id,name,pe_json
         FROM orders.combined_order_view
         WHERE LOWER(REPLACE(order_id, '#', '')) = %s
         ORDER BY order_id, latest_status_timestamp DESC
@@ -1914,7 +1970,7 @@ class Order2:
         self.conn.commit()
 
 
-    def registrar_delivery(self, data):
+    def registrar_delivery(self, data, order_id):
         """
         Realiza una solicitud POST para registrar un delivery.
         Antes de enviar la data, se hace un preprocesamiento 
@@ -1960,7 +2016,9 @@ class Order2:
             "Authorization": f'Token token="{TOKEN}"',
             "Content-Type": "application/json"
         }
-
+        
+        pe_id = ''
+        
         try:
             # 5. Enviamos la solicitud POST con la data ya preprocesada
             response = requests.post(url, headers=headers, json=preprocessed_data)
@@ -1968,6 +2026,15 @@ class Order2:
             # 6. Manejo de la respuesta
             if response.status_code == 200:
                 # Retorna el JSON de la respuesta si es exitoso
+                pe_id = response.json()['data']["delivery_identificadorunico"]
+                query_update_pe_id = f"update orders.orders set pe_id = '{pe_id}' where id = '{order_id}' "
+
+                print(query_update_pe_id)
+                
+                self.cursor.execute(query_update_pe_id)
+
+                self.conn.commit()
+                
                 return response.json()
             else:
                 # Manejamos error con status_code
@@ -1976,6 +2043,7 @@ class Order2:
         except Exception as e:
             # Manejamos excepciones (errores de conexión, timeouts, etc.)
             return f"Excepción durante la solicitud: {str(e)}"
+        
 
 
 
@@ -2041,7 +2109,7 @@ class Order2:
             order_json[0]['listaPedidos'] = self.ajustar_cantidades(pedidos)
 
             # Registra el delivery con la lista de pedidos ajustada
-            delivery_response = self.registrar_delivery(order_json[0])
+            delivery_response = self.registrar_delivery(order_json[0],order_id)
 
             # Opcional: Muestra la lista de pedidos resultante o el response para depuración
             print(delivery_response.get('listaPedidos', 'No se encontró listaPedidos en response'))
@@ -2121,7 +2189,7 @@ class Order2:
             order_json[0]['listaPedidos'] = self.ajustar_cantidades(pedidos)
 
             # Registra el delivery con la lista de pedidos ajustada
-            delivery_response = self.registrar_delivery(order_json[0])
+            delivery_response = self.registrar_delivery(order_json[0],order_id)
 
             # Opcional: Muestra la lista de pedidos resultante o el response para depuración
             print(delivery_response.get('listaPedidos', 'No se encontró listaPedidos en response'))
@@ -2252,7 +2320,6 @@ class Order2:
             self.cursor.execute(get_site_id_query, (order_id,))
             site_id_result = self.cursor.fetchone()
             site_id = site_id_result[0]
-            self.create_or_update_event(1, site_id, 1132, '1 minute', False)
             self.conn.commit()
 
 
@@ -2270,22 +2337,23 @@ class Order2:
             
             # order_json[0] debería ser el diccionario que contiene la información de la orden
             pedidos = order_json[0]['listaPedidos']  # Asegúrate de que esté en esta estructura
+            self.create_or_update_event(1, site_id, 1132, '1 minute', False)
 
             # Ajusta las cantidades en listaPedidos
             order_json[0]['listaPedidos'] = self.ajustar_cantidades(pedidos)
 
             # Registra el delivery con la lista de pedidos ajustada
-            delivery_response = self.registrar_delivery(order_json[0])
+            delivery_response = self.registrar_delivery(order_json[0],order_id)
 
             # Opcional: Muestra la lista de pedidos resultante o el response para depuración
             print(delivery_response.get('listaPedidos', 'No se encontró listaPedidos en response'))
-            
+
             if isinstance(delivery_response, dict):
                 print("Delivery enviado con éxito:", delivery_response)
             else:
                 print("Error al enviar el delivery:", delivery_response)
 
-
+            self.conn.commit()
 
 
 

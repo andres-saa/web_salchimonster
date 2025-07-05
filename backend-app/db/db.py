@@ -39,7 +39,6 @@ class Db:
             print(f"An error occurred: {e}")
 
 
-
     def execute_query_json(self, query, params=None, fetch=False):
             """
             Ejecuta una consulta SQL procesando automáticamente los parámetros que sean
@@ -287,6 +286,68 @@ class Db:
         if returning:
             query += f' RETURNING {returning}'
         return query
+
+
+
+
+
+    def execute_query_model(
+            self,
+            query: str,
+            params=None,
+            fetch: bool = False
+        ):
+            """
+            Ejecuta una consulta aceptando parámetros que puedan ser
+            BaseModel, dict, list, tupla o combinaciones anidadas.
+            Convierte automáticamente BaseModel → dict → Json(jsonb).
+            """
+            processed = self._process_model_params(params)
+
+            try:
+                with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    cursor.execute(query, processed)
+                    self.conn.commit()
+                    if fetch:
+                        return cursor.fetchall()
+            except Exception as e:
+                self.conn.rollback()
+                print(f"An error occurred: {e}")
+
+        # ──────────────────────────────
+        # HELPER PRIVADO
+        # ──────────────────────────────
+    def _process_model_params(self, params):
+        """
+        ▸ BaseModel  → Json(model_dump())
+        ▸ dict/list  → procesa recursivamente sus elementos
+        ▸ otros tipos → se devuelven sin cambios
+        """
+        if params is None:
+            return None
+
+        # Caso BaseModel (individual)
+        if isinstance(params, BaseModel):
+            return Json(params.model_dump())
+
+        # Colecciones posicionales
+        if isinstance(params, (list, tuple)):
+            return type(params)(
+                self._process_model_params(p) for p in params
+            )
+
+        # Mapping (parámetros nombrados)
+        if isinstance(params, dict):
+            return {
+                k: self._process_model_params(v)
+                for k, v in params.items()
+            }
+
+        # Escalar: se devuelve tal cual
+        return params
+
+
+
 
 
     def __exit__(self, exc_type, exc_val, exc_tb):

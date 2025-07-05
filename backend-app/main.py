@@ -65,6 +65,10 @@ from routes.integracion.tiendas import tiendas_router
 from routes.carta.carta import carta_router
 from routes.Banners.Banners import banner_router
 from routes.checkout.checkout import checkout_router
+from routes.encusta.encuesta import encuesta_router
+
+from routes.push.push import push_router
+
 app = FastAPI()
 # from routes.area import area_router
 app.add_middleware(
@@ -75,6 +79,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(push_router)
+
+app.include_router(encuesta_router)
 app.include_router(checkout_router)
 app.include_router(carta_router)
 app.include_router(banner_router)

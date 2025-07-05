@@ -40,7 +40,7 @@ scheduler.start()
 
 def download_and_resize_image(image_url: str, image_code: str):
     """
-    Descarga y redimensiona la imagen a 600px de ancho.
+    Descarga y redimensiona la imagen a 1200px de ancho.
     Guarda la imagen en el directorio de cache_images en formato JPEG,
     sin importar si el image_code no tiene extensión.
     """
@@ -65,11 +65,11 @@ def download_and_resize_image(image_url: str, image_code: str):
             image = image.convert('RGB')
         
         # Calcular la nueva altura manteniendo la relación de aspecto
-        width_percent = (600 / float(image.size[0]))
+        width_percent = (1200 / float(image.size[0]))
         new_height = int((float(image.size[1]) * float(width_percent)))
 
         # Redimensionar la imagen
-        resized_image = image.resize((600, new_height), Image.Resampling.LANCZOS)
+        resized_image = image.resize((1200, new_height), Image.Resampling.LANCZOS)
 
         # Guardar como JPEG (aunque no tenga extensión, se fuerza JPEG)
         resized_image.save(image_path, "JPEG")
@@ -341,7 +341,7 @@ def get_categorized_products(dominio_id: int, local_id: int, quipupos: int = 0):
 def get_image(image_url: str):
     """
     Endpoint para obtener una imagen por su URL (parcial).
-    Si la imagen no está en caché, la descarga y la redimensiona a 600px de ancho
+    Si la imagen no está en caché, la descarga y la redimensiona a 1200px de ancho
     y se guarda como JPEG, incluso si no tiene extensión.
     
     Parámetros:
@@ -360,9 +360,9 @@ def get_image(image_url: str):
             response.raise_for_status()
 
             image = Image.open(response.raw)
-            width_percent = (600 / float(image.size[0]))
+            width_percent = (1200 / float(image.size[0]))
             new_height = int((float(image.size[1]) * float(width_percent)))
-            resized_image = image.resize((600, new_height), Image.Resampling.LANCZOS)
+            resized_image = image.resize((1200, new_height), Image.Resampling.LANCZOS)
             
             # Forzamos guardado en JPEG
             resized_image.save(image_path, "JPEG")

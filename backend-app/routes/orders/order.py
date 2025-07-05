@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException,Path,Body,WebSocket,WebSocketDisconnect,websockets,Query
+from fastapi import APIRouter, HTTPException,Path,Body,WebSocket,WebSocketDisconnect,websockets,Query,  Path as PathParam
 from models.orders.order import Order
-from schema.orders.order import Orders,DeliveryPersons,OrderNotes,OrderStatus,OrderStatusHistory,PaymentMethodOptions,Cancellation_request
+from schema.orders.order import Orders,DeliveryPersons,OrderNotes,OrderStatus,OrderStatusHistory,PaymentMethodOptions,Cancellation_request,CancellationRequestImage
 from typing import List,Dict
 from schema.order import OrderSchemaPost
 from models.orders.order2 import Order2
@@ -21,8 +21,14 @@ from datetime import datetime, timedelta
 order_router = APIRouter()
 from datetime import datetime, timedelta
 from dateutil import parser
-
-
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
+from pathlib import Path
+import uuid, shutil
+from pathlib import Path  as FilePath
+from fastapi import Path  # deja libre el nombre Path para FastAPI
+from pathlib import Path as FsPath           # alias para filesystem Path
+import mimetypes
+from fastapi.responses import FileResponse
 
 
 connected_clients: Dict[int, List[WebSocket]] = {}
@@ -315,6 +321,109 @@ def get_order_count_by_site_id(calncelation:Cancellation_request):
 
 
 
+
+
+def save_upload_file(upload: UploadFile) -> str:
+    if upload is None:          # por si llega None
+        return ''
+    dst_folder = FsPath('uploads/images/cancellations')   # ← FsPath
+    dst_folder.mkdir(parents=True, exist_ok=True)
+
+    random_name = f'{uuid.uuid4().hex}{FsPath(upload.filename).suffix}'
+    dst_path = dst_folder / random_name
+
+    with dst_path.open('wb') as buffer:
+        shutil.copyfileobj(upload.file, buffer)
+
+    return random_name 
+
+
+@order_router.post('/insert-cancellation-order-image', status_code=status.HTTP_201_CREATED)
+async def insert_cancellation_order_image(
+    order_id: str                    = Form(...),
+    responsible: str                 = Form(...),
+    reason: str                      = Form(...),
+    product_disposition: str         = Form(''),          # opcional
+    image: UploadFile                   = File(None)         # opcional
+):
+    """
+    Crea una solicitud de cancelación y, opcionalmente, almacena una imagen
+    relacionada con la prenda/producto.
+    """
+    # 1. Guardar la imagen si viene en el request
+    try:
+        file_id = save_upload_file(image)
+    finally:
+        if image is not None:
+            await image.close()
+
+    # 2. Persistir la solicitud
+    order_instance = Order2()
+    try:
+        result = order_instance.insert_cancellation_request(
+            order_id=order_id,
+            responsible=responsible,
+            reason=reason,
+            product_disposition=product_disposition,
+            file_id=file_id
+        )
+        order_instance.close_connection()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+    return result
+
+
+
+@order_router.api_route(
+    '/cancellation-files/{file_id}',
+    methods=['GET', 'HEAD'],
+    summary="Descarga o muestra la imagen asociada a la cancelación"
+)
+async def get_cancellation_file(
+    file_id: str = PathParam(..., description="Nombre de archivo generado (uuid.ext)")
+):
+    """
+    Devuelve el archivo *tal cual* se almacenó en
+    `uploads/images/cancellations/{file_id}`.
+
+    • Para imágenes se muestra en línea.  
+    • Para video/audio se fuerza la descarga (Content-Disposition: attachment).  
+    • Protegido contra *path traversal* (`..`, `/`, etc.).
+    """
+    # 1. Carpeta base y ruta absoluta
+    base_dir = FsPath('uploads/images/cancellations').resolve()
+    file_path = (base_dir / file_id).resolve()
+
+    # 2. Validación de path traversal
+    if base_dir not in file_path.parents and file_path != base_dir:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Acceso inválido al archivo"
+        )
+
+    # 3. Existencia del archivo
+    if not file_path.is_file():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Archivo no encontrado"
+        )
+
+    # 4. Tipo MIME y cabeceras (descarga forzada para video/audio)
+    mime, _ = mimetypes.guess_type(file_path.name)
+    headers = {}
+    if mime and mime.startswith(('video/', 'audio/')):
+        headers['Content-Disposition'] = f'attachment; filename="{file_path.name}"'
+
+    # 5. Respuesta
+    return FileResponse(
+        path=file_path,
+        media_type=mime or 'application/octet-stream',
+        headers=headers
+    )
+
+
+
 @order_router.put('/delivery_zero/{order_id}')
 def get_order_count_by_site_id(order_id:str):
     order_instance = Order2()
@@ -439,7 +548,6 @@ async def authorize_order(order_id: str, responsible_id: int = Body(..., embed=T
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         order_instance.close_connection()
-
 
 
 

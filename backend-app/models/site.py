@@ -94,6 +94,7 @@ class Site:
             updated_data.email_address,
             site_id
         ))
+        self.conn.commit()
         columns = [desc[0] for desc in self.cursor.description]
         updated_site_data = self.cursor.fetchone()
         if updated_site_data:

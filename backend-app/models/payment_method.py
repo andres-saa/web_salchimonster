@@ -19,7 +19,7 @@ class Pyment_method:
 
  
     def get_all_payment_methods(self):
-        select_query = "SELECT * FROM orders.payment_method_options;"
+        select_query = "SELECT * FROM orders.payment_method_options where exist = true;"
         self.cursor.execute(select_query)
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in self.cursor.fetchall()]

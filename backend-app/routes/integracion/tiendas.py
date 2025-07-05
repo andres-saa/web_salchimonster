@@ -80,7 +80,7 @@ tiendas_router = APIRouter()
 # -----------------------------------------------------
 def download_and_resize_image(image_url: str, image_code: str):
     """
-    Descarga y redimensiona la imagen a 600px de ancho.
+    Descarga y redimensiona la imagen a 1200px de ancho.
     Guarda la imagen en el directorio de cache_images en formato JPEG,
     sin importar si el image_code no tiene extensión.
     """
@@ -105,11 +105,11 @@ def download_and_resize_image(image_url: str, image_code: str):
             image = image.convert('RGB')
         
         # Calcular la nueva altura manteniendo la relación de aspecto
-        width_percent = (600 / float(image.size[0]))
+        width_percent = (1200 / float(image.size[0]))
         new_height = int((float(image.size[1]) * float(width_percent)))
 
         # Redimensionar la imagen
-        resized_image = image.resize((600, new_height), Image.Resampling.LANCZOS)
+        resized_image = image.resize((1200, new_height), Image.Resampling.LANCZOS)
 
         # Guardar como JPEG (aunque no tenga extensión, se fuerza JPEG)
         resized_image.save(image_path, "JPEG")
@@ -442,9 +442,9 @@ def get_image_tienda(image_url: str):
             response.raise_for_status()
             image = Image.open(response.raw)
 
-            width_percent = (600 / float(image.size[0]))
+            width_percent = (1200 / float(image.size[0]))
             new_height = int(float(image.size[1]) * width_percent)
-            resized_image = image.resize((600, new_height), Image.LANCZOS)
+            resized_image = image.resize((1200, new_height), Image.LANCZOS)
             resized_image.save(image_path)
 
             logger.info(f"Imagen descargada y redimensionada: {image_code}")

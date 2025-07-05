@@ -76,4 +76,10 @@ class Cancellation_request (BaseModel):
     reason:str
 
 
-
+class CancellationRequestImage(BaseModel):
+    id: Optional[int] = None
+    order_id: str
+    responsible: str
+    reason: str
+    product_disposition: Optional[str] = ''   # ← opcional
+    file_id: Optional[str] = ''  

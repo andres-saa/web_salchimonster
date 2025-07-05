@@ -21,7 +21,7 @@ class Student:
 
 
     def get_video_mark_users(self,video_id:int):
-        query = 'SELECT * FROM video_training.mark_video_users_view where video_id = %s or video_id is null'
+        query = 'SELECT * FROM video_training.mark_video_users_view3 where video_id = %s or video_id is null'
         result = self.db.fetch_all(query,[video_id])
         return result
 
@@ -41,6 +41,7 @@ class Student:
                 gender,
                 site_name,
                 position,
+                dni,
                 ROW_NUMBER() OVER (PARTITION BY id ORDER BY 
                     CASE 
                         WHEN sequence_id = %s AND enrolled = true THEN 0
@@ -52,6 +53,7 @@ class Student:
         SELECT
             user_name,
             id,
+            dni,
             site_id,
             CASE 
                 WHEN sequence_id = %s THEN sequence_id 
@@ -94,7 +96,8 @@ class Student:
                 'site_id': row['site_id'],
                 'sequence_id': row['sequence_id'],
                 'enrolled': row['enrolled'],
-                'gender':row['gender']
+                'gender':row['gender'],
+                'dni':row['dni']
             }
             
             # Si el nombre de la sede no está en el diccionario, añadirlo con una lista vacía
@@ -107,6 +110,9 @@ class Student:
         return grouped_result
 
 
+
+
+
     def get_students_by_sequence_id_group_by_site(self, sequence_id: int):
         query = """
         WITH RankedStudents AS (
@@ -116,6 +122,7 @@ class Student:
                 site_id,
                 sequence_id,
                 enrolled,
+                dni,
                 gender,
                 site_name,
                 position,
@@ -131,6 +138,7 @@ class Student:
             user_name,
             id,
             site_id,
+            dni,
             CASE 
                 WHEN sequence_id = %s THEN sequence_id 
                 ELSE NULL 
@@ -159,7 +167,8 @@ class Student:
                 'site_id': row['site_id'],
                 'sequence_id': row['sequence_id'],
                 'enrolled': row['enrolled'],
-                'gender':row['gender']
+                'gender':row['gender'],
+                'dni':row['dni']
             }
             
             # Si el nombre de la sede no está en el diccionario, añadirlo con una lista vacía
@@ -172,6 +181,12 @@ class Student:
         return grouped_result
 
     
+
+
+
+
+
+
     def get_students_enrolled_by_sequence_id_group_by_position(self, sequence_id: int):
         query = 'SELECT * FROM video_training.enrrolled_students WHERE sequence_id = %s and enrolled = true'
         result = self.db.fetch_all(query, [sequence_id])
@@ -188,7 +203,8 @@ class Student:
                 'site_id': row['site_id'],
                 'sequence_id': row['sequence_id'],
                 'enrolled': row['enrolled'],
-                'gender':row['gender']
+                'gender':row['gender'],
+                'dni':row['dni']
             }
             
             # Si el nombre de la sede no está en el diccionario, añadirlo con una lista vacía
@@ -211,6 +227,7 @@ class Student:
                 sequence_id,
                 enrolled,
                 gender,
+                dni,
                 site_name,
                 position,
                 ROW_NUMBER() OVER (PARTITION BY id ORDER BY 
@@ -224,6 +241,7 @@ class Student:
         SELECT
             user_name,
             id,
+            dni,
             site_id,
             CASE 
                 WHEN sequence_id = %s THEN sequence_id 
@@ -254,7 +272,8 @@ class Student:
                 'site_id': row['site_id'],
                 'sequence_id': row['sequence_id'],
                 'enrolled': row['enrolled'],
-                'gender':row['gender']
+                'gender':row['gender'],
+                'dni':row['dni']
             }
             
             # Si el nombre de la sede no está en el diccionario, añadirlo con una lista vacía

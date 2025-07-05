@@ -472,11 +472,13 @@ class Order:
                 co.payment_method,
                 co.delivery_price,
                 responsible_observation,
-                cancelation_solve_responsible
+                cancelation_solve_responsible,
+                co.cancellation_categorie 
+
             FROM orders.combined_order_view co
             WHERE co.latest_status_timestamp BETWEEN %s AND %s
             AND co.site_id = ANY(%s)
-            AND co.current_status IN ('enviada', 'cancelada')
+        
             ORDER BY co.site_name, co.order_id
         """
         params = (start_date, end_date, site_ids)
@@ -502,7 +504,8 @@ class Order:
                 payment_method,
                 delivery_price,
                 responsible_observation,
-                cancelation_solve_responsible
+                cancelation_solve_responsible,
+                cancellation_categorie
             ) = row
 
             # Convertir fecha/hora a Colombia; separar fecha y hora
@@ -540,6 +543,8 @@ class Order:
                 "Estado": current_status or "",
                 "Responsable": cancelation_solve_responsible if cancelation_solve_responsible else "no aplica",
                 "razon de la cancelacion": responsible_observation if responsible_observation else "no aplica",
+                "Categoría cancelación": cancellation_categorie if cancellation_categorie else "no aplica",   # << NUEVO
+
                 "Domicilio": float(delivery_price) if delivery_price else 0.0,
                 "Metodo de pago": payment_method or "",
                 "Nombre del usuario": user_name or "",
@@ -560,6 +565,7 @@ class Order:
             "Estado": 12,
             "Responsable": 20,
             "razon de la cancelacion": 30,
+            "Categoría cancelación": 22,   # << NUEVO
             "Domicilio": 10,
             "Metodo de pago": 15,
             "Nombre del usuario": 20,

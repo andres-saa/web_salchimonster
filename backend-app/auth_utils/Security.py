@@ -31,7 +31,7 @@ def authenticate_user(dni: str, password: str):
     employer_instance.close_connection()
 
     # print(user)
-    if user and user.get("password") == password:  # Access the 'password' key in the dictionary
+    if user and user.get("password") == password :  # Access the 'password' key in the dictionary
         return user
 
 # Función para crear un token JWT

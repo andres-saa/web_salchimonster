@@ -113,8 +113,8 @@ class Employer:
     
     def select_employer_by_dni(self, dni):
         select_query = """
-        SELECT * from permission.permission_employer_complete
-        WHERE dni = %s;
+        SELECT * from permission.permission_employer_complete 
+        WHERE dni = %s and status = 'activo';
         """
         self.cursor.execute(select_query, (dni,))
         columns = [desc[0] for desc in self.cursor.description]

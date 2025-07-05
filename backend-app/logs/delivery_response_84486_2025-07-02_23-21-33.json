@@ -1,0 +1,19 @@
+{
+    "data": {},
+    "mensajes": [
+        [
+            "Para anular un delivery ya pagado, es necesario con anular la venta relacionada, esto anulará el delivery."
+        ]
+    ],
+    "tipo": "3",
+    "response": {
+        "data": {
+            "deliverys": [],
+            "pedidoDeliveryList": []
+        },
+        "mensajes": [
+            "Para anular un delivery ya pagado, es necesario con anular la venta relacionada, esto anulará el delivery."
+        ],
+        "tipo": "3"
+    }
+}

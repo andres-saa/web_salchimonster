@@ -7,8 +7,9 @@ class user_schema_post(BaseModel):
     user_phone:str
     user_address:str
     site_id:Optional[int] = None
+    email:Optional[str] = None
+    wa_user_id:Optional[str] = None
     
-
 
 class user_schema(user_schema_post):
 

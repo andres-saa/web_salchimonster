@@ -29,16 +29,12 @@ class Users:
     
     def __init__(self):
         self.db = DataBase()
-            
+                
     def get_user_report(self, site_ids: list, start_date: str, end_date: str):
         """
         Obtiene un reporte de usuarios a partir de la vista orders.combined_order_view,
-        filtrando por las sedes y un rango de fechas (por ejemplo: filtramos por last_purchase).
-
-        :param site_ids: Lista de IDs de sedes a filtrar.
-        :param start_date: Fecha de inicio en formato 'YYYY-MM-DD'.
-        :param end_date: Fecha de fin en formato 'YYYY-MM-DD'.
-        :return: Diccionario con la lista de usuarios (clave "data").
+        filtrando por sedes y rango de fechas.
+        Devuelve: lista de usuarios con métricas, clasificación y email.
         """
 
         query = """
@@ -46,46 +42,41 @@ class Users:
             SELECT
                 co.user_id,
                 co.user_name,
-                -- Agrupamos teléfonos únicos
+                co.email AS email,                                        -- ⬅️ email
                 STRING_AGG(DISTINCT co.user_phone, ', ' ORDER BY co.user_phone) AS phone_numbers,
                 co.user_address,
-                
-                -- Cantidad total gastada por el usuario en todas sus órdenes
-                SUM(co.total_order_price) AS total_spent,
 
-                -- Último registro de compra o cambio de estado
+                SUM(co.total_order_price) AS total_spent,
                 MAX(co.latest_status_timestamp) AS last_purchase,
 
-                -- Listado de órdenes como objetos JSON con id_order y valor_orden
                 JSON_AGG(
                     JSONB_BUILD_OBJECT(
-                        'id_order', co.order_id,
+                        'id_order',  co.order_id,
                         'valor_orden', co.total_order_price,
                         'fecha_order', TO_CHAR(co.latest_status_timestamp::date, 'DD-MM-YYYY')
                     ) ORDER BY co.order_id DESC
                 ) AS orders,
 
-                -- Veces que ha comprado (conteo de órdenes únicas)
                 COUNT(DISTINCT co.order_id) AS times_purchased,
-
-                -- Fecha de unión del usuario (usando el primer registro de latest_status_timestamp)
                 TO_CHAR(MIN(co.latest_status_timestamp)::date, 'DD-MM-YYYY') AS joined_date
             FROM orders.combined_order_view co
             JOIN public.sites s ON s.site_id = co.site_id
             WHERE s.show_on_web = TRUE
-                AND s.site_id = ANY(%(site_ids)s)
-                AND co.latest_status_timestamp::date BETWEEN %(start_date)s AND %(end_date)s
-                AND co.user_name     NOT ILIKE '%%prueba%%'
-                AND co.user_address  NOT ILIKE '%%prueba%%'
-                AND co.order_notes   NOT ILIKE '%%prueba%%'
+            AND s.site_id = ANY(%(site_ids)s)
+            AND co.latest_status_timestamp::date BETWEEN %(start_date)s AND %(end_date)s
+            AND co.user_name     NOT ILIKE '%%prueba%%'
+            AND co.user_address  NOT ILIKE '%%prueba%%'
+            AND co.order_notes   NOT ILIKE '%%prueba%%'
             GROUP BY
                 co.user_id,
                 co.user_name,
+                co.email,                                                -- ⬅️ incluido en GROUP BY
                 co.user_address
         )
         SELECT
             user_id,
             user_name,
+            email,                                                       -- ⬅️ email en SELECT final
             phone_numbers,
             user_address,
             total_spent,
@@ -104,25 +95,18 @@ class Users:
         }
 
         try:
-            # Ejecutar la consulta
             result = self.db.execute_query(query=query, params=params, fetch=True)
         except Exception as e:
-            # Manejar errores de la consulta
-            return {
-                "error": str(e)
-            }
+            return {"error": str(e)}
 
         if result is None:
-            return {
-                "error": "La consulta no devolvió ningún resultado."
-            }
+            return {"error": "La consulta no devolvió ningún resultado."}
 
-        # Construir la respuesta
         user_data = []
         for row in result:
             times_purchased = row.get("times_purchased") or 0
-            
-            # Clasificación según la cantidad de veces que compró
+
+            # Clasificación según compras
             if times_purchased == 1:
                 classification = "PREOCUPANTE"
             elif times_purchased == 2:
@@ -134,19 +118,20 @@ class Users:
             elif times_purchased > 8:
                 classification = "ESTRELLA"
             else:
-                classification = "SIN DATOS"  # Por si viene 0 u otro caso no contemplado
+                classification = "SIN DATOS"
 
             user_data.append({
                 "user_id": row.get("user_id"),
                 "user_name": row.get("user_name"),
+                "email": row.get("email"),                              # ⬅️ email en la salida
                 "phone_numbers": row.get("phone_numbers"),
                 "user_address": row.get("user_address"),
                 "total_spent": float(row["total_spent"]) if row.get("total_spent") else 0.0,
-                "last_purchase": row.get("last_purchase"),    # Fecha ya formateada
-                "orders": row.get("orders") or [],            # Lista de órdenes como objetos ya formateados
+                "last_purchase": row.get("last_purchase"),
+                "orders": row.get("orders") or [],
                 "times_purchased": times_purchased,
-                "joined_date": row.get("joined_date"),        # Fecha ya formateada
-                "classification": classification              # Clasificación añadida
+                "joined_date": row.get("joined_date"),
+                "classification": classification
             })
 
         return user_data

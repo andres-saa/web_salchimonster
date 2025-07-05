@@ -17,3 +17,5 @@ python-dateutil
 requests
 pydrive2
 apscheduler
+pywebpush
+cryptography

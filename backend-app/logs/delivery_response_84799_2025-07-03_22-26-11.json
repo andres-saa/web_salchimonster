@@ -1,0 +1,21 @@
+{
+    "data": {},
+    "mensajes": [
+        [
+            "Para anular un delivery ya pagado, es necesario con anular la venta relacionada, esto anulará el delivery.",
+            "El delivery ya fue confirmado y esta en preparacion, no puede ser cancelado."
+        ]
+    ],
+    "tipo": "3",
+    "response": {
+        "data": {
+            "deliverys": [],
+            "pedidoDeliveryList": []
+        },
+        "mensajes": [
+            "Para anular un delivery ya pagado, es necesario con anular la venta relacionada, esto anulará el delivery.",
+            "El delivery ya fue confirmado y esta en preparacion, no puede ser cancelado."
+        ],
+        "tipo": "3"
+    }
+}
